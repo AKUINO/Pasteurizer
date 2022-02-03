@@ -1,0 +1,22 @@
+$def with (connected,mail)
+$var title : Cleaning Parameters
+<button onclick="action('Z')" class="btn btn-danger" id="STOP" style="float:right">STOP</button>
+<h3><b id="time"></b> <b id="actionletter"></b>:<b id="action"></b></h3>
+<p style="margin:auto"><span id="actiontitle"></span></p>
+<button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
+<button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
+<p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
+<hr/>
+<h2>$(ml.T("Paramètres de Nettoyage","Cleansing Parameters","Reiniging parameters"))</h2>
+<form method="post" action="/option2">
+$for letter in menus.dirtyOptions:
+  <div class="form-group">
+    <label for="opt_$(letter)">$(menus.options[letter][2]) ( $(menus.options[letter][5]) )</label>
+    <input type="number" class="form-control" id="opt_$(letter)" name="opt_$(letter)" aria-describedby="emailHelp" placeholder="$(menus.options[letter][4])" min="0.0" max="$(menus.options[letter][7])" step="$(menus.options[letter][8])" value="$(menus.options[letter][3])">
+  </div>
+<button type="submit" class="btn btn-success">$(ml.T("Enregistrer","Save","Opslaan"))</button>
+</form>
+<hr/>
+<a href="/index"><button class="btn btn-info">$(ml.T("Quitter","Cancel","Annuleer"))</button></a> &nbsp;
+<a href="/option2?reset=on"><button class="btn btn-warning">$(ml.T("Valeurs par défaut","Reset to default","Reset"))</button></a>
+<script type="text/javascript" src="/static/js/index.js"></script>

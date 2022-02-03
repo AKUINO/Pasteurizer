@@ -1,0 +1,137 @@
+$def with (content)
+$ ip = web.ctx['ip']
+<!doctype html>
+<html lang="fr">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="pastOnomic.solutions : pasteurisation accessible">
+    <meta name="theme-color" content="#563d7c">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+	  integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>$content.title</title>
+    <!-- Custom styles for these templates -->
+    <link rel="stylesheet" type="text/css" href="/css/local.css"/>
+    <link href="/css/navbar-top-fixed.css" rel="stylesheet">
+    <link href="/css/sticky-footer-navbar.css" rel="stylesheet">
+    <link rel="icon" href="/static/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css"/>
+    <!--link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet"-->
+    <link href="/css/glyphicons-local.css" rel="stylesheet">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+	    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+	    crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+	    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+	    crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.js"></script>
+
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+    <script type="text/javascript" src="/static/js/index.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" onclick="void(0);">
+	<a class="navbar-brand" href="/#"><img src="/static/akuino_black.png" alt="AKUINO" style="height:1.5em;" align="bottom"> $(ml.T("Pasteurisateur","Pasterizer","Pasteur"))</a>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+		aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+	    <span class="navbar-toggler-icon"></span>
+	</button>
+	<div class="collapse navbar-collapse" id="navbarCollapse">
+	    <ul class="navbar-nav mr-auto">
+		<li class="nav-item dropdown">
+		  <a class="nav-link dropdown-toggle" href="#" id="clean" data-toggle="dropdown">
+		    $(ml.T("Propre","Cleaned","Schoon"))
+		  </a>
+		  <div class="dropdown-menu">
+		  $for letter in menus.cleanActions:
+		    <a class="dropdown-item"$:(freshHref("/explain/"+letter+"#doc"))>$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
+		  <div class="dropdown-divider"></div>
+		  <a class="dropdown-item" href="/option1" onclick="closeMenu()">$(ml.T("Paramètres de Pasteurisation et Refroidissement","Pasteurisation and Cooling Parameters","Pasteurisatie- en koelparameters"))</a>
+		  </div>
+		</li>
+		<li class="nav-item dropdown">
+		  <a class="nav-link dropdown-toggle" href="#" id="dirty" data-toggle="dropdown">
+		    $(ml.T("Sale","Dirty","Vuil"))
+		  </a>
+		  <div class="dropdown-menu">
+		  $for letter in menus.dirtyActions:
+		    <a class="dropdown-item"$:(freshHref("/explain/"+letter+"#doc"))>$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
+		  <div class="dropdown-divider"></div>
+		  <a class="dropdown-item" href="/option2" onclick="closeMenu()">$(ml.T("Paramètres de Nettoyage","Cleansing Parameters","Reiniging parameters"))</a>
+		  </div>
+		</li>
+		<li class="nav-item dropdown">
+		  <a class="nav-link dropdown-toggle" href="#" id="sys" data-toggle="dropdown">
+		    $(ml.T("Système","System","Systeem"))
+		  </a>
+		  <div class="dropdown-menu">
+		  $for letter in menus.sysActions:
+		    <a class="dropdown-item"$:(freshHref("/explain/"+letter+"#doc"))>$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
+		  <div class="dropdown-divider"></div>
+		  <a class="dropdown-item" href="/csv" onclick="closeMenu()">$(ml.T("Données brutes","Raw Data","Ruwe Data"))</a>
+		  <div class="dropdown-divider"></div>
+		  <a class="dropdown-item" href="/assignsensor" onclick="closeMenu()">$(ml.T("Config.Capteurs","Sensors Config.","Sensoren Config."))</a>
+		  <a class="dropdown-item" href="/calibrate" onclick="closeMenu()">$(ml.T("Calibration","Calibration","Calibratie"))</a>
+		  <!--a class="dropdown-item" href="/valve?pos=0" onclick="closeMenu()">(ml.T("Fermer Vanne","Close Valve","Sluit de Klep"))</a>
+		  <a class="dropdown-item" href="/valve?pos=1" onclick="closeMenu()">(ml.T("Ouvrir Vanne","Open Valve","Open Klep"))</a>
+		  <a class="dropdown-item" href="/pump?speed=0" onclick="closeMenu()">(ml.T("Arrêter Pompe","Stop Pump","Stop de Pomp"))</a>
+		  <a class="dropdown-item" href="/pump?speed=P" onclick="closeMenu()">(ml.T("Pomper","Pump","Pompen"))</a>
+		  <a class="dropdown-item" href="/pump?speed=-P" onclick="closeMenu()">(ml.T("Reculer","Pump back","Pompen Terug"))</a-->
+		  <div class="dropdown-divider"></div>
+		  <a class="dropdown-item" href="/disconnect" onclick="closeMenu()">$(ml.T("Déconnexion","Disconnection","Ontkoppeling")) $ip</a>
+		  </div>
+		</li>
+		<li class="nav-item dropdown">
+		  <a class="nav-link dropdown-toggle" href="#" id="lang" data-toggle="dropdown">
+		    $(ml.T("Langue","Language","Taal"))
+		  </a>
+		  <div class="dropdown-menu">
+		      <a class="dropdown-item" href="/?lang=e" onclick="closeMenu()">English</a>
+		      <a class="dropdown-item" href="/?lang=f" onclick="closeMenu()">Français</a>
+		      <a class="dropdown-item" href="/?lang=n" onclick="closeMenu()">Nederlands</a>
+		  </div>
+		</li>
+		<li class="nav-item">
+		  <a class="nav-link" href="/logtable" id="logtable">$(ml.T("Journal","Log","Logboek"))</a>
+		</li>
+		<!--li class="nav-item">
+		  <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+		</li-->
+	    </ul>
+	    <!--form class="form-inline mt-2 mt-md-0" action="/recherche">
+		<input class="form-control mr-sm-2" type="text" placeholder="Chercher" aria-label="Chercher"
+		       name="recherche">
+		<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Chercher</button>
+	    </form-->
+	</div>
+    </nav>
+
+<main role="main" class="container">
+    <div class="jumbotron" onclick="void(0);">
+	$:content
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+	<span class="text-muted">$(ml.T("Un pasteurisateur développé par le projet","A pasteurizer developed by project","Een pasteur ontwikkeld door project")) <a href="http://akuino.net"><img
+		src="/static/favicon.png" alt="AKUINO.net" style="height:1em;"/> AKUINO.net</a>.</span>
+    </div>
+</footer>
+
+<script type="text/javascript">
+$$('.navbar-collapse').collapse('hide');
+</script>
+
+</body>
+</html>

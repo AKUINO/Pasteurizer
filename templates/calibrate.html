@@ -1,0 +1,53 @@
+$def with (sensor, calibrating, temp_ref_calib, means)
+$var title : Calibration
+<h3><b id="time"></b> $(ml.T("Calibration","Calibration","Calibratie")) <b>$sensor</b></h3>
+<p>
+$if calibrating:
+  <a href="/calibrate/off"><button class="btn btn-warning">$(ml.T("Pause","Pause","Pauze"))</button></a> &nbsp;
+$else:
+  <a href="/calibrate/on"><button class="btn btn-success">$(ml.T("Démarrer","Start","Start"))</button></a> &nbsp;
+<a href="/calibrate/reset"><button class="btn btn-danger">$(ml.T("Réinitialiser","Reset","Reset"))</button></a>
+<b id="reft"></b>°C
+</p>
+$if not sensor:
+  <p>$(ml.T("Une petite bouteille Thermos est recommandée pour réunir tous les capteurs dans un même bain d'eau. Vous changez la température par incréments de 5 à 10°C. Faites Pause pendant les changements et laisser un peu de temps pour stabiliser.", "A small Thermos bottle is recommended to put all sensors together in a water bath. You then vary the temperature by increments of 5 or 10°C. Set Pause during the changes and allow some time to stabilize.", "Een kleine thermosfles wordt aanbevolen om alle sensoren samen in een waterbad te plaatsen. Vervolgens varieer je de temperatuur in stappen van 5 of 10 ° C. Stel Pauze in tijdens de wijzigingen en geef wat tijd om te stabiliseren."))</p>
+  $if len(temp_ref_calib) > 0:
+     <p>$(len(temp_ref_calib)) $(ml.T("mesures","measures","meten")),
+     $(datetime.fromtimestamp(int(temp_ref_calib[0]['time'])))=$(int(temp_ref_calib[0]['reft']*1000.0)/1000.0)°C
+     : $(datetime.fromtimestamp(int(temp_ref_calib[len(temp_ref_calib)-1]['time'])))=$(int(temp_ref_calib[len(temp_ref_calib)-1]['reft']*1000.0)/1000.0)°C
+     ($(int(temp_ref_calib[len(temp_ref_calib)-1]['time'] - temp_ref_calib[0]['time']))")
+     </p>
+  <a href="/calibrate"><button class="btn btn-info">$(ml.T("Rafraîchir","Refresh","Vernieuwen"))</button></a>
+$elif sensor in ['on','off','reset']:
+  <h1>$sensor ! </h1>
+  <a href="/calibrate"><button class="btn btn-info">$(ml.T("Rafraîchir","Refresh","Vernieuwen"))</button></a>
+$else:
+  $if len(temp_ref_calib) > 0:
+     <p>$(len(temp_ref_calib)) $(ml.T("mesures","measures","meten")),
+     $(datetime.fromtimestamp(int(temp_ref_calib[0]['time'])))=$(int(isnull(temp_ref_calib[0][sensor],0.0)*1000.0)/1000.0)°C
+     : $(datetime.fromtimestamp(int(temp_ref_calib[len(temp_ref_calib)-1]['time'])))=$(int(isnull(temp_ref_calib[len(temp_ref_calib)-1][sensor],0.0)*1000.0)/1000.0)°C
+     ($(int(temp_ref_calib[len(temp_ref_calib)-1]['time'] - temp_ref_calib[0]['time']))")
+     </p>
+  <table cellpadding="3">
+  <tr><th>Class</th><th>Qty</th><th>App.</th><th>True</th><th>Offset</th></tr>
+  $ preval = -999
+  $for key in sorted(means.keys()):
+    $ mean = means[key]
+    <tr><th align="right">$(key)°</th><td align="right">$(mean[0])</td><td align="right">$(int(mean[1]*1000.0)/1000.0)°</td><td align="right">
+    $if mean[2] <= preval:
+      <b style="color:red">$(int(mean[2]*1000.0)/1000.0)</b>°C
+    $else:
+      $(int(mean[2]*1000.0)/1000.0)°C
+    </td><td align="right">$(int((mean[2]-mean[1])*1000.0)/1000.0)°</td><td><a href="/calibrate/*$(sensor)?class=$(key)"><button class="btn btn-danger">X</button></a></td></tr>
+    $ preval = mean[2]
+  </table>
+  <a href="/calibrate/$sensor"><button class="btn btn-info">$(ml.T("Rafraîchir","Refresh","Vernieuwen"))</button></a>
+  <a href="/calibrate/!$sensor"><button class="btn btn-danger">$(ml.T("Enregistrer","Save","Opslaan"))</button></a>
+<ul>
+$if len(temp_ref_calib) > 0:
+    <table cellpadding="3">
+    $for key,val in temp_ref_calib[len(temp_ref_calib)-1].items():
+        $if (not key in ['time','reft']) and val:
+           <tr><th><a href="/calibrate/$key">$key</a></th><td "align=right"><b>$(int(val*1000.0)/1000.0)</b>°C</td><td><span id="$(key)"></span>°</td></tr>
+    </table>
+</ul>
