@@ -375,7 +375,7 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                        # ,ml.T("Cycle complet de nettoyage","Complete cleaning cycle","Volledige reinigingscyclus")],
                'F':['F',ml.T("Flush","Flush","Flush") \
                        ,ml.T("Entrée et Sortie connectés, Vidange...","Inlet and Outlet connected, Drain ...","Inlaat bij de klep, Uitlaat bij de blauwe klep, Afvoer ...") \
-                       ,ml.T("Pré-rinçage à l'eau de ville","Pre-rinse with city water","Voorspoelen met stadswater")],
+                       ,ml.T("Rinçage à l'eau de ville","Rinse with city water","Spoelen met stadswater")],
                # 'K':['K',ml.T("eau froide","Kooling","Kool") \
                        # ,ml.T("Spécifier AVANT la Quantité et la Température dans Options","Specify BEFORE Quantity and Temperature in Options","Specificeer VOOR hoeveelheid en temperatuur in Opties") \
                        # ,ml.T("Ajouter de l'eau froide dans la Tempérisation","Add cold water to Mitigation","Voeg koud water toe aan Mitigation")],
@@ -445,6 +445,45 @@ menus.operName = { 'HEAT':ml.T('chauffer','heating','verwarm') \
                   ,'MESS':ml.T('signaler','message','bericht') \
                   ,'SUBR':ml.T('processer','process','werkwijze') \
                   ,'SUBS':ml.T('procéder','proceed','doorgan') }
+
+menus.pipeState = { 'R':ml.T('Propre','Clean','Schoon'), \
+                    'O':ml.T('Vieux','Old','Oud'), \
+                    'A':ml.T('Vidé','Purged','Leeg'), \
+                    'B':ml.T('Vidé+Sale','Purged+Dirty','Leeg+Vies'), \
+                    'T':ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
+                    'S':ml.T('Sale','Dirty','Vies'), \
+                    'N':ml.T('Soude','Soda','Natrium'), \
+                    'D':ml.T('Acide','Acid','Zuur'), \
+                    'G':ml.T('Produit Gras','Greasy Product','Vet Product'), \
+                    'P':ml.T('Produit','Product','Product') }
+
+
+menus.stateTransitions = { 'R-P' : ['P','G'], 'R-V' : ['A'], \
+                           'R-t' : ['O'], 'R-t.2' : ['S'], \
+                           'A-t' : ['B'], \
+                           'O-F*2' : ['R'], 'O-V' : ['B'], \
+                           'B-F*1' : ['S'], \
+                           'P-F*2' : ['S'], 'G-F*2' : ['T'], \
+                           'T-N' : ['N','N0'], 'S-N' : ['N','N0'], \
+                           'S-D' : ['D','D0'], \
+                           'N-F*4' : ['R'],  'D-F*4' : ['R'] }
+# R + Pasteuriser Gras = G
+# R + Pasteuriser Maigre = P
+# R + Vider = A
+# R + delay = O
+# A + delay = B
+# O + Flush x 2 = R
+# O + Vider = B
+# B + Flush = S
+# R + longer delay = S
+# P + Flush x 2 (P1,P2) = S
+# G + Flush x 2 (G1,G2) = T
+# T + Nettoyer = N au début, N0 quand complet
+# S + Nettoyer = N au début, N0 quand complet
+# Nx + Flush x 4 (N1,N2,N3,N4) = R
+# S + Acide = D au début, D0 quand complet
+# T + Acide INTERDIT
+# Dx + Flush x 4 (D1,D2,D3,D4) = R
 
 def menu_confirm(choice,delay=None):
     global display_pause, lines
