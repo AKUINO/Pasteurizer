@@ -5,6 +5,7 @@ import platform
 import term
 import traceback
 import ml
+import MICHApast
 
 hostname = socket.gethostname()
 machine = platform.machine()
@@ -43,7 +44,6 @@ print (hostname+" / "+machine)
 # One Wire sensors address
 if hostname == "pastOnomic":
     Raspberry = True
-    import MICHApast
     MICHA_device = "/dev/serial0"
     io = MICHApast.Micha(MICHA_device)
     OW_heating = "28.CC3EAF040000"  # Extra: typiquement sortie du refroidissement rapide
