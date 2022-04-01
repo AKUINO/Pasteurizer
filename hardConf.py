@@ -52,7 +52,7 @@ elif hostname == "pastoB04001":
     Odroid = True
     import MICHA40past
     MICHA_device = "/dev/ttyS1"
-    io = MICHA40past.Micha(MICHA_device)
+    io = MICHA40past.Micha4(MICHA_device)
     OW_heating = None
     OW_extra = None # "28.AA5659501401"  # Bain de tempérisation (sortie) régulé en refroidissement   28.FFDD64931504 est    # OW_temper = "28.AABA43501401"  # Bain de chauffe
     ml.setLang('f')
