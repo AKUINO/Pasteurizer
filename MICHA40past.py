@@ -9,51 +9,11 @@ import traceback
 from serial import Serial, PARITY_NONE
 from umodbus.client.serial import rtu
 import time
-
-SLAVE_ID = 1
-MODBUS_RETRY = 2
-WRITE_RETRY = 5
-DELAY_RETRY = 0.05
-
-VOLTAGE_REF = 2.497 # value of the excitement voltage reference
-THERMI_WIRE = 0.6 # value of the twin wire resistor
-
-
-# Registre configuration
-# coils
-THERMIS_POW_REG             = 0x00  # register which stores the thermistor power state
-LEVEL1_FLAG_REG             = 0x01  # register which stores the flag which enables/disables the level 1 sensor management
-LEVEL2_FLAG_REG             = 0x02  # register which stores the flag which enables/disables the level 2 sensor management
-PRESS_FLAG_REG              = 0x03  # register which stores the flag which enables/disables the pressure sensor management
-PUMP_DIR_REG                = 0x10  # register which stores the pump direction
-PUMP_POW_REG                = 0x11  # register which stores the pump power state
-TANK1_REG                   = 0x20  # register which stores the tank 1 state
-SOL_HOT_REG                 = 0x30  # register which stores the hot water solenoid state
-BOOT_FLAG_REG               = 0x40  # register which stores the boot state
-DEBUG_FLAG_REG              = 0x41  # register which stores the state of the debug mode
-
-# discrete registers
-LEVEL_SENSOR1_REG           = 0x01  # register which stores the state of the input level sensor (1 for water)
-LEVEL_SENSOR2_REG           = 0x02  # register which stores the state of the output level sensor (1 for water)
-EMERGENCY_STOP_REG          = 0x10  # register which stores the state of  the emergency stop button (0 for active emergency stop)
-
-# input registers
-GEN_STATE_REG               = 0x00  # register which stores the general state of the system
-THERMI1_REG                 = 0x01  # register which stores the thermistor 1 value (0 - 4095)
-THERMI2_REG                 = 0x02  # register which stores the thermistor 2 value (0 - 4095)
-THERMI3_REG                 = 0x03  # register which stores the thermistor 3 value (0 - 4095)
-THERMI4_REG                 = 0x04  # register which stores the thermistor 4 value (0 - 4095)
-PRESS_SENSOR_REG            = 0x10  # register which stores the pressure sensor value (0 (low pressure) - 4095 (high pressure))
-ERROR_CODE_REG              = 0x20  # register which stores the general error codes
-
-# holding registers
-ID_REG                      = 0x00  # register which stores the modbus ID
-PUMP_SPEED_REG              = 0x10  # register which stores the pump speed
-PUMP_SPEED_INC_REG          = 0x11  # register which stores the increasing/decreasing value of the pump frequency
+import MICHApast
 
 
 # Class to manage the MICHA board
-class Micha:
+class Micha4:
     def __init__(self,device='/dev/ttyS1'):  # serial0 for RPi, ttyS1 for Odroid
         self.device = device
         self.id = 0
@@ -79,16 +39,16 @@ class Micha:
     # Configuration and starting of the modbus communication
     def get_serial_port(self):
         while self.busy:
-            time.sleep(DELAY_RETRY)
+            time.sleep(MICHApast.MICHApast.DELAY_RETRY)
         self.busy = True
         while not self.port: # In case of error, we reset the access to the ModBus
             try:
                 """Return a serial.Serial instance which is ready to use with a RS485 adaptor."""
-                self.port = Serial(port=self.device, baudrate=19200, parity=PARITY_NONE, stopbits=1, bytesize=8, timeout=DELAY_RETRY)
+                self.port = Serial(port=self.device, baudrate=19200, parity=PARITY_NONE, stopbits=1, bytesize=8, timeout=MICHApast.DELAY_RETRY)
             except:
                 print("MICHA open failed\r")
                 self.port = None
-                time.sleep(DELAY_RETRY) # Do not retry too fast...
+                time.sleep(MICHApast.MICHApast.DELAY_RETRY) # Do not retry too fast...
         return self.port
 
     def close_serial_port(self):
@@ -109,10 +69,10 @@ class Micha:
         
     def read_pin(self,reg): # read a single coil register at reg address
         i = 0
-        while i < MODBUS_RETRY:
+        while i < MICHApast.MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()
-                message = rtu.read_coils(SLAVE_ID, reg, 1)
+                message = rtu.read_coils(MICHApast.MICHApast.SLAVE_ID, reg, 1)
                 #print("READ mess=%s\r"%(''.join('%02x '%i for i in message)))
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
@@ -126,10 +86,10 @@ class Micha:
 
     def write_pin(self,reg,val): # write val in a single coil register at reg address
         i = 0
-        while i < WRITE_RETRY:
+        while i < MICHApast.WRITE_RETRY:
             try:
                 serial_port = self.get_serial_port()                
-                message = rtu.write_single_coil(SLAVE_ID, reg, val)
+                message = rtu.write_single_coil(MICHApast.MICHApast.SLAVE_ID, reg, val)
                 #print("WRITE mess=%s\r"%(''.join('%02x '%i for i in message)))
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
@@ -144,10 +104,10 @@ class Micha:
 
     def read_discrete(self,reg): # read a discrete input register at reg address
         i=0
-        while i < MODBUS_RETRY:
+        while i < MICHApast.MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()
-                message = rtu.read_discrete_inputs(SLAVE_ID, reg, 1)
+                message = rtu.read_discrete_inputs(MICHApast.MICHApast.SLAVE_ID, reg, 1)
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
                 return response[0]
@@ -160,10 +120,10 @@ class Micha:
 
     def read_input(self,reg): # read a single input register at reg address
         i = 0
-        while i < MODBUS_RETRY:
+        while i < MICHApast.MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()            
-                message = rtu.read_input_registers(SLAVE_ID, reg, 1)
+                message = rtu.read_input_registers(MICHApast.MICHApast.SLAVE_ID, reg, 1)
                 #print("INPUT mess=%s\r"%(''.join('%02x '%i for i in message)))
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
@@ -178,10 +138,10 @@ class Micha:
 
     def read_holding(self,reg): # read a single holding register at reg address
         i = 0
-        while i < MODBUS_RETRY:
+        while i < MICHApast.MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()
-                message = rtu.read_holding_registers(SLAVE_ID, reg, 1)
+                message = rtu.read_holding_registers(MICHApast.MICHApast.SLAVE_ID, reg, 1)
                 #print("HOLDING mess=%s\r"%(''.join('%02x '%i for i in message)))
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
@@ -196,10 +156,10 @@ class Micha:
 
     def write_holding(self,reg, val): # write val in the holding register at reg address
         i = 0
-        while i < WRITE_RETRY:
+        while i < MICHApast.WRITE_RETRY:
             try:
                 serial_port = self.get_serial_port()            
-                message = rtu.write_single_register(SLAVE_ID, reg, val)
+                message = rtu.write_single_register(MICHApast.MICHApast.SLAVE_ID, reg, val)
                 #print("WRITE HOLDING mess=%s\r"%(''.join('%02x '%i for i in message)))
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
@@ -213,46 +173,46 @@ class Micha:
         return None
 
     def get_id(self): # to get the modbus ID
-        self.id = self.read_holding(ID_REG)
+        self.id = self.read_holding(MICHApast.ID_REG)
         return self.id
 
     def get_boot_flag(self): # to get the boot state
-        self.boot_flag = self.read_pin(BOOT_FLAG_REG)
+        self.boot_flag = self.read_pin(MICHApast.BOOT_FLAG_REG)
         return self.boot_flag
     
     def set_boot_flag(self,flag=0): # to set the boot state
         self.boot_flag = flag
-        response = self.write_pin(BOOT_FLAG_REG, flag)
+        response = self.write_pin(MICHApast.BOOT_FLAG_REG, flag)
         return response
 
     def get_thermis_pow(self):  # to get the power state of the thermistors (stored in the register), returns the thermistors power state
-        self.thermis_pow = self.read_pin(THERMIS_POW_REG)
+        self.thermis_pow = self.read_pin(MICHApast.THERMIS_POW_REG)
         return self.thermis_pow
 
     def set_thermis_pow(self,power=0):  # to set the power of the thermistors
         if self.thermis_pow != power:
             self.thermis_pow = power
-            response = self.write_pin(THERMIS_POW_REG, power)
+            response = self.write_pin(MICHApast.THERMIS_POW_REG, power)
             return response
         return 0
     
     def get_thermi(self, th=0): # to get the thermistor value, returns the thermistor value
         self.thermi = th
         i=0
-        while i < MODBUS_RETRY:
+        while i < MICHApast.MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()
                 
                 if self.thermi==0: # get the value of all the thermistors
-                    message = rtu.read_input_registers(SLAVE_ID, THERMI1_REG, 4)
+                    message = rtu.read_input_registers(MICHApast.SLAVE_ID, MICHApast.THERMI1_REG, 4)
                 elif self.thermi==1: # get the thermistor 1 value
-                    message = rtu.read_input_registers(SLAVE_ID, THERMI1_REG, 1)
+                    message = rtu.read_input_registers(MICHApast.SLAVE_ID, MICHApast.THERMI1_REG, 1)
                 elif self.thermi==2: # get the thermistor 2 value
-                    message = rtu.read_input_registers(SLAVE_ID, THERMI2_REG, 1)
+                    message = rtu.read_input_registers(MICHApast.SLAVE_ID, MICHApast.THERMI2_REG, 1)
                 elif self.thermi==3: # get the thermistor 3 value
-                    message = rtu.read_input_registers(SLAVE_ID, THERMI3_REG, 1)
+                    message = rtu.read_input_registers(MICHApast.SLAVE_ID, MICHApast.THERMI3_REG, 1)
                 elif self.thermi==4: # get the thermistor 4 value
-                    message = rtu.read_input_registers(SLAVE_ID, THERMI4_REG, 1)
+                    message = rtu.read_input_registers(MICHApast.SLAVE_ID, MICHApast.THERMI4_REG, 1)
                 else:
                     print("ERROR: no thermistor was found at this value")
                 
@@ -271,125 +231,125 @@ class Micha:
     def set_pump_power(self,power=0): # to set the power of the pump
         if self.pump_power != power:
             self.pump_power = power
-            response = self.write_pin(PUMP_POW_REG, power)
+            response = self.write_pin(MICHApast.PUMP_POW_REG, power)
             return response
         return 0
 
     def set_pump_speed(self,speed=0): # to set the speed of the pump
         if self.pump_speed != speed:
             self.pump_speed = speed
-            return self.write_holding(PUMP_SPEED_REG, speed)
+            return self.write_holding(MICHApast.PUMP_SPEED_REG, speed)
         return 0
 
     def set_pump_speed_inc(self,inc=0): # to set the speed incrementation of the pump
         if self.pump_speed_inc!=inc:
             self.pump_speed_inc = inc
-            return self.write_holding(PUMP_SPEED_INC_REG, inc)
+            return self.write_holding(MICHApast.PUMP_SPEED_INC_REG, inc)
         return 0
     
     def set_pump_dir(self,dir=0): # to set the direction of the pump
         if self.pump_dir != dir:
             self.pump_dir = dir
-            response = self.write_pin(PUMP_DIR_REG, dir)
+            response = self.write_pin(MICHApast.PUMP_DIR_REG, dir)
             return response
         return 0
     
     def get_pump_power(self): # to get the power state of the pump (stored in the register), returns the pump power state
-        self.pump_power = self.read_pin(PUMP_POW_REG)
+        self.pump_power = self.read_pin(MICHApast.PUMP_POW_REG)
         return self.pump_power
     
     def get_pump_dir(self): # to get the direction state of the pump (stored in the register), returns the pump direction value
-        self.pump_dir = self.read_pin(PUMP_DIR_REG)
+        self.pump_dir = self.read_pin(MICHApast.PUMP_DIR_REG)
         return self.pump_dir
     
     def get_pump_speed(self): # to get the speed of the pump (stored in the register), returns the pump speed
-        self.pump_speed = self.read_holding(PUMP_SPEED_REG)
+        self.pump_speed = self.read_holding(MICHApast.PUMP_SPEED_REG)
         return self.pump_speed
 
     def get_pump_speed_inc(self): # to get the speed incrementation of the pump (stored in the register), returns the pump speed incrementation
-        self.pump_speed_inc = self.read_holding(PUMP_SPEED_INC_REG)
+        self.pump_speed_inc = self.read_holding(MICHApast.PUMP_SPEED_INC_REG)
         return self.pump_speed_inc
     
     def set_tank1(self,state=0): # to set the state of the tank 1
         if self.tank1 != state:
             self.tank1 = state
-            response = self.write_pin(TANK1_REG, state)
+            response = self.write_pin(MICHApast.TANK1_REG, state)
             return response
         return 0
     
     def get_tank1(self): # to get the state of the tank 1 (stored in the register)
-        self.tank1 = self.read_pin(TANK1_REG)
+        self.tank1 = self.read_pin(MICHApast.TANK1_REG)
         return self.tank1
     
     def set_sol_hot(self,state=0): # to set the state of the hot water solenoid
         if self.sol_hot != state:
             self.sol_hot = state
-            response = self.write_pin(SOL_HOT_REG, state)
+            response = self.write_pin(MICHApast.SOL_HOT_REG, state)
             return response
         return 0
     
     def get_sol_hot(self): # to get the state of the hot water solenoid (stored in the register)
-        self.sol_hot = self.read_pin(SOL_HOT_REG)
+        self.sol_hot = self.read_pin(MICHApast.SOL_HOT_REG)
         return self.sol_hot
 
     def get_level1_sensor(self): # to get the level 1 sensor value, returns the level 1 sensor value
-        return self.read_discrete(LEVEL_SENSOR1_REG)
+        return self.read_discrete(MICHApast.LEVEL_SENSOR1_REG)
 
     def set_level1_flag(self,state=0): # to set the level 1 sensor flag value
         if self.level1_flag != state:
             self.level1_flag = state
-            response = self.write_pin(LEVEL1_FLAG_REG, state)
+            response = self.write_pin(MICHApast.LEVEL1_FLAG_REG, state)
             return response
         return 0
 
     def get_level1_flag(self): # to get the level 1 sensor flag value, returns the level 1 sensor flag value
-        return self.read_pin(LEVEL1_FLAG_REG)
+        return self.read_pin(MICHApast.LEVEL1_FLAG_REG)
 
     def get_level2_sensor(self): # to get the level 2 sensor value, returns the level 2 sensor value
-        return self.read_discrete(LEVEL_SENSOR2_REG)
+        return self.read_discrete(MICHApast.LEVEL_SENSOR2_REG)
 
     def set_level2_flag(self,state=0): # to set the level 2 sensor flag value
         if self.level2_flag != state:
             self.level2_flag = state
-            response = self.write_pin(LEVEL2_FLAG_REG, state)
+            response = self.write_pin(MICHApast.LEVEL2_FLAG_REG, state)
             return response
         return 0
 
     def get_level2_flag(self): # to get the level 2 sensor flag value, returns the level 2 sensor flag value
-        return self.read_pin(LEVEL2_FLAG_REG)
+        return self.read_pin(MICHApast.LEVEL2_FLAG_REG)
 
     def get_press_sensor(self): # to get the pressure sensor value, returns the pressure sensor value
-        return self.read_input(PRESS_SENSOR_REG)
+        return self.read_input(MICHApast.PRESS_SENSOR_REG)
 
     def set_press_flag(self, state=0):  # to set the pressure sensor flag value
         if self.press_flag != state:
             self.press_flag = state
-            response = self.write_pin(PRESS_FLAG_REG, state)
+            response = self.write_pin(MICHApast.PRESS_FLAG_REG, state)
             return response
         return 0
 
     def get_press_flag(self):  # to get the pressure sensor flag value, returns the pressure sensor flag value
-        return self.read_pin(PRESS_FLAG_REG)
+        return self.read_pin(MICHApast.PRESS_FLAG_REG)
 
     def get_emergency_stop(self): # to get the emergency stop value, returns the emergency stop value
-        return self.read_discrete(EMERGENCY_STOP_REG)
+        return self.read_discrete(MICHApast.EMERGENCY_STOP_REG)
 
     def get_general_state(self): # to get the general state of the system (stored in the register)
-        self.general_state = self.read_input(GEN_STATE_REG)
+        self.general_state = self.read_input(MICHApast.GEN_STATE_REG)
         return self.general_state
     
     def get_error_code(self): # to get the general error code
-        self.error_code = self.read_input(ERROR_CODE_REG)
+        self.error_code = self.read_input(MICHApast.ERROR_CODE_REG)
         return self.error_code
 
     def get_debug_flag(self):  # to get the debug state
-        self.debug_flag = self.read_pin(DEBUG_FLAG_REG)
+        self.debug_flag = self.read_pin(MICHApast.DEBUG_FLAG_REG)
         return self.debug_flag
 
     def set_debug_flag(self, flag=0):  # to set the debug state
         if self.debug_flag != flag:
             self.debug_flag = flag
-            response = self.write_pin(DEBUG_FLAG_REG, flag)
+            response = self.write_pin(MICHApast.DEBUG_FLAG_REG, flag)
             return response
         return 0
 
@@ -437,32 +397,32 @@ if __name__ == "__main__":
             thermi3 = pasto.get_thermi(3)[0]
             thermi4 = pasto.get_thermi(4)[0]
 
-            thermi1_mV = (VOLTAGE_REF * thermi1 / 4096) * 1000
-            thermi2_mV = (VOLTAGE_REF * thermi2 / 4096) * 1000
-            thermi3_mV = (VOLTAGE_REF * thermi3 / 4096) * 1000
-            thermi4_mV = (VOLTAGE_REF * thermi4 / 4096) * 1000
+            thermi1_mV = (MICHApast.VOLTAGE_REF * thermi1 / 4096) * 1000
+            thermi2_mV = (MICHApast.VOLTAGE_REF * thermi2 / 4096) * 1000
+            thermi3_mV = (MICHApast.VOLTAGE_REF * thermi3 / 4096) * 1000
+            thermi4_mV = (MICHApast.VOLTAGE_REF * thermi4 / 4096) * 1000
 
             print('\n')
             i = 1
             for value in pasto.get_thermi():
-                print("Thermistor {} = {} ({:4.3f} mV)".format(i, value, (VOLTAGE_REF * value / 4096) * 1000))
+                print("Thermistor {} = {} ({:4.3f} mV)".format(i, value, (MICHApast.VOLTAGE_REF * value / 4096) * 1000))
                 i += 1
             print('\n')
         elif choice == 'ts1':
             thermi1 = pasto.get_thermi(1)[0]
-            thermi1_mV = (VOLTAGE_REF * thermi1 / 4096) * 1000
+            thermi1_mV = (MICHApast.VOLTAGE_REF * thermi1 / 4096) * 1000
             print("\nThermistor 1 = {} ({:4.3f} mV)\n".format(thermi1, thermi1_mV))
         elif choice == 'ts2':
             thermi2 = pasto.get_thermi(2)[0]
-            thermi2_mV = (VOLTAGE_REF * thermi2 / 4096) * 1000
+            thermi2_mV = (MICHApast.VOLTAGE_REF * thermi2 / 4096) * 1000
             print("\nThermistor 2 = {} ({:4.3f} mV)\n".format(thermi2, thermi2_mV))
         elif choice == 'ts3':
             thermi3 = pasto.get_thermi(3)[0]
-            thermi3_mV = (VOLTAGE_REF * thermi3 / 4096) * 1000
+            thermi3_mV = (MICHApast.VOLTAGE_REF * thermi3 / 4096) * 1000
             print("\nThermistor 3 = {} ({:4.3f} mV)\n".format(thermi3, thermi3_mV))
         elif choice == 'ts4':
             thermi4 = pasto.get_thermi(4)[0]
-            thermi4_mV = (VOLTAGE_REF * thermi4 / 4096) * 1000
+            thermi4_mV = (MICHApast.VOLTAGE_REF * thermi4 / 4096) * 1000
             print("\nThermistor 4 = {} ({:4.3f} mV)\n".format(thermi4, thermi4_mV))
 
         return 0
@@ -666,7 +626,7 @@ if __name__ == "__main__":
 
     ################ main program ################
 
-    pasto = Micha()
+    pasto = Micha4()
     choice = -1
 
     while choice != 'exit':

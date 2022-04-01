@@ -5,7 +5,6 @@ import platform
 import term
 import traceback
 import ml
-import MICHApast
 
 hostname = socket.gethostname()
 machine = platform.machine()
@@ -44,12 +43,16 @@ print (hostname+" / "+machine)
 # One Wire sensors address
 if hostname == "pastOnomic":
     Raspberry = True
+    import MICHApast
     MICHA_device = "/dev/serial0"
+    io = MICHApast.Micha(MICHA_device)
     OW_heating = "28.CC3EAF040000"  # Extra: typiquement sortie du refroidissement rapide
     OW_extra = None # "28.AA5659501401"  # Bain de tempérisation (sortie) régulé en refroidissement   28.FFDD64931504 est mort (FFDD)
 elif hostname == "pastoB04001":
     Odroid = True
+    import MICHA40past
     MICHA_device = "/dev/ttyS1"
+    io = MICHA40past.Micha(MICHA_device)
     OW_heating = None
     OW_extra = None # "28.AA5659501401"  # Bain de tempérisation (sortie) régulé en refroidissement   28.FFDD64931504 est    # OW_temper = "28.AABA43501401"  # Bain de chauffe
     ml.setLang('f')
@@ -71,7 +74,6 @@ if Odroid:
     pi = GPIO # Uses BCM numbering for pins...
 
 if MICHA_device:
-    io = MICHApast.Micha(MICHA_device)
     thermistors_voltage = MICHApast.VOLTAGE_REF
     
     # Heating tanks

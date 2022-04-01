@@ -18,10 +18,14 @@ DELAY_RETRY = 0.05
 VOLTAGE_REF = 2.497 # value of the excitement voltage reference
 THERMI_WIRE = 0.6 # value of the twin wire resistor
 
-
 # Registre configuration
+
 # coils
-#THERMIS_POW_REG            = 0x01  # register which stores the thermistor power state
+THERMIS_POW_REG             = 0x00  # 4.0 register which stores the thermistor power state
+LEVEL1_FLAG_REG             = 0x01  # 4.0 register which stores the flag which enables/disables the level 1 sensor management
+LEVEL2_FLAG_REG             = 0x02  # 4.0 register which stores the flag which enables/disables the level 2 sensor management
+PRESS_FLAG_REG              = 0x03  # 4.0 register which stores the flag which enables/disables the pressure sensor management
+
 PUMP_DIR_REG                = 0x10  # register which stores the pump direction
 PUMP_POW_REG                = 0x11  # register which stores the pump power state
 TANK1_REG                   = 0x20  # register which stores the tank 1 state
@@ -35,12 +39,18 @@ VALVE2_DIR_REG              = 0x35  # register which stores the valve 2 directio
 BOOT_FLAG_REG               = 0x40  # register which stores the boot state
 DEBUG_FLAG_REG              = 0x41  # register which stores the state of the debug mode
 
+# discrete registers
+LEVEL_SENSOR1_REG           = 0x01  # 4.0 register which stores the state of the input level sensor (1 for water)
+LEVEL_SENSOR2_REG           = 0x02  # 4.0 register which stores the state of the output level sensor (1 for water)
+EMERGENCY_STOP_REG          = 0x10  # 4.0 register which stores the state of  the emergency stop button (0 for active emergency stop)
+
 # input registers
 GEN_STATE_REG               = 0x00  # register which stores the general state of the system
 THERMI1_REG                 = 0x01  # register which stores the thermistor 1 value (0 - 4095)
 THERMI2_REG                 = 0x02  # register which stores the thermistor 2 value (0 - 4095)
 THERMI3_REG                 = 0x03  # register which stores the thermistor 3 value (0 - 4095)
 THERMI4_REG                 = 0x04  # register which stores the thermistor 4 value (0 - 4095)
+PRESS_SENSOR_REG            = 0x10  # 4.0 register which stores the pressure sensor value (0 (low pressure) - 4095 (high pressure))
 PUMP_ERR_REG                = 0x10  # register which stores the error code returned by the pump regulator
 PUMP_SERVO_PERIODMAX_REG    = 0x11  # register which stores the max period of the servo signal returned by the pump
 PUMP_SERVO_PERIODMIN_REG    = 0x12  # register which stores the min period of the servo signal returned by the pump
@@ -54,8 +64,6 @@ PUMP_SPEED_REG              = 0x10  # register which stores the pump speed
 PUMP_SPEED_INC_REG          = 0x11  # register which stores the increasing/decreasing value of the pump frequency
 #PUMP_SPIN_RATE_REG         = 0x12  # register which stores the pump spining rate approved
 PUMP_SERVO_PULSES_REG       = 0x13  # register which stores the pulse count of the servo signal returned by the pump (on some time)
-
-
 
 # Class to manage the MICHA board
 class Micha:
