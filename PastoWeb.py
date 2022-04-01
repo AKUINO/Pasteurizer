@@ -264,7 +264,10 @@ class ThreadOneWire(threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
-        self.owproxy = pyownet.protocol.proxy(host="localhost", port=4304)
+        try:
+            self.owproxy = pyownet.protocol.proxy(host="localhost", port=4304)
+        except:
+            pass
 
     def sensorParam(self,address,param):
         global cohorts
@@ -281,7 +284,7 @@ class ThreadOneWire(threading.Thread):
             try:
                 time.sleep(0.2)
                 now = time.perf_counter()
-                if now > (last+2.5):
+                if self.owproxy and now > (last+2.5):
                     last = now
                     try:
                         status = self.owproxy.write("/simultaneous/temperature", b'1')
@@ -1489,11 +1492,18 @@ taps['H'] = hotTapSolenoid
 
 reloadPasteurizationSpeed()
 
-T_OneWire = ThreadOneWire()
-T_OneWire.daemon = True
-T_OneWire.sensorParam("extra",hardConf.OW_extra)  # Extra: typiquement sortie du refroidissement rapide
-#T_OneWire.sensorParam("temper",hardConf.OW_temper)  # Bain de tempérisation (sortie) régulé en refroidissement
-T_OneWire.sensorParam("heating",hardConf.OW_heating)  # Bain de chauffe
+T_OneWire = None
+if hardConf.OW_extra or hardConf.OW_heating:
+    T_OneWire = ThreadOneWire()
+    T_OneWire.daemon = True
+
+    if hardConf.OW_extra:
+        T_OneWire.sensorParam("extra",hardConf.OW_extra)  # Extra: typiquement sortie du refroidissement rapide
+    #T_OneWire.sensorParam("temper",hardConf.OW_temper)  # Bain de tempérisation (sortie) régulé en refroidissement
+    if hardConf.OW_heating:
+        T_OneWire.sensorParam("heating",hardConf.OW_heating)  # Bain de chauffe
+
+    T_OneWire.start()
 
 cohorts.addSensor("rmeter",sensor.Sensor(typeRMeter,"rmeter",hardConf.Rmeter))
 
@@ -1561,7 +1571,6 @@ data_file.close()
 ##    print(x[0],x[1])
 ##a=input("next")
 
-T_OneWire.start()
 T_Thermistor.start()
 T_DAC.T_Pump = T_Pump
 T_DAC.start()

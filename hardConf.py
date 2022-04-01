@@ -11,6 +11,7 @@ hostname = socket.gethostname()
 machine = platform.machine()
 
 Raspberry = False
+Odroid = False
 io = None
 adc = None
 pi = None
@@ -38,26 +39,36 @@ MICHA_device = None
 thermistors_voltage = 4.087 # Surprisingly not 4.095
 thermistors_Rtop = 2000.0 # Divider bridge to measure temperature (top resistor). Should include 2 ohms for the transistor of stimulation power
 
+print (hostname+" / "+machine)
+
 # One Wire sensors address
 if hostname == "pastOnomic":
     Raspberry = True
     MICHA_device = "/dev/serial0"
     OW_heating = "28.CC3EAF040000"  # Extra: typiquement sortie du refroidissement rapide
     OW_extra = None # "28.AA5659501401"  # Bain de tempérisation (sortie) régulé en refroidissement   28.FFDD64931504 est mort (FFDD)
-   # OW_temper = "28.AABA43501401"  # Bain de chauffe
+elif hostname == "pastoB04001":
+    Odroid = True
+    MICHA_device = "/dev/ttyS1"
+    OW_heating = None
+    OW_extra = None # "28.AA5659501401"  # Bain de tempérisation (sortie) régulé en refroidissement   28.FFDD64931504 est    # OW_temper = "28.AABA43501401"  # Bain de chauffe
     ml.setLang('f')
 elif hostname == "christophe-Latitude-E7440":    
     #OW_temper = "28.A6156B070000"  # Extra: typiquement sortie du refroidissement rapide
-    OW_extra = "28.CC3EAF040000"  # Bain de tempérisation (sortie) régulé en refroidissement
     OW_heating = "28.AA5E36501401"  # Bain de chauffe
+    OW_extra = "28.CC3EAF040000"  # Bain de tempérisation (sortie) régulé en refroidissement
     ml.setLang('e')
 # else keep variables undefined...
 
-print (hostname+" / "+machine)
 
 if Raspberry:
     import pigpio
     pi = pigpio.pi() # Uses BCM numbering for pins...
+
+if Odroid:
+    import Odroid.GPIO as GPIO
+    GPIO.setmode(GPIO.BOARD)
+    pi = GPIO # Uses BCM numbering for pins...
 
 if MICHA_device:
     io = MICHApast.Micha(MICHA_device)
@@ -81,10 +92,10 @@ if MICHA_device:
     T_sp9 = 2 # Garantie sortie serpentin long
     T_sp9b = 4 # Garantie entrée serpentin court
     
+elif Raspberry:
     import RMETERpast
     Rmeter = RMETERpast.R_Meter() # bus=0, spi_channel=0, bus2=1, spi_channel2=0, S1=25, S2=6, S3=5
 
-elif Raspberry:
     # We use "pigpio" now, always with BCM numbering...
     # import RPi.GPIO as GPIO
     # GPIO.setmode(GPIO.BOARD)
@@ -107,22 +118,24 @@ elif Raspberry:
         adc = None
         print("PANNE des Signaux de contrôle")
         traceback.print_exc()
+elif Odroid:
+    io = None
+    adc = None
 else:
     print("SIMULATION car pas sur un RaspberryPi")
     io = None
     adc = None
 
 def close():
-    if Raspberry:
-        if MICHA_device:
-            io.close()
-        else:
-            # All ExpanderPI GPIO in input mode:
-            io.set_port_direction(0, 0xFF)
-            io.set_port_direction(1, 0xFF)
-            ## We do not leave output floating because we are not sure we have the right pull up always there...
-            ##io.set_port_direction(0, 0xFF)
-            ##io.set_port_direction(1, 0xFF)
+    if MICHA_device:
+        io.close()
+    elif Raspberry:
+        # All ExpanderPI GPIO in input mode:
+        io.set_port_direction(0, 0xFF)
+        io.set_port_direction(1, 0xFF)
+        ## We do not leave output floating because we are not sure we have the right pull up always there...
+        ##io.set_port_direction(0, 0xFF)
+        ##io.set_port_direction(1, 0xFF)
     if pi:
         pi.stop()
 
