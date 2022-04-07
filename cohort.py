@@ -154,6 +154,8 @@ class Cohort(object):
         return current_observ
         
     def getCalibratedValue(self,address,apparentValue=None):
+        if not address in self.catalog:
+            return None
         if apparentValue is None:
             apparentValue = self.catalog[address].value
             if apparentValue is None:
@@ -184,6 +186,8 @@ class Cohort(object):
         return trueValue
 
     def val(self,address,format="%.2f"):
+        if not address in self.catalog:
+            return ""
         sensor = self.catalog[address]
         if not sensor.value:
             return ""
@@ -191,6 +195,8 @@ class Cohort(object):
             return format % self.getCalibratedValue(address)
 
     def display(self,term,address,format=" %5.2f°C"):
+        if not address in self.catalog:
+            return
         sensor = self.catalog[address]
         if sensor.changed < 0.0:
             attr = term.blue
