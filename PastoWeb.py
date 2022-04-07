@@ -1495,6 +1495,10 @@ taps['H'] = hotTapSolenoid
 reloadPasteurizationSpeed()
 
 T_OneWire = None
+
+if hardConf.Rmeter:
+    cohorts.addSensor("rmeter",sensor.Sensor(typeRMeter,"rmeter",hardConf.Rmeter))
+
 if hardConf.OW_extra or hardConf.OW_heating:
     T_OneWire = ThreadOneWire()
     T_OneWire.daemon = True
@@ -1507,15 +1511,15 @@ if hardConf.OW_extra or hardConf.OW_heating:
 
     T_OneWire.start()
 
-if hardConf.Rmeter:
-    cohorts.addSensor("rmeter",sensor.Sensor(typeRMeter,"rmeter",hardConf.Rmeter))
-
 T_Thermistor = ThreadThermistor()
 T_Thermistor.daemon = True
 T_Thermistor.sensorParam("input",hardConf.T_input) # Entrée
 T_Thermistor.sensorParam("heatout",hardConf.T_heatout) # Sortie
 T_Thermistor.sensorParam("sp9",hardConf.T_sp9) # Garantie sortie serpentin long
 #T_Thermistor.sensorParam("temper",hardConf.T_sp9b) # Garantie entrée serpentin court
+if hardConf.T_heating:
+    T_Thermistor.sensorParam("heating",hardConf.T_heating)
+
 
 if not pumpy.open():
     term.writeLine("Pompe inaccessible ???", term.red, term.bold, term.bgwhite)

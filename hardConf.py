@@ -34,6 +34,7 @@ T_input = 1 # Entrée
 T_heatout = 2 # Sortie
 T_sp9 = 3 # Garantie sortie serpentin long
 T_sp9b = 4 # Garantie entrée serpentin court
+T_heating = None # If no OneWire, this will be T_sp9b
 
 MICHA_device = None
 thermistors_voltage = 4.087 # Surprisingly not 4.095
@@ -53,6 +54,7 @@ elif hostname == "pastoB04001":
     import MICHA40past
     MICHA_device = "/dev/ttyS1"
     io = MICHA40past.Micha4(MICHA_device)
+    T_heating = T_sp9b
     OW_heating = None
     OW_extra = None # "28.AA5659501401"  # Bain de tempérisation (sortie) régulé en refroidissement   28.FFDD64931504 est    # OW_temper = "28.AABA43501401"  # Bain de chauffe
     ml.setLang('f')
