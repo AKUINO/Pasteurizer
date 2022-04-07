@@ -2174,3 +2174,4 @@ data_file.close()
 
 if WebExit: # Exit asked from web: shutdown the computer
     subprocess.call(['sudo','/sbin/shutdown', '-h', 'now'])
+    #os.system('systemctl poweroff')

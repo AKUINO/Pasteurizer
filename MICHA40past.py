@@ -543,10 +543,12 @@ if __name__ == "__main__":
 
     def pressSensor(choice):
         """Get or set a value related to the pressure sensor."""
-        Vcc = 5  # power voltage applied to the pressure sensor
+        Vcc = 5.1  # power voltage applied to the pressure sensor
         pressure = pasto.get_press_sensor()  # raw value of the pressure (0-4095)
         pressure_V = pressure / 1638  # pressure in V
-        pressure_psi = 125 * (pressure_V / Vcc) - 12.5  # pressure in Psi
+        #pressure_psi = 125 * (pressure_V / Vcc) - 12.5  # pressure in Psi
+
+        pressure_psi = (pressure_V - (Vcc*0.1) ) * (90 / (Vcc*0.8))  # pressure in Psi
         pressure_bar = pressure_psi / 14.504  # pressure in bar
 
         if choice == 'prs':  # gets the current pressure sensor value
