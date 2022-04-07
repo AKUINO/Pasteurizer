@@ -2173,5 +2173,5 @@ term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite
 data_file.close()
 
 if WebExit: # Exit asked from web: shutdown the computer
-    subprocess.call(['sudo','/sbin/shutdown', '-h', 'now'])
-    #os.system('systemctl poweroff')
+    #subprocess.call(['sudo','/sbin/shutdown', '-h', 'now'])
+    os.system('systemctl poweroff')
