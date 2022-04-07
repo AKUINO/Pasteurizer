@@ -140,6 +140,6 @@ def close():
         ## We do not leave output floating because we are not sure we have the right pull up always there...
         ##io.set_port_direction(0, 0xFF)
         ##io.set_port_direction(1, 0xFF)
-    if pi:
+    if pi and Raspberry:
         pi.stop()
 
