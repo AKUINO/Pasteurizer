@@ -47,6 +47,7 @@ class Micha4:
                 self.port = Serial(port=self.device, baudrate=19200, parity=PARITY_NONE, stopbits=1, bytesize=8, timeout=1)
             except:
                 print("MICHA open failed\r")
+                traceback.print_exc()
                 self.port = None
                 time.sleep(MICHApast.DELAY_RETRY) # Do not retry too fast...
         return self.port
