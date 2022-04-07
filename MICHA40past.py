@@ -39,16 +39,16 @@ class Micha4:
     # Configuration and starting of the modbus communication
     def get_serial_port(self):
         while self.busy:
-            time.sleep(MICHApast.MICHApast.DELAY_RETRY)
+            time.sleep(MICHApast.DELAY_RETRY)
         self.busy = True
         while not self.port: # In case of error, we reset the access to the ModBus
             try:
                 """Return a serial.Serial instance which is ready to use with a RS485 adaptor."""
-                self.port = Serial(port=self.device, baudrate=19200, parity=PARITY_NONE, stopbits=1, bytesize=8, timeout=MICHApast.DELAY_RETRY)
+                self.port = Serial(port=self.device, baudrate=19200, parity=PARITY_NONE, stopbits=1, bytesize=8, timeout=1)
             except:
                 print("MICHA open failed\r")
                 self.port = None
-                time.sleep(MICHApast.MICHApast.DELAY_RETRY) # Do not retry too fast...
+                time.sleep(MICHApast.DELAY_RETRY) # Do not retry too fast...
         return self.port
 
     def close_serial_port(self):
