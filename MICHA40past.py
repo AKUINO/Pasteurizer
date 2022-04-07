@@ -46,7 +46,7 @@ class Micha4:
                 """Return a serial.Serial instance which is ready to use with a RS485 adaptor."""
                 self.port = Serial(port=self.device, baudrate=19200, parity=PARITY_NONE, stopbits=1, bytesize=8, timeout=1)
             except:
-                print("MICHA open failed\r")
+                print("MICHA4 open failed\r")
                 traceback.print_exc()
                 self.port = None
                 time.sleep(MICHApast.DELAY_RETRY) # Do not retry too fast...
@@ -73,7 +73,7 @@ class Micha4:
         while i < MICHApast.MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()
-                message = rtu.read_coils(MICHApast.MICHApast.SLAVE_ID, reg, 1)
+                message = rtu.read_coils(MICHApast.SLAVE_ID, reg, 1)
                 #print("READ mess=%s\r"%(''.join('%02x '%i for i in message)))
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
@@ -90,7 +90,7 @@ class Micha4:
         while i < MICHApast.WRITE_RETRY:
             try:
                 serial_port = self.get_serial_port()                
-                message = rtu.write_single_coil(MICHApast.MICHApast.SLAVE_ID, reg, val)
+                message = rtu.write_single_coil(MICHApast.SLAVE_ID, reg, val)
                 #print("WRITE mess=%s\r"%(''.join('%02x '%i for i in message)))
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
@@ -108,7 +108,7 @@ class Micha4:
         while i < MICHApast.MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()
-                message = rtu.read_discrete_inputs(MICHApast.MICHApast.SLAVE_ID, reg, 1)
+                message = rtu.read_discrete_inputs(MICHApast.SLAVE_ID, reg, 1)
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
                 return response[0]
@@ -124,7 +124,7 @@ class Micha4:
         while i < MICHApast.MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()            
-                message = rtu.read_input_registers(MICHApast.MICHApast.SLAVE_ID, reg, 1)
+                message = rtu.read_input_registers(MICHApast.SLAVE_ID, reg, 1)
                 #print("INPUT mess=%s\r"%(''.join('%02x '%i for i in message)))
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
@@ -142,7 +142,7 @@ class Micha4:
         while i < MICHApast.MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()
-                message = rtu.read_holding_registers(MICHApast.MICHApast.SLAVE_ID, reg, 1)
+                message = rtu.read_holding_registers(MICHApast.SLAVE_ID, reg, 1)
                 #print("HOLDING mess=%s\r"%(''.join('%02x '%i for i in message)))
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
@@ -160,7 +160,7 @@ class Micha4:
         while i < MICHApast.WRITE_RETRY:
             try:
                 serial_port = self.get_serial_port()            
-                message = rtu.write_single_register(MICHApast.MICHApast.SLAVE_ID, reg, val)
+                message = rtu.write_single_register(MICHApast.SLAVE_ID, reg, val)
                 #print("WRITE HOLDING mess=%s\r"%(''.join('%02x '%i for i in message)))
                 response = rtu.send_message(message, serial_port)
                 self.release_serial_port()
