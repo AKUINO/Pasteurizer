@@ -284,33 +284,35 @@ class ThreadOneWire(threading.Thread):
             try:
                 time.sleep(0.2)
                 now = time.perf_counter()
-                if self.owproxy and now > (last+2.5):
+                if now > (last+2.5):
                     last = now
-                    try:
-                        status = self.owproxy.write("/simultaneous/temperature", b'1')
-                    except:
-                        traceback.print_exc()
-                    for (address,aSensor) in cohorts.catalog.items():
-                        #print (address)
-                        if aSensor.sensorType == typeOneWire and aSensor.param:
-                            time.sleep(0.02)
-                            try:
-                                value = float(self.owproxy.read("/"+aSensor.param+"/temperature"))
-                                if value != 85.0: # Can be invalid value...
-                                    aSensor.set(value)
-                            except KeyboardInterrupt:
-                                loop = False
-                                break
-                            except:
-                                traceback.print_exc()
-                        if aSensor.sensorType == typeRMeter:
-                            try:
-                                r,v = hardConf.Rmeter.r_meter_get_ohms(0)
-                                if r > 0:
-                                    aSensor.set(r)
-                            except:
-                                traceback.print_exc()                                
-                            #print(r)
+                    if self.owproxy:
+                        try:
+                            status = self.owproxy.write("/simultaneous/temperature", b'1')
+                        except:
+                            traceback.print_exc()
+                    if self.owproxy or hardConf.Rmeter:
+                        for (address,aSensor) in cohorts.catalog.items():
+                            #print (address)
+                            if self.owproxy and aSensor.sensorType == typeOneWire and aSensor.param:
+                                time.sleep(0.02)
+                                try:
+                                    value = float(self.owproxy.read("/"+aSensor.param+"/temperature"))
+                                    if value != 85.0: # Can be invalid value...
+                                        aSensor.set(value)
+                                except KeyboardInterrupt:
+                                    loop = False
+                                    break
+                                except:
+                                    traceback.print_exc()
+                            if hardConf.Rmeter and aSensor.sensorType == typeRMeter:
+                                try:
+                                    r,v = hardConf.Rmeter.r_meter_get_ohms(0)
+                                    if r > 0:
+                                        aSensor.set(r)
+                                except:
+                                    traceback.print_exc()
+                                #print(r)
             except KeyboardInterrupt:
                 loop = False
                 break
@@ -1505,7 +1507,8 @@ if hardConf.OW_extra or hardConf.OW_heating:
 
     T_OneWire.start()
 
-cohorts.addSensor("rmeter",sensor.Sensor(typeRMeter,"rmeter",hardConf.Rmeter))
+if hardConf.Rmeter:
+    cohorts.addSensor("rmeter",sensor.Sensor(typeRMeter,"rmeter",hardConf.Rmeter))
 
 T_Thermistor = ThreadThermistor()
 T_Thermistor.daemon = True
