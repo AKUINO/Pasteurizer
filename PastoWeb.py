@@ -2173,5 +2173,8 @@ term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite
 data_file.close()
 
 if WebExit: # Exit asked from web: shutdown the computer
+    #To make the following call possible, please configure in /etc/sudoer file:
+    #    username ALL = NOPASSWD: /sbin/shutdown
+    #    %admin  ALL = NOPASSWD: /sbin/shutdown
     subprocess.call(['sudo','/sbin/shutdown', '-h', 'now'])
     #os.system('systemctl poweroff')  demande aussi une authentication...
