@@ -28,6 +28,7 @@ DMP_close = 6
 # Pump
 pumpON = 0
 pumpOFF = 1
+pumpDirection = -14
 
 # Solenoids to control water inputs
 TAP = 8 # Hot rinsing water
@@ -59,6 +60,7 @@ elif hostname == "pastoB04001":
     MICHA_device = "/dev/ttyS1"
     pumpON = 1
     pumpOFF = 0
+    pumpDirection = 14
     io = MICHA40past.Micha4(MICHA_device)
     T_heating = T_sp9b
     OW_heating = None
