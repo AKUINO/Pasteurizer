@@ -404,7 +404,7 @@ class pump_PWM(sensor.Sensor):
             self.speed_liters = self.maximal_liters
         elif not self.speed_liters:
             self.speed_liters = self.speedLitersHour(self.speed)
-        if hardConf.Raspberry:
+        if hardConf.MICHA_device or hardConf.Raspberry:
             self.setSpeed(prvSpeed,self.speed,self.reverse)
             return True
         else:
@@ -415,7 +415,7 @@ class pump_PWM(sensor.Sensor):
         
         #traceback.print_stack()
         print(" STOP %s \r"%self.address)
-        if hardConf.Raspberry:
+        if hardConf.MICHA_device or hardConf.Raspberry:
             self.setSpeed(-self.speed if self.reverse else self.speed, 0)
             # GPIO.output(self.pinDirection, 1)
             # if self.pinDirection > 0:
@@ -568,7 +568,7 @@ if __name__ == "__main__":
             print ("Error closing!")
         else:
             print ("Pump stopped and closed.")
-        if hardConf.Raspberry:
-            # GPIO.cleanup()
+        if hardConf.Odroid:
+            hardConf.pi.cleanup()
             pass
 

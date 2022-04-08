@@ -129,12 +129,9 @@ elif Raspberry:
         print("PANNE des Signaux de contrôle")
         traceback.print_exc()
 elif Odroid:
-    io = None
-    adc = None
+    pass
 else:
     print("SIMULATION car pas sur un RaspberryPi")
-    io = None
-    adc = None
 
 def close():
     if MICHA_device:
