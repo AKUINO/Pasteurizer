@@ -25,6 +25,10 @@ DAC2 = 12 # T: Temperization
 DMP_open = 2
 DMP_close = 6
 
+# Pump
+pumpON = 0
+pumpOFF = 1
+
 # Solenoids to control water inputs
 TAP = 8 # Hot rinsing water
 CLD = 4 # Cooling water
@@ -53,6 +57,8 @@ elif hostname == "pastoB04001":
     Odroid = True
     import MICHA40past
     MICHA_device = "/dev/ttyS1"
+    pumpON = 1
+    pumpOFF = 0
     io = MICHA40past.Micha4(MICHA_device)
     T_heating = T_sp9b
     OW_heating = None

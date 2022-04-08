@@ -468,9 +468,10 @@ menus.stateTransitions = { 'R-P' : ['P','G'], 'R-V' : ['A'], \
                            'A-t' : ['B'], \
                            'O-F*2' : ['R'], 'O-V' : ['B'], \
                            'B-F*1' : ['S'], \
-                           'P-F*2' : ['S'], 'G-F*2' : ['T'], \
-                           'T-N' : ['N','N0'], 'S-N' : ['N','N0'], \
-                           'S-D' : ['D','D0'], \
+                           'P-F' : ['E'], 'G-F' : ['H'], \
+                           'P-F*2' : ['E'], 'G-F*2' : ['H'], \
+                           'H-N' : ['N','N0'], 'T-N' : ['N','N0'], 'S-N' : ['N','N0'], \
+                           'E-D' : ['D','D0'], 'S-D' : ['D','D0'], \
                            'N-F*4' : ['R'],  'D-F*4' : ['R'] }
 # R + Pasteuriser Gras = G
 # R + Pasteuriser Maigre = P

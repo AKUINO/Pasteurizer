@@ -251,16 +251,16 @@ class pump_PWM(sensor.Sensor):
         self.stop()
         if hardConf.MICHA_device:
             time.sleep(2)
-            hardConf.io.set_pump_power(1) # Disable power. (pins are managed by MICHA board)
+            hardConf.io.set_pump_power(hardconf.pumpOFF) # Disable power. (pins are managed by MICHA board)
             time.sleep(2)    
-            hardConf.io.set_pump_power(0) # Enable power. (pins are managed by MICHA board)
+            hardConf.io.set_pump_power(hardconf.pumpON) # Enable power. (pins are managed by MICHA board)
 
     def open(self):
 
         OK = True
         try:
             if hardConf.MICHA_device:
-                hardConf.io.set_pump_power(0) # Enable power. (pins are managed by MICHA board)
+                hardConf.io.set_pump_power(hardconf.pumpON) # Enable power. (pins are managed by MICHA board)
             elif hardConf.Raspberry:
                 # GPIO.setmode(GPIO.BOARD)
                 # GPIO.setwarnings(False)
@@ -310,7 +310,7 @@ class pump_PWM(sensor.Sensor):
 
     def close(self):
         if hardConf.MICHA_device:
-            hardConf.io.set_pump_power(1) # Disable power. (pins are managed by MICHA board)
+            hardConf.io.set_pump_power(hardconf.pumpOFF) # Disable power. (pins are managed by MICHA board)
         else:
             self.stop()
             time.sleep(0.1)
