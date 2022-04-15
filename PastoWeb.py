@@ -242,13 +242,13 @@ final_tubing = 3587.0-up_to_thermistor-pasteurization_tube-vol_tube(8,1800)+exch
 
 cohorts.sequence = [ # Tubing and Sensor Sequence of the Pasteurizer
                     [initial_tubing,'input'], #input de la chauffe
-                    [heating_tube,'sp9'], # Garantie
-                    [pasteurization_tube,'heatout'], # Bassin
+                    [heating_tube,'warranty'], # Garantie
+                    [pasteurization_tube,'output'], # Bassin
                     [final_tubing+vol_tube(8,1800),'extra'] ] # Sortie
 START_VOL = 0.0
 for curr_cohort in cohorts.sequence:
     START_VOL += curr_cohort[0]
-    if curr_cohort[1] == 'sp9':
+    if curr_cohort[1] == 'heating':
         break
 
 TOTAL_VOL = 0.0
@@ -759,8 +759,8 @@ class ThreadDAC(threading.Thread):
                                        1 if self.T_Pump.paused else 0, \
                                        cohorts.val('extra'), \
                                        cohorts.val('input'), \
-                                       cohorts.val('sp9'), \
-                                       cohorts.val('heatout'), \
+                                       cohorts.val('warranty'), \
+                                       cohorts.val('output'), \
                                        cohorts.catalog['DAC1'].val(), \
                                        cohorts.val('heating'), \
                                        cohorts.val('rmeter') ) )
@@ -785,8 +785,8 @@ class ThreadDAC(threading.Thread):
                     cohorts.catalog[self.T_Pump.pump.address].display() # Pompe
                     cohorts.display(term,'extra',format=" %5.1f° ") #Echgeur
                     cohorts.display(term,'input',format=" %5.1f° ") # Entrée de la Chauffe
-                    cohorts.display(term,'sp9',format=" %5.1f° ") # Garant
-                    cohorts.display(term,'heatout',format=" %5.1f° ") # Garant
+                    cohorts.display(term,'warranty',format=" %5.1f° ") # Garant
+                    cohorts.display(term,'output',format=" %5.1f° ") # Garant
                     term.write(' %1d ' % int(isnull(cohorts.catalog['DAC1'].value,0)),term.black,term.bgwhite) # Watts #+isnull(cohorts.catalog['DAC2'].value,0)
                     cohorts.display(term,'heating',format=" %5.1f° ") # Bassin
                     #cohorts.display(term,'temper',format=" %5.1f° ") # Bassin de tempérisation
@@ -1525,8 +1525,8 @@ if hardConf.OW_extra or hardConf.OW_heating:
 T_Thermistor = ThreadThermistor()
 T_Thermistor.daemon = True
 T_Thermistor.sensorParam("input",hardConf.T_input) # Entrée
-T_Thermistor.sensorParam("heatout",hardConf.T_heatout) # Sortie
-T_Thermistor.sensorParam("sp9", hardConf.T_warranty) # Garantie sortie serpentin long
+T_Thermistor.sensorParam("output",hardConf.T_output) # Sortie
+T_Thermistor.sensorParam("warranty", hardConf.T_warranty) # Garantie sortie serpentin long
 #T_Thermistor.sensorParam("temper",hardConf.T_sp9b) # Garantie entrée serpentin court
 if hardConf.T_heating:
     T_Thermistor.sensorParam("heating",hardConf.T_heating)
@@ -1562,7 +1562,7 @@ defFile = datetime.now().strftime("%Y_%m%d_%H%M")
 #if not fileName:
 fileName = defFile
 data_file = open(DIR_DATA_CSV + fileName+".csv", "w")
-data_file.write("epoch_sec\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\textra\tinput\twarant\theatout\theat\theatbath\trmeter\n") #\twatt2\ttemper\theat
+data_file.write("epoch_sec\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\textra\tinput\twarant\toutput\theat\theatbath\trmeter\n") #\twatt2\ttemper\theat
 term.write("Données stockées dans ",term.blue, term.bgwhite)
 term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
 data_file.close()
@@ -1864,8 +1864,8 @@ class WebApiPut:
                         temp_ref_calib.append({'time':now,'reft':ref_val, \
                                     'extra': cohorts.catalog['extra'].value, \
                                     'input': cohorts.catalog['input'].value, \
-                                    'heatout': cohorts.catalog['heatout'].value, \
-                                    'sp9': cohorts.catalog['sp9'].value, \
+                                    'output': cohorts.catalog['output'].value, \
+                                    'warranty': cohorts.catalog['warranty'].value, \
                                     'heating': cohorts.catalog['heating'].value })
         return "" # Status 200 is enough !
 
@@ -1934,10 +1934,10 @@ class WebApiLog:
                             'speed': T_Pump.pump.liters() if not T_Pump.paused else 0, \
                             'extra': isnull(cohorts.getCalibratedValue('extra'), ''), \
                             'input': isnull(cohorts.getCalibratedValue('input'), ''), \
-                            'heatout': isnull(cohorts.getCalibratedValue('heatout'), ''), \
+                            'output': isnull(cohorts.getCalibratedValue('output'), ''), \
                             'watts': isnull(cohorts.catalog['DAC1'].value*HEAT_POWER, ''), \
                             #'watts2': isnull(cohorts.catalog['DAC2'].value*MITIG_POWER, ''), \
-                            'sp9': isnull(cohorts.getCalibratedValue('sp9'), ''), \
+                            'warranty': isnull(cohorts.getCalibratedValue('warranty'), ''), \
                             'heating': isnull(cohorts.getCalibratedValue('heating'), ''), \
                             #'temper': isnull(cohorts.getCalibratedValue('temper'), ''), \
                             'rmeter': isnull(cohorts.val('rmeter'), ''), \
@@ -1946,7 +1946,7 @@ class WebApiLog:
                             #'opt_T': temper if temper <  99.0 else '', \
                             'opt_M': menus.options['M'][3], \
                             'opt_temp': opt_temp, \
-                            'output': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['P','E','I'] else 1), \
+                            'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['P','E','I'] else 1), \
                             'pause': 1 if T_Pump.paused else 0, \
                             'pumpopt': optimal_speed, \
                             'pumpeff': (100.0*pumping_volume/(pumping_time/3600))/optimal_speed if pumping_time else 0, \

@@ -130,8 +130,8 @@ $(document).ready(function() {
                     $('#vitesse').text(speed);
                     colorit($('#vitesse'),0.0,625*3.6/data['opt_M'],180.0);
                     $('#input').text(floorDeci(data['input']));
-                    $('#heatout').text(floorDeci(data['heatout']));
-                    $('#sp9').text(floorDeci(data['sp9']));
+                    $('#output').text(floorDeci(data['output']));
+                    $('#warranty').text(floorDeci(data['warranty']));
                     colorit($('#sp9'),45.0,data['opt_temp'],90.0);
                     $('#reft').text(floorDeci(data['reft']));
                     $('#heating').text(floorDeci(data['heating']));
@@ -150,7 +150,7 @@ $(document).ready(function() {
                             $('#restart').show();
                         } else {
                             $('#pause').show();
-                            if (data['output'] > 2) { $('#restart').show() }
+                            if (data['purge'] > 2) { $('#restart').show() }
                             else { $('#restart').hide() }
                         }
                     } else {
@@ -158,23 +158,23 @@ $(document).ready(function() {
                         $('#pause').hide();
                         $('#restart').hide();
                     }
-                    if (data['output'] == 1) {
+                    if (data['purge'] == 1) {
                         $('#dumpbutton').show();
-                        $('#output').removeClass("glyphicon-trash");
-                        $('#output').removeClass("glyphicon-arrow-left");
-                        $('#output').addClass("glyphicon glyphicon-share-alt flip-vertical")
-                    } else if (data['output'] >= 2) {
+                        $('#purge').removeClass("glyphicon-trash");
+                        $('#purge').removeClass("glyphicon-arrow-left");
+                        $('#purge').addClass("glyphicon glyphicon-share-alt flip-vertical")
+                    } else if (data['purge'] >= 2) {
                         $('#dumpbutton').hide();
-                        $('#output').removeClass("glyphicon-arrow-left");
-                        $('#output').removeClass("glyphicon-share-alt");
-                        $('#output').removeClass("flip-vertical");
-                        $('#output').addClass("glyphicon glyphicon-trash")
+                        $('#purge').removeClass("glyphicon-arrow-left");
+                        $('#purge').removeClass("glyphicon-share-alt");
+                        $('#purge').removeClass("flip-vertical");
+                        $('#purge').addClass("glyphicon glyphicon-trash")
                     } else {
                         $('#dumpbutton').hide();
-                        $('#output').removeClass("glyphicon-trash");
-                        $('#output').removeClass("glyphicon-share-alt");
-                        $('#output').removeClass("flip-vertical");
-                        $('#output').addClass("glyphicon glyphicon-arrow-left")
+                        $('#purge').removeClass("glyphicon-trash");
+                        $('#purge').removeClass("glyphicon-share-alt");
+                        $('#purge').removeClass("flip-vertical");
+                        $('#purge').addClass("glyphicon glyphicon-arrow-left")
                     }
                     var temptext = ''
                     if ('opt_T' in data && data['opt_T']) {
@@ -208,7 +208,7 @@ $(document).ready(function() {
                                     floorCenti(data['totalwatts']), floorCenti(data['watts']),
                                     floorCenti(data['volume']), floorCenti(data['speed']),
                                     floorCenti(data['input']), floorCenti(data['heating']),
-                                    floorCenti(data['sp9']), floorCenti(data['heatout']),
+                                    floorCenti(data['warranty']), floorCenti(data['output']),
                                     //floorCenti(data['temper']),
                                     floorCenti(data['extra'])
                         ]
