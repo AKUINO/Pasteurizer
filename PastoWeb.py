@@ -32,6 +32,7 @@ import cohort
 
 from thermistor import Thermistor
 from solenoid import Solenoid
+from LED import LED
 from valve import Valve
 from menus import Menus
 
@@ -114,8 +115,8 @@ def tell_message(message):
 typeOneWire = 1
 typeRMeter = 11
 
-YellowLED = LED('yellow')
-GreenLED = LED('green')
+YellowLED = LED('yellow',18) #BCM=24
+GreenLED = LED('green',16) #BCM=23
 
 ##BATH_TUBE = 4.6 # degrees Celsius. Margin between temperature in bath and temperature wished in the tube
 FLOOD_TIME = 60.0 # 90 econds of hot water tap flushing (when a pump is in the way. 60 if not)
