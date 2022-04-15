@@ -70,7 +70,7 @@ class R_Meter:
 
         def r_meter_get_ohms( self, adcnum = 0  ):
 
-            hardConf.pi.write(self.polarityIO, 0 if self.polarity else 1)
+            hardConf.localGPIO.write(self.polarityIO, 0 if self.polarity else 1)
             self.polarity = not self.polarity
 
             #Rx = 283 #236
@@ -78,16 +78,16 @@ class R_Meter:
             # GPIO.output(self.S1,GPIO.HIGH)
             # GPIO.output(self.S2,GPIO.LOW)
             # GPIO.output(self.S3,GPIO.LOW)
-            hardConf.pi.write(self.S1, 1)
-            hardConf.pi.write(self.S2, 0)
-            hardConf.pi.write(self.S3, 0)
+            hardConf.localGPIO.write(self.S1, 1)
+            hardConf.localGPIO.write(self.S2, 0)
+            hardConf.localGPIO.write(self.S3, 0)
             time.sleep(0.1)
 
             Voltage = self.read_voltage_average(adcnum) #6
 
             #V2 = spi.read(0)
             #GPIO.output(self.S1,GPIO.LOW)
-            hardConf.pi.write(self.S1, 0)
+            hardConf.localGPIO.write(self.S1, 0)
             
             if ( Voltage > 0 and Voltage < 2045 ):
                 #return self.calculate_r(Rx,IFB,Voltage,V2)
@@ -98,15 +98,15 @@ class R_Meter:
                 # GPIO.output(self.S1,GPIO.LOW)
                 # GPIO.output(self.S2,GPIO.HIGH)
                 # GPIO.output(self.S3,GPIO.LOW)
-                hardConf.pi.write(self.S1, 0)
-                hardConf.pi.write(self.S2, 1)
-                hardConf.pi.write(self.S3, 0)
+                hardConf.localGPIO.write(self.S1, 0)
+                hardConf.localGPIO.write(self.S2, 1)
+                hardConf.localGPIO.write(self.S3, 0)
                 time.sleep(0.02)
 
                 Voltage = self.read_voltage_average(adcnum) #6
                 #V2 = spi.read(0)
                 #GPIO.output(self.S2,GPIO.LOW)
-                hardConf.pi.write(self.S2, 0)
+                hardConf.localGPIO.write(self.S2, 0)
                 
                 if (Voltage > 0 and Voltage < 2045 ):
                     #return self.calculate_r(Rx,IFB,Voltage,V2)
@@ -117,15 +117,15 @@ class R_Meter:
                     # GPIO.output(self.S1,GPIO.LOW)
                     # GPIO.output(self.S2,GPIO.LOW)
                     # GPIO.output(self.S3,GPIO.HIGH)
-                    hardConf.pi.write(self.S1, 0)
-                    hardConf.pi.write(self.S2, 0)
-                    hardConf.pi.write(self.S3, 1)
+                    hardConf.localGPIO.write(self.S1, 0)
+                    hardConf.localGPIO.write(self.S2, 0)
+                    hardConf.localGPIO.write(self.S3, 1)
                     time.sleep(0.02)
 
                     Voltage = self.read_voltage_average(adcnum) #60
                     #V2 = spi.read(0)
                     #GPIO.output(self.S3,GPIO.LOW)
-                    hardConf.pi.write(self.S3, 0)
+                    hardConf.localGPIO.write(self.S3, 0)
                     if (Voltage > 0 and Voltage < 2047 ):
                         #return self.calculate_r(Rx,IFB,Voltage,V2)
                         return self.ohm_10K(Voltage),Voltage
@@ -146,14 +146,14 @@ class R_Meter:
                 # GPIO.output(self.S1,GPIO.LOW)
                 # GPIO.output(self.S2,GPIO.LOW)
                 # GPIO.output(self.S3,GPIO.LOW)
-                hardConf.pi.set_mode(self.S1, pigpio.OUTPUT)
-                hardConf.pi.set_mode(self.S2, pigpio.OUTPUT)
-                hardConf.pi.set_mode(self.S3, pigpio.OUTPUT)
-                hardConf.pi.set_mode(self.polarityIO, pigpio.OUTPUT)
-                hardConf.pi.write(self.S1, 0)
-                hardConf.pi.write(self.S2, 0)
-                hardConf.pi.write(self.S3, 0)
-                hardConf.pi.write(self.polarityIO, 0)
+                hardConf.localGPIO.set_mode(self.S1, pigpio.OUTPUT)
+                hardConf.localGPIO.set_mode(self.S2, pigpio.OUTPUT)
+                hardConf.localGPIO.set_mode(self.S3, pigpio.OUTPUT)
+                hardConf.localGPIO.set_mode(self.polarityIO, pigpio.OUTPUT)
+                hardConf.localGPIO.write(self.S1, 0)
+                hardConf.localGPIO.write(self.S2, 0)
+                hardConf.localGPIO.write(self.S3, 0)
+                hardConf.localGPIO.write(self.polarityIO, 0)
                     
                 self.bus = bus
                 self.spi_channel = spi_channel

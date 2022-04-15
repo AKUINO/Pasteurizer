@@ -172,7 +172,7 @@ class pump_PWM(sensor.Sensor):
 
     def __init__(self,
                  pinPWM = 12, # 12(board=32) or 18(board=12) CustardPi Digital out #2, RPi PWM
-                 pinDirection = hardConf.pumpDirection, # 17(board=11) CustardPi Digital out #2
+                 pinDirection = -14, # 17(board=11) CustardPi Digital out #2
                  pinStatus = -15,  # 23(board=16) CustardPi Digital in #1. RPi pin must be in "Pull-up"...
                  maxSpeed = 437, #600 in theory. 400 is possible when pumping air (previous value: 284)
                  maximal_liters = None,
@@ -251,17 +251,17 @@ class pump_PWM(sensor.Sensor):
         self.stop()
         if hardConf.MICHA_device:
             time.sleep(2)
-            hardConf.io.set_pump_power(hardConf.pumpOFF) # Disable power. (pins are managed by MICHA board)
+            hardConf.io.set_pump_power(0) # Disable power. (pins are managed by MICHA board)
             time.sleep(2)    
-            hardConf.io.set_pump_power(hardConf.pumpON) # Enable power. (pins are managed by MICHA board)
+            hardConf.io.set_pump_power(1) # Enable power. (pins are managed by MICHA board)
 
     def open(self):
 
         OK = True
         try:
             if hardConf.MICHA_device:
-                hardConf.io.set_pump_power(hardConf.pumpON) # Enable power. (pins are managed by MICHA board)
-            elif hardConf.Raspberry:
+                hardConf.io.set_pump_power(1) # Enable power. (pins are managed by MICHA board)
+            elif hardConf.localGPIOtype:
                 # GPIO.setmode(GPIO.BOARD)
                 # GPIO.setwarnings(False)
                 # GPIO.setup(self.pinStatus, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -270,17 +270,17 @@ class pump_PWM(sensor.Sensor):
                 # self.pwm = GPIO.PWM(self.pinPWM, 1000)  # create PWM instance with frequency
                 # self.pwm.start(0)  # keep PWM quiet for now. Should be 50 when running
                 if self.pinStatus > 0:
-                    hardConf.pi.set_mode(self.pinStatus, pigpio.INPUT)
-                    hardConf.pi.set_pull_up_down(self.pinStatus, pigpio.PUD_UP)
+                    hardConf.localGPIO.set_mode(self.pinStatus, hardConf.pigpio_INPUT)
+                    hardConf.localGPIO.set_pull_up_down(self.pinStatus, hardConf.pigpio_PUD_UP)
                 elif self.pinStatus < 0:
                     hardConf.io.set_pin_direction(-self.pinStatus, 1)
                     hardConf.io.set_pin_pullup(-self.pinStatus, 1)
                 if self.pinDirection > 0:
-                    hardConf.pi.set_mode(self.pinDirection, pigpio.OUTPUT)
+                    hardConf.localGPIO.set_mode(self.pinDirection, hardConf.pigpio_OUTPUT)
                 else:
                     hardConf.io.set_pin_direction(-self.pinDirection, 0)
                 # PWM is not possible through IOexpanding board...
-                hardConf.pi.set_mode(self.pinPWM, pigpio.OUTPUT)
+                hardConf.localGPIO.set_mode(self.pinPWM, hardConf.pigpio_OUTPUT)
                 #hardConf.pi.set_mode(self.pinPWM, pigpio.ALT5)
                 #hardConf.pi.set_PWM_dutycycle(self.pinPWM, 128)
                 #hardConf.pi.set_PWM_frequency(self.pinPWM, 0)
@@ -300,9 +300,9 @@ class pump_PWM(sensor.Sensor):
 
     def read_return(self):
         
-        if hardConf.Raspberry and not hardConf.MICHA_device:
+        if hardConf.processor != 'pc' and not hardConf.MICHA_device:
             if self.pinStatus > 0:
-                return 0 if hardConf.pi.read(self.pinStatus) else 1
+                return 0 if hardConf.localGPIO.read(self.pinStatus) else 1
             else:
                 return 0 if hardConf.io.read_pin( -self.pinStatus ) else 1
         else:
@@ -310,7 +310,7 @@ class pump_PWM(sensor.Sensor):
 
     def close(self):
         if hardConf.MICHA_device:
-            hardConf.io.set_pump_power(hardConf.pumpOFF) # Disable power. (pins are managed by MICHA board)
+            hardConf.io.set_pump_power(0) # Disable power. (pins are managed by MICHA board)
         else:
             self.stop()
             time.sleep(0.1)
@@ -329,18 +329,18 @@ class pump_PWM(sensor.Sensor):
         #(" Speed=%d \r" % speed)
         if duty:
             if hardConf.MICHA_device:
-                hardConf.io.write_pin(self.pinDirection, 0 if speed > 0 else 1)
+                hardConf.io.write_pin(self.pinDirection, (0 if speed > 0 else 1) if hardConf.reversedPump else (1 if speed > 0 else 0) )
             else:
                 if self.pinDirection > 0:
-                    hardConf.pi.write(self.pinDirection, 1 if speed > 0 else 0)
+                    hardConf.localGPIO.write(self.pinDirection, 1 if speed > 0 else 0)
                 elif self.pinDirection < 0:
                     hardConf.io.write_pin( -self.pinDirection, 1 if speed > 0 else 0)
             time.sleep(0.01)
             
         if hardConf.MICHA_device:
             hardConf.io.write_holding(self.pinPWM, self.speed_freq(speed if speed >= 0 else -speed) ) #, 500000 if duty else 0)
-        else:
-            status = hardConf.pi.hardware_PWM(self.pinPWM, self.speed_freq(speed if speed >= 0 else -speed) if duty else 1000, 500000 if duty else 0)
+        elif hardConf.localGPIOtype == 'pigpio':
+            status = hardConf.localGPIO.hardware_PWM(self.pinPWM, self.speed_freq(speed if speed >= 0 else -speed) if duty else 1000, 500000 if duty else 0)
             if status:
                 print(" PWM err=%d \r" % status)
         #hardConf.pi.set_PWM_frequency(self.pinPWM,self.speed_freq(speed))
@@ -404,7 +404,7 @@ class pump_PWM(sensor.Sensor):
             self.speed_liters = self.maximal_liters
         elif not self.speed_liters:
             self.speed_liters = self.speedLitersHour(self.speed)
-        if hardConf.MICHA_device or hardConf.Raspberry:
+        if hardConf.MICHA_device or hardConf.processor != 'pc':
             self.setSpeed(prvSpeed,self.speed,self.reverse)
             return True
         else:
@@ -415,7 +415,7 @@ class pump_PWM(sensor.Sensor):
         
         #traceback.print_stack()
         print(" STOP %s \r"%self.address)
-        if hardConf.MICHA_device or hardConf.Raspberry:
+        if hardConf.MICHA_device or hardConf.processor != 'pc':
             self.setSpeed(-self.speed if self.reverse else self.speed, 0)
             # GPIO.output(self.pinDirection, 1)
             # if self.pinDirection > 0:
@@ -569,6 +569,6 @@ if __name__ == "__main__":
         else:
             print ("Pump stopped and closed.")
         if hardConf.Odroid:
-            hardConf.pi.cleanup()
+            hardConf.localGPIO.cleanup()
             pass
 

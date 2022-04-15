@@ -76,13 +76,23 @@ def getch():
 
     ch = None
     fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
     try:
+        old_settings = termios.tcgetattr(fd)
         tty.setraw(fd)
+    except: #ioctl
+        old_settings = None
+    try:
         ch = sys.stdin.read(1)
     finally:
-        termios.tcsetattr(fd,termios.TCSADRAIN,old_settings)
+        if old_settings:
+            termios.tcsetattr(fd,termios.TCSADRAIN,old_settings)
     return ch
+
+def termSize():
+    if term and term.getSize():
+        return term.getSize()
+    else:
+        return (25,80)
 
 def tell_message(message):
     
@@ -91,7 +101,7 @@ def tell_message(message):
         prec_disp = display_pause
         display_pause = True
         time.sleep(0.01)
-        (lines, columns) = term.getSize()
+        (lines, columns) = termSize()
         term.pos(lines,1)
         term.writeLine("",term.bgwhite) # scroll the whole display by one line
         term.pos(lines-4,1)
@@ -766,7 +776,7 @@ class ThreadDAC(threading.Thread):
 
                 if not display_pause:
                     time.sleep(0.01)
-                    (lines, columns) = term.getSize()
+                    (lines, columns) = termSize()
                     term.pos(lines,1)
                     term.writeLine("",term.bgwhite) # scroll the whole display by one line
                     term.pos(lines-4,1)
@@ -1462,7 +1472,7 @@ class ThreadPump(threading.Thread):
                     if not DEBUG:
                         prec_disp = display_pause
                         display_pause = True
-                        (lines,cols) = term.getSize()
+                        (lines,cols) = termSize()
                         term.pos(1,cols-10)
                         term.write("%5.2d" % speed, term.bold, term.yellow if speed > 0.0 else term.red, term.bgwhite)
                         display_pause = prec_disp
@@ -1482,7 +1492,7 @@ class ThreadPump(threading.Thread):
         self.join()
 
 term.setTitle("pastOnomic, pasteurisation accessible")
-(lines, columns) = term.getSize()
+(lines, columns) = termSize()
 term.pos(lines,1)
 for i in range(1,lines):
     term.writeLine(" ",term.black, term.bgwhite)
@@ -1516,7 +1526,7 @@ T_Thermistor = ThreadThermistor()
 T_Thermistor.daemon = True
 T_Thermistor.sensorParam("input",hardConf.T_input) # Entrée
 T_Thermistor.sensorParam("heatout",hardConf.T_heatout) # Sortie
-T_Thermistor.sensorParam("sp9",hardConf.T_sp9) # Garantie sortie serpentin long
+T_Thermistor.sensorParam("sp9", hardConf.T_warranty) # Garantie sortie serpentin long
 #T_Thermistor.sensorParam("temper",hardConf.T_sp9b) # Garantie entrée serpentin court
 if hardConf.T_heating:
     T_Thermistor.sensorParam("heating",hardConf.T_heating)
