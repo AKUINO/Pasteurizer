@@ -232,13 +232,20 @@ def vol_coil(diamT,diamS,nbS):
     long = diamS*PI*nbS
     return vol_tube(diamT,long)
 
-exchanger_tube = 2.0*712.6 #mL
-old_exchanger = vol_tube(8,8*1800)
-pasteurization_tube = 625 #vol_tube(8,15000) # 15m of expensive pump tube
-up_to_thermistor = 2330.0
-heating_tube = vol_tube(10.5,500)+vol_coil(10.5,220,18)+vol_tube(8,200)+vol_coil(7,250,20)
-initial_tubing = up_to_thermistor-heating_tube+exchanger_tube-old_exchanger
-final_tubing = 3587.0-up_to_thermistor-pasteurization_tube-vol_tube(8,1800)+exchanger_tube-old_exchanger
+if hardConf.tubing == "horizontal":
+    pasteurization_tube = 625 #vol_tube(8,15000) # 15m of expensive pump tube
+    up_to_thermistor = 2330.0
+    heating_tube = vol_tube(10.5,500)+vol_coil(10.5,220,18)+vol_tube(8,200)+vol_coil(7,250,20)
+    initial_tubing = up_to_thermistor-heating_tube
+    final_tubing = 3587.0-up_to_thermistor-pasteurization_tube-vol_tube(8,1800)
+else:
+    exchanger_tube = 2.0*712.6 #mL
+    old_exchanger = vol_tube(8,8*1800)
+    pasteurization_tube = vol_tube(9.5,8820) # = 625mL aussi
+    up_to_thermistor = 2330.0
+    heating_tube = vol_tube(10.5,500)+vol_coil(10.5,220,18)+vol_tube(8,200)+vol_coil(7,250,20)
+    initial_tubing = up_to_thermistor-heating_tube+exchanger_tube-old_exchanger
+    final_tubing = 3587.0-up_to_thermistor-pasteurization_tube-vol_tube(8,1800)+exchanger_tube-old_exchanger
 
 cohorts.sequence = [ # Tubing and Sensor Sequence of the Pasteurizer
                     [initial_tubing,'input'], #input de la chauffe
@@ -248,7 +255,7 @@ cohorts.sequence = [ # Tubing and Sensor Sequence of the Pasteurizer
 START_VOL = 0.0
 for curr_cohort in cohorts.sequence:
     START_VOL += curr_cohort[0]
-    if curr_cohort[1] == 'heating':
+    if curr_cohort[1] == 'warranty':
         break
 
 TOTAL_VOL = 0.0
@@ -259,6 +266,10 @@ tell_message("Amorçage=%dmL, Pasteurisation=%dmL : %.1fL/h, Total=%dmL" % (int(
 #Amorçage=2031mL, Pasteurisation=538mL, Total=3676mL
 #Amorçage=2034mL, Pasteurisation=325mL, Total=3346mL
 #Amorçage=2300mL, Pasteurisation=400mL, Total=3840mL MESURE
+#Amorçage=2330mL, Pasteurisation=625mL, Total=3587mL (new config system)
+#New exchanger:
+#Amorçage=3031mL, Pasteurisation=625mL, Total=4989mL
+
 
 
 START_VOL = START_VOL / 1000.0 # 1.9L

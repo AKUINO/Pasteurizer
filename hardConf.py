@@ -66,6 +66,7 @@ configFile = ""
 configParsing = None
 MICHA_version = None
 reversedPump = False
+tubing=None
 
 if hostname.startswith(prefixHostname):
     i = hostname.index('-')
@@ -103,6 +104,8 @@ if configParsing:
                     localGPIOtype = "pypi"
             elif anItem[0].lower() == 'gpio':
                 localGPIOtype = anItem[1].lower()
+            elif anItem[0].lower() == 'tubing':
+                tubing = anItem[1].lower()
         if localGPIOtype == "pigpio":
             import pigpio
             localGPIO = pigpio.pi() # Uses BCM numbering for pins...
@@ -220,31 +223,6 @@ if configParsing:
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
         Rmeter = RMETERpast.R_Meter(S1=R_S1, S2=R_S2, S3=R_S3, polarityIO=R_polarity) # bus=0, spi_channel=0, bus2=1, spi_channel2=0
-
-# One Wire sensors address
-# if hostname == "pastOnomic":
-#     Raspberry = True
-#     MICHA_device = "/dev/serial0"
-#     io = MICHApast.Micha(MICHA_device)
-#     OW_heating = "28.CC3EAF040000"  # Extra: typiquement sortie du refroidissement rapide
-#     OW_extra = None # "28.AA5659501401"  # Bain de tempérisation (sortie) régulé en refroidissement   28.FFDD64931504 est mort (FFDD)
-# elif hostname == "pastoB04001":
-#     Odroid = True
-#     MICHA_device = "/dev/ttyS1"
-#     pumpON = 1
-#     pumpOFF = 0
-#     import MICHA40past
-#     io = MICHA40past.Micha4(MICHA_device)
-#     T_heating = T_extra
-#     OW_heating = None
-#     OW_extra = None # "28.AA5659501401"  # Bain de tempérisation (sortie) régulé en refroidissement   28.FFDD64931504 est    # OW_temper = "28.AABA43501401"  # Bain de chauffe
-#     ml.setLang('f')
-# elif hostname == "christophe-Latitude-E7440":
-#     #OW_temper = "28.A6156B070000"  # Extra: typiquement sortie du refroidissement rapide
-#     OW_heating = "28.AA5E36501401"  # Bain de chauffe
-#     OW_extra = "28.CC3EAF040000"  # Bain de tempérisation (sortie) régulé en refroidissement
-#     ml.setLang('e')
-# else keep variables undefined...
 
 if MICHA_device:
     thermistors_voltage = MICHApast.VOLTAGE_REF
