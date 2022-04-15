@@ -5,6 +5,18 @@ import datetime
 import traceback
 import term
 
+# typeNum assignation
+# 1 : One Wire
+# 2 : Button
+# 3 : ssr
+# 4 : pump (not pwm)
+# 5 : thermistor
+# 6 : valve
+# 7 : pump_pwm
+#11 : RMeter
+#12 : LED
+#15 : solenoid
+
 class Sensor(object):
 
     def __init__(self,sensorType,address,param):

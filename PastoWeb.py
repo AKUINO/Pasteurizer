@@ -114,6 +114,9 @@ def tell_message(message):
 typeOneWire = 1
 typeRMeter = 11
 
+YellowLED = LED('yellow')
+GreenLED = LED('green')
+
 ##BATH_TUBE = 4.6 # degrees Celsius. Margin between temperature in bath and temperature wished in the tube
 FLOOD_TIME = 60.0 # 90 econds of hot water tap flushing (when a pump is in the way. 60 if not)
 
@@ -1454,7 +1457,10 @@ class ThreadPump(threading.Thread):
                 now = time.perf_counter()
                 if self.paused:
                     speed = 0.0
-                else:                        
+                    YellowLED.off(); # blink twice per second
+                    GreenLED.blink(2);
+                else:
+                    YellowLED.on();
                     if not self.currOperation:
                         if not self.currSequence or not len(self.currSequence):
                             speed = 0.0
@@ -1468,6 +1474,7 @@ class ThreadPump(threading.Thread):
                         speed = self.currOperation.execute(now,self)
                     else:
                         speed = 0.0
+                    GreenLED.set(1 if speed != 0.0 else 0)
                 prec_speed = self.pump.liters()
                 if speed != prec_speed:
                     time.sleep(0.01)

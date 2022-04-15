@@ -109,9 +109,9 @@ if configParsing:
         if localGPIOtype == "pigpio":
             import pigpio
             localGPIO = pigpio.pi() # Uses BCM numbering for pins...
-            pigpio_PUD_UP = pigpio.PUD_UP
-            pigpio_INPUT = pigpio.INPUT
-            pigpio_OUTPUT = pigpio.OUTPUT
+            gpio_PUD_UP = pigpio.PUD_UP
+            gpio_INPUT = pigpio.INPUT
+            gpio_OUTPUT = pigpio.OUTPUT
         elif localGPIOtype == "pypi":
             try:
                 if processor == "odroid":
@@ -122,6 +122,9 @@ if configParsing:
                 print("Error importing RPi or Odroid.GPIO!  This is probably because you need superuser privileges.  You can achieve this by using 'sudo' to run your script")
             GPIO.setmode(GPIO.BOARD)
             localGPIO = GPIO # Uses BOARD numbering for pins...
+            gpio_PUD_UP = GPIO.PUD_UP
+            gpio_INPUT = GPIO.INPUT
+            gpio_OUTPUT = GPIO.OUTPUT
 
     if 'user' in configParsing.sections():
         for anItem in configParsing.items('user'):

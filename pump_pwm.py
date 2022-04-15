@@ -270,17 +270,17 @@ class pump_PWM(sensor.Sensor):
                 # self.pwm = GPIO.PWM(self.pinPWM, 1000)  # create PWM instance with frequency
                 # self.pwm.start(0)  # keep PWM quiet for now. Should be 50 when running
                 if self.pinStatus > 0:
-                    hardConf.localGPIO.set_mode(self.pinStatus, hardConf.pigpio_INPUT)
-                    hardConf.localGPIO.set_pull_up_down(self.pinStatus, hardConf.pigpio_PUD_UP)
+                    hardConf.localGPIO.set_mode(self.pinStatus, hardConf.gpio_INPUT)
+                    hardConf.localGPIO.set_pull_up_down(self.pinStatus, hardConf.gpio_PUD_UP)
                 elif self.pinStatus < 0:
                     hardConf.io.set_pin_direction(-self.pinStatus, 1)
                     hardConf.io.set_pin_pullup(-self.pinStatus, 1)
                 if self.pinDirection > 0:
-                    hardConf.localGPIO.set_mode(self.pinDirection, hardConf.pigpio_OUTPUT)
+                    hardConf.localGPIO.set_mode(self.pinDirection, hardConf.gpio_OUTPUT)
                 else:
                     hardConf.io.set_pin_direction(-self.pinDirection, 0)
                 # PWM is not possible through IOexpanding board...
-                hardConf.localGPIO.set_mode(self.pinPWM, hardConf.pigpio_OUTPUT)
+                hardConf.localGPIO.set_mode(self.pinPWM, hardConf.gpio_OUTPUT)
                 #hardConf.pi.set_mode(self.pinPWM, pigpio.ALT5)
                 #hardConf.pi.set_PWM_dutycycle(self.pinPWM, 128)
                 #hardConf.pi.set_PWM_frequency(self.pinPWM, 0)
