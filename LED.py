@@ -14,7 +14,7 @@ class LED(sensor.Sensor):
     def __init__(self,address,param):
         try:
             if hardConf.localGPIOtype == 'pypi':
-                hardConf.localGPIO.GPIO.setup(param, hardConf.gpio_OUTPUT)
+                hardConf.localGPIO.setup(param, hardConf.gpio_OUTPUT)
             elif hardConf.localGPIOtype == 'pigpio':
                 hardConf.localGPIO.set_mode(param, hardConf.gpio_OUTPUT)
         except:

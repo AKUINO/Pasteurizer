@@ -33,6 +33,7 @@ import cohort
 from thermistor import Thermistor
 from solenoid import Solenoid
 from LED import LED
+from button import button
 from valve import Valve
 from menus import Menus
 
@@ -115,9 +116,30 @@ def tell_message(message):
 typeOneWire = 1
 typeRMeter = 11
 
-#configuration of used pins?
-YellowLED = LED('yellow',18) #BCM=24
-GreenLED = LED('green',16) #BCM=23
+Buzzer = None
+RedLED = None
+YellowLED = None
+GreenLED = None
+RedButton = None
+YellowButton = None
+GreenButton = None
+#configuration of output pins
+if hardConf.Out_Buzzer:
+    Buzzer = LED('buzzer',hardConf.Out_Buzzer)
+if hardConf.Out_Red:
+    RedLED = LED('red',hardConf.Out_Red) #BCM=24
+if hardConf.Out_Yellow:
+    YellowLED = LED('yellow',hardConf.Out_Yellow) #BCM=24
+if hardConf.Out_Green:
+    GreenLED = LED('green',hardConf.Out_Green) #BCM=23
+
+#configuration of input pins
+if hardConf.In_Red:
+    RedButton = button('red',hardConf.In_Red)
+if hardConf.In_Yellow:
+    YellowButton = button('yellow',hardConf.In_Yellow)
+if hardConf.In_Green:
+    GreenButton = button('green',hardConf.In_Green)
 
 ##BATH_TUBE = 4.6 # degrees Celsius. Margin between temperature in bath and temperature wished in the tube
 FLOOD_TIME = 60.0 # 90 econds of hot water tap flushing (when a pump is in the way. 60 if not)
@@ -376,7 +398,7 @@ class ThreadThermistor(threading.Thread):
             try: 
                 time.sleep(1.0)
                 for (address, aSensor) in cohorts.catalog.items():
-                    if aSensor.sensorType == Thermistor.typeNum:
+                    if aSensor.sensorType in [Thermistor.typeNum,button.typeNum]:
                         aSensor.get()
                 if not hardConf.MICHA_device: # Average of 3 measures needed
                     time.sleep(0.01)
@@ -1455,14 +1477,23 @@ class ThreadPump(threading.Thread):
         self.running = True
         while self.running:
             try:
-                time.sleep(0.5)
+                time.sleep(0.2)
                 now = time.perf_counter()
+                if YellowButton.get() == 1:
+                    if not self.paused:
+                        self.setPause(True)  # Will make the pump stops !
+                if GreenButton.get() == 1:
+                    if self.paused:
+                        T_Pump.setPause(False)
                 if self.paused:
                     speed = 0.0
-                    YellowLED.off(); # blink twice per second
-                    GreenLED.blink(2);
+                    if YellowLED:
+                        YellowLED.off() # blink twice per second
+                    if GreenLED:
+                        GreenLED.blink(2)
                 else:
-                    YellowLED.on();
+                    if YellowLED:
+                        YellowLED.on();
                     if not self.currOperation:
                         if not self.currSequence or not len(self.currSequence):
                             speed = 0.0
@@ -1476,7 +1507,8 @@ class ThreadPump(threading.Thread):
                         speed = self.currOperation.execute(now,self)
                     else:
                         speed = 0.0
-                    GreenLED.set(1 if speed != 0.0 else 0)
+                    if GreenLED:
+                        GreenLED.set(1 if speed != 0.0 else 0)
                 prec_speed = self.pump.liters()
                 if speed != prec_speed:
                     time.sleep(0.01)

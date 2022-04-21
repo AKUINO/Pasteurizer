@@ -43,6 +43,17 @@ T_warranty = 3 # Garantie sortie serpentin long
 T_heating = 4 # If no OneWire, this will be T_sp9b
 T_extra = None
 
+In_Green = None
+Out_Green = None
+
+In_Yellow = None
+Out_Yellow = None
+
+In_Red = None
+Out_Red = None # TXD, SYS_LED for Odroid?
+
+Out_Buzzer = None
+
 OW_input = None # Entrée
 OW_output= None # Sortie
 OW_warranty = None # Garantie sortie serpentin long
@@ -112,6 +123,13 @@ if configParsing:
             gpio_PUD_UP = pigpio.PUD_UP
             gpio_INPUT = pigpio.INPUT
             gpio_OUTPUT = pigpio.OUTPUT
+            In_Green = 22
+            Out_Green = 23
+            In_Yellow = 27
+            Out_Yellow = 24
+            In_Red =  13
+            Out_Red = None # TXD, SYS_LED for Odroid?
+            Out_Buzzer = 26
         elif localGPIOtype == "pypi":
             try:
                 if processor == "odroid":
@@ -125,6 +143,60 @@ if configParsing:
             gpio_PUD_UP = GPIO.PUD_UP
             gpio_INPUT = GPIO.IN
             gpio_OUTPUT = GPIO.OUT
+            In_Green = 15 # BCM 22
+            Out_Green = 16 # BCM 23
+            In_Yellow = 13 # BCM 27
+            Out_Yellow = 18 # BCM 24
+            In_Red = 33 # BCM 13
+            Out_Red = None # TXD, SYS_LED for Odroid
+            Out_Buzzer = 37 # BCM 26
+
+    if 'green' in configParsing.sections():
+        for anItem in configParsing.items('green'):
+            if anItem[0].lower() == 'input':
+                try:
+                    In_Green = int(anItem[1])
+                except:
+                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+            elif anItem[0].lower() == 'output':
+                try:
+                    Out_Green = int(anItem[1])
+                except:
+                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+
+    if 'yellow' in configParsing.sections():
+        for anItem in configParsing.items('yellow'):
+            if anItem[0].lower() == 'input':
+                try:
+                    In_Yellow = int(anItem[1])
+                except:
+                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+            elif anItem[0].lower() == 'output':
+                try:
+                    Out_Yellow = int(anItem[1])
+                except:
+                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+
+    if 'red' in configParsing.sections():
+        for anItem in configParsing.items('red'):
+            if anItem[0].lower() == 'input':
+                try:
+                    In_Red = int(anItem[1])
+                except:
+                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+            elif anItem[0].lower() == 'output':
+                try:
+                    Out_Red = int(anItem[1])
+                except:
+                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+
+    if 'buzzer' in configParsing.sections():
+        for anItem in configParsing.items('buzzer'):
+            if anItem[0].lower() == 'output':
+                try:
+                    Out_Buzzer = int(anItem[1])
+                except:
+                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
 
     if 'user' in configParsing.sections():
         for anItem in configParsing.items('user'):

@@ -15,6 +15,7 @@ import term
 # 7 : pump_pwm
 #11 : RMeter
 #12 : LED
+#13 : button
 #15 : solenoid
 
 class Sensor(object):
