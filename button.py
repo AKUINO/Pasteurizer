@@ -14,9 +14,10 @@ class button(sensor.Sensor):
     def __init__(self,address,param):
         try:
             if hardConf.localGPIOtype == 'pypi':
-                hardConf.localGPIO.setup(param, hardConf.gpio_INPUT)
+                hardConf.localGPIO.setup(param, hardConf.gpio_INPUT, pull_up_down=hardConf.gpio_PUD_UP)
             elif hardConf.localGPIOtype == 'pigpio':
                 hardConf.localGPIO.set_mode(param, hardConf.gpio_INPUT)
+                hardConf.localGPIO.set_pull_up_down(param, hardConf.gpio_PUD_UP)
         except:
             print ("%s: init GPIO no.%d" % (address,param))
             traceback.print_exc()
