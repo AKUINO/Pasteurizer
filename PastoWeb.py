@@ -115,6 +115,7 @@ def tell_message(message):
 typeOneWire = 1
 typeRMeter = 11
 
+#configuration of used pins?
 YellowLED = LED('yellow',18) #BCM=24
 GreenLED = LED('green',16) #BCM=23
 
