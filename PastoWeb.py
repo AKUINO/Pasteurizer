@@ -1472,7 +1472,7 @@ class ThreadPump(threading.Thread):
         return 0.0
 
     def run(self):
-        
+
         global display_pause
         
         self.running = True
@@ -1481,13 +1481,11 @@ class ThreadPump(threading.Thread):
                 time.sleep(0.3)
                 now = time.perf_counter()
                 if YellowButton.get() == 1:
-                    print("yellow")
                     if not self.paused:
                         self.setPause(True)  # Will make the pump stops !
                 if GreenButton.get() == 1:
-                    print("green")
                     if self.paused:
-                        T_Pump.setPause(False)
+                        self.setPause(False)
                 Buzzer.off()
                 if self.paused:
                     speed = 0.0

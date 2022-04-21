@@ -43,8 +43,8 @@ class LED(sensor.Sensor):
             value = 1
         else:
             value = 0
-        changed = super().set(value)
         self.write(value)
+        changed = super().set(value)
         return changed
 
     def display(self,format=" %d"):

@@ -137,7 +137,8 @@ if configParsing:
                 else:
                     import RPi.GPIO as GPIO
             except RuntimeError:
-                print("Error importing RPi or Odroid.GPIO!  This is probably because you need superuser privileges.  You can achieve this by using 'sudo' to run your script")
+                print("Error importing RPi or Odroid.GPIO.")
+                traceback.print_exc()
             GPIO.setmode(GPIO.BOARD)
             localGPIO = GPIO # Uses BOARD numbering for pins...
             gpio_PUD_UP = GPIO.PUD_UP
