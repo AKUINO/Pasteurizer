@@ -398,7 +398,7 @@ class ThreadThermistor(threading.Thread):
             try: 
                 time.sleep(1.0)
                 for (address, aSensor) in cohorts.catalog.items():
-                    if aSensor.sensorType in [Thermistor.typeNum,button.typeNum]:
+                    if aSensor.sensorType == Thermistor.typeNum:
                         aSensor.get()
                 if not hardConf.MICHA_device: # Average of 3 measures needed
                     time.sleep(0.01)
@@ -1482,9 +1482,11 @@ class ThreadPump(threading.Thread):
                 time.sleep(0.2)
                 now = time.perf_counter()
                 if YellowButton.get() == 1:
+                    print("yellow")
                     if not self.paused:
                         self.setPause(True)  # Will make the pump stops !
                 if GreenButton.get() == 1:
+                    print("green")
                     if self.paused:
                         T_Pump.setPause(False)
                 if self.paused:
