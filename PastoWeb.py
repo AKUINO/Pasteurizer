@@ -1292,34 +1292,34 @@ opSequences = {
           ],
     'P': # Pasteurisation
         [ Operation('PasT','HEAT',ref='P',ref2='t', dump=True,programmable=True),
-          Operation('PasI','TRAK','sp9','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('Pasi','TRAK','sp9','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=TOTAL_VOL-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('PasI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Pasi','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=TOTAL_VOL-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('PasE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',ref2='t', dump=True),
-          Operation('PasP','TRAK','sp9','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
     'I': # Reprise d'une Pasteurisation
         [ Operation('PasT','HEAT',ref='P',ref2='t', dump=True,programmable=True),
-          Operation('PasP','TRAK','sp9','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
     'E': # Eau pour finir une Pasteurisation en poussant juste ce qu'il faut le lait encore dans les tuyaux
         [ Operation('EauT','HEAT',ref='P',ref2='t', dump=True,programmable=True),
-          Operation('EauI','TRAK','sp9','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('EauP','TRAK','sp9','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('EauI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('EauP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('EauV','PUMP', base_speed=MAX_SPEED, ref='P',ref2='t', qty=(TOTAL_VOL*0.96)-START_VOL,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites C quand vous voulez nettoyer!","Press C when you want to clean!","Druk op C als u wilt reinigen!"),dump=True)
           ],
     'M': # Passer à un lait d'un autre provenance en chassant celui de la pasteurisation précédente
         [ Operation('Mult','HEAT',ref='P',ref2='t', dump=True,programmable=True),
-          Operation('Muli','TRAK','sp9','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('Mulp','TRAK','sp9','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Muli','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Mulp','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('MulC','PAUS',message=ml.T("Consigne nouveau lait puis une touche pour finir de chasser le 1er lait","Setpoint for New milk then press a key to finish bottling 1st","Instelpunt voor nieuwe melk en druk vervolgens op een toets om het bottelen eerst te beëindigen"),ref='P',ref2='t', dump=True),
           Operation('MulT','HEAT',ref='P',ref2='t', dump=True),
-          Operation('MulP','TRAK','sp9','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('MulP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('MulE','PAYS',message=ml.T("Contenant pour le nouveau lait!","New Milk container!","Houder voor nieuwe melk!"),ref='P',ref2='t', dump=True),
           Operation('MulH','HEAT',ref='P',ref2='t', dump=True),
-          Operation('MulI','TRAK','sp9','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('MulI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ]
     }
