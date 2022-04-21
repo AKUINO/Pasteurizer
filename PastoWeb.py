@@ -964,7 +964,6 @@ class Operation(object):
             Buzzer.on()
             T_Pump.setPause(True)
             tell_message(self.message)
-            Buzzer.off()
         elif self.typeOp == 'SUBR': # 1st Call a subroutine and loop...
             i = 0
             for op in opSequences[self.subSequence]:
@@ -1479,7 +1478,7 @@ class ThreadPump(threading.Thread):
         self.running = True
         while self.running:
             try:
-                time.sleep(0.2)
+                time.sleep(0.3)
                 now = time.perf_counter()
                 if YellowButton.get() == 1:
                     print("yellow")
@@ -1489,6 +1488,7 @@ class ThreadPump(threading.Thread):
                     print("green")
                     if self.paused:
                         T_Pump.setPause(False)
+                Buzzer.off()
                 if self.paused:
                     speed = 0.0
                     if YellowLED:
