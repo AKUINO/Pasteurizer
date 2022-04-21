@@ -1480,6 +1480,12 @@ class ThreadPump(threading.Thread):
             try:
                 time.sleep(0.3)
                 now = time.perf_counter()
+                if RedButton.get() == 1:
+                    T_Pump.stopAction()
+                    if YellowButton.get() == 1:
+                        T_Pump.currAction = 'X'
+                        os.kill(os.getpid(),signal.SIGINT)
+                        WebExit = True # SHUTDOWN !
                 if YellowButton.get() == 1:
                     if not self.paused:
                         self.setPause(True)  # Will make the pump stops !
@@ -1511,8 +1517,6 @@ class ThreadPump(threading.Thread):
                         speed = self.currOperation.execute(now,self)
                     else:
                         speed = 0.0
-                    if GreenLED:
-                        GreenLED.set(1 if speed != 0.0 else 0)
                 prec_speed = self.pump.liters()
                 if speed != prec_speed:
                     time.sleep(0.01)
