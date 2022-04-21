@@ -144,13 +144,22 @@ if configParsing:
             gpio_PUD_UP = GPIO.PUD_UP
             gpio_INPUT = GPIO.IN
             gpio_OUTPUT = GPIO.OUT
-            In_Green = 22 # board 15 # BCM 22
-            Out_Green = 23 # board 16 # BCM 23
-            In_Yellow = 27 # board 13 # BCM 27
-            Out_Yellow = 24 # board 18 # BCM 24
-            In_Red = 13 # board 33 # BCM 13
-            Out_Red = None # TXD, SYS_LED for Odroid
-            Out_Buzzer = 26 # board 35 # BCM 26
+            if processor == "odroid":
+                In_Green = 483 # board 15 # BCM 22
+                Out_Green = 476 # board 16 # BCM 23
+                In_Yellow = 480 # board 13 # BCM 27
+                Out_Yellow = 477 # board 18 # BCM 24
+                In_Red = 482 # board 33 # BCM 13
+                Out_Red = None # TXD, SYS_LED for Odroid
+                Out_Buzzer = 495 # board 35 # BCM 26
+            else:
+                In_Green = 22 # board 15 # BCM 22
+                Out_Green = 23 # board 16 # BCM 23
+                In_Yellow = 27 # board 13 # BCM 27
+                Out_Yellow = 24 # board 18 # BCM 24
+                In_Red = 13 # board 33 # BCM 13
+                Out_Red = None # TXD, SYS_LED for Odroid
+                Out_Buzzer = 26 # board 35 # BCM 26
 
     if 'green' in configParsing.sections():
         for anItem in configParsing.items('green'):
