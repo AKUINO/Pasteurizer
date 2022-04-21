@@ -149,7 +149,7 @@ if configParsing:
             Out_Yellow = 18 # BCM 24
             In_Red = 33 # BCM 13
             Out_Red = None # TXD, SYS_LED for Odroid
-            Out_Buzzer = 37 # BCM 26
+            Out_Buzzer = 35 # BCM 26
 
     if 'green' in configParsing.sections():
         for anItem in configParsing.items('green'):
