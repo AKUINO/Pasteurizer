@@ -961,8 +961,10 @@ class Operation(object):
         elif self.typeOp == 'REVR':
             T_Pump.pump.reset_pump()
         elif self.typeOp == 'PAUS':
+            Buzzer.on()
             T_Pump.setPause(True)
             tell_message(self.message)
+            Buzzer.off()
         elif self.typeOp == 'SUBR': # 1st Call a subroutine and loop...
             i = 0
             for op in opSequences[self.subSequence]:
