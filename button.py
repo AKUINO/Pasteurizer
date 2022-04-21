@@ -32,6 +32,7 @@ class button(sensor.Sensor):
                 value = hardConf.localGPIO.read(self.param)
             #print ("%d=%d" % (self.param,value))
             #traceback.print_stack()
+            value = 0 if value > 0 else 1 # REVERSE because pressing is grounding !!!
         except:
             print ("%s: %d=%d" % (self.address, self.param,value))
             traceback.print_exc()
