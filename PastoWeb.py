@@ -1492,10 +1492,12 @@ class ThreadPump(threading.Thread):
                 if self.paused:
                     speed = 0.0
                     if YellowLED:
-                        YellowLED.off() # blink twice per second
+                        YellowLED.off()
                     if GreenLED:
-                        GreenLED.blink(2)
+                        GreenLED.blink(2) # blink twice per second
                 else:
+                    if GreenLED:
+                        GreenLED.off()
                     if YellowLED:
                         YellowLED.on();
                     if not self.currOperation:
