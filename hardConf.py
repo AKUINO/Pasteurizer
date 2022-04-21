@@ -123,8 +123,8 @@ if configParsing:
             GPIO.setmode(GPIO.BOARD)
             localGPIO = GPIO # Uses BOARD numbering for pins...
             gpio_PUD_UP = GPIO.PUD_UP
-            gpio_INPUT = GPIO.INPUT
-            gpio_OUTPUT = GPIO.OUTPUT
+            gpio_INPUT = GPIO.IN
+            gpio_OUTPUT = GPIO.OUT
 
     if 'user' in configParsing.sections():
         for anItem in configParsing.items('user'):
