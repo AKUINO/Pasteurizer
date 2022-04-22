@@ -2274,9 +2274,9 @@ except:
 if T_PumpReading:
     try:
         T_PumpReading.close()
+        time.sleep(0.1)
     except:
         traceback.print_exc()
-    time.sleep(0.1)
 
 try:
     T_Pump.close()
@@ -2284,6 +2284,7 @@ try:
     term.writeLine ("éteinte.", term.green, term.bold, term.bgwhite)
 except:
     traceback.print_exc()
+
 hotTapSolenoid.close()
 #coldTapSolenoid.close()
 
