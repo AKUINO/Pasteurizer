@@ -2112,8 +2112,11 @@ class ThreadWebServer(threading.Thread):
 
 
     def stop(self):
-        self.app.stop()
-        self.join()
+        try:
+            self.app.stop()
+            self.join()
+        except:
+            traceback.print_exc()
 
 def freshHref(url):
     pieces = url.split('#')
