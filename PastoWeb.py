@@ -1474,15 +1474,26 @@ class ThreadPump(threading.Thread):
     def run(self):
 
         global display_pause, WebExit
-        
+
+        if GreenLED:
+            GreenLED.off()
+        if YellowLED:
+            YellowLED.off()
+        if RedLED:
+            RedLED.off()
+
         self.running = True
         while self.running:
             try:
                 time.sleep(0.3)
                 now = time.perf_counter()
                 if RedButton.get() == 1:
-                    self.stopAction()
-                    if YellowButton.get() == 1:
+                    if not self.currAction in ['X','Z',' ']:
+                        self.stopAction()
+                        if RedLED:
+                            RedLED.blink(2)
+                        time.sleep(2.0) # Press long!
+                    else:
                         self.currAction = 'X'
                         os.kill(os.getpid(),signal.SIGINT)
                         WebExit = True # SHUTDOWN !
@@ -1493,10 +1504,18 @@ class ThreadPump(threading.Thread):
                     if self.paused:
                         self.setPause(False)
                 Buzzer.off()
+                if RedButton:
+                    if not self.currAction in ['X','Z',' ']:
+                        RedButton.on ()
+                    else:
+                        RedButton.blink (2)
                 if self.paused:
                     speed = 0.0
                     if YellowLED:
-                        YellowLED.off()
+                        if not self.currAction in ['X','Z',' ']:
+                            YellowLED.on()
+                        else:
+                            YellowLED.off()
                     if GreenLED:
                         GreenLED.blink(2) # blink twice per second
                 else:
@@ -1549,6 +1568,8 @@ class ThreadPump(threading.Thread):
         time.sleep(0.1)
         self.pump.close()
         time.sleep(0.1)
+        if RedLED:
+            RedLED.off()
         try:
             self.join()
         except:
@@ -2250,5 +2271,5 @@ if WebExit: # Exit asked from web: shutdown the computer
     #To make the following call possible, please configure in /etc/sudoer file:
     #    username ALL = NOPASSWD: /sbin/shutdown
     #    %admin  ALL = NOPASSWD: /sbin/shutdown
-    subprocess.call(['sudo','/sbin/shutdown', '-h', 'now'])
+    subprocess.call(['/usr/sbin/shutdown', '-h', 'now'])
     #os.system('systemctl poweroff')  demande aussi une authentication...
