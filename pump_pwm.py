@@ -250,10 +250,13 @@ class pump_PWM(sensor.Sensor):
     def reset_pump(self):
         self.stop()
         if hardConf.MICHA_device:
-            time.sleep(2)
-            hardConf.io.set_pump_power(0) # Disable power. (pins are managed by MICHA board)
-            time.sleep(2)    
-            hardConf.io.set_pump_power(1) # Enable power. (pins are managed by MICHA board)
+            try:
+                time.sleep(2)
+                hardConf.io.set_pump_power(0) # Disable power. (pins are managed by MICHA board)
+                time.sleep(2)
+                hardConf.io.set_pump_power(1) # Enable power. (pins are managed by MICHA board)
+            except:
+                traceback.print_exc()
 
     def open(self):
 

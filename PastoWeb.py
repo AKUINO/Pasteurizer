@@ -85,6 +85,8 @@ def getch():
         old_settings = None
     try:
         ch = sys.stdin.read(1)
+    except:
+        traceback.print_exc()
     finally:
         if old_settings:
             termios.tcsetattr(fd,termios.TCSADRAIN,old_settings)
