@@ -2271,5 +2271,5 @@ if WebExit: # Exit asked from web: shutdown the computer
     #To make the following call possible, please configure in /etc/sudoer file:
     #    username ALL = NOPASSWD: /sbin/shutdown
     #    %admin  ALL = NOPASSWD: /sbin/shutdown
-    subprocess.call(['/usr/sbin/shutdown', '-h', 'now'])
+    subprocess.call(['/sbin/shutdown', '-h', 'now'])
     #os.system('systemctl poweroff')  demande aussi une authentication...
