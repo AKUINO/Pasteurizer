@@ -2263,10 +2263,13 @@ time.sleep(0.1)
 change = dumpValve.setWait(1.0)  # better to keep dumping valve open
 term.write ("Vanne ", term.blue, term.bgwhite)
 term.writeLine ("OUVERTE vers l'égout.", term.green, term.bold, term.bgwhite)
-T_DAC.close()
-term.write ("Chauffe ", term.blue, term.bgwhite)
-term.writeLine ("éteinte.", term.green, term.bold, term.bgwhite)
-time.sleep(0.1)
+try:
+    T_DAC.close()
+    term.write ("Chauffe ", term.blue, term.bgwhite)
+    term.writeLine ("éteinte.", term.green, term.bold, term.bgwhite)
+    time.sleep(0.1)
+except:
+    traceback.print_exc()
 
 if T_PumpReading:
     try:
@@ -2274,6 +2277,7 @@ if T_PumpReading:
     except:
         traceback.print_exc()
     time.sleep(0.1)
+
 try:
     T_Pump.close()
     term.write ("Pompe ", term.blue, term.bgwhite)
