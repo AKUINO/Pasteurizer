@@ -416,7 +416,10 @@ class pump_PWM(sensor.Sensor):
         #traceback.print_stack()
         print(" STOP %s \r"%self.address)
         if hardConf.MICHA_device or hardConf.processor != 'pc':
-            self.setSpeed(-self.speed if self.reverse else self.speed, 0)
+            try:
+                self.setSpeed(-self.speed if self.reverse else self.speed, 0)
+            except:
+                traceback.print_exc()
             # GPIO.output(self.pinDirection, 1)
             # if self.pinDirection > 0:
                 # hardConf.pi.write(self.pinDirection, 0)

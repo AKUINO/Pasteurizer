@@ -1495,7 +1495,7 @@ class ThreadPump(threading.Thread):
                         time.sleep(2.0) # Press long!
                     else:
                         self.currAction = 'X'
-                        WebExit = True # SHUTDOWN !
+                        WebExit = True # SHUTDOWN requested
                         try:
                             os.kill(os.getpid(),signal.SIGINT)
                         except:
