@@ -112,7 +112,7 @@ if configParsing:
                 if processor == "rpi" and not localGPIOtype:
                     localGPIOtype = 'pigpio'
                 elif processor == "odroid" and not localGPIOtype:
-                    localGPIOtype = "pypi"
+                    localGPIOtype = "gpio"
             elif anItem[0].lower() == 'gpio':
                 localGPIOtype = anItem[1].lower()
             elif anItem[0].lower() == 'tubing':
@@ -130,7 +130,7 @@ if configParsing:
             In_Red =  13
             Out_Red = None # TXD, SYS_LED for Odroid?
             Out_Buzzer = 26
-        elif localGPIOtype == "pypi":
+        elif localGPIOtype == "gpio":
             try:
                 if processor == "odroid":
                     import Odroid.GPIO as GPIO
@@ -150,7 +150,7 @@ if configParsing:
                 In_Yellow = 480 # board 13 # BCM 27
                 Out_Yellow = 477 # board 18 # BCM 24
                 In_Red = 482 # board 33 # BCM 13
-                Out_Red = None # TXD, SYS_LED for Odroid
+                Out_Red = 432 # board 36 # was TXD, SYS_LED for Odroid
                 Out_Buzzer = 495 # board 35 # BCM 26
             else:
                 In_Green = 22 # board 15 # BCM 22
@@ -324,7 +324,7 @@ if MICHA_device:
     CLD = MICHApast.SOL_HOT_REG # Hot rinsing water
     TAP = MICHApast.SOL_COLD_REG # Cooling water
 
-elif localGPIOtype == "pypi":
+elif localGPIOtype == "gpio":
     from ExpanderPi import IO
     from ExpanderPi import ADC
 
@@ -346,7 +346,7 @@ elif localGPIOtype == "pypi":
 def close():
     if MICHA_device:
         io.close()
-    elif localGPIOtype == "pypi":
+    elif localGPIOtype == "gpio":
         # All ExpanderPI GPIO in input mode:
         io.set_port_direction(0, 0xFF)
         io.set_port_direction(1, 0xFF)

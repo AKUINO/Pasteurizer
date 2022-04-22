@@ -1473,7 +1473,7 @@ class ThreadPump(threading.Thread):
 
     def run(self):
 
-        global display_pause
+        global display_pause, WebExit
         
         self.running = True
         while self.running:
@@ -1481,9 +1481,9 @@ class ThreadPump(threading.Thread):
                 time.sleep(0.3)
                 now = time.perf_counter()
                 if RedButton.get() == 1:
-                    T_Pump.stopAction()
+                    self.stopAction()
                     if YellowButton.get() == 1:
-                        T_Pump.currAction = 'X'
+                        self.currAction = 'X'
                         os.kill(os.getpid(),signal.SIGINT)
                         WebExit = True # SHUTDOWN !
                 if YellowButton.get() == 1:

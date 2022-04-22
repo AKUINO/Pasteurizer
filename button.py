@@ -13,7 +13,7 @@ class button(sensor.Sensor):
 
     def __init__(self,address,param):
         try:
-            if hardConf.localGPIOtype == 'pypi':
+            if hardConf.localGPIOtype == 'gpio':
                 hardConf.localGPIO.setup(param, hardConf.gpio_INPUT, pull_up_down=hardConf.gpio_PUD_UP)
             elif hardConf.localGPIOtype == 'pigpio':
                 hardConf.localGPIO.set_mode(param, hardConf.gpio_INPUT)
@@ -27,7 +27,7 @@ class button(sensor.Sensor):
     def get(self):
         value = None
         try:
-            if hardConf.localGPIOtype == 'pypi':
+            if hardConf.localGPIOtype == 'gpio':
                 value = hardConf.localGPIO.input(self.param)
             elif hardConf.localGPIOtype == 'pigpio':
                 value = hardConf.localGPIO.read(self.param)
