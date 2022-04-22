@@ -1504,11 +1504,11 @@ class ThreadPump(threading.Thread):
                     if self.paused:
                         self.setPause(False)
                 Buzzer.off()
-                if RedButton:
+                if RedLED:
                     if not self.currAction in ['X','Z',' ']:
-                        RedButton.on ()
+                        RedLED.on ()
                     else:
-                        RedButton.blink (2)
+                        RedLED.blink (2)
                 if self.paused:
                     speed = 0.0
                     if YellowLED:
