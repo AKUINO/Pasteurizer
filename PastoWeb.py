@@ -1567,6 +1567,7 @@ class ThreadPump(threading.Thread):
                 self.pump.stop()
                 prec_speed = 0.0
                 prec = time.perf_counter()
+
         time.sleep(0.01)
         self.pump.stop()
 
@@ -2290,6 +2291,13 @@ except:
 
 hotTapSolenoid.close()
 #coldTapSolenoid.close()
+
+if GreenLED:
+    GreenLED.off()
+if YellowLED:
+    YellowLED.off()
+if RedLED:
+    RedLED.off()
 
 hardConf.close()
 
