@@ -1357,6 +1357,8 @@ class ThreadPump(threading.Thread):
         self.pumpLastChange = 0 # Time of last change in pump running
         self.pumpLastVolume = 0
         self.pumpLastHeating = 0
+        self.startAction = 0
+        self.lastStop = 0
 
     def pushContext(self,opContext):
         if opContext:
@@ -1407,6 +1409,7 @@ class ThreadPump(threading.Thread):
         self.pump.reset_pump() # to be sure that no situation ends with a running pump...
         time.sleep(0.01)
         self.currAction = 'Z' # Should stop operations...
+        self.lastStop = time.perf_counter()
 
     def setAction(self,action):
         global opSequences
@@ -1496,8 +1499,7 @@ class ThreadPump(threading.Thread):
                         RedLED.blink(2)
                     if not self.currAction in ['X','Z',' ']:
                         self.stopAction()
-                        time.sleep(2.0) # Press long!
-                    else:
+                    elif now > self.lastStop + 3.0:
                         self.currAction = 'X'
                         WebExit = True # SHUTDOWN requested
                         try:
@@ -2256,6 +2258,13 @@ while T_Pump.currAction != 'X':
         time.sleep(5)
 ## End of main loop.
 
+if GreenLED:
+    GreenLED.on()
+if YellowLED:
+    YellowLED.on()
+if RedLED:
+    RedLED.on()
+
 try:
     # Stops Web Server...
     webServerThread.stop()
@@ -2289,8 +2298,16 @@ try:
 except:
     traceback.print_exc()
 
-hotTapSolenoid.close()
-#coldTapSolenoid.close()
+try:
+    hotTapSolenoid.close()
+    #coldTapSolenoid.close()
+except:
+    traceback.print_exc()
+
+with open(DIR_DATA_CSV + fileName+".csv", "r") as data_file:
+    term.write("Données stockées dans ",term.blue, term.bgwhite)
+    term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
+    data_file.close()
 
 if GreenLED:
     GreenLED.off()
@@ -2300,11 +2317,6 @@ if RedLED:
     RedLED.off()
 
 hardConf.close()
-
-with open(DIR_DATA_CSV + fileName+".csv", "r") as data_file:
-    term.write("Données stockées dans ",term.blue, term.bgwhite)
-    term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
-    data_file.close()
 
 if WebExit: # Exit asked from web: shutdown the computer
     #To make the following call possible, please configure in /etc/sudoer file:
