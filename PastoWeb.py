@@ -1495,8 +1495,11 @@ class ThreadPump(threading.Thread):
                         time.sleep(2.0) # Press long!
                     else:
                         self.currAction = 'X'
-                        os.kill(os.getpid(),signal.SIGINT)
                         WebExit = True # SHUTDOWN !
+                        try:
+                            os.kill(os.getpid(),signal.SIGINT)
+                        except:
+                            traceback.print_exc()
                 if YellowButton.get() == 1:
                     if not self.paused:
                         self.setPause(True)  # Will make the pump stops !
