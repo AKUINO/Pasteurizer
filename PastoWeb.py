@@ -1492,10 +1492,10 @@ class ThreadPump(threading.Thread):
                 time.sleep(0.3)
                 now = time.perf_counter()
                 if RedButton.get() == 1:
+                    if RedLED:
+                        RedLED.blink(2)
                     if not self.currAction in ['X','Z',' ']:
                         self.stopAction()
-                        if RedLED:
-                            RedLED.blink(2)
                         time.sleep(2.0) # Press long!
                     else:
                         self.currAction = 'X'
@@ -1504,6 +1504,11 @@ class ThreadPump(threading.Thread):
                             os.kill(os.getpid(),signal.SIGINT)
                         except:
                             traceback.print_exc()
+                else:
+                    if RedLED:
+                        val = RedLED.get()
+                        if val > 1:
+                            RedLED.blink (2)
                 if YellowButton.get() == 1:
                     if not self.paused:
                         self.setPause(True)  # Will make the pump stops !
@@ -1511,11 +1516,6 @@ class ThreadPump(threading.Thread):
                     if self.paused:
                         self.setPause(False)
                 Buzzer.off()
-                if RedLED:
-                    if not self.currAction in ['X','Z',' ']:
-                        RedLED.on ()
-                    else:
-                        RedLED.blink (2)
                 if self.paused:
                     speed = 0.0
                     if YellowLED:
