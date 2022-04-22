@@ -2275,6 +2275,6 @@ if WebExit: # Exit asked from web: shutdown the computer
     #    username ALL = NOPASSWD: /sbin/shutdown
     #    %admin  ALL = NOPASSWD: /sbin/shutdown
     print ("shutdown...")
-    subprocess.call(['/sbin/shutdown', '-h', 'now'])
+    subprocess.call(['sudo','/sbin/shutdown', '-h', 'now'])
     print ("Done!")
     #os.system('systemctl poweroff')  demande aussi une authentication...
