@@ -2265,14 +2265,16 @@ hotTapSolenoid.close()
 
 hardConf.close()
 
-data_file = open(DIR_DATA_CSV + fileName+".csv", "r")
-term.write("Données stockées dans ",term.blue, term.bgwhite)
-term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
-data_file.close()
+with open(DIR_DATA_CSV + fileName+".csv", "r") as data_file:
+    term.write("Données stockées dans ",term.blue, term.bgwhite)
+    term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
+    data_file.close()
 
 if WebExit: # Exit asked from web: shutdown the computer
     #To make the following call possible, please configure in /etc/sudoer file:
     #    username ALL = NOPASSWD: /sbin/shutdown
     #    %admin  ALL = NOPASSWD: /sbin/shutdown
+    print ("shutdown...")
     subprocess.call(['/sbin/shutdown', '-h', 'now'])
+    print ("Done!")
     #os.system('systemctl poweroff')  demande aussi une authentication...
