@@ -1549,7 +1549,10 @@ class ThreadPump(threading.Thread):
         time.sleep(0.1)
         self.pump.close()
         time.sleep(0.1)
-        self.join()
+        try:
+            self.join()
+        except:
+            traceback.print_exc()
 
 term.setTitle("pastOnomic, pasteurisation accessible")
 (lines, columns) = termSize()
