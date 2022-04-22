@@ -2269,12 +2269,17 @@ term.writeLine ("éteinte.", term.green, term.bold, term.bgwhite)
 time.sleep(0.1)
 
 if T_PumpReading:
-    T_PumpReading.close()
+    try:
+        T_PumpReading.close()
+    except:
+        traceback.print_exc()
     time.sleep(0.1)
-T_Pump.close()
-term.write ("Pompe ", term.blue, term.bgwhite)
-term.writeLine ("éteinte.", term.green, term.bold, term.bgwhite)
-
+try:
+    T_Pump.close()
+    term.write ("Pompe ", term.blue, term.bgwhite)
+    term.writeLine ("éteinte.", term.green, term.bold, term.bgwhite)
+except:
+    traceback.print_exc()
 hotTapSolenoid.close()
 #coldTapSolenoid.close()
 
