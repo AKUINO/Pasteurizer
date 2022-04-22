@@ -47,6 +47,9 @@ class Sensor(object):
             self.last = time.perf_counter()
         return self.changed
 
+    def setWait(self,value):
+        return self.set(value)
+
     def reset(self):
         if not self.entry_size:
             return self.value

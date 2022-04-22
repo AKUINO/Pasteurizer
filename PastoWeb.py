@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import socket
 import sys
@@ -34,6 +35,7 @@ from thermistor import Thermistor
 from solenoid import Solenoid
 from LED import LED
 from button import button
+from sensor import Sensor
 from valve import Valve
 from menus import Menus
 
@@ -1637,9 +1639,14 @@ T_DAC = ThreadDAC()
 # Manage pump at a higher level and execute operations for a given Action sequence
 T_Pump = ThreadPump(pumpy,T_DAC)
 
+dumpValve = None
 # Ball Valve:
-dumpValve = Valve('DMP',hardConf.DMP_open,hardConf.DMP_close) # using default duration set in Valve.py...
+if dumpValve:
+    dumpValve = Valve('DMP',hardConf.DMP_open,hardConf.DMP_close) # using default duration set in Valve.py...
+else:
+    dumpValve = Sensor()
 dumpValve.set(1.0) # Open by default
+
 
 defFile = datetime.now().strftime("%Y_%m%d_%H%M")
 # term.write("Code de production ["+defFile+"] :", term.bgwhite, term.blue)
