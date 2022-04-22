@@ -2255,9 +2255,12 @@ while T_Pump.currAction != 'X':
         time.sleep(5)
 ## End of main loop.
 
-# Stops Web Server...
-webServerThread.stop()
-time.sleep(0.1)
+try:
+    # Stops Web Server...
+    webServerThread.stop()
+    time.sleep(0.1)
+except:
+    traceback.print_exc()
 
 # Close equipments...
 change = dumpValve.setWait(1.0)  # better to keep dumping valve open
