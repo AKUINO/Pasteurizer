@@ -999,13 +999,13 @@ class Operation(object):
         dumpValve.set(1.0 if self.dump else 0.0) # Will stop command if open/close duration is done
 
         requiredTime = self.duration() if self.duration else None
-        if requiredTime and (T_Pump.currOpContext.duration() >= requiredTime):
+        if requiredTime and T_Pump.currOpContext and (T_Pump.currOpContext.duration() >= requiredTime):
             return True
         if self.typeOp == 'HEAT':
             if float(cohorts.getCalibratedValue('heating')) >= float(self.tempRef()+menus.options['G'][3]-0.2):
                 return True
         elif self.typeOp in ['PUMP','FLOO','TRAK','EMPT','REVR']:
-            if self.qty:
+            if self.qty and T_Pump.currOpContext:
                 if self.qty > 0.0 and (T_Pump.currOpContext.volume() >= self.qty):
                     return True
                 if self.qty < 0.0:
@@ -2092,6 +2092,9 @@ class WebLog(object):
         for line in data:
             if line:
                 print (line+'\r')
+
+    def flush(self):
+        pass
 
 class ThreadWebServer(threading.Thread):
 
