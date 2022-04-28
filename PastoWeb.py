@@ -1500,11 +1500,6 @@ class ThreadPump(threading.Thread):
                 if RedPendingConfirmation != 0.0:
                     if RedLED:
                         RedLED.blink(2)
-                    if self.currAction in [None,'X','Z',' ']:
-                        if GreenLED:
-                            GreenLED.blink(2)
-                        if YellowLED:
-                            YellowLED.blink(2)
                 if RedButton and (RedButton.get() == 1):
                     if RedPendingConfirmation > 0.0:
                         RedPendingConfirmation = 0.0
@@ -1528,11 +1523,11 @@ class ThreadPump(threading.Thread):
                             RedPendingConfirmation = 0.0
                             if RedLED:
                                 RedLED.on()
-                            if self.currAction in [None,'X','Z',' ']:
-                                if GreenLED:
-                                    GreenLED.off()
-                                if YellowLED:
-                                    YellowLED.off()
+                            # if self.currAction in [None,'X','Z',' ']:
+                            #     if GreenLED:
+                            #         GreenLED.off()
+                            #     if YellowLED:
+                            #         YellowLED.off()
                     elif RedLED:
                         RedLED.on()
                 if YellowButton and (YellowButton.get() == 1):
@@ -1549,7 +1544,10 @@ class ThreadPump(threading.Thread):
                         GreenLED.blink(2) # blink twice per second
                 else:
                     if GreenLED:
-                        GreenLED.off()
+                        if RedPendingConfirmation != 0.0 and self.currAction in [None,'X','Z',' ']:
+                            GreenLED.blink(2)
+                        else:
+                            GreenLED.off()
                     if not self.currOperation:
                         if not self.currSequence or not len(self.currSequence):
                             speed = 0.0
@@ -1564,7 +1562,9 @@ class ThreadPump(threading.Thread):
                     else:
                         speed = 0.0
                 if YellowLED:
-                    if speed == 0.0:
+                    if RedPendingConfirmation != 0.0 and self.currAction in [None,'X','Z',' ']:
+                        YellowLED.blink(2)
+                    elif speed == 0.0:
                         YellowLED.off()
                     else:
                         YellowLED.on()
