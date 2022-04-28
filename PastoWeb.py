@@ -1490,7 +1490,8 @@ class ThreadPump(threading.Thread):
         if YellowLED:
             YellowLED.off()
         if RedLED:
-            RedLED.blink(2)
+            RedLED.on()
+        RedPendingConfirmation = 0
 
         self.running = True
         while self.running:
@@ -1498,21 +1499,34 @@ class ThreadPump(threading.Thread):
                 time.sleep(0.3)
                 now = time.perf_counter()
                 if RedButton and (RedButton.get() == 1):
-                    if RedLED:
-                        RedLED.blink(2)
-                    if not self.currAction in ['X','Z',' ']:
-                        self.stopAction()
-                    elif now > self.lastStop + 3.0:
-                        self.currAction = 'X'
-                        WebExit = True # SHUTDOWN requested
-                        try:
-                            os.kill(os.getpid(),signal.SIGINT)
-                        except:
-                            traceback.print_exc()
-                if RedLED:
-                    val = RedLED.get()
-                    if val and val[0] > 1:
-                        RedLED.blink (2)
+                    if RedPendingConfirmation:
+                        if RedLED:
+                            RedLED.blink(2)
+                        if RedPendingConfirmation > now:
+                            RedPendingConfirmation = 0
+                            if not self.currAction in ['X','Z',' ']:
+                                self.stopAction()
+                            elif now > self.lastStop + 3.0:
+                                if RedLED:
+                                    RedLED.off()
+                                self.currAction = 'X'
+                                WebExit = True # SHUTDOWN requested
+                                try:
+                                    os.kill(os.getpid(),signal.SIGINT)
+                                except:
+                                    traceback.print_exc()
+                    else:
+                        RedPendingConfirmation = now + 3.0 #Confirmation must occur within 3 seconds
+                else:
+                    if RedPendingConfirmation:
+                        if RedPendingConfirmation > now:
+                            RedPendingConfirmation = 0
+                            if RedLED:
+                                RedLED.on()
+                        elif RedLED:
+                            RedLED.blink(2)
+                    elif RedLED:
+                        RedLED.on()
                 if YellowButton and (YellowButton.get() == 1):
                     if not self.paused:
                         self.setPause(True)  # Will make the pump stops !
@@ -1541,13 +1555,13 @@ class ThreadPump(threading.Thread):
                         speed = self.currOperation.execute(now,self)
                     else:
                         speed = 0.0
+                if YellowLED:
+                    if speed == 0.0:
+                        YellowLED.off()
+                    else:
+                        YellowLED.on()
                 prec_speed = self.pump.liters()
                 if speed != prec_speed:
-                    if YellowLED:
-                        if speed == 0.0:
-                            YellowLED.off()
-                        else:
-                            YellowLED.on()
                     time.sleep(0.01)
                     if speed == 0.0:
                         self.pump.stop()
