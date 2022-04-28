@@ -1516,7 +1516,8 @@ class ThreadPump(threading.Thread):
                     else:
                         if RedPendingConfirmation == 0.0: # Synchronize all LED !
                             if RedLED:
-                                RedLED.on()
+                                RedLED.off()
+                                RedLED.blink(2)
                             if self.currAction in [None,'X','Z',' ']:
                                 if YellowLED:
                                     YellowLED.off()
