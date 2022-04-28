@@ -1417,6 +1417,8 @@ class ThreadPump(threading.Thread):
         if action in opSequences:
             self.stopAction()
             self.currAction = action
+            if RedLED:
+                RedLED.on()
             self.startAction = time.perf_counter()
             self.pump.reset_volume()
             self.setPause(False);
@@ -1487,7 +1489,7 @@ class ThreadPump(threading.Thread):
         if YellowLED:
             YellowLED.off()
         if RedLED:
-            RedLED.off()
+            RedLED.blink(2)
 
         self.running = True
         while self.running:
@@ -1506,11 +1508,10 @@ class ThreadPump(threading.Thread):
                             os.kill(os.getpid(),signal.SIGINT)
                         except:
                             traceback.print_exc()
-                else:
-                    if RedLED:
-                        val = RedLED.get()
-                        if val > 1:
-                            RedLED.blink (2)
+                if RedLED:
+                    val = RedLED.get()
+                    if val > 1:
+                        RedLED.blink (2)
                 if YellowButton.get() == 1:
                     if not self.paused:
                         self.setPause(True)  # Will make the pump stops !
@@ -1520,18 +1521,11 @@ class ThreadPump(threading.Thread):
                 Buzzer.off()
                 if self.paused:
                     speed = 0.0
-                    if YellowLED:
-                        if not self.currAction in ['X','Z',' ']:
-                            YellowLED.on()
-                        else:
-                            YellowLED.off()
                     if GreenLED:
                         GreenLED.blink(2) # blink twice per second
                 else:
                     if GreenLED:
                         GreenLED.off()
-                    if YellowLED:
-                        YellowLED.on();
                     if not self.currOperation:
                         if not self.currSequence or not len(self.currSequence):
                             speed = 0.0
@@ -1547,6 +1541,11 @@ class ThreadPump(threading.Thread):
                         speed = 0.0
                 prec_speed = self.pump.liters()
                 if speed != prec_speed:
+                    if YellowLED:
+                        if speed == 0.0:
+                            YellowLED.off()
+                        else:
+                            YellowLED.on()
                     time.sleep(0.01)
                     if speed == 0.0:
                         self.pump.stop()
