@@ -965,7 +965,8 @@ class Operation(object):
         elif self.typeOp == 'REVR':
             T_Pump.pump.reset_pump()
         elif self.typeOp == 'PAUS':
-            Buzzer.on()
+            if Buzzer:
+                Buzzer.on()
             T_Pump.setPause(True)
             tell_message(self.message)
         elif self.typeOp == 'SUBR': # 1st Call a subroutine and loop...
@@ -1512,13 +1513,14 @@ class ThreadPump(threading.Thread):
                     val = RedLED.get()
                     if val > 1:
                         RedLED.blink (2)
-                if YellowButton.get() == 1:
+                if YellowButton and (YellowButton.get() == 1):
                     if not self.paused:
                         self.setPause(True)  # Will make the pump stops !
-                if GreenButton.get() == 1:
+                if GreenButton and (GreenButton.get() == 1):
                     if self.paused:
                         self.setPause(False)
-                Buzzer.off()
+                if Buzzer:
+                    Buzzer.off()
                 if self.paused:
                     speed = 0.0
                     if GreenLED:
