@@ -1499,16 +1499,15 @@ class ThreadPump(threading.Thread):
                 time.sleep(0.3)
                 now = time.perf_counter()
                 if RedButton and (RedButton.get() == 1):
+                    if RedLED:
+                        RedLED.blink(2)
                     if RedPendingConfirmation:
-                        if RedLED:
-                            RedLED.blink(2)
                         if RedPendingConfirmation > now:
                             RedPendingConfirmation = 0
                             if not self.currAction in [None,'X','Z',' ']:
                                 self.stopAction()
-                            elif now > self.lastStop + 3.0:
-                                if RedLED:
-                                    RedLED.off()
+                            else:
+                                self.close()
                                 self.currAction = 'X'
                                 WebExit = True # SHUTDOWN requested
                                 try:
