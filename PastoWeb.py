@@ -1496,7 +1496,7 @@ class ThreadPump(threading.Thread):
             try:
                 time.sleep(0.3)
                 now = time.perf_counter()
-                if RedButton.get() == 1:
+                if RedButton and (RedButton.get() == 1):
                     if RedLED:
                         RedLED.blink(2)
                     if not self.currAction in ['X','Z',' ']:
