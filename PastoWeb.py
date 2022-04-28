@@ -1520,7 +1520,7 @@ class ThreadPump(threading.Thread):
                     if RedPendingConfirmation != 0.0:
                         if RedPendingConfirmation < 0.0: # Button not released yet
                             RedPendingConfirmation = 0.0 - RedPendingConfirmation
-                        if RedPendingConfirmation > now:
+                        if now > RedPendingConfirmation:
                             RedPendingConfirmation = 0.0
                             if RedLED:
                                 RedLED.on()
