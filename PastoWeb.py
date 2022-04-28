@@ -1412,6 +1412,7 @@ class ThreadPump(threading.Thread):
         self.pump.reset_pump() # to be sure that no situation ends with a running pump...
         time.sleep(0.01)
         self.currAction = 'Z' # Should stop operations...
+        self.setPause(False)
         self.lastStop = time.perf_counter()
 
     def setAction(self,action):
