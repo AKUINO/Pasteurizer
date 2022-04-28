@@ -1511,7 +1511,7 @@ class ThreadPump(threading.Thread):
                             traceback.print_exc()
                 if RedLED:
                     val = RedLED.get()
-                    if val > 1:
+                    if val and val[0] > 1:
                         RedLED.blink (2)
                 if YellowButton and (YellowButton.get() == 1):
                     if not self.paused:
