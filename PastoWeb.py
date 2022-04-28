@@ -122,6 +122,8 @@ typeRMeter = 11
 
 Buzzer = None
 RedLED = None
+RedConfirmationDelay = 4.5 # secondes pour confirmer un arrêt ou un shutdown
+
 YellowLED = None
 GreenLED = None
 RedButton = None
@@ -1418,8 +1420,6 @@ class ThreadPump(threading.Thread):
         if action in opSequences:
             self.stopAction()
             self.currAction = action
-            if RedLED:
-                RedLED.on()
             self.startAction = time.perf_counter()
             self.pump.reset_volume()
             self.setPause(False);
@@ -1483,7 +1483,7 @@ class ThreadPump(threading.Thread):
 
     def run(self):
 
-        global display_pause, WebExit
+        global display_pause, WebExit, RedConfirmationDelay
 
         if GreenLED:
             GreenLED.off()
@@ -1492,7 +1492,6 @@ class ThreadPump(threading.Thread):
         if RedLED:
             RedLED.on()
         RedPendingConfirmation = 0.0
-
         self.running = True
         while self.running:
             try:
@@ -1501,6 +1500,11 @@ class ThreadPump(threading.Thread):
                 if RedPendingConfirmation != 0.0:
                     if RedLED:
                         RedLED.blink(2)
+                    if self.currAction in [None,'X','Z',' ']:
+                        if GreenLED:
+                            GreenLED.blink(2)
+                        if YellowLED:
+                            YellowLED.blink(2)
                 if RedButton and (RedButton.get() == 1):
                     if RedPendingConfirmation > 0.0:
                         RedPendingConfirmation = 0.0
@@ -1515,7 +1519,7 @@ class ThreadPump(threading.Thread):
                             except:
                                 traceback.print_exc()
                     else:
-                        RedPendingConfirmation = 0.0 - (now + 3.0) #Confirmation must occur within 3 seconds
+                        RedPendingConfirmation = 0.0 - (now + RedConfirmationDelay) #Confirmation must occur within 3 seconds
                 else:
                     if RedPendingConfirmation != 0.0:
                         if RedPendingConfirmation < 0.0: # Button not released yet
@@ -1524,6 +1528,11 @@ class ThreadPump(threading.Thread):
                             RedPendingConfirmation = 0.0
                             if RedLED:
                                 RedLED.on()
+                            if self.currAction in [None,'X','Z',' ']:
+                                if GreenLED:
+                                    GreenLED.off()
+                                if YellowLED:
+                                    YellowLED.off()
                     elif RedLED:
                         RedLED.on()
                 if YellowButton and (YellowButton.get() == 1):
@@ -2324,11 +2333,11 @@ with open(DIR_DATA_CSV + fileName+".csv", "r") as data_file:
     data_file.close()
 
 if GreenLED:
-    GreenLED.off()
+    GreenLED.on()
 if YellowLED:
-    YellowLED.off()
+    YellowLED.on()
 if RedLED:
-    RedLED.off()
+    RedLED.on()
 
 hardConf.close()
 
