@@ -57,7 +57,7 @@ class Micha4:
             try:
                 self.port.close()
             except:
-                pass
+                traceback.print_exc()
             self.port = None
         self.busy = False
 
