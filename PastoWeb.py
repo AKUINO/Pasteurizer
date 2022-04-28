@@ -1504,7 +1504,7 @@ class ThreadPump(threading.Thread):
                             RedLED.blink(2)
                         if RedPendingConfirmation > now:
                             RedPendingConfirmation = 0
-                            if not self.currAction in ['X','Z',' ']:
+                            if not self.currAction in [None,'X','Z',' ']:
                                 self.stopAction()
                             elif now > self.lastStop + 3.0:
                                 if RedLED:
