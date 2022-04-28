@@ -1491,39 +1491,39 @@ class ThreadPump(threading.Thread):
             YellowLED.off()
         if RedLED:
             RedLED.on()
-        RedPendingConfirmation = 0
+        RedPendingConfirmation = 0.0
 
         self.running = True
         while self.running:
             try:
                 time.sleep(0.3)
                 now = time.perf_counter()
-                if RedButton and (RedButton.get() == 1):
+                if RedPendingConfirmation != 0.0:
                     if RedLED:
                         RedLED.blink(2)
-                    if RedPendingConfirmation:
-                        if RedPendingConfirmation > now:
-                            RedPendingConfirmation = 0
-                            if not self.currAction in [None,'X','Z',' ']:
-                                self.stopAction()
-                            else:
-                                self.close()
-                                self.currAction = 'X'
-                                WebExit = True # SHUTDOWN requested
-                                try:
-                                    os.kill(os.getpid(),signal.SIGINT)
-                                except:
-                                    traceback.print_exc()
+                if RedButton and (RedButton.get() == 1):
+                    if RedPendingConfirmation > 0.0:
+                        RedPendingConfirmation = 0.0
+                        if not self.currAction in [None,'X','Z',' ']:
+                            self.stopAction()
+                        else:
+                            self.close()
+                            self.currAction = 'X'
+                            WebExit = True # SHUTDOWN requested
+                            try:
+                                os.kill(os.getpid(),signal.SIGINT)
+                            except:
+                                traceback.print_exc()
                     else:
-                        RedPendingConfirmation = now + 3.0 #Confirmation must occur within 3 seconds
+                        RedPendingConfirmation = 0.0 - (now + 3.0) #Confirmation must occur within 3 seconds
                 else:
-                    if RedPendingConfirmation:
+                    if RedPendingConfirmation != 0.0:
+                        if RedPendingConfirmation < 0.0: # Button not released yet
+                            RedPendingConfirmation = 0.0 - RedPendingConfirmation
                         if RedPendingConfirmation > now:
-                            RedPendingConfirmation = 0
+                            RedPendingConfirmation = 0.0
                             if RedLED:
                                 RedLED.on()
-                        elif RedLED:
-                            RedLED.blink(2)
                     elif RedLED:
                         RedLED.on()
                 if YellowButton and (YellowButton.get() == 1):
