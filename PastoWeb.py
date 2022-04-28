@@ -1514,6 +1514,17 @@ class ThreadPump(threading.Thread):
                             except:
                                 traceback.print_exc()
                     else:
+                        if RedPendingConfirmation == 0.0: # Synchronize all LED !
+                            if RedLED:
+                                RedLED.off()
+                                RedLED.blink(2)
+                            if self.currAction in [None,'X','Z',' ']:
+                                if YellowLED:
+                                    YellowLED.off()
+                                    YellowLED.blink(2)
+                                if GreenLED:
+                                    GreenLED.off()
+                                    GreenLED.blink(2)
                         RedPendingConfirmation = 0.0 - (now + RedConfirmationDelay) #Confirmation must occur within 3 seconds
                 else:
                     if RedPendingConfirmation != 0.0:
