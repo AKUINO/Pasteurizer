@@ -346,14 +346,11 @@ elif localGPIOtype == "gpio":
 def close():
     if MICHA_device:
         io.close()
-    elif localGPIOtype == "gpio":
+    elif io:
         # All ExpanderPI GPIO in input mode:
         io.set_port_direction(0, 0xFF)
         io.set_port_direction(1, 0xFF)
         ## We do not leave output floating because we are not sure we have the right pull up always there...
         ##io.set_port_direction(0, 0xFF)
         ##io.set_port_direction(1, 0xFF)
-        localGPIO.cleanup()
-    elif localGPIOtype == "pigpio":
-        localGPIO.stop()
 
