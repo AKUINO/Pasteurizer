@@ -2337,15 +2337,6 @@ with open(DIR_DATA_CSV + fileName+".csv", "r") as data_file:
     term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
     data_file.close()
 
-if GreenLED:
-    GreenLED.on()
-if YellowLED:
-    YellowLED.on()
-if RedLED:
-    RedLED.on()
-
-hardConf.close()
-
 if WebExit: # Exit asked from web: shutdown the computer
     #To make the following call possible, please configure in /etc/sudoer file:
     #    username ALL = NOPASSWD: /sbin/shutdown
@@ -2355,3 +2346,12 @@ if WebExit: # Exit asked from web: shutdown the computer
     subprocess.call(['systemctl','poweroff'])
     print ("Done!")
     #os.system('systemctl poweroff')  demande aussi une authentication...
+
+if GreenLED:
+    GreenLED.off()
+if YellowLED:
+    YellowLED.off()
+if RedLED:
+    RedLED.off()
+
+hardConf.close()
