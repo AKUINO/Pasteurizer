@@ -343,7 +343,9 @@ class pump_PWM(sensor.Sensor):
         if hardConf.MICHA_device:
             hardConf.io.write_holding(self.pinPWM, self.speed_freq(speed if speed >= 0 else -speed) ) #, 500000 if duty else 0)
         elif hardConf.localGPIOtype == 'pigpio':
-            status = hardConf.localGPIO.hardware_PWM(self.pinPWM, self.speed_freq(speed if speed >= 0 else -speed) if duty else 1000, 500000 if duty else 0)
+            status = hardConf.localGPIO.hardware_PWM(self.pinPWM,
+                                                     self.speed_freq(speed if speed >= 0 else -speed) if duty else 1000,
+                                                     500000 if duty else 0)
             if status:
                 print(" PWM err=%d \r" % status)
         #hardConf.pi.set_PWM_frequency(self.pinPWM,self.speed_freq(speed))
@@ -563,6 +565,8 @@ if __name__ == "__main__":
                 status = Reading.status()
             elif hardConf.MICHA_device and hardConf.MICHA_version < 40:
                 status = hardConf.io.read_input(pumpy.pinStatus)
+            else:
+                status = "--"
             if status != prvError :
                 if (status):
                     print( "Error=%d" % status )
