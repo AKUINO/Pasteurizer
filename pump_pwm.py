@@ -264,7 +264,7 @@ class pump_PWM(sensor.Sensor):
         try:
             if hardConf.MICHA_device:
                 hardConf.io.set_pump_power(1) # Enable power. (pins are managed by MICHA board)
-            elif hardConf.localGPIOtype:
+            elif hardConf.localGPIOtype = "pigpio":
                 # GPIO.setmode(GPIO.BOARD)
                 # GPIO.setwarnings(False)
                 # GPIO.setup(self.pinStatus, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -498,6 +498,8 @@ class pump_PWM(sensor.Sensor):
 
 if __name__ == "__main__":
 
+    RPM = True # False for liters
+
     TEST = True
     
     pumpy = pump_PWM()
@@ -509,7 +511,7 @@ if __name__ == "__main__":
         print ("What "+pumpy.address+" can do for you?")
 
         Reading = None
-        if not hardConf.MICHA_device:
+        if not hardConf.MICHA_device and hardConf.MICHA_version < 40:
             Reading = ReadPump_PWM(pumpy)
             Reading.daemon = True
             Reading.start()
@@ -519,8 +521,10 @@ if __name__ == "__main__":
         while True:
           try:
             time.sleep(0.5)
-            liters = input("Liters/hour=").upper()
-            #liters = input("RPM=").upper()
+            if RPM:
+                liters = input("RPM=").upper()
+            else:
+                liters = input("Liters/hour=").upper()
             now = time.perf_counter()
             print ("%.3f seconds  at %.2f L/hour = %dmL." % (now-prec,precL, int(precL*(now-prec)/3.600) ) )
             if liters == "":
@@ -530,7 +534,7 @@ if __name__ == "__main__":
                     Reading.OK = False
                 break
             elif liters == "?":
-                print ("{-}liters, 0, X=exit")
+                print ("{-}"+("RPM" if RPM else "liters")+", 0, X=exit")
             else:  
                 try:
                     liters = float(liters)
@@ -541,9 +545,12 @@ if __name__ == "__main__":
                            print ("Error stopping!")
                         print ("Stop!")
                     else:
-                        #if not pumpy.run(liters):
-                        if not pumpy.run_liters(liters):
-                            print ("Error running!")
+                        if RPM:
+                            if not pumpy.run(liters):
+                                print ("Error running!")
+                        else:
+                            if not pumpy.run_liters(liters):
+                                print ("Error running!")
                         precL = pumpy.liters()
                         #precL = pumpy.speed
                         print ("Speed=%.2f, %.2f L/hour" % (pumpy.speed,precL) )
@@ -554,7 +561,7 @@ if __name__ == "__main__":
             time.sleep(0.3)
             if Reading:
                 status = Reading.status()
-            elif hardConf.MICHA_device:
+            elif hardConf.MICHA_device and hardConf.MICHA_version < 40:
                 status = hardConf.io.read_input(pumpy.pinStatus)
             if status != prvError :
                 if (status):
@@ -574,7 +581,6 @@ if __name__ == "__main__":
             print ("Error closing!")
         else:
             print ("Pump stopped and closed.")
-        if hardConf.Odroid:
+        if hardConf.localGPIOtype == "gpio":
             hardConf.localGPIO.cleanup()
             pass
-
