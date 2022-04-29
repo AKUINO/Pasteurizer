@@ -174,7 +174,7 @@ class pump_PWM(sensor.Sensor):
                  pinPWM = 12, # 12(board=32) or 18(board=12) CustardPi Digital out #2, RPi PWM
                  pinDirection = -14, # 17(board=11) CustardPi Digital out #2
                  pinStatus = -15,  # 23(board=16) CustardPi Digital in #1. RPi pin must be in "Pull-up"...
-                 maxSpeed = 437, #600 in theory. 400 is possible when pumping air (previous value: 284)
+                 maxSpeed = 600#437, #600 in theory. 400 is possible when pumping air (previous value: 284)
                  maximal_liters = None,
                  minimal_liters = 15.0
                  ):

@@ -276,7 +276,7 @@ else:
     old_exchanger = vol_tube(8,8*1800)
     pasteurization_tube = vol_tube(9.5,8820) # = 625mL aussi
     up_to_thermistor = 2330.0
-    heating_tube = vol_tube(10.5,500)+5127-3845
+    heating_tube = vol_tube(10.5,500)+5127-3860 #1267   1444-336=1108
     initial_tubing = up_to_thermistor-heating_tube+exchanger_tube-old_exchanger
     final_tubing = 3587.0-up_to_thermistor-pasteurization_tube-vol_tube(8,1800)+exchanger_tube-old_exchanger
 
