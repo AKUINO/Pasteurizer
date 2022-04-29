@@ -264,7 +264,7 @@ class pump_PWM(sensor.Sensor):
         try:
             if hardConf.MICHA_device:
                 hardConf.io.set_pump_power(1) # Enable power. (pins are managed by MICHA board)
-            elif hardConf.localGPIOtype = "pigpio":
+            elif hardConf.localGPIOtype == "pigpio":
                 # GPIO.setmode(GPIO.BOARD)
                 # GPIO.setwarnings(False)
                 # GPIO.setup(self.pinStatus, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -581,6 +581,6 @@ if __name__ == "__main__":
             print ("Error closing!")
         else:
             print ("Pump stopped and closed.")
-        if hardConf.localGPIOtype == "gpio":
+        if hardConf.localGPIOtype == "pigpio":
             hardConf.localGPIO.cleanup()
             pass
