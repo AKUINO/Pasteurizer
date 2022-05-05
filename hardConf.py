@@ -327,7 +327,7 @@ if MICHA_device:
     CLD = MICHApast.SOL_HOT_REG # Hot rinsing water
     TAP = MICHApast.SOL_COLD_REG # Cooling water
 
-    if MICHA_version > 40:
+    if MICHA_version >= 40:
         inputPressure = MICHApast.PRESS_SENSOR_REG
         inputPressureFlag = MICHApast.PRESS_FLAG_REG
 
