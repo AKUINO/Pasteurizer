@@ -32,6 +32,7 @@ import pump_pwm
 import cohort
 
 from thermistor import Thermistor
+from pressure import Pressure
 from solenoid import Solenoid
 from LED import LED
 from button import button
@@ -158,7 +159,7 @@ CLEAN_TIME = 1800.0
 DISINF_TIME = 300.0
 RINSE_TIME = 300.0
 
-menus = Menus();
+menus = Menus()
 menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,ml.T("Gradient de température","Temperature Gradient","Gradient van Temperatuur") \
                             ,3.0,3.0,"°C",False,7,0.1], # Gradient de Température
@@ -393,8 +394,15 @@ class ThreadThermistor(threading.Thread):
 
     def sensorParam(self,address,param):
         global cohorts
-        if not address in cohorts.catalog:
+        if param and not address in cohorts.catalog:
             cohorts.addSensor(address,Thermistor(address,param))
+            cohorts.readCalibration(DIR_DATA_CSV,address)
+        return cohorts.catalog[address]
+
+    def pressureSensorParam(self,address,param, flag):
+        global cohorts
+        if param and flag and not address in cohorts.catalog:
+            cohorts.addSensor(address,Pressure(address,param,flag))
             cohorts.readCalibration(DIR_DATA_CSV,address)
         return cohorts.catalog[address]
 
@@ -404,6 +412,8 @@ class ThreadThermistor(threading.Thread):
             try: 
                 time.sleep(1.0)
                 for (address, aSensor) in cohorts.catalog.items():
+                    if aSensor.sensorType == Pressure.typeNum:
+                        aSensor.get()
                     if aSensor.sensorType == Thermistor.typeNum:
                         aSensor.get()
                 if not hardConf.MICHA_device: # Average of 3 measures needed
@@ -807,7 +817,7 @@ class ThreadDAC(threading.Thread):
                                        cohorts.val('output'), \
                                        cohorts.catalog['DAC1'].val(), \
                                        cohorts.val('heating'), \
-                                       cohorts.val('rmeter') ) )
+                                       cohorts.val('press' if hardConf.inputPressure else 'rmeter') ) )
                                        #self.totalWatts2, \
                                        #cohorts.val('temper'),
                                        #cohorts.catalog['DAC2'].val(), \
@@ -1652,6 +1662,7 @@ T_Thermistor.sensorParam("warranty", hardConf.T_warranty) # Garantie sortie serp
 #T_Thermistor.sensorParam("temper",hardConf.T_sp9b) # Garantie entrée serpentin court
 if hardConf.T_heating:
     T_Thermistor.sensorParam("heating",hardConf.T_heating)
+T_Thermistor.pressureSensorParam("press", hardConf.inputPressureReg, hardConf.inputPressureFlag) # Garantie sortie serpentin long
 
 
 if not pumpy.open():
@@ -1689,7 +1700,8 @@ defFile = datetime.now().strftime("%Y_%m%d_%H%M")
 #if not fileName:
 fileName = defFile
 data_file = open(DIR_DATA_CSV + fileName+".csv", "w")
-data_file.write("epoch_sec\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\textra\tinput\twarant\toutput\theat\theatbath\trmeter\n") #\twatt2\ttemper\theat
+data_file.write("epoch_sec\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\textra\tinput\twarant\toutput\theat\theatbath\t"
+                +("press" if hardConf.inputPressure else "rmeter")+"\n") #\twatt2\ttemper\theat
 term.write("Données stockées dans ",term.blue, term.bgwhite)
 term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
 data_file.close()
@@ -2068,6 +2080,7 @@ class WebApiLog:
                             'heating': isnull(cohorts.getCalibratedValue('heating'), ''), \
                             #'temper': isnull(cohorts.getCalibratedValue('temper'), ''), \
                             'rmeter': isnull(cohorts.val('rmeter'), ''), \
+                            'press': isnull(cohorts.val('press'), ''), \
                             'reft': isnull(cohorts.reft.value, ''), \
                             'message': message, \
                             #'opt_T': temper if temper <  99.0 else '', \

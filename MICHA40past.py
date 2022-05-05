@@ -62,6 +62,7 @@ class Micha4:
         self.busy = False
 
     def close (self):
+        self.write_pin(MICHApast.PRESS_FLAG_REG,0)
         self.close_serial_port()
 
     def release_serial_port(self):

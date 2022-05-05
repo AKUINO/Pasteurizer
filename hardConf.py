@@ -43,6 +43,9 @@ T_warranty = 3 # Garantie sortie serpentin long
 T_heating = 4 # If no OneWire, this will be T_sp9b
 T_extra = None
 
+inputPressure = None
+inputPressureFlag = None
+
 In_Green = None
 Out_Green = None
 
@@ -323,6 +326,10 @@ if MICHA_device:
     # Solenoids to control water inputs
     CLD = MICHApast.SOL_HOT_REG # Hot rinsing water
     TAP = MICHApast.SOL_COLD_REG # Cooling water
+
+    if MICHA_version > 40:
+        inputPressure = MICHApast.PRESS_SENSOR_REG
+        inputPressureFlag = MICHApast.PRESS_FLAG_REG
 
 elif localGPIOtype == "gpio":
     from ExpanderPi import IO

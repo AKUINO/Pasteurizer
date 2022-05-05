@@ -13,6 +13,7 @@ import term
 # 5 : thermistor
 # 6 : valve
 # 7 : pump_pwm
+# 8 : pressure
 #11 : RMeter
 #12 : LED
 #13 : button

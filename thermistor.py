@@ -95,7 +95,7 @@ class Thermistor(sensor.Sensor):
         return temperature
 
     def close(self):
-        if hardConf.io:
+        if not hardConf.MICHA_device and hardConf.io: # LOCAL ADC (not MICHA)
             hardConf.io.set_pin_direction(self.stim_pin,0) #Output
             hardConf.io.write_pin(self.stim_pin,1) #Disable measurement
 
