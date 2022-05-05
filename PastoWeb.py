@@ -1662,7 +1662,7 @@ T_Thermistor.sensorParam("warranty", hardConf.T_warranty) # Garantie sortie serp
 #T_Thermistor.sensorParam("temper",hardConf.T_sp9b) # Garantie entrée serpentin court
 if hardConf.T_heating:
     T_Thermistor.sensorParam("heating",hardConf.T_heating)
-T_Thermistor.pressureSensorParam("press", hardConf.inputPressureReg, hardConf.inputPressureFlag) # Garantie sortie serpentin long
+T_Thermistor.pressureSensorParam("press", hardConf.inputPressure, hardConf.inputPressureFlag) # Garantie sortie serpentin long
 
 
 if not pumpy.open():
