@@ -139,7 +139,7 @@ $(document).ready(function() {
                     //$('#temper').text(floorDeci(data['temper']));
                     //colorit($('#temper'),4.0,(data['watts2'] <= 0) ? data['opt_T'] : data['opt_temp'],70.0);
                     $('#rmeter').text(data['rmeter'] > 0.0 ? floorUni(data['rmeter']) : "?");
-                    $('#press').text(data['press'] > 0.0 ? floorUni(data['press']) : "?");
+                    $('#press').text(data['press'] > 0.0 ? floorDeci(data['press']) : "?");
                     $('#extra').text(floorDeci(data['extra']));
                     $('#pumpeff').text(floorDeci(data['pumpeff']));
                     $('#heateff').text(floorDeci(data['heateff']));
