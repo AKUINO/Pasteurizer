@@ -457,6 +457,9 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                'P':['P',ml.T("Pasteur.","Pasteur.","Pasteur.") \
                        ,ml.T("Lait de la traite en entrée; Récipient pasteurisé en sortie. Jeter l'eau","Milking milk at inlet; Pasteurized container at the outlet. Discard water","Melk melken als voorgerecht; Gepasteuriseerde container bij de uitlaat. Gooi water") \
                        ,ml.T("Pasteurisation","Pasteurization","Pasteurisatie")],
+               'G':['G',ml.T("Pasteur.Gras","Pasteur.Greasy","Pasteur.Vet") \
+                         ,ml.T("Lait de la traite en entrée; Récipient pasteurisé en sortie. Jeter l'eau","Milking milk at inlet; Pasteurized container at the outlet. Discard water","Melk melken als voorgerecht; Gepasteuriseerde container bij de uitlaat. Gooi water") \
+                         ,ml.T("Pasteurisation Gras","Pasteurization Greasy","Pasteurisatie Vet")],
                'I':['I',ml.T("reprIse","resume","resume") \
                        ,ml.T("Lait de la traite en entrée et un récipient pasteurisé en sortie","Milking milk at inlet and pasteurized container at outlet","Melk bij binnenkomst en gepasteuriseerde container bij vertrek") \
                        ,ml.T("Reprise d'une pasteurisation interrompue","Resume an interrupted pasteurization","Hervatting van onderbroken pasteurisatie")],
@@ -496,7 +499,7 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                '_':['_',ml.T("Redémar.","Restart","Herstart") \
                        ,ml.T("Redémarrage de l'opération en cours.","Restart of the current operation.","Herstart van de huidige bewerking.") \
                        ,ml.T("Redémarrer l'opération en cours","Restart the current operation","Herstart de huidige bewerking")]}
-menus.sortedActions1 = "APIMERND" #C
+menus.sortedActions1 = "APGIMERND" #C
 menus.sortedActions2 = "FVOYLTZSX" #K
 
 menus.cleanActions = "LYTAPIMEV" #K
@@ -515,28 +518,34 @@ menus.operName = { 'HEAT':ml.T('chauffer','heating','verwarm') \
                   ,'SUBR':ml.T('processer','process','werkwijze') \
                   ,'SUBS':ml.T('procéder','proceed','doorgan') }
 
-menus.pipeState = { 'R':ml.T('Propre','Clean','Schoon'), \
-                    'O':ml.T('Vieux','Old','Oud'), \
-                    'A':ml.T('Vidé','Purged','Leeg'), \
-                    'B':ml.T('Vidé+Sale','Purged+Dirty','Leeg+Vies'), \
-                    'T':ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
-                    'S':ml.T('Sale','Dirty','Vies'), \
-                    'N':ml.T('Soude','Soda','Natrium'), \
-                    'D':ml.T('Acide','Acid','Zuur'), \
-                    'G':ml.T('Produit Gras','Greasy Product','Vet Product'), \
-                    'P':ml.T('Produit','Product','Product') }
+menus.pipeState = { 'r':ml.T('Propre','Clean','Schoon'), \
+                    'o':ml.T('Vieux','Old','Oud'), \
+                    'a':ml.T('Vidé','Purged','Leeg'), \
+                    'b':ml.T('Vidé+Sale','Purged+Dirty','Leeg+Vies'), \
+                    't':ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
+                    's':ml.T('Sale','Dirty','Vies'), \
+                    'n':ml.T('Soude','Soda','Natrium'), \
+                    'd':ml.T('Acide','Acid','Zuur'), \
+                    'g':ml.T('Produit Gras','Greasy Product','Vet Product'), \
+                    'p':ml.T('Produit','Product','Product'), \
+                    'e':ml.T('Eau+Produit','Water+Product','Water+Product'), \
+                    'h':ml.T('Eau+Produit gras','Water+Greasy Product','Water+Vet Product')
+                    }
 
-
-menus.stateTransitions = { 'R-P' : ['P','G'], 'R-V' : ['A'], \
-                           'R-t' : ['O'], 'R-t.2' : ['S'], \
-                           'A-t' : ['B'], \
-                           'O-F*2' : ['R'], 'O-V' : ['B'], \
-                           'B-F*1' : ['S'], \
-                           'P-F' : ['E'], 'G-F' : ['H'], \
-                           'P-F*2' : ['E'], 'G-F*2' : ['H'], \
-                           'H-N' : ['N','N0'], 'T-N' : ['N','N0'], 'S-N' : ['N','N0'], \
-                           'E-D' : ['D','D0'], 'S-D' : ['D','D0'], \
-                           'N-F*4' : ['R'],  'D-F*4' : ['R'] }
+#TODO: Integrer les commandes "M", "Y", "L", "T" + "J". La distinction entre la commande  "P" et "G" se fait selon le paramètre "Produit Gras"
+menus.stateTransitions = { 'r' : [ ('A','r'),('J','r'),('Y','r'),('L','r'),('T','r'),('G','g'),('P','p'),('F','r'),('V','a'),('t','o') ], \
+                           'o' : [ ('R',['o','r']),('F','o'),('V','b'),('t','s') ], \
+                           'a' : [ ('F',['a','r']),('V','a'),('t','b') ], \
+                           'b' : [ ('F','s'),('V','b') ], \
+                           't' : [ ('N',['t','n']),                ('F','t'),('V','t') ], \
+                           's' : [ ('N',['s','n']),('D',['s','d']),('F','s'),('V','s') ], \
+                           'n' : [ ('R',['n','r']),('F','n'),('V','n') ], \
+                           'd' : [ ('R',['d','r']),('F','d'),('V','d') ], \
+                           'g' : [ ('I','g'),('M','g'),('E','h'),('N',['h','s','n']),                    ('J','g'),('Y','g'),('L','g'),('T','g'),('F','h'),('V','h'),('t','t') ], \
+                           'p' : [ ('I','p'),('M','p'),('E','e'),('D',['e','s','d']),('N',['e','s','n']),('J','p'),('Y','g'),('L','g'),('T','g'),('F','e'),('V','e'),('t','s') ], \
+                           'e' : [ ('D',['e','s','d']),('J','e'),('Y','e'),('L','e'),('T','e'),('G','g'),('P','p'),('F','e'),('V','e'),('t','s') ], \
+                           'h' : [ ('N',['h','s','n']),('J','h'),('Y','h'),('L','h'),('T','h'),('G','g'),('P','g'),('F','h'),('V','h'),('t','t') ] \
+                           }
 # R + Pasteuriser Gras = G
 # R + Pasteuriser Maigre = P
 # R + Vider = A
@@ -1314,6 +1323,14 @@ opSequences = {
           Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
+    'G': # Pasteurisation d'un produit gras
+        [ Operation('PasT','HEAT',ref='P',ref2='t', dump=True,programmable=True),
+          Operation('PasI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Pasi','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=TOTAL_VOL-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('PasE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',ref2='t', dump=True),
+          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
+          ],
     'I': # Reprise d'une Pasteurisation
         [ Operation('PasT','HEAT',ref='P',ref2='t', dump=True,programmable=True),
           Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
@@ -1662,7 +1679,8 @@ T_Thermistor.sensorParam("warranty", hardConf.T_warranty) # Garantie sortie serp
 #T_Thermistor.sensorParam("temper",hardConf.T_sp9b) # Garantie entrée serpentin court
 if hardConf.T_heating:
     T_Thermistor.sensorParam("heating",hardConf.T_heating)
-T_Thermistor.pressureSensorParam("press", hardConf.inputPressure, hardConf.inputPressureFlag) # Garantie sortie serpentin long
+if hardConf.inputPressure:
+    T_Thermistor.pressureSensorParam("press", hardConf.inputPressure, hardConf.inputPressureFlag) # Garantie sortie serpentin long
 
 
 if not pumpy.open():
