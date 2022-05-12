@@ -69,8 +69,8 @@ class Pressure(sensor.Sensor):
             regVal = hardConf.io.read_input(self.param)
             if regVal != None:
                 press = calcBar(regVal)
-                minVal = hardConf.io.read_input(self.param+1)
-                maxVal = hardConf.io.read_input(self.param+2)
+                minVal = calcBar(hardConf.io.read_input(self.param+1))
+                maxVal = calcBar(hardConf.io.read_input(self.param+2))
                 #print ("%d(%f)=%f ohm; %f°C"%(self.param,volts,res,temp))
                 return press,minVal,maxVal
         return 0.0
