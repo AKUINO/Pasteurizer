@@ -532,7 +532,7 @@ menus.pipeState = { 'r':ml.T('Propre','Clean','Schoon'), \
                     'h':ml.T('Eau+Produit gras','Water+Greasy Product','Water+Vet Product')
                     }
 
-#TODO: Integrer les commandes "M", "Y", "L", "T" + "J". La distinction entre la commande  "P" et "G" se fait selon le paramètre "Produit Gras"
+#TODO: Commande "M" grasse? 't': différents délais à calibrer: temps reste propre avec de l'eau? à vide? temps reste correct avec du produit dans les tuyaux? Insérer dans la machine d'état
 menus.stateTransitions = { 'r' : [ ('A','r'),('J','r'),('Y','r'),('L','r'),('T','r'),('G','g'),('P','p'),('F','r'),('V','a'),('t','o') ], \
                            'o' : [ ('R',['o','r']),('F','o'),('V','b'),('t','s') ], \
                            'a' : [ ('F',['a','r']),('V','a'),('t','b') ], \
