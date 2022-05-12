@@ -2098,7 +2098,9 @@ class WebApiLog:
                             'heating': isnull(cohorts.getCalibratedValue('heating'), ''), \
                             #'temper': isnull(cohorts.getCalibratedValue('temper'), ''), \
                             'rmeter': isnull(cohorts.val('rmeter'), ''), \
-                            'press': isnull(cohorts.val('press'), ''), \
+                            'press': isnull(cohorts.val('press',peak=0), ''), \
+                            'pressMin': isnull(cohorts.val('press',peak=-1), ''), \
+                            'pressMax': isnull(cohorts.val('press',peak=1), ''), \
                             'reft': isnull(cohorts.reft.value, ''), \
                             'message': message, \
                             #'opt_T': temper if temper <  99.0 else '', \

@@ -50,6 +50,8 @@ class Pressure(sensor.Sensor):
     def __init__(self,address,param,enable_pin):
         super().__init__(Pressure.typeNum,address,param)
         self.enable_pin = enable_pin
+        self.min = None
+        self.max = None
         if hardConf.io:
             hardConf.io.write_pin(self.enable_pin,1) #Enable measurement
 
@@ -74,8 +76,10 @@ class Pressure(sensor.Sensor):
         return 0.0
 
     def get(self):
-        value = self.getreading()
+        value,min,max = self.getreading()
         if value:
+            self.min = min
+            self.max = max
             self.set(value)
         return value
 

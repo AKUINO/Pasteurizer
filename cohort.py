@@ -185,14 +185,19 @@ class Cohort(object):
         #print("**4="+str(trueValue))
         return trueValue
 
-    def val(self,address,format="%.2f"):
+    def val(self,address,format="%.2f",peak=0):
         if not address in self.catalog:
             return ""
         sensor = self.catalog[address]
         if not sensor.value:
             return ""
         else:
-            return format % self.getCalibratedValue(address)
+            if peak == 0:
+                return format % self.getCalibratedValue(address)
+            elif peak < 0:
+                return format % self.getCalibratedValue(address,apparentValue=self.sensor.min)
+            else: # peak > 0:
+                return format % self.getCalibratedValue(address,apparentValue=self.sensor.max)
 
     def display(self,term,address,format=" %5.2f°C"):
         if not address in self.catalog:
