@@ -195,9 +195,9 @@ class Cohort(object):
             if peak == 0:
                 return format % self.getCalibratedValue(address)
             elif peak < 0:
-                return format % self.getCalibratedValue(address,apparentValue=self.sensor.min)
+                return format % self.getCalibratedValue(address,apparentValue=sensor.min)
             else: # peak > 0:
-                return format % self.getCalibratedValue(address,apparentValue=self.sensor.max)
+                return format % self.getCalibratedValue(address,apparentValue=sensor.max)
 
     def display(self,term,address,format=" %5.2f°C"):
         if not address in self.catalog:
