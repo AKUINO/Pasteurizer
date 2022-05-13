@@ -154,16 +154,16 @@ $(document).ready(function() {
                         for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
                             if (data['allowedActions'].indexOf(ml) >= 0) {
-                                $('#menu'+ml).removeClass('ui-state-disabled');
+                                $('#menu'+ml).removeClass('disabled');
                             }
                             else {
-                                $('#menu'+ml).addClass('ui-state-disabled');
+                                $('#menu'+ml).addClass('disabled');
                             }
                         }
                     } else {
                         for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
-                            $('#menu'+ml).removeClass('ui-state-disabled');
+                            $('#menu'+ml).removeClass('disabled');
                         }
                     }
                     if (data['actif'] > 0) {
@@ -273,16 +273,16 @@ function action(letter) {
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
                         if (data['allowedActions'].indexOf(ml) >= 0) {
-                            $('#menu'+ml).removeClass('ui-state-disabled');
+                            $('#menu'+ml).removeClass('disabled');
                         }
                         else {
-                            $('#menu'+ml).addClass('ui-state-disabled');
+                            $('#menu'+ml).addClass('disabled');
                         }
                     }
                 } else {
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
-                        $('#menu'+ml).removeClass('ui-state-disabled');
+                        $('#menu'+ml).removeClass('disabled');
                     }
                 }
                 if (data['pause'] != 0) {
