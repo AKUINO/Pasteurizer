@@ -571,10 +571,10 @@ State('d',ml.T('Acide','Acid','Zuur'), \
     [ ('R',['d','r']),('F','d'),('V','d') ] )
 
 State('p',ml.T('Produit','Product','Product'), \
-    [ ('I','p'),('M','p'),('E','e'),('D',['e','s','d']),('N',['e','s','n']),('J','p'),('Y','g'),('L','g'),('T','g'),('F','e'),('V','e'),('t','s') ] )
+    [ ('I','p'),('M','p'),('E','e'),('D',['e','s','d']),('N',['h','s','n']),('J','p'),('Y','g'),('L','g'),('T','g'),('F','e'),('V','e'),('t','s') ] )
 
 State('g',ml.T('Produit Gras','Greasy Product','Vet Product'), \
-    [ ('I','g'),('M','g'),('E','h'),('N',['h','s','n']),                    ('J','g'),('Y','g'),('L','g'),('T','g'),('F','h'),('V','h'),('t','t') ] )
+    [ ('I','g'),('M','g'),('E','h'),                    ('N',['h','s','n']),('J','g'),('Y','g'),('L','g'),('T','g'),('F','h'),('V','h'),('t','t') ] )
 
 State('e',ml.T('Eau+Produit','Water+Product','Water+Product'), \
     [ ('D',['e','s','d']),('J','e'),('Y','e'),('L','e'),('T','e'),('G','g'),('P','p'),('F','e'),('V','e'),('t','s') ] )
@@ -1472,7 +1472,7 @@ class ThreadPump(threading.Thread):
             self.stopAction()
             self.currAction = action
             self.startAction = time.perf_counter()
-            (self.currStateStart,self.currState) = self.currState.transit(State.ACTION_BEGIN,action,self.currStateStart,self.startAction)
+            (self.currStateStart,self.currState) = self.currState.transit(State.ACTION_BEGIN,action,self.currStateStart)
             self.pump.reset_volume()
             self.setPause(False);
             self.currSequence = []

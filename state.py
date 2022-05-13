@@ -40,7 +40,7 @@ class State(object):
         self.transitions = transitions
         State.knownStates[letter] = self
 
-    def transit(self,step,action,start,now = time.perf_counter()):
+    def transit(self,step,action,start, now=int(time.time()) ):
         for (actDone,nextState) in self.transitions:
             if action == actDone:
                 if isinstance(nextState, list):
@@ -67,8 +67,8 @@ class State(object):
             result += actDone
         return result
 
-    def save(self,nowT=time.perf_counter()):
+    def save(self, now=int(time.time()) ):
         data_file = open(data_dir + "state.csv", "w")
         data_file.write("epoch_sec\tstate\n")
-        data_file.write("%d\t%s\n"%(int(nowT),self.letter))
+        data_file.write("%d\t%s\n"%(now,self.letter))
         data_file.close()
