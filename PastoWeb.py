@@ -1947,9 +1947,9 @@ class WebApiAction:
                         'actionletter':letter,
                         'action':str(menus.actionName[letter][1]),
                         'actiontitle':str(menus.actionName[letter][3]),
-                        'stateletter': T_Pump.currState.letter,
-                        'state': str(T_Pump.currState.labels),
-                        'allowedActions' : str(T_Pump.currState.allowedActions()),
+                        'stateletter': (T_Pump.currState.letter if T_Pump.currState else ''),
+                        'state': (str(T_Pump.currState.labels) if T_Pump.currState else ''),
+                        'allowedActions' : (str(T_Pump.currState.allowedActions()) if T_Pump.currState else ''),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[letter][2])+': '+message,
                         'output': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if letter in ['P','E','I'] else 1),
@@ -2109,9 +2109,9 @@ class WebApiLog:
                             'actionletter': T_Pump.currAction, \
                             'action': str(menus.actionName[T_Pump.currAction][1]), \
                             'actiontitle': str(menus.actionName[T_Pump.currAction][3]), \
-                            'stateletter': T_Pump.currState.letter,
-                            'state': str(T_Pump.currState.labels),
-                            'allowedActions' : str(T_Pump.currState.allowedActions()),
+                            'stateletter': (T_Pump.currState.letter if T_Pump.currState else ''),
+                            'state': (str(T_Pump.currState.labels) if T_Pump.currState else ''),
+                            'allowedActions' : (str(T_Pump.currState.allowedActions()) if T_Pump.currState else ''),
                             'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "", \
                             'delay': durationRemaining, \
                             'remain': quantityRemaining, \
