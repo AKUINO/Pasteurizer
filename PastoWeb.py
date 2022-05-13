@@ -1009,7 +1009,7 @@ class Operation(object):
                 Buzzer.on()
             T_Pump.setPause(True)
             tell_message(self.message)
-            T_Pump.currState.transit(State.ACTION_RESUME,T_Pump.currAction,T_Pump.startState)
+            (T_Pump.currStateStart,T_Pump.currState) = T_Pump.currState.transit(State.ACTION_RESUME,T_Pump.currAction,T_Pump.startState)
         elif self.typeOp == 'SUBR': # 1st Call a subroutine and loop...
             i = 0
             for op in opSequences[self.subSequence]:
