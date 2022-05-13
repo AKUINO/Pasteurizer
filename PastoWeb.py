@@ -830,7 +830,7 @@ class ThreadDAC(threading.Thread):
                     data_file = open(DIR_DATA_CSV + fileName+".csv", "a")
                     data_file.write("%d\t%s\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
                                     % (int(nowT), \
-                                       self.T_Pump.currState.letter, \
+                                       self.T_Pump.currState.letter if self.T_Pump.currState else '', \
                                        self.T_Pump.currAction, \
                                        self.T_Pump.currOperation.acronym if self.T_Pump.currOperation else "", \
                                        durationRemaining, \

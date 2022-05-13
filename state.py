@@ -38,24 +38,22 @@ class State(object):
     def transit(self,step,action,start,now = time.perf_counter()):
         for (actDone,nextState) in self.transitions:
             if action == actDone:
-                if action in State.knownStates:
-                    if isinstance(nextState, list):
-                        if step == State.ACTION_BEGIN:
-                            newLetter = nextState[0]
-                        elif step == State.ACTION_RESUME:
-                            newLetter = nextState[(len(nextState)-1) if (len(nextState) > 2) else 1]
-                        else: # ACTION_END
-                            newLetter = nextState[len(nextState) - 1]
-                        newState = State.knownStates[newLetter]
-                    else:
-                        newState = State.knownStates[nextState]
-                    if newState.letter != self.letter:
-                        newState.save()
-                        return now, newState.letter
-                    else:
-                        return start, self.letter
+                if isinstance(nextState, list):
+                    if step == State.ACTION_BEGIN:
+                        newLetter = nextState[0]
+                    elif step == State.ACTION_RESUME:
+                        newLetter = nextState[(len(nextState)-1) if (len(nextState) > 2) else 1]
+                    else: # ACTION_END
+                        newLetter = nextState[len(nextState) - 1]
+                    newState = State.knownStates[newLetter]
                 else:
-                    return 0,None
+                    newState = State.knownStates[nextState]
+                if newState.letter != self.letter:
+                    newState.save()
+                    return now, newState.letter
+                else:
+                    return start, self.letter
+        print ("Unknown action=%s for state=%s"%(action,self.letter))
         return 0,None
 
     def allowedActions (self):
