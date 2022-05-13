@@ -71,7 +71,7 @@ function closeMenu() {
   $('#cancel').hide();
 }
 
-var ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 $(document).ready(function() {
     var logging = ($("#tableau").length > 0);
@@ -151,16 +151,18 @@ $(document).ready(function() {
                     $('#heateff').text(floorDeci(data['heateff']));
                     $('#message').text(data['message']);
                     if (data['allowedActions'] != '') {
-                        for(int i=0; i < ALPHABET.Length; i++) {
+                        for(int i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
-                            if (data['allowedActions'].indexOf(ml) >= 0)
+                            if (data['allowedActions'].indexOf(ml) >= 0) {
                                 $('#menu'+ml).removeClass('ui-state-disabled');
-                             else {
+                            }
+                            else {
                                 $('#menu'+ml).addClass('ui-state-disabled');
                             }
                         }
                     } else {
-                        for (ml in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+                        for(int i=0; i < ALPHABET.length; i++) {
+                            ml = ALPHABET.charAt(i);
                             $('#menu'+ml).removeClass('ui-state-disabled');
                         }
                     }
@@ -268,17 +270,19 @@ function action(letter) {
                 $('#accro').text(accro);
                 $('#message').text(data['message']);
                 if (data['allowedActions'] != '') {
-                    for(int i=0; i < ALPHABET.Length; i++) {
+                    for(int i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
-                         if (data['allowedActions'].indexOf(ml) >= 0)
-                            $('#menu'+ml).removeClass('disabled');
-                         else {
-                            $('#menu'+ml).addClass('disabled');
+                        if (data['allowedActions'].indexOf(ml) >= 0) {
+                            $('#menu'+ml).removeClass('ui-state-disabled');
+                        }
+                        else {
+                            $('#menu'+ml).addClass('ui-state-disabled');
                         }
                     }
                 } else {
-                    for (ml in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-                        $('#menu'+ml).removeClass('disabled');
+                    for(int i=0; i < ALPHABET.length; i++) {
+                        ml = ALPHABET.charAt(i);
+                        $('#menu'+ml).removeClass('ui-state-disabled');
                     }
                 }
                 if (data['pause'] != 0) {
