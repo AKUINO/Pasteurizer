@@ -150,7 +150,7 @@ $(document).ready(function() {
                     $('#message').text(data['message']);
                     if (data['allowedActions'] != '') {
                         for (ml in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-                            if (ml in data['allowedActions'])
+                            if (data['allowedActions'].indexOf(ml) >= 0)
                                 $('#menu'+ml).removeClass('ui-state-disabled');
                              else {
                                 $('#menu'+ml).addClass('ui-state-disabled');
