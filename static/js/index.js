@@ -71,6 +71,8 @@ function closeMenu() {
   $('#cancel').hide();
 }
 
+var ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
 $(document).ready(function() {
     var logging = ($("#tableau").length > 0);
     if (logging) {
@@ -149,7 +151,8 @@ $(document).ready(function() {
                     $('#heateff').text(floorDeci(data['heateff']));
                     $('#message').text(data['message']);
                     if (data['allowedActions'] != '') {
-                        for (ml in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+                        for(int i=0; i < ALPHABET.Length; i++) {
+                            ml = ALPHABET.charAt(i);
                             if (data['allowedActions'].indexOf(ml) >= 0)
                                 $('#menu'+ml).removeClass('ui-state-disabled');
                              else {
@@ -265,7 +268,8 @@ function action(letter) {
                 $('#accro').text(accro);
                 $('#message').text(data['message']);
                 if (data['allowedActions'] != '') {
-                    for (ml in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+                    for(int i=0; i < ALPHABET.Length; i++) {
+                        ml = ALPHABET.charAt(i);
                          if (data['allowedActions'].indexOf(ml) >= 0)
                             $('#menu'+ml).removeClass('disabled');
                          else {
