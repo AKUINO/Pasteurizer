@@ -4,7 +4,12 @@ import time
 import datetime
 import traceback
 
+data_dir = None
+
 def load(DIR_DATA_CSV): # returns timestamp and current state
+    global data_dir
+
+    data_dir = DIR_DATA_CSV
     try:
         with open(DIR_DATA_CSV + "state.csv") as f:
             stateData = f.read()
@@ -62,8 +67,8 @@ class State(object):
             result += actDone
         return result
 
-    def save(self,DIR_DATA_CSV,nowT=time.perf_counter()):
-        data_file = open(DIR_DATA_CSV + "state.csv", "w")
+    def save(self,nowT=time.perf_counter()):
+        data_file = open(data_dir + "state.csv", "w")
         data_file.write("epoch_sec\tstate\n")
         data_file.write("%d\t%s\n"%(int(nowT),self.letter))
         data_file.close()
