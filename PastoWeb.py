@@ -1009,6 +1009,7 @@ class Operation(object):
                 Buzzer.on()
             T_Pump.setPause(True)
             tell_message(self.message)
+            T_Pump.currState.transit(State.ACTION_RESUME,T_Pump.currAction,T_Pump.startState)
         elif self.typeOp == 'SUBR': # 1st Call a subroutine and loop...
             i = 0
             for op in opSequences[self.subSequence]:
@@ -1440,7 +1441,7 @@ class ThreadPump(threading.Thread):
             self.currSequence = self.currSequence[1:]
             self.startOperation(self.currOperation)
         else:
-            (self.currStateStart, self.currState) = self.currState.transit(self.currStateStart) # State obtained at the end of the action
+            (self.currStateStart, self.currState) = self.currState.transit(State.ACTION_END, self.currStateStart) # State obtained at the end of the action
 
     def closeSequence(self): # Executer la dernière opération si elle sert à cloturer une sequence
         if self.currOperation and self.currOperation.acronym != 'CLOS':
@@ -1471,7 +1472,7 @@ class ThreadPump(threading.Thread):
             self.stopAction()
             self.currAction = action
             self.startAction = time.perf_counter()
-            (self.currStateStart,self.currState) = self.currState.transit(action,self.currStateStart,self.startAction)
+            (self.currStateStart,self.currState) = self.currState.transit(State.ACTION_BEGIN,self.currStateStart,self.startAction)
             self.pump.reset_volume()
             self.setPause(False);
             self.currSequence = []

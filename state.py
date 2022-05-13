@@ -24,6 +24,9 @@ def load(DIR_DATA_CSV): # returns timestamp and current state
 class State(object):
 
     knownStates = { }
+    ACTION_BEGIN = 1
+    ACTION_RESUME = 2
+    ACTION_END = 3
 
     def __init__(self,letter,labels,transitions):
         #cohorts.catalog[address] = self Done by the threading class...
@@ -32,11 +35,20 @@ class State(object):
         self.transitions = transitions
         State.knownStates[letter] = self
 
-    def transit(self,action,start,now = time.perf_counter()):
+    def transit(self,step,action,start,now = time.perf_counter()):
         for (actDone,nextState) in self.transitions:
             if action == actDone:
                 if action in State.knownStates:
-                    newState = State.knownStates[nextState]
+                    if isinstance(nextState, list):
+                        if step == State.ACTION_BEGIN:
+                            newLetter = nextState[0]
+                        elif step == State.ACTION_RESUME:
+                            newLetter = nextState[(len(nextState)-1) if (len(nextState) > 2) else 1]
+                        else: # ACTION_END
+                            newLetter = nextState[len(nextState) - 1]
+                        newState = State.knownStates[newLetter]
+                    else:
+                        newState = State.knownStates[nextState]
                     if newState.letter != self.letter:
                         newState.save()
                         return now, newState.letter
