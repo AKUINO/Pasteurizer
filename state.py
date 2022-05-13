@@ -5,8 +5,8 @@ import datetime
 import traceback
 
 def load(DIR_DATA_CSV): # returns timestamp and current state
-    with open(DIR_DATA_CSV + "state.csv") as f:
-        try:
+    try:
+        with open(DIR_DATA_CSV + "state.csv") as f:
             stateData = f.read()
             print (stateData)
             data = stateData.split('\n')
@@ -17,8 +17,8 @@ def load(DIR_DATA_CSV): # returns timestamp and current state
                     stateLetter = data[1]
                     if stateLetter and stateLetter[0] and stateLetter in State.knownStates:
                         return int(since),State.knownStates[stateLetter[0]]
-        except IOError: # unknown previous state
-            traceback.print_exc()
+    except IOError: # unknown previous state
+        traceback.print_exc()
     return 0,State.knownStates['s'] # If state unknown, it is dirty !
 
 class State(object):
@@ -32,14 +32,19 @@ class State(object):
         self.transitions = transitions
         State.knownStates[letter] = self
 
-    def transit(self,action):
+    def transit(self,action,start,now = time.perf_counter()):
         for (actDone,nextState) in self.transitions:
             if action == actDone:
                 if action in State.knownStates:
-                    return State.knownStates[nextState]
+                    newState = State.knownStates[nextState]
+                    if newState.letter != self.letter:
+                        newState.save()
+                        return now, newState.letter
+                    else:
+                        return start, self.letter
                 else:
-                    return None
-        return None
+                    return 0,None
+        return 0,None
 
     def allowedActions (self):
         result = ""
@@ -47,7 +52,7 @@ class State(object):
             result += actDone
         return result
 
-    def save(self,DIR_DATA_CSV,nowT=time.time()):
+    def save(self,DIR_DATA_CSV,nowT=time.perf_counter()):
         data_file = open(DIR_DATA_CSV + "state.csv", "w")
         data_file.write("epoch_sec\tstate\n")
         data_file.write("%d\t%s\n"%(int(nowT),self.letter))

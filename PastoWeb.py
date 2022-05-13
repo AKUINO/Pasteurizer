@@ -1397,7 +1397,8 @@ class ThreadPump(threading.Thread):
         self.pump = pumpy
         self.T_DAC = T_DAC
         self.currAction = 'Z'
-        (self.currStateStart, self.currState) = state.load(DIR_DATA_CSV)
+        self.startAction = time.perf_counter()
+        (self.currStateStart, self.currState) = state.load(DIR_DATA_CSV,self.startAction,self.startAction)
         self.currSequence = None
         self.currOperation = None
         self.currOpContext = None
@@ -1407,7 +1408,6 @@ class ThreadPump(threading.Thread):
         self.pumpLastChange = 0 # Time of last change in pump running
         self.pumpLastVolume = 0
         self.pumpLastHeating = 0
-        self.startAction = 0
         self.lastStop = 0
 
     def pushContext(self,opContext):
@@ -1440,7 +1440,7 @@ class ThreadPump(threading.Thread):
             self.currSequence = self.currSequence[1:]
             self.startOperation(self.currOperation)
         else:
-            self.currState = self.currState.transit() # State obtained at the end of the action
+            (self.currStateStart, self.currState) = self.currState.transit(self.currStateStart) # State obtained at the end of the action
 
     def closeSequence(self): # Executer la dernière opération si elle sert à cloturer une sequence
         if self.currOperation and self.currOperation.acronym != 'CLOS':
@@ -1470,8 +1470,8 @@ class ThreadPump(threading.Thread):
         if action in opSequences:
             self.stopAction()
             self.currAction = action
-            self.currState = self.currState.transit(action)
             self.startAction = time.perf_counter()
+            (self.currStateStart,self.currState) = self.currState.transit(action,self.currStateStart,self.startAction)
             self.pump.reset_volume()
             self.setPause(False);
             self.currSequence = []
