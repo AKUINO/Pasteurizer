@@ -39,6 +39,8 @@ from button import button
 from sensor import Sensor
 from valve import Valve
 from menus import Menus
+import state
+from state import State
 
 DEBUG = True
 
@@ -158,6 +160,8 @@ FLOOD_TIME = 60.0 # 90 econds of hot water tap flushing (when a pump is in the w
 CLEAN_TIME = 1800.0
 DISINF_TIME = 300.0
 RINSE_TIME = 300.0
+WAIT_TIME = 1*3600
+STAY_CLEAN_TIME = 8*3600
 
 menus = Menus()
 menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
@@ -166,6 +170,12 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                     'P':['P',ml.T("Pasteurisation°","Pasteurization°","Pasteurisatie°") \
                             ,ml.T("Température de pasteurisation","Pasteurisation Temperature","Pasteurisatie Temperatuur") \
                             ,72.0,72.0,"°C",False,90,0.1], # Température normale de pasteurisation
+                    'W':['W',ml.T("Pause maximale","Max Pause","Max Pauze") \
+                        ,ml.T("Temps d'arrêt maximum autorisé","Maximum process stop duration","Maximaal toegestane uitvaltijd") \
+                        ,WAIT_TIME,WAIT_TIME,'"',False,3600*4,1], # Durée de pause en cours de production avant de devoir tout nettoyer
+                    'w':['w',ml.T("Pause maximale","Max Pause","Max Pauze") \
+                        ,ml.T("Temps d'arrêt maximum autorisé","Maximum process stop duration","Maximaal toegestane uitvaltijd") \
+                        ,STAY_CLEAN_TIME,STAY_CLEAN_TIME,'"',False,3600*12,1], # Durée où un tuyau propre le reste sans rinçage (le double avant de tout re-nettoyer)
                     'R':['R',ml.T("Rinçage°","Rinse°","Spoelen°") \
                             ,ml.T("Température de rinçage","Rinse Temperature","Spoelen Temperatuur") \
                             ,45.0,45.0,"°C",False,90,0.1], # Température du Bassin pour le prélavage
@@ -204,9 +214,9 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,0.0,0.0,"hh.m0",True,23.5,0.1], # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
                     'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
                             ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
-menus.sortedOptions = "PMGKQRrNnDdZ" #T
-menus.cleanOptions = "PMGQH" #TtK
-menus.dirtyOptions = "RGrNnDdH"
+menus.sortedOptions = "PMGKWwQRrNnDdZ" #T
+menus.cleanOptions = "PMGWQH" #TtK
+menus.dirtyOptions = "RGrNnDdwH"
 #(options['P'][3] + BATH_TUBE) = 75.0  # Température du Bassin de chauffe
 ##reject = 71.7 # Température minimum de pasteurisation
 
@@ -518,34 +528,6 @@ menus.operName = { 'HEAT':ml.T('chauffer','heating','verwarm') \
                   ,'SUBR':ml.T('processer','process','werkwijze') \
                   ,'SUBS':ml.T('procéder','proceed','doorgan') }
 
-menus.pipeState = { 'r':ml.T('Propre','Clean','Schoon'), \
-                    'o':ml.T('Vieux','Old','Oud'), \
-                    'a':ml.T('Vidé','Purged','Leeg'), \
-                    'b':ml.T('Vidé+Sale','Purged+Dirty','Leeg+Vies'), \
-                    't':ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
-                    's':ml.T('Sale','Dirty','Vies'), \
-                    'n':ml.T('Soude','Soda','Natrium'), \
-                    'd':ml.T('Acide','Acid','Zuur'), \
-                    'g':ml.T('Produit Gras','Greasy Product','Vet Product'), \
-                    'p':ml.T('Produit','Product','Product'), \
-                    'e':ml.T('Eau+Produit','Water+Product','Water+Product'), \
-                    'h':ml.T('Eau+Produit gras','Water+Greasy Product','Water+Vet Product')
-                    }
-
-#TODO: Commande "M" grasse? 't': différents délais à calibrer: temps reste propre avec de l'eau? à vide? temps reste correct avec du produit dans les tuyaux? Insérer dans la machine d'état
-menus.stateTransitions = { 'r' : [ ('A','r'),('J','r'),('Y','r'),('L','r'),('T','r'),('G','g'),('P','p'),('F','r'),('V','a'),('t','o') ], \
-                           'o' : [ ('R',['o','r']),('F','o'),('V','b'),('t','s') ], \
-                           'a' : [ ('F',['a','r']),('V','a'),('t','b') ], \
-                           'b' : [ ('F','s'),('V','b') ], \
-                           't' : [ ('N',['t','n']),                ('F','t'),('V','t') ], \
-                           's' : [ ('N',['s','n']),('D',['s','d']),('F','s'),('V','s') ], \
-                           'n' : [ ('R',['n','r']),('F','n'),('V','n') ], \
-                           'd' : [ ('R',['d','r']),('F','d'),('V','d') ], \
-                           'g' : [ ('I','g'),('M','g'),('E','h'),('N',['h','s','n']),                    ('J','g'),('Y','g'),('L','g'),('T','g'),('F','h'),('V','h'),('t','t') ], \
-                           'p' : [ ('I','p'),('M','p'),('E','e'),('D',['e','s','d']),('N',['e','s','n']),('J','p'),('Y','g'),('L','g'),('T','g'),('F','e'),('V','e'),('t','s') ], \
-                           'e' : [ ('D',['e','s','d']),('J','e'),('Y','e'),('L','e'),('T','e'),('G','g'),('P','p'),('F','e'),('V','e'),('t','s') ], \
-                           'h' : [ ('N',['h','s','n']),('J','h'),('Y','h'),('L','h'),('T','h'),('G','g'),('P','g'),('F','h'),('V','h'),('t','t') ] \
-                           }
 # R + Pasteuriser Gras = G
 # R + Pasteuriser Maigre = P
 # R + Vider = A
@@ -563,6 +545,42 @@ menus.stateTransitions = { 'r' : [ ('A','r'),('J','r'),('Y','r'),('L','r'),('T',
 # S + Acide = D au début, D0 quand complet
 # T + Acide INTERDIT
 # Dx + Flush x 4 (D1,D2,D3,D4) = R
+
+State('r',ml.T('Propre','Clean','Schoon'), \
+    [ ('A','r'),('J','r'),('Y','r'),('L','r'),('T','r'),('G','g'),('P','p'),('F','r'),('V','a'),('w','o') ] )
+
+State('o',ml.T('Vieux','Old','Oud'), \
+    [ ('R',['o','r']),('F','o'),('V','b'),('w','s') ] )
+
+State('a',ml.T('Vidé','Purged','Leeg'), \
+    [ ('F',['a','r']),('V','a'),('w','b') ] )
+
+State('b',ml.T('Vidé+Sale','Purged+Dirty','Leeg+Vies'), \
+    [ ('F','s'),('V','b') ] )
+
+State('t',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
+    [ ('N',['t','n']),                ('F','t'),('V','t') ] )
+
+State('s',ml.T('Sale','Dirty','Vies'), \
+    [ ('N',['s','n']),('D',['s','d']),('F','s'),('V','s') ] )
+
+State('n',ml.T('Soude','Soda','Natrium'), \
+    [ ('R',['n','r']),('F','n'),('V','n') ] )
+
+State('d',ml.T('Acide','Acid','Zuur'), \
+    [ ('R',['d','r']),('F','d'),('V','d') ] )
+
+State('p',ml.T('Produit','Product','Product'), \
+    [ ('I','p'),('M','p'),('E','e'),('D',['e','s','d']),('N',['e','s','n']),('J','p'),('Y','g'),('L','g'),('T','g'),('F','e'),('V','e'),('t','s') ] )
+
+State('g',ml.T('Produit Gras','Greasy Product','Vet Product'), \
+    [ ('I','g'),('M','g'),('E','h'),('N',['h','s','n']),                    ('J','g'),('Y','g'),('L','g'),('T','g'),('F','h'),('V','h'),('t','t') ] )
+
+State('e',ml.T('Eau+Produit','Water+Product','Water+Product'), \
+    [ ('D',['e','s','d']),('J','e'),('Y','e'),('L','e'),('T','e'),('G','g'),('P','p'),('F','e'),('V','e'),('t','s') ] )
+
+State('h',ml.T('Eau+Produit gras','Water+Greasy Product','Water+Vet Product'), \
+    [ ('N',['h','s','n']),('J','h'),('Y','h'),('L','h'),('T','h'),('G','g'),('P','g'),('F','h'),('V','h'),('t','t') ] )
 
 def menu_confirm(choice,delay=None):
     global display_pause, lines
@@ -810,8 +828,9 @@ class ThreadDAC(threading.Thread):
                 quantityRemaining = self.T_Pump.quantityRemaining()
                 try:
                     data_file = open(DIR_DATA_CSV + fileName+".csv", "a")
-                    data_file.write("%d\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
+                    data_file.write("%d\t%s\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
                                     % (int(nowT), \
+                                       self.T_Pump.currState.letter, \
                                        self.T_Pump.currAction, \
                                        self.T_Pump.currOperation.acronym if self.T_Pump.currOperation else "", \
                                        durationRemaining, \
@@ -1378,6 +1397,7 @@ class ThreadPump(threading.Thread):
         self.pump = pumpy
         self.T_DAC = T_DAC
         self.currAction = 'Z'
+        (self.currStateStart, self.currState) = state.load(DIR_DATA_CSV)
         self.currSequence = None
         self.currOperation = None
         self.currOpContext = None
@@ -1419,6 +1439,8 @@ class ThreadPump(threading.Thread):
             self.currOperation = self.currSequence[0]
             self.currSequence = self.currSequence[1:]
             self.startOperation(self.currOperation)
+        else:
+            self.currState = self.currState.transit() # State obtained at the end of the action
 
     def closeSequence(self): # Executer la dernière opération si elle sert à cloturer une sequence
         if self.currOperation and self.currOperation.acronym != 'CLOS':
@@ -1448,6 +1470,7 @@ class ThreadPump(threading.Thread):
         if action in opSequences:
             self.stopAction()
             self.currAction = action
+            self.currState = self.currState.transit(action)
             self.startAction = time.perf_counter()
             self.pump.reset_volume()
             self.setPause(False);
@@ -1523,7 +1546,7 @@ class ThreadPump(threading.Thread):
         self.running = True
         while self.running:
             try:
-                time.sleep(0.3)
+                time.sleep(0.25)
                 now = time.perf_counter()
                 if RedPendingConfirmation != 0.0:
                     if RedLED:
@@ -1684,7 +1707,7 @@ if hardConf.inputPressure:
 
 
 if not pumpy.open():
-    term.writeLine("Pompe inaccessible ???", term.red, term.bold, term.bgwhite)
+    term.writeLine("Pompe inaccessible ?", term.red, term.bold, term.bgwhite)
 pumpy.stop() # in case it was running wild!
 
 # manage pump and keep track of volume pumped
@@ -1718,7 +1741,7 @@ defFile = datetime.now().strftime("%Y_%m%d_%H%M")
 #if not fileName:
 fileName = defFile
 data_file = open(DIR_DATA_CSV + fileName+".csv", "w")
-data_file.write("epoch_sec\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\textra\tinput\twarant\toutput\theat\theatbath\t"
+data_file.write("epoch_sec\tstate\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\textra\tinput\twarant\toutput\theat\theatbath\t"
                 +("press" if hardConf.inputPressure else "rmeter")+"\n") #\twatt2\ttemper\theat
 term.write("Données stockées dans ",term.blue, term.bgwhite)
 term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
@@ -1863,7 +1886,7 @@ class WebApiAction:
 
     def GET(self, letter):
 
-        global menus, WebExit
+        global menus, WebExit, dumpValve
 
         data, connected, mail, password = init_access()
         web.header('Content-type', 'application/json; charset=utf-8')
@@ -1923,9 +1946,12 @@ class WebApiAction:
                         'actionletter':letter,
                         'action':str(menus.actionName[letter][1]),
                         'actiontitle':str(menus.actionName[letter][3]),
-                        'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "", \
+                        'stateletter': T_Pump.currState.letter,
+                        'state': str(T_Pump.currState.labels),
+                        'allowedActions' : str(T_Pump.currState.allowedActions()),
+                        'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[letter][2])+': '+message,
-                        'output': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if letter in ['P','E','I'] else 1), \
+                        'output': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if letter in ['P','E','I'] else 1),
                         'pause': 1 if T_Pump.paused else 0 }
         return json.dumps(result)
 
@@ -2082,6 +2108,9 @@ class WebApiLog:
                             'actionletter': T_Pump.currAction, \
                             'action': str(menus.actionName[T_Pump.currAction][1]), \
                             'actiontitle': str(menus.actionName[T_Pump.currAction][3]), \
+                            'stateletter': T_Pump.currState.letter,
+                            'state': str(T_Pump.currState.labels),
+                            'allowedActions' : str(T_Pump.currState.allowedActions()),
                             'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "", \
                             'delay': durationRemaining, \
                             'remain': quantityRemaining, \

@@ -105,6 +105,8 @@ $(document).ready(function() {
                     $('#time').text(time);
                     $('#actionletter').text(data['actionletter']);
                     $('#action').text(data['action']);
+                    $('#stateletter').text(data['stateletter']);
+                    $('#state').text(data['state']);
                     $('#actiontitle').text(data['actiontitle']);
                     var accro = "";
                     if ('accro' in data && data['accro'].length >= 4) {
@@ -146,6 +148,19 @@ $(document).ready(function() {
                     $('#pumpeff').text(floorDeci(data['pumpeff']));
                     $('#heateff').text(floorDeci(data['heateff']));
                     $('#message').text(data['message']);
+                    if (data['allowedActions'] != '') {
+                        for (ml in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+                            if (ml in data['allowedActions'])
+                                $('#menu'+ml).removeClass('ui-state-disabled');
+                             else {
+                                $('#menu'+ml).addClass('ui-state-disabled');
+                            }
+                        }
+                    } else {
+                        for (ml in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+                            $('#menu'+ml).removeClass('ui-state-disabled');
+                        }
+                    }
                     if (data['actif'] > 0) {
                         $('#STOP').show();
                         if (data['pause'] > 0) {
@@ -240,6 +255,8 @@ function action(letter) {
                 $('#time').text(time);
                 $('#actionletter').text(data['actionletter']);
                 $('#action').text(data['action']);
+                $('#stateletter').text(data['stateletter']);
+                $('#state').text(data['state']);
                 $('#actiontitle').text(data['actiontitle']);
                 var accro = "";
                 if ('accro' in data && data['accro'].length >= 4) {
@@ -247,6 +264,19 @@ function action(letter) {
                 }
                 $('#accro').text(accro);
                 $('#message').text(data['message']);
+                if (data['allowedActions'] != '') {
+                    for (ml in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+                        if (ml in data['allowedActions'])
+                            $('#menu'+ml).removeClass('ui-state-disabled');
+                         else {
+                            $('#menu'+ml).addClass('ui-state-disabled');
+                        }
+                    }
+                } else {
+                    for (ml in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+                        $('#menu'+ml).removeClass('ui-state-disabled');
+                    }
+                }
                 if (data['pause'] != 0) {
                     $('#pause').hide();
                     $('#restart').show();

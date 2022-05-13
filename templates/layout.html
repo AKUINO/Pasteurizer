@@ -54,7 +54,7 @@ $ ip = web.ctx['ip']
 		  </a>
 		  <div class="dropdown-menu">
 		  $for letter in menus.cleanActions:
-		    <a class="dropdown-item"$:(freshHref("/explain/"+letter+"#doc"))>$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
+		    <a id="menu$(letter)" class="dropdown-item"$:(freshHref("/explain/"+letter+"#doc"))>$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
 		  <div class="dropdown-divider"></div>
 		  <a class="dropdown-item" href="/option1" onclick="closeMenu()">$(ml.T("Paramètres de Pasteurisation et Refroidissement","Pasteurisation and Cooling Parameters","Pasteurisatie- en koelparameters"))</a>
 		  </div>
@@ -65,7 +65,7 @@ $ ip = web.ctx['ip']
 		  </a>
 		  <div class="dropdown-menu">
 		  $for letter in menus.dirtyActions:
-		    <a class="dropdown-item"$:(freshHref("/explain/"+letter+"#doc"))>$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
+		    <a id="menu$(letter)" class="dropdown-item"$:(freshHref("/explain/"+letter+"#doc"))>$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
 		  <div class="dropdown-divider"></div>
 		  <a class="dropdown-item" href="/option2" onclick="closeMenu()">$(ml.T("Paramètres de Nettoyage","Cleansing Parameters","Reiniging parameters"))</a>
 		  </div>
