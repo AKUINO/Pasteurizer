@@ -151,7 +151,7 @@ $(document).ready(function() {
                     $('#heateff').text(floorDeci(data['heateff']));
                     $('#message').text(data['message']);
                     if (data['allowedActions'] != '') {
-                        for(int i=0; i < ALPHABET.length; i++) {
+                        for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
                             if (data['allowedActions'].indexOf(ml) >= 0) {
                                 $('#menu'+ml).removeClass('ui-state-disabled');
@@ -161,7 +161,7 @@ $(document).ready(function() {
                             }
                         }
                     } else {
-                        for(int i=0; i < ALPHABET.length; i++) {
+                        for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
                             $('#menu'+ml).removeClass('ui-state-disabled');
                         }
@@ -270,7 +270,7 @@ function action(letter) {
                 $('#accro').text(accro);
                 $('#message').text(data['message']);
                 if (data['allowedActions'] != '') {
-                    for(int i=0; i < ALPHABET.length; i++) {
+                    for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
                         if (data['allowedActions'].indexOf(ml) >= 0) {
                             $('#menu'+ml).removeClass('ui-state-disabled');
@@ -280,7 +280,7 @@ function action(letter) {
                         }
                     }
                 } else {
-                    for(int i=0; i < ALPHABET.length; i++) {
+                    for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
                         $('#menu'+ml).removeClass('ui-state-disabled');
                     }
