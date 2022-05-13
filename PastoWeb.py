@@ -1441,7 +1441,7 @@ class ThreadPump(threading.Thread):
             self.currSequence = self.currSequence[1:]
             self.startOperation(self.currOperation)
         else:
-            (self.currStateStart, self.currState) = self.currState.transit(State.ACTION_END, self.currStateStart) # State obtained at the end of the action
+            (self.currStateStart, self.currState) = self.currState.transit(State.ACTION_END, self.currAction, self.currStateStart) # State obtained at the end of the action
 
     def closeSequence(self): # Executer la dernière opération si elle sert à cloturer une sequence
         if self.currOperation and self.currOperation.acronym != 'CLOS':
@@ -1472,7 +1472,7 @@ class ThreadPump(threading.Thread):
             self.stopAction()
             self.currAction = action
             self.startAction = time.perf_counter()
-            (self.currStateStart,self.currState) = self.currState.transit(State.ACTION_BEGIN,self.currStateStart,self.startAction)
+            (self.currStateStart,self.currState) = self.currState.transit(State.ACTION_BEGIN,action,self.currStateStart,self.startAction)
             self.pump.reset_volume()
             self.setPause(False);
             self.currSequence = []
