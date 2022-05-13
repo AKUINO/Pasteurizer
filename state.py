@@ -50,9 +50,9 @@ class State(object):
                     newState = State.knownStates[nextState]
                 if newState.letter != self.letter:
                     newState.save()
-                    return now, newState.letter
+                    return now, newState
                 else:
-                    return start, self.letter
+                    return start, self
         print ("Unknown action=%s for state=%s"%(action,self.letter))
         return 0,None
 
