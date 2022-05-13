@@ -1398,7 +1398,7 @@ class ThreadPump(threading.Thread):
         self.T_DAC = T_DAC
         self.currAction = 'Z'
         self.startAction = time.perf_counter()
-        (self.currStateStart, self.currState) = state.load(DIR_DATA_CSV,self.startAction,self.startAction)
+        (self.currStateStart, self.currState) = state.load(DIR_DATA_CSV)
         self.currSequence = None
         self.currOperation = None
         self.currOpContext = None
