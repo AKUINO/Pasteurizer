@@ -54,7 +54,7 @@ class State(object):
                 else:
                     return start, self
         print ("Unknown action=%s for state=%s"%(action,self.letter))
-        return 0,None
+        return start,self
 
     def allowedActions (self):
         result = ""
