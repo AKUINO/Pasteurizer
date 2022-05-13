@@ -267,14 +267,14 @@ function action(letter) {
                 if (data['allowedActions'] != '') {
                     for (ml in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
                          if (data['allowedActions'].indexOf(ml) >= 0)
-                            $('#menu'+ml).removeClass('ui-state-disabled');
+                            $('#menu'+ml).removeClass('disabled');
                          else {
-                            $('#menu'+ml).addClass('ui-state-disabled');
+                            $('#menu'+ml).addClass('disabled');
                         }
                     }
                 } else {
                     for (ml in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-                        $('#menu'+ml).removeClass('ui-state-disabled');
+                        $('#menu'+ml).removeClass('disabled');
                     }
                 }
                 if (data['pause'] != 0) {
