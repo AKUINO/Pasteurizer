@@ -167,6 +167,9 @@ menus = Menus()
 menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,ml.T("Gradient de température","Temperature Gradient","Gradient van Temperatuur") \
                             ,3.0,3.0,"°C",False,7,0.1], # Gradient de Température
+                    'g':['G',ml.T("Produit Gras","Fatty Product","Vet Product") \
+                        ,ml.T("Nécessite de la soude(1) Pas toujours(0)","Needs Soda Cleaning(1) Not always(0)","Soda-reiniging nodig(1) Niet altijd(0)") \
+                        ,1,1,"-",False,1,1], # Faux=0, 1=Vrai
                     'P':['P',ml.T("Pasteurisation°","Pasteurization°","Pasteurisatie°") \
                             ,ml.T("Température de pasteurisation","Pasteurisation Temperature","Pasteurisatie Temperatuur") \
                             ,72.0,72.0,"°C",False,90,0.1], # Température normale de pasteurisation
@@ -467,7 +470,7 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                'P':['P',ml.T("Pasteur.","Pasteur.","Pasteur.") \
                        ,ml.T("Lait de la traite en entrée; Récipient pasteurisé en sortie. Jeter l'eau","Milking milk at inlet; Pasteurized container at the outlet. Discard water","Melk melken als voorgerecht; Gepasteuriseerde container bij de uitlaat. Gooi water") \
                        ,ml.T("Pasteurisation","Pasteurization","Pasteurisatie")],
-               'G':['G',ml.T("Pasteur.Gras","Pasteur.Greasy","Pasteur.Vet") \
+               'G':['G',ml.T("Pasteur.Gras","Pasteur.Fatty","Pasteur.Vet") \
                          ,ml.T("Lait de la traite en entrée; Récipient pasteurisé en sortie. Jeter l'eau","Milking milk at inlet; Pasteurized container at the outlet. Discard water","Melk melken als voorgerecht; Gepasteuriseerde container bij de uitlaat. Gooi water") \
                          ,ml.T("Pasteurisation Gras","Pasteurization Greasy","Pasteurisatie Vet")],
                'I':['I',ml.T("reprIse","resume","resume") \
@@ -1694,6 +1697,8 @@ if hardConf.OW_extra or hardConf.OW_heating:
         T_OneWire.sensorParam("heating",hardConf.OW_heating)  # Bain de chauffe
 
     T_OneWire.start()
+else:
+    ExtraSensor = Sensor(99,'extra','')
 
 T_Thermistor = ThreadThermistor()
 T_Thermistor.daemon = True
@@ -2258,7 +2263,7 @@ try:
         '/calibrate', 'WebCalibrate',
         '/api/log', 'WebApiLog',
         '/api/put/(.+)', 'WebApiPut',
-        '/favicon.(.+)', 'getFavicon',
+        '/favicon(.+)', 'getFavicon',
         '/static/js/(.+)', 'getJS',
         '/static/css/(.+)', 'getCSS',
         '/js/(.+)', 'getJS',

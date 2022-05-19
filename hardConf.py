@@ -12,7 +12,7 @@ import term
 import ml
 import MICHApast
 
-processor = None #1: Raspberry, 2=Odroid...
+processor = None # pc, rpi, odroid
 io = None
 adc = None
 localGPIO = None

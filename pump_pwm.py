@@ -303,7 +303,7 @@ class pump_PWM(sensor.Sensor):
 
     def read_return(self):
         
-        if hardConf.processor != 'pc' and not hardConf.MICHA_device:
+        if hardConf.processor and hardConf.processor != 'pc' and not hardConf.MICHA_device:
             if self.pinStatus > 0:
                 return 0 if hardConf.localGPIO.read(self.pinStatus) else 1
             else:
