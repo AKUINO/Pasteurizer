@@ -36,8 +36,8 @@ def calcBar(regVal):
         pressure_V = regVal / 1638  # pressure in V
         #pressure_psi = 125 * (pressure_V / Vcc) - 12.5  # pressure in Psi
 
-        #pressure_psi = (pressure_V - (Vcc*0.1) ) * (90 / (Vcc*0.8))  # pressure in Psi
-        pressure_psi = 100*(pressure_V/Vcc)
+        pressure_psi = (pressure_V - (Vcc*0.1) ) * (90 / (Vcc*0.8))  # pressure in Psi
+        #pressure_psi = 100*(pressure_V/Vcc)
         pressure_bar = pressure_psi / 14.504  # pressure in bar
         return pressure_bar
     except:
