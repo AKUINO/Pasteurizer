@@ -335,9 +335,11 @@ class pump_PWM(sensor.Sensor):
                 hardConf.io.write_pin(self.pinDirection, (0 if speed > 0 else 1) if hardConf.reversedPump else (1 if speed > 0 else 0) )
             else:
                 if self.pinDirection > 0:
-                    hardConf.localGPIO.write(self.pinDirection, 1 if speed > 0 else 0)
+                    if hardConf.localGPIO:
+                        hardConf.localGPIO.write(self.pinDirection, 1 if speed > 0 else 0)
                 elif self.pinDirection < 0:
-                    hardConf.io.write_pin( -self.pinDirection, 1 if speed > 0 else 0)
+                    if hardConf.io:
+                        hardConf.io.write_pin( -self.pinDirection, 1 if speed > 0 else 0)
             time.sleep(0.01)
             
         if hardConf.MICHA_device:

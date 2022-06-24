@@ -109,6 +109,8 @@ $(document).ready(function() {
                     $('#action').text(data['action']);
                     $('#stateletter').text(data['stateletter']);
                     $('#state').text(data['state']);
+                    $('#empty').text(data['empty']);
+                    $('#greasy').text(data['greasy']);
                     $('#actiontitle').text(data['actiontitle']);
                     var accro = "";
                     if ('accro' in data && data['accro'].length >= 4) {
@@ -156,7 +158,7 @@ $(document).ready(function() {
                             if (data['allowedActions'].indexOf(ml) >= 0) {
                                 $('#menu'+ml).removeClass('disabled');
                             }
-                            else {
+                            else if ("JYLTO".indexOf(ml) < 0) { // StateLessActions
                                 $('#menu'+ml).addClass('disabled');
                             }
                         }
@@ -262,6 +264,8 @@ function action(letter) {
                 $('#action').text(data['action']);
                 $('#stateletter').text(data['stateletter']);
                 $('#state').text(data['state']);
+                $('#empty').text(data['empty']);
+                $('#greasy').text(data['greasy']);
                 $('#actiontitle').text(data['actiontitle']);
                 var accro = "";
                 if ('accro' in data && data['accro'].length >= 4) {

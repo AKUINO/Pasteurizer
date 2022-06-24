@@ -46,6 +46,10 @@ T_extra = None
 inputPressure = None
 inputPressureFlag = None
 
+In_Emergency = None
+In_Level1 = None
+In_Level2 = None
+
 In_Green = None
 Out_Green = None
 
@@ -120,6 +124,9 @@ if configParsing:
                 localGPIOtype = anItem[1].lower()
             elif anItem[0].lower() == 'tubing':
                 tubing = anItem[1].lower()
+            else:
+                print('[system] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: type, pigpio, gpio, tubing')
+
         if localGPIOtype == "pigpio":
             import pigpio
             localGPIO = pigpio.pi() # Uses BCM numbering for pins...
@@ -155,6 +162,9 @@ if configParsing:
                 In_Red = 482 # board 33 # BCM 13
                 Out_Red = 432 # board 36 # was TXD, SYS_LED for Odroid
                 Out_Buzzer = 495 # board 35 # BCM 26
+                In_Emergency = - MICHApast.EMERGENCY_STOP_REG # Negative to signal indirect read through MICHA
+                In_Level1 = - MICHApast.LEVEL_SENSOR1_REG # Negative to signal indirect read through MICHA
+                In_Level2 = - MICHApast.LEVEL_SENSOR2_REG # Negative to signal indirect read through MICHA
             else:
                 In_Green = 22 # board 15 # BCM 22
                 Out_Green = 23 # board 16 # BCM 23
@@ -163,6 +173,36 @@ if configParsing:
                 In_Red = 13 # board 33 # BCM 13
                 Out_Red = None # TXD, SYS_LED for Odroid
                 Out_Buzzer = 26 # board 35 # BCM 26
+
+    if 'emergency' in configParsing.sections():
+        for anItem in configParsing.items('emergency'):
+            if anItem[0].lower() == 'input':
+                try:
+                    In_Emergency = int(anItem[1])
+                except:
+                    print(anItem[0] + ': ' + anItem[1] + ' is not decimal.')
+            elif anItem[0].lower() == 'output':
+                try:
+                    Out_Emergency = int(anItem[1])
+                except:
+                    print(anItem[0] + ': ' + anItem[1] + ' is not decimal.')
+            else:
+                print('[emergency] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: input, output')
+
+    if 'level' in configParsing.sections():
+        for anItem in configParsing.items('level'):
+            if anItem[0].lower() == '1':
+                try:
+                    In_Level1 = int(anItem[1])
+                except:
+                    print(anItem[0] + ': ' + anItem[1] + ' is not decimal.')
+            elif anItem[0].lower() == '2':
+                try:
+                    In_Level2 = int(anItem[1])
+                except:
+                    print(anItem[0] + ': ' + anItem[1] + ' is not decimal.')
+            else:
+                print('[level] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: 1, 2')
 
     if 'green' in configParsing.sections():
         for anItem in configParsing.items('green'):
@@ -176,6 +216,8 @@ if configParsing:
                     Out_Green = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+            else:
+                print('[green] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: input, output')
 
     if 'yellow' in configParsing.sections():
         for anItem in configParsing.items('yellow'):
@@ -189,6 +231,8 @@ if configParsing:
                     Out_Yellow = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+            else:
+                print('[yellow] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: input, output')
 
     if 'red' in configParsing.sections():
         for anItem in configParsing.items('red'):
@@ -202,6 +246,8 @@ if configParsing:
                     Out_Red = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+            else:
+                print('[red] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: input, output')
 
     if 'buzzer' in configParsing.sections():
         for anItem in configParsing.items('buzzer'):
@@ -210,11 +256,15 @@ if configParsing:
                     Out_Buzzer = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+            else:
+                print('[buzzer] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: output')
 
     if 'user' in configParsing.sections():
         for anItem in configParsing.items('user'):
             if anItem[0].lower() == 'lang':
                 ml.setLang(anItem[1].lower())
+            else:
+                print('[user] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: lang')
 
     if 'MICHA' in configParsing.sections():
         for anItem in configParsing.items('MICHA'):
@@ -225,6 +275,8 @@ if configParsing:
                     MICHA_version = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+            else:
+                print('[MICHA] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: device, version')
         if MICHA_version >= 40:
             import MICHA40past
             io = MICHA40past.Micha4(MICHA_device)
@@ -241,6 +293,8 @@ if configParsing:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
             elif anItem[0].lower == 'onewire':
                 OW_heating = anItem[1]
+            else:
+                print('[heating] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
 
     if 'extra' in configParsing.sections():
         for anItem in configParsing.items('extra'):
@@ -251,6 +305,8 @@ if configParsing:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
             elif anItem[0].lower == 'onewire':
                 OW_extra = anItem[1]
+            else:
+                print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
 
     if 'input' in configParsing.sections():
         for anItem in configParsing.items('input'):
@@ -261,6 +317,8 @@ if configParsing:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
             elif anItem[0].lower == 'onewire':
                 OW_input = anItem[1]
+            else:
+                print('[input] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
 
     if 'output' in configParsing.sections():
         for anItem in configParsing.items('output'):
@@ -271,6 +329,8 @@ if configParsing:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
             elif anItem[0].lower == 'onewire':
                 OW_output = anItem[1]
+            else:
+                print('[output] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
 
     if 'warranty' in configParsing.sections():
         for anItem in configParsing.items('warranty'):
@@ -281,6 +341,8 @@ if configParsing:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
             elif anItem[0].lower == 'onewire':
                 OW_warranty = anItem[1]
+            else:
+                print('[warranty] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
 
     if 'Rmeter' in configParsing.sections():
         import RMETERpast
@@ -310,6 +372,9 @@ if configParsing:
                     R_polarity = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+            else:
+                print('[Rmeter] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
+
         Rmeter = RMETERpast.R_Meter(S1=R_S1, S2=R_S2, S3=R_S3, polarityIO=R_polarity) # bus=0, spi_channel=0, bus2=1, spi_channel2=0
 
 if MICHA_device:

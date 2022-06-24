@@ -12,7 +12,7 @@ import time
 import web
 from datetime import datetime
 
-global render,_lock_socket
+global render, _lock_socket
 
 import tty
 import termios
@@ -41,6 +41,8 @@ from valve import Valve
 from menus import Menus
 import state
 from state import State
+
+from TimeTrigger import TimeTrigger
 
 DEBUG = True
 
@@ -132,6 +134,8 @@ GreenLED = None
 RedButton = None
 YellowButton = None
 GreenButton = None
+EmergencyButton = None
+
 #configuration of output pins
 if hardConf.Out_Buzzer:
     Buzzer = LED('buzzer',hardConf.Out_Buzzer)
@@ -149,6 +153,8 @@ if hardConf.In_Yellow:
     YellowButton = button('yellow',hardConf.In_Yellow)
 if hardConf.In_Green:
     GreenButton = button('green',hardConf.In_Green)
+if hardConf.In_Emergency:
+    EmergencyButton = button('emergency',hardConf.In_Emergency)
 
 ##BATH_TUBE = 4.6 # degrees Celsius. Margin between temperature in bath and temperature wished in the tube
 FLOOD_TIME = 60.0 # 90 seconds of hot water tap flushing (when a pump is in the way. 60 if not) to FILL an EMPTY machine
@@ -160,6 +166,7 @@ FLOOD_TIME = 60.0 # 90 seconds of hot water tap flushing (when a pump is in the 
 # To be parameterized?
 CLEAN_TIME = 1800.0
 DISINF_TIME = 300.0
+TH_DISINF_TIME = 300.0
 RINSE_TIME = 300.0
 WAIT_TIME = 1*3600
 STAY_CLEAN_TIME = 8*3600
@@ -168,7 +175,7 @@ menus = Menus()
 menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,ml.T("Gradient de température","Temperature Gradient","Gradient van Temperatuur") \
                             ,3.0,3.0,"°C",False,7,0.1], # Gradient de Température
-                    'g':['G',ml.T("Produit Gras","Fatty Product","Vet Product") \
+                    'g':['g',ml.T("Produit Gras","Fatty Product","Vet Product") \
                         ,ml.T("Nécessite de la soude(1) Pas toujours(0)","Needs Soda Cleaning(1) Not always(0)","Soda-reiniging nodig(1) Niet altijd(0)") \
                         ,1,1,"-",False,1,1], # Faux=0, 1=Vrai
                     'P':['P',ml.T("Pasteurisation°","Pasteurization°","Pasteurisatie°") \
@@ -195,6 +202,12 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                     'n':['n',ml.T("Nettoyage\"","Cleaning\"","Schoonmaak\"") \
                             ,ml.T("Durée de nettoyage","Cleaning Duration","Schoonmaak Tijd") \
                             ,CLEAN_TIME,CLEAN_TIME,'"',False,9999,1], # Température pour un passage au détergent
+                    'C':['C',ml.T("Désinfection thermique°""Thermal Disinfection°","Thermisch Desinfectie°") \
+                        ,ml.T("Température de désinfection","Disinfection Temperature","Desinfectie Temperatuur") \
+                        ,80.0,80.0,"°C",False,90,0.1], # Température pour un traitement à l'acide ou au percarbonate de soude
+                    'c':['c',ml.T("Désinfection thermique\"","Thermal Disinfection\"","Thermisch Desinfectie\"") \
+                        ,ml.T("Durée de désinfection","Disinfection Duration","Desinfectie Tijd") \
+                        ,TH_DISINF_TIME,TH_DISINF_TIME,'"',False,9999,1], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'D':['D',ml.T("Désinfection°""Disinfection°","Desinfectie°") \
                             ,ml.T("Température de désinfection","Disinfection Temperature","Desinfectie Temperatuur") \
                             ,60.0,60.0,"°C",False,90,0.1], # Température pour un traitement à l'acide ou au percarbonate de soude
@@ -221,9 +234,11 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,0.0,0.0,"hh.m0",True,23.5,0.1], # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
                     'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
                             ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
-menus.sortedOptions = "PMGKWwQRrsNnDdZ" #T
-menus.cleanOptions = "PMGWQH" #TtK
-menus.dirtyOptions = "RGrsNnDdwH"
+menus.sortedOptions = "PMgGKWwQHRrsNnDdCcZ" #T
+menus.cleanOptions = "PGMgWQH" #TtK
+menus.dirtyOptions = "RgrsNnDdCcwH"
+
+trigger_w = TimeTrigger('w',menus)
 #(options['P'][3] + BATH_TUBE) = 75.0  # Température du Bassin de chauffe
 ##reject = 71.7 # Température minimum de pasteurisation
 
@@ -231,8 +246,9 @@ tank = 20.6 # litres dans le bassin de chauffe
 
 kCalWatt = 1.16 # watts per kilo calories
 HEAT_POWER = 2500.0 # watts per hour (puissance de la chauffe)
+WATT_LOSS = 10 # watts lost per 1°C difference with room temperature
 #MITIG_POWER = 1500.0 # watts per hour (puissance du bac de mitigation)
-ROOM_TEMP = 21.0 # degrees: should be measured...
+ROOM_TEMP = 20.0 # degrees: should be measured...
 
 PUMP_SLOWDOWN = 1.0 # Slowing factor from speed calculated by temperature difference
 
@@ -473,9 +489,6 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                'P':['P',ml.T("Pasteur.","Pasteur.","Pasteur.") \
                        ,ml.T("Lait de la traite en entrée; Récipient pasteurisé en sortie. Jeter l'eau","Milking milk at inlet; Pasteurized container at the outlet. Discard water","Melk melken als voorgerecht; Gepasteuriseerde container bij de uitlaat. Gooi water") \
                        ,ml.T("Pasteurisation","Pasteurization","Pasteurisatie")],
-               'G':['G',ml.T("Pasteur.Gras","Pasteur.Fatty","Pasteur.Vet") \
-                         ,ml.T("Lait de la traite en entrée; Récipient pasteurisé en sortie. Jeter l'eau","Milking milk at inlet; Pasteurized container at the outlet. Discard water","Melk melken als voorgerecht; Gepasteuriseerde container bij de uitlaat. Gooi water") \
-                         ,ml.T("Pasteurisation Gras","Pasteurization Greasy","Pasteurisatie Vet")],
                'I':['I',ml.T("reprIse","resume","resume") \
                        ,ml.T("Lait de la traite en entrée et un récipient pasteurisé en sortie","Milking milk at inlet and pasteurized container at outlet","Melk bij binnenkomst en gepasteuriseerde container bij vertrek") \
                        ,ml.T("Reprise d'une pasteurisation interrompue","Resume an interrupted pasteurization","Hervatting van onderbroken pasteurisatie")],
@@ -491,9 +504,12 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                'N':['N',ml.T("Nettoy.","Clean","Schoon") \
                        ,ml.T("Entrée et Sortie connectés et dans un seau, Ajouter le Détergent...","Inlet and Outlet connected and in a bucket, Add Detergent ...","Input en output aangesloten en in een emmer, Wasmiddel toevoegen ...") \
                        ,ml.T("Nettoyer avec un détergent (caustique)","Clean with detergent (caustic)","Reinig met afwasmiddel (bijtend)")],
+               'C':['C',ml.T("désinfCt.th.","th.disinfCt","th.desinfeCt.") \
+                       ,ml.T("Entrée et Sortie connectés et dans un seau","Inlet and Outlet connected and in a bucket","Input en output aangesloten en in een emmer") \
+                       ,ml.T("Désinfecter les tuyaux thermiquement","Disinfect pipes (thermal)","Desinfecteer leidingen (thermisch)")], \
                'D':['D',ml.T("Désinfct.","Disinfct","Desinfect.") \
                        ,ml.T("Entrée et Sortie connectés et dans un seau, Ajouter le Désinfectant...","Inlet and Outlet connected and in a bucket, Add Disinfectant ...","Input en output aangesloten en in een emmer, Desinfectiemiddel toevoegen ...") \
-                       ,ml.T("Désinfecter les tuyaux (acide)","Disinfect pipes (acid)","Desinfecteer leidingen (zuur)")],
+                       ,ml.T("Désinfecter les tuyaux (acide)","Disinfect pipes (acid)","Desinfecteer leidingen (zuur)")], \
                'S':['S',ml.T("pauSe","pauSe","pause") \
                        ,ml.T("s=arrêter / S=redémarrer / V=vidanger / Z=arrêter l'opération en cours","s = stop / S = restart / V = ​​drain / Z = stop the operation in progress","s = stop / S = herstart / V = ​​afvoer / Z = stop de lopende operatie") \
                        ,ml.T("Suspendre ou arrêter l'opération en cours","Suspend or stop the current operation","Onderbreek of stop de huidige bewerking")],
@@ -503,6 +519,9 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                'Y':['Y',ml.T("Yaourt","Yogurt","Yoghurt") \
                        ,ml.T("Pasteuriser pour Yaourt","Pasteurize for Yogurt","Pasteuriseren voor yoghurt") \
                        ,ml.T("Température pour Yaourt","Temperature for Yogurt","Temperatuur voor yoghurt")],
+               'J':['J',ml.T("Jus","Juics","Saap") \
+                        ,ml.T("Pasteuriser du Jus","Pasteurize for Juice","Pasteuriseren voor saap") \
+                        ,ml.T("Température pour Jus","Temperature for Juice","Temperatuur voor saap")],
                'L':['L',ml.T("Lait","miLk","meLk") \
                        ,ml.T("Pasteuriser du Lait","Pasteurize for Milk","Pasteuriseren voor melk") \
                        ,ml.T("Température pour Lait","Temperature for Milk","Temperatuur voor melk")],
@@ -515,11 +534,11 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                '_':['_',ml.T("Redémar.","Restart","Herstart") \
                        ,ml.T("Redémarrage de l'opération en cours.","Restart of the current operation.","Herstart van de huidige bewerking.") \
                        ,ml.T("Redémarrer l'opération en cours","Restart the current operation","Herstart de huidige bewerking")]}
-menus.sortedActions1 = "APGIMERND" #C
+menus.sortedActions1 = "APGIMERNDC"
 menus.sortedActions2 = "FVOYLTZSX" #K
 
-menus.cleanActions = "LYTAPIMEV" #K
-menus.dirtyActions = "RFNDV" #C
+menus.cleanActions = "LYJTAPIMEV" #K
+menus.dirtyActions = "RFNDCV"
 menus.sysActions = "ZX"
 
 menus.operName = { 'HEAT':ml.T('chauffer','heating','verwarm') \
@@ -528,6 +547,7 @@ menus.operName = { 'HEAT':ml.T('chauffer','heating','verwarm') \
                   ,'TRAK':ml.T('débiter','trace','trace') \
                   ,'SHAK':ml.T('brasser','shake','schud') \
                   ,'REVR':ml.T('reculer','pump back','pomp terug') \
+                  ,'FILL':ml.T('remplir','fill','vullen') \
                   ,'FLOO':ml.T('eau courante','running water','lopend water') \
                   ,'RFLO':ml.T('rincer entrée','input rince','invoer rins') \
                   ,'PAUS':ml.T('attendre','wait','wacht') \
@@ -553,41 +573,43 @@ menus.operName = { 'HEAT':ml.T('chauffer','heating','verwarm') \
 # T + Acide INTERDIT
 # Dx + Flush x 4 (D1,D2,D3,D4) = R
 
+StateLessActions = "JYLT" # TO BE DUPLICATED in index.js !
+
 State('r',ml.T('Propre','Clean','Schoon'), \
-    [ ('A','r'),('J','r'),('Y','r'),('L','r'),('T','r'),('G','g'),('P','p'),('F','r'),('V','a'),('w','o') ] )
+    [ ('A','r'),('P','p'),('F',''),('V',['',['',True,None]]),('w','o') ] )
 
 State('o',ml.T('Vieux','Old','Oud'), \
-    [ ('R',['o','r']),('F','o'),('V','b'),('w','s') ] )
+    [ ('F',''),('V',['',['',True,None]]),('R',['','r']),('w','l') ] )
 
-State('a',ml.T('Vidé','Purged','Leeg'), \
-    [ ('F',['a','r']),('V','a'),('w','b') ] )
+State('l',ml.T('Très Vieux','Very Old','Veel Oud'), \
+    [ ('F',''),('V',['',['',True,None]]),('C',['','r']) ] )
 
-State('b',ml.T('Vidé+Sale','Purged+Dirty','Leeg+Vies'), \
-    [ ('F','s'),('V','b') ] )
-
-State('t',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
-    [ ('N',['t','n']),                ('F','t'),('V','t') ] )
-
+State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
+    [ ('N',['s',['n',None,False]]),                             ('F',''),('V',['',['',True,None]]) ]
+    , [False,True],[True])
 State('s',ml.T('Sale','Dirty','Vies'), \
-    [ ('N',['s','n']),('D',['s','d']),('F','s'),('V','s') ] )
+    [ ('N',['s',['n',None,False]]),('D',['s',['d',None,False]]),('F',''),('V',['',['',True,None]]) ]
+    , [False,True],[False] )
 
 State('n',ml.T('Soude','Soda','Natrium'), \
-    [ ('R',['n','r']),('F','n'),('V','n') ] )
+    [ ('R',['','r']),('F',''),('V',['',['',True,None]]) ] )
 
 State('d',ml.T('Acide','Acid','Zuur'), \
-    [ ('R',['d','r']),('F','d'),('V','d') ] )
+    [ ('R',['','r']),('F',''),('V',['',['',True,None]]) ] )
 
 State('p',ml.T('Produit','Product','Product'), \
-    [ ('I','p'),('M','p'),('E','e'),('D',['e','s','d']),('N',['h','s','n']),('J','p'),('Y','g'),('L','g'),('T','g'),('F','e'),('V','e'),('t','s') ] )
+    [ ('I',''),('M',''),('E','e'),('D',['e','s','d']),('N',['e','s','n']),('F','e'),('V',[['p',True,None]]),('t','s') ]
+    , [False,True],[False] )
+State('p',ml.T('Produit Gras','Greasy Product','Vet Product'), \
+    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'), ('N',['e','s',['n',None,False]]),('F','e'),('V',[['p',True,None]]),('t','s') ]
+    , [False,True],[True] )
 
-State('g',ml.T('Produit Gras','Greasy Product','Vet Product'), \
-    [ ('I','g'),('M','g'),('E','h'),                    ('N',['h','s','n']),('J','g'),('Y','g'),('L','g'),('T','g'),('F','h'),('V','h'),('t','t') ] )
-
+State('e',ml.T('Eau+Produit Gras','Water+Greasy Product','Water+Vet Product'), \
+      [                     ('N',['e','s','n']),('P','p'),('F',''),('V',['e',['e',True,None]]),('t','s') ]
+      , [False,True],[True] )
 State('e',ml.T('Eau+Produit','Water+Product','Water+Product'), \
-    [ ('D',['e','s','d']),('N',['e','s','n']),('J','e'),('Y','e'),('L','e'),('T','e'),('G','g'),('P','p'),('F','e'),('V','e'),('t','s') ] )
-
-State('h',ml.T('Eau+Produit gras','Water+Greasy Product','Water+Vet Product'), \
-    [ ('N',['h','s','n']),                    ('J','h'),('Y','h'),('L','h'),('T','h'),('G','g'),('P','g'),('F','h'),('V','h'),('t','t') ] )
+      [ ('D',['e','s','d']),('N',['e','s','n']),('P','p'),('F',''),('V',['e',['e',True,None]]),('t','s') ]
+      , [False,True],[False] )
 
 def menu_confirm(choice,delay=None):
     global display_pause, lines
@@ -835,9 +857,11 @@ class ThreadDAC(threading.Thread):
                 quantityRemaining = self.T_Pump.quantityRemaining()
                 try:
                     data_file = open(DIR_DATA_CSV + fileName+".csv", "a")
-                    data_file.write("%d\t%s\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
+                    data_file.write("%d\t%s%s%s\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
                                     % (int(nowT), \
-                                       self.T_Pump.currState.letter if self.T_Pump.currState else '', \
+                                       State.current.letter if State.current else '', \
+                                       'V' if State.empty else 'W', \
+                                       'G' if State.greasy else 'J', \
                                        self.T_Pump.currAction, \
                                        self.T_Pump.currOperation.acronym if self.T_Pump.currOperation else "", \
                                        durationRemaining, \
@@ -899,8 +923,8 @@ class ThreadDAC(threading.Thread):
                     term.write(" %dWh" % (self.totalWatts+self.totalWatts2),term.red,term.bgwhite)
                     if self.setpoint:
                         term.write(" %0.1f°C" % self.setpoint,term.black,term.bgwhite)
-                    if self.setpoint2:
-                        term.write("*",term.red,term.bgwhite)
+                    #if self.setpoint2:
+                    #    term.write("*",term.red,term.bgwhite)
                         
                     #term.write(" %0.1fV" % batt,term.blue,term.bgwhite)
                     term.clearLineFromPos()
@@ -970,7 +994,12 @@ class Operation(object):
         if not self.ref: # do not heat !
             return 0.0
         return menus.options[self.ref][3]
-        
+
+    def tempWithGradient(self): # Current heating temperature along what is set in options
+        if not self.ref: # do not heat !
+            return 0.0
+        return menus.options[self.ref][3] + ( menus.options['G'][3] if self.ref == 'P' else 0.0 )
+
     # def tempRef2(self): # Current heating temperature along what is set in options
         # if not self.ref2: # do not heat !
             # return None
@@ -996,14 +1025,20 @@ class Operation(object):
         dumpValve.set(1.0 if self.dump else 0.0)
         T_Pump.currOpContext = OperationContext(self,T_Pump.pump)
         if not self.programmable or not menus.options['H'][3] or floating_time(datetime.now()) >= float(menus.options['H'][3]):
-            T_Pump.T_DAC.set_temp(self.tempRef()+menus.options['G'][3]) #, self.tempRef2())
+            T_Pump.T_DAC.set_temp(self.tempWithGradient())
         else:
             T_Pump.T_DAC.set_temp(None) #,None) # Delayed start
         # if self.cooling:
             # T_Pump.T_DAC.set_cold(menus.options['T'][3])
         # else:
             # T_Pump.T_DAC.set_cold(None)
-        if self.typeOp in ['FLOO','RFLO']:
+        if self.typeOp == 'FILL' :
+            if State.empty :
+                if menus.options['s'][3] < 1:
+                    taps[self.tap].set(1)
+                else: # Eau dans un seau..
+                    pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
+        elif self.typeOp in ['FLOO','RFLO']:
             if menus.options['s'][3] < 1:
                 taps[self.tap].set(1)
             else: # Eau dans un seau..
@@ -1015,7 +1050,7 @@ class Operation(object):
                 Buzzer.on()
             T_Pump.setPause(True)
             tell_message(self.message)
-            (T_Pump.currStateStart,T_Pump.currState) = T_Pump.currState.transit(State.ACTION_RESUME,T_Pump.currAction,T_Pump.currStateStart)
+            State.transitCurrent(State.ACTION_RESUME, T_Pump.currAction)
         elif self.typeOp == 'SUBR': # 1st Call a subroutine and loop...
             i = 0
             for op in opSequences[self.subSequence]:
@@ -1054,15 +1089,20 @@ class Operation(object):
         if requiredTime and T_Pump.currOpContext and (T_Pump.currOpContext.duration() >= requiredTime):
             return True
         if self.typeOp == 'HEAT':
-            if float(cohorts.getCalibratedValue('heating')) >= float(self.tempRef()+menus.options['G'][3]-0.2):
+            if float(cohorts.getCalibratedValue('heating')) >= float(self.tempWithGradient()-0.2):
                 return True
+        elif self.typeOp == 'FILL' :
+            if State.empty :
+                return False # not finished
+            else:
+                return True # finished
         elif self.typeOp in ['FLOO','RFLO']:
             if menus.options['s'][3] < 1:
                 if self.typeOp == 'FLOO':
                     return False
             else: # Seau
                 if self.typeOp == 'RFLO':
-                    return False
+                    return True #Immediately finished because "reverse kick" of tap water is not needed
             if self.qty and T_Pump.currOpContext:
                 if self.qty > 0.0 and (T_Pump.currOpContext.volume() >= self.qty):
                     return True
@@ -1074,7 +1114,7 @@ class Operation(object):
                         T_Pump.pump.reset_pump()
                         return True
             return False # not finished
-        elif self.typeOp in ['PUMP','RFLO','TRAK','EMPT','REVR']:
+        elif self.typeOp in ['PUMP','TRAK','EMPT','REVR']:
             if self.qty and T_Pump.currOpContext:
                 if self.qty > 0.0 and (T_Pump.currOpContext.volume() >= self.qty):
                     return True
@@ -1106,7 +1146,7 @@ class Operation(object):
         time.sleep(0.01)
         dumpValve.set(1.0 if self.dump else 0.0) # Will stop command if open/close duration is done
         if not self.programmable or not menus.options['H'][3] or floating_time(datetime.now()) >= float(menus.options['H'][3]):
-            T_Pump.T_DAC.set_temp(self.tempRef()+menus.options['G'][3]) #,self.tempRef2()) # In case of a manual change
+            T_Pump.T_DAC.set_temp(self.tempWithGradient()) #,self.tempRef2()) # In case of a manual change
         else:
             T_Pump.T_DAC.set_temp(None) #, None) # Delayed start
         # if self.cooling:
@@ -1124,6 +1164,17 @@ class Operation(object):
             speed = self.desired_speed()
             if self.typeOp == 'REVR':
                 speed = -speed
+            elif self.typeOp == 'EMPT':
+                State.empty = True
+            else: # 'PUMP'
+                State.empty = False
+        elif self.typeOp == 'FILL' :
+            if State.empty :
+                if menus.options['s'][3] < 1:
+                    taps[self.tap].set(1)
+                else: # Water by bucket, what  must be done
+                    speed = self.desired_speed()
+                    State.empty = False
         elif self.typeOp in ['FLOO', 'RFLO']:
             if menus.options['s'][3] < 1:
                 if self.typeOp == 'RFLO':
@@ -1132,6 +1183,7 @@ class Operation(object):
             else: # Water by bucket, what  must be done
                 if self.typeOp == 'FLOO':
                     speed = self.desired_speed()
+                    State.empty = False
         elif self.typeOp == 'SHAK':
             #print ("S=%f\r" % speed)
             if speed == 0.0:
@@ -1166,6 +1218,8 @@ class Operation(object):
                         speed = self.min_speed
                 #print("SHAK="+str(speed)+"\r")
             else:
+                if menus.options['g'][3]:
+                    State.greasy = True
                 totalVol,totalTime,beginTemp,endTemp = cohorts.evolution(self.sensor2,self.sensor1)
                 #print("EVOL="+str(totalVol)+"L/"+str(totalTime)+"s "+str(beginTemp)+"°C<"+str(endTemp)+"°C\r")
                 if not totalVol or (totalVol <= 0.0) or (endTemp <= beginTemp) or (self.tempRef() <= beginTemp): # no data
@@ -1214,7 +1268,12 @@ class Operation(object):
         if self.programmable and menus.options['H'][3] and menus.options['H'][3] != 0.0 and floating_time(datetime.now()) >= float(menus.options['H'][3]):
             menus.options['H'][3] = 0.0
         #T_Pump.T_DAC.set_cold(None)
-        if self.typeOp in ['FLOO','RFLO']:
+        if self.typeOp == 'FILL':
+            if State.empty:
+                T_Pump.pump.stop()
+                if menus.options['s'][3] < 1:
+                    taps[self.tap].set(0)
+        elif self.typeOp in ['FLOO','RFLO']:
             T_Pump.pump.stop()
             if menus.options['s'][3] < 1:
                 taps[self.tap].set(0)
@@ -1257,6 +1316,7 @@ class OperationContext(object):
 optimal_speed = 0.0
 
 opSequences = {
+    # 'J': [Operation('PAUS','MESS',message="Jus = 75°C!")],
     # 'L': [Operation('PAUS','MESS',message="Lait = 72°C!")],
     # 'Y': [Operation('PAUS','MESS',message="Yaourt = 85°C!")],
     # 'T': [Operation('PAUS','MESS',message="Thermisation = 65°C!")],
@@ -1265,44 +1325,45 @@ opSequences = {
     # 'X': [Operation('STOP','MESS',message="Au revoir!")],
     # 'Z': [Operation('STOP','MESS',message="Arrêt de l'opération en cours")],
     'A': # Amorçage, pré chauffage...
-        [ Operation('AmoT','HEAT',ref='P', ref2='P', dump=True,programmable=True),
-          Operation('AmoI','FLOO',duration=lambda:menus.options['r'][3]*1.5, base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='P', ref2='P', dump=False),
-          Operation('AmoJ','HEAT',ref='P', ref2='P', dump=False),
-          Operation('Amoi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='P',ref2='P',dump=False),
+        [ Operation('AmoT','HEAT',ref='P', dump=True,programmable=True),
+          Operation('AmoF','FILL',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='P',dump=False),
+          Operation('AmoI','FLOO',duration=lambda:menus.options['r'][3]*1.5, base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='P', dump=False),
+          Operation('AmoJ','HEAT',ref='P', dump=False),
+          Operation('Amoi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='P',dump=False),
           Operation('Amoo','SUBR',duration=lambda:menus.options['r'][3],subSequence='a',dump=False),
-          Operation('AmoP','PUMP',ref='P',ref2='P', base_speed=MAX_SPEED, qty=1.0,dump=False),
+          Operation('AmoP','PUMP',ref='P',base_speed=MAX_SPEED, qty=1.0,dump=False),
           Operation('CLOS','MESS',message=ml.T("Déconnecter le tuyau d'entrée, P pour pasteuriser!","Disconnect input pipe, P to pasteurize!","Ontkoppel de invoerleiding, P om te pasteuriseren!"),dump=True)
           ],
           
     'a': # Étape répétée du nettoyage
-        [ Operation('Amop','PUMP',ref='P',ref2='P', base_speed=MAX_SPEED, qty=2.0,dump=False),
-          Operation('AmoS','REVR',ref='P',ref2='P', base_speed=MAX_SPEED, qty=-0.4,dump=False)
+        [ Operation('Amop','PUMP',ref='P',base_speed=MAX_SPEED, qty=2.0,dump=False),
+          Operation('AmoS','REVR',ref='P',base_speed=MAX_SPEED, qty=-0.4,dump=False)
           ],
           
     # 'C': # Enchainement complet
-        # [ Operation('PreT','HEAT',ref='R',ref2='R',dump=True,programmable=True),
-          # Operation('PreI','FLOO',duration=lambda:menus.options['r'][3]*2.0,ref='R',ref2='R',dump=True),
-          # Operation('PreW','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,ref='R',ref2='R',dump=True),
-          # Operation('RinI','FLOO',duration=lambda:menus.options['r'][3]*1.5,ref='R',ref2='R',dump=False),
+        # [ Operation('PreT','HEAT',ref='R',dump=True,programmable=True),
+          # Operation('PreI','FLOO',duration=lambda:menus.options['r'][3]*2.0,ref='R',dump=True),
+          # Operation('PreW','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,ref='R',dump=True),
+          # Operation('RinI','FLOO',duration=lambda:menus.options['r'][3]*1.5,ref='R',dump=False),
           # Operation('Rinc','SUBR',duration=lambda:menus.options['r'][3],subSequence='r',dump=False),
-          # Operation('RinV','FLOO',duration=lambda:menus.options['r'][3]/2.0,ref='R',ref2='R',dump=True),
-          # Operation('RinW','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,ref='N',ref2='N',dump=True),
-          # Operation('NetT','HEAT',ref='N',ref2='N',dump=True),
-          # Operation('NetI','FLOO',duration=lambda:menus.options['r'][3]*1.5,ref='N',ref2='N',dump=False),
-          # Operation('NETY','PAUS',message=ml.T("Mettre le Nettoyant dans le seau puis Redémarrer!","Put the Cleaner in the bucket then press Restart!","Zet de Cleaner in de emmer en druk op Herstart!"),ref='N',ref2='N',dump=False),
-          # Operation('Neti','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='N',ref2='N',dump=False),
+          # Operation('RinV','FLOO',duration=lambda:menus.options['r'][3]/2.0,ref='R',dump=True),
+          # Operation('RinW','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,ref='N',dump=True),
+          # Operation('NetT','HEAT',ref='N',dump=True),
+          # Operation('NetI','FLOO',duration=lambda:menus.options['r'][3]*1.5,ref='N',dump=False),
+          # Operation('NETY','PAUS',message=ml.T("Mettre le Nettoyant dans le seau puis Redémarrer!","Put the Cleaner in the bucket then press Restart!","Zet de Cleaner in de emmer en druk op Herstart!"),ref='N',dump=False),
+          # Operation('Neti','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='N',dump=False),
           # Operation('Neto','SUBR',duration=lambda:menus.options['n'][3],subSequence='n',dump=False),
-          # Operation('NetF','FLOO',duration=lambda:menus.options['r'][3],ref='N',ref2='N',dump=True),
-          # Operation('NetV','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,ref='N',ref2='N',dump=True),
-          # Operation('MidT','HEAT',ref='R',ref2='R',dump=True),
-          # Operation('MidI','FLOO',duration=lambda:menus.options['r'][3]*1.5,ref='R',ref2='R',dump=False),
+          # Operation('NetF','FLOO',duration=lambda:menus.options['r'][3],ref='N',dump=True),
+          # Operation('NetV','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,ref='N',dump=True),
+          # Operation('MidT','HEAT',ref='R',dump=True),
+          # Operation('MidI','FLOO',duration=lambda:menus.options['r'][3]*1.5,ref='R',dump=False),
           # Operation('Midc','SUBR',duration=lambda:menus.options['r'][3],subSequence='r',dump=False),
-          # Operation('MidW','EMPT',base_speed=MAX_SPEED, qty=DRY_VOLUME,ref='R',ref2='R',dump=True),
-          # Operation('MidZ','PAUS',message=ml.T("Faire Arrêt pour éviter la désinfection, sinon cliquez Redémarrer!","Press STOP to avoid Disinfection. Else click Restart!","Druk op STOP om desinfectie te voorkomen. Anders klikt u op Herstart!"),ref='D',ref2='D',dump=False),
-          # Operation('DesT','HEAT',ref='D',ref2='D',dump=True),
-          # Operation('DesI','FLOO',duration=lambda:menus.options['r'][3]*1.5,ref='D',ref2='D',dump=False),
-          # Operation('DESN','PAUS',message=ml.T("Mettre le Désinfectant dans le seau puis Redémarrer!","Put the Disinfectant in the bucket then Restart!","Doe het desinfectiemiddel in de emmer en druk op een toets!"),ref='D',ref2='D',dump=False),
-          # Operation('Desi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='D',ref2='D',dump=False),
+          # Operation('MidW','EMPT',base_speed=MAX_SPEED, qty=DRY_VOLUME,ref='R',dump=True),
+          # Operation('MidZ','PAUS',message=ml.T("Faire Arrêt pour éviter la désinfection, sinon cliquez Redémarrer!","Press STOP to avoid Disinfection. Else click Restart!","Druk op STOP om desinfectie te voorkomen. Anders klikt u op Herstart!"),ref='D',dump=False),
+          # Operation('DesT','HEAT',ref='D',dump=True),
+          # Operation('DesI','FLOO',duration=lambda:menus.options['r'][3]*1.5,ref='D',dump=False),
+          # Operation('DESN','PAUS',message=ml.T("Mettre le Désinfectant dans le seau puis Redémarrer!","Put the Disinfectant in the bucket then Restart!","Doe het desinfectiemiddel in de emmer en druk op een toets!"),ref='D',dump=False),
+          # Operation('Desi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='D',dump=False),
           # Operation('Desf','SUBR',duration=lambda:menus.options['d'][3],subSequence='d',dump=False),
           # Operation('DesV','EMPT',base_speed=MAX_SPEED, qty=DRY_VOLUME,dump=True),
           # #Operation('DesR','EMPT',base_speed=-pumpy.maximal_liters, qty=-DRY_VOLUME,dump=True),
@@ -1310,26 +1371,26 @@ opSequences = {
           # ],
 
     'F': # Pré-rinçage (Flush)
-        [ Operation('PreT','HEAT',ref='R', ref2='t',dump=True,programmable=True),
-          Operation('PreI','FLOO',duration=lambda:menus.options['r'][3], base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',ref2='R',dump=True),  #
-          Operation('PreR','RFLO',duration=lambda:13,ref='R',ref2='R', base_speed=MAX_SPEED, qty=-2.0,dump=True),
+        [ Operation('PreT','HEAT',ref='R', dump=True,programmable=True),
+          Operation('PreI','FLOO',duration=lambda:menus.options['r'][3], base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          Operation('PreR','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('CLOS','MESS',message=ml.T("Recommencer au besoin!","Repeat if needed!","Herhaal indien nodig!"),dump=True)
           ],
     'R': # Pré-rinçage 4 fois
-        [ Operation('Pr1T','HEAT',ref='R', ref2='t',dump=True,programmable=True),
-          Operation('Pr1I','FLOO',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',ref2='R',dump=True),  #
-          Operation('Pr1R','RFLO',duration=lambda:13,ref='R',ref2='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
-          Operation('Pr2T','HEAT',ref='R', ref2='t',dump=True,programmable=True),
-          Operation('Pr2I','FLOO',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',ref2='R',dump=True),  #
-          Operation('Pr2R','RFLO',duration=lambda:13,ref='R',ref2='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+        [ Operation('Pr1T','HEAT',ref='R', dump=True,programmable=True),
+          Operation('Pr1I','FLOO',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          Operation('Pr1R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+          Operation('Pr2T','HEAT',ref='R', dump=True,programmable=True),
+          Operation('Pr2I','FLOO',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          Operation('Pr2R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('2END','MESS',message=ml.T("2 rinçages effectués!","2 flushes done!","2 keer doorspoelen!"),dump=True),
-          Operation('Pr3T','HEAT',ref='R', ref2='t',dump=True,programmable=True),
-          Operation('Pr3I','FLOO',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',ref2='R',dump=True),  #
-          Operation('Pr3R','RFLO',duration=lambda:13,ref='R',ref2='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+          Operation('Pr3T','HEAT',ref='R', dump=True,programmable=True),
+          Operation('Pr3I','FLOO',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          Operation('Pr3R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('3END','MESS',message=ml.T("3 rinçages effectués!","3 flushes done!","3 keer doorspoelen!"),dump=True),
-          Operation('Pr4T','HEAT',ref='R', ref2='t',dump=True,programmable=True),
-          Operation('Pr4I','FLOO',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',ref2='R',dump=True),  #
-          Operation('Pr4R','RFLO',duration=lambda:13,ref='R',ref2='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+          Operation('Pr4T','HEAT',ref='R', dump=True,programmable=True),
+          Operation('Pr4I','FLOO',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          Operation('Pr4R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('CLOS','MESS',message=ml.T("4 rinçages effectués!","4 flushes done!","4 keer doorspoelen!"),dump=True)
           ],
     'V': # Vider le réservoir (aux égouts la plupart du temps)
@@ -1337,69 +1398,70 @@ opSequences = {
            Operation('CLOS','MESS',message=ml.T("Tuyaux vidés autant que possible.","Pipes emptied as much as possible.","Leidingen zoveel mogelijk geleegd."),dump=True)
         ],
     'D': # Désinfectant
-        [ Operation('DesT','HEAT',ref='D',ref2='D',dump=False,programmable=True),
-          Operation('DesI','FLOO',duration=lambda:menus.options['r'][3]*1.5,base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='D',ref2='D',dump=False),
-          Operation('DESN','PAUS',message=ml.T("Mettre le Désinfectant dans le seau puis une touche!","Put the Disinfectant in the bucket then press a key!","Doe het desinfectiemiddel in de emmer en druk op een toets!"),ref='D',ref2='D',dump=False),
-          Operation('Desi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='D',ref2='D',dump=False),
+        [ Operation('DesT','HEAT',ref='D',dump=False,programmable=True),
+          Operation('DesF','FILL',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=False),
+          Operation('DesI','FLOO',duration=lambda:menus.options['r'][3]*1.5,base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='D',dump=False),
+          Operation('DESN','PAUS',message=ml.T("Mettre le Désinfectant dans le seau puis une touche!","Put the Disinfectant in the bucket then press a key!","Doe het desinfectiemiddel in de emmer en druk op een toets!"),ref='D',dump=False),
+          Operation('Desi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='D',dump=False),
           Operation('Desf','SUBR',duration=lambda:menus.options['d'][3],subSequence='d',dump=False),
           #Operation('DesV','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,dump=True),
           Operation('CLOS','MESS',message=ml.T("Faites V pour vider puis rincer!","Press V to empty and then rinse!","Druk op V om te legen en spoel daarna af!"),dump=True)
         ],
     'd': # Étape répétée de la désinfection
-        [ Operation('DesS','PUMP',ref='D',ref2='D', base_speed=MAX_SPEED, qty=4.0,dump=False),
-          Operation('DesP','REVR',ref='D',ref2='D', base_speed=MAX_SPEED, qty=-2.0,dump=False)
+        [ Operation('DesS','PUMP',ref='D', base_speed=MAX_SPEED, qty=4.0,dump=False),
+          Operation('DesP','REVR',ref='D', base_speed=MAX_SPEED, qty=-2.0,dump=False)
         ],
+    'C': # Désinfection thermique
+        [ Operation('DetT','HEAT',ref='C',dump=False,programmable=True),
+          Operation('DetF','FILL',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='C',dump=False),
+          Operation('NETY','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='C',dump=False),
+          Operation('DetH','TRAK','output','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='C', qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('DetS','PUMP',ref='C',base_speed=MAX_SPEED, duration=lambda:menus.options['c'][3],dump=False)
+          ],
     'N': # Détergent
-        [ Operation('NetT','HEAT',ref='N',ref2='N',dump=False,programmable=True),
-          Operation('NetI','FLOO',duration=lambda:menus.options['r'][3]*1.5,base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='N',ref2='N',dump=False),
-          Operation('NETY','PAUS',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),ref='N',ref2='N',dump=False),
-          Operation('Neti','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='N',ref2='N',dump=False),
+        [ Operation('NetT','HEAT',ref='N',dump=False,programmable=True),
+          Operation('NetF','FILL',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='N',dump=False),
+          Operation('NetI','FLOO',duration=lambda:menus.options['r'][3]*1.5,base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='N',dump=False),
+          Operation('NETY','PAUS',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),ref='N',dump=False),
+          Operation('Neti','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='N',dump=False),
           Operation('Neto','SUBR',duration=lambda:menus.options['n'][3],subSequence='n',dump=False),
           #Operation('NetV','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,dump=True),
           Operation('CLOS','MESS',message=ml.T("Faites V pour vider puis rincer!","Press V to empty and then rinse!","Druk op V om te legen en spoel daarna af!"),dump=True)
         ],
     'n': # Étape répétée du nettoyage
-        [ Operation('NetS','PUMP',ref='N',ref2='N', base_speed=MAX_SPEED, qty=4.0,dump=False),
-          Operation('NetP','REVR',ref='N',ref2='N', base_speed=MAX_SPEED, qty=-2.0,dump=False)
+        [ Operation('NetS','PUMP',ref='N',base_speed=MAX_SPEED, qty=4.0,dump=False),
+          Operation('NetP','REVR',ref='N',base_speed=MAX_SPEED, qty=-2.0,dump=False)
           ],
     'P': # Pasteurisation
-        [ Operation('PasT','HEAT',ref='P',ref2='t', dump=True,programmable=True),
-          Operation('PasI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('Pasi','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('PasE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',ref2='t', dump=True),
-          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
-          ],
-    'G': # Pasteurisation d'un produit gras
-        [ Operation('PasT','HEAT',ref='P',ref2='t', dump=True,programmable=True),
-          Operation('PasI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('Pasi','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('PasE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',ref2='t', dump=True),
-          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
+        [ Operation('PasT','HEAT',ref='P',dump=True,programmable=True),
+          Operation('PasI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Pasi','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('PasE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',dump=True),
+          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
     'I': # Reprise d'une Pasteurisation
-        [ Operation('PasT','HEAT',ref='P',ref2='t', dump=True,programmable=True),
-          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
+        [ Operation('PasT','HEAT',ref='P',dump=True,programmable=True),
+          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
     'E': # Eau pour finir une Pasteurisation en poussant juste ce qu'il faut le lait encore dans les tuyaux
-        [ Operation('EauT','HEAT',ref='P',ref2='t', dump=True,programmable=True),
-          Operation('EauI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('EauP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('EauV','PUMP', base_speed=MAX_SPEED, ref='P',ref2='t', qty=(TOTAL_VOL*0.96)-START_VOL,dump=True,cooling=True),
+        [ Operation('EauT','HEAT',ref='P',dump=True,programmable=True),
+          Operation('EauI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('EauP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('EauV','PUMP', base_speed=MAX_SPEED, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites C quand vous voulez nettoyer!","Press C when you want to clean!","Druk op C als u wilt reinigen!"),dump=True)
           ],
     'M': # Passer à un lait d'un autre provenance en chassant celui de la pasteurisation précédente
-        [ Operation('Mult','HEAT',ref='P',ref2='t', dump=True,programmable=True),
-          Operation('Muli','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('Mulp','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('MulC','PAUS',message=ml.T("Consigne nouveau lait puis une touche pour finir de chasser le 1er lait","Setpoint for New milk then press a key to finish bottling 1st","Instelpunt voor nieuwe melk en druk vervolgens op een toets om het bottelen eerst te beëindigen"),ref='P',ref2='t', dump=True),
-          Operation('MulT','HEAT',ref='P',ref2='t', dump=True),
-          Operation('MulP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',ref2='t', qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('MulE','PAYS',message=ml.T("Contenant pour le nouveau lait!","New Milk container!","Houder voor nieuwe melk!"),ref='P',ref2='t', dump=True),
-          Operation('MulH','HEAT',ref='P',ref2='t', dump=True),
-          Operation('MulI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',ref2='t', shake_qty=SHAKE_QTY,dump=True,cooling=True),
+        [ Operation('Mult','HEAT',ref='P',dump=True,programmable=True),
+          Operation('Muli','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Mulp','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('MulC','PAUS',message=ml.T("Consigne nouveau lait puis une touche pour finir de chasser le 1er lait","Setpoint for New milk then press a key to finish bottling 1st","Instelpunt voor nieuwe melk en druk vervolgens op een toets om het bottelen eerst te beëindigen"),ref='P',dump=True),
+          Operation('MulT','HEAT',ref='P',dump=True),
+          Operation('MulP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('MulE','PAYS',message=ml.T("Contenant pour le nouveau lait!","New Milk container!","Houder voor nieuwe melk!"),ref='P',dump=True),
+          Operation('MulH','HEAT',ref='P',dump=True),
+          Operation('MulI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ]
     }
@@ -1420,13 +1482,16 @@ def reloadPasteurizationSpeed():
 class ThreadPump(threading.Thread):
 
     def __init__(self, pumpy, T_DAC):
+        global trigger_w
+
         threading.Thread.__init__(self)
         self.running = False
         self.pump = pumpy
         self.T_DAC = T_DAC
         self.currAction = 'Z'
         self.startAction = time.perf_counter()
-        (self.currStateStart, self.currState) = state.load(DIR_DATA_CSV)
+        since, current, empty, greasy = State.loadCurrent(DIR_DATA_CSV)
+        trigger_w.base = since
         self.currSequence = None
         self.currOperation = None
         self.currOpContext = None
@@ -1468,7 +1533,7 @@ class ThreadPump(threading.Thread):
             self.currSequence = self.currSequence[1:]
             self.startOperation(self.currOperation)
         else:
-            (self.currStateStart, self.currState) = self.currState.transit(State.ACTION_END, self.currAction, self.currStateStart) # State obtained at the end of the action
+            State.transitCurrent(State.ACTION_END, self.currAction) # State obtained at the end of the action
 
     def closeSequence(self): # Executer la dernière opération si elle sert à cloturer une sequence
         if self.currOperation and self.currOperation.acronym != 'CLOS':
@@ -1499,7 +1564,7 @@ class ThreadPump(threading.Thread):
             self.stopAction()
             self.currAction = action
             self.startAction = time.perf_counter()
-            (self.currStateStart,self.currState) = self.currState.transit(State.ACTION_BEGIN,action,self.currStateStart)
+            State.transitCurrent( State.ACTION_BEGIN, action )
             self.pump.reset_volume()
             self.setPause(False);
             self.currSequence = []
@@ -1532,7 +1597,7 @@ class ThreadPump(threading.Thread):
                 if diffTemp <= 0.0:
                     return 0
                 else:
-                    return int(diffTemp * tank * kCalWatt / HEAT_POWER * 3600)
+                    return int( diffTemp * tank * kCalWatt / ( (HEAT_POWER-((heating-ROOM_TEMP)*WATT_LOSS)) * 3600.0 ) )
             else:
                 subr = self.topContext()
                 if subr and subr.operation and subr.operation.duration:
@@ -1562,7 +1627,7 @@ class ThreadPump(threading.Thread):
 
     def run(self):
 
-        global display_pause, WebExit, RedConfirmationDelay
+        global display_pause, WebExit, RedConfirmationDelay, trigger_w
 
         if GreenLED:
             GreenLED.off()
@@ -1572,9 +1637,15 @@ class ThreadPump(threading.Thread):
             RedLED.on()
         RedPendingConfirmation = 0.0
         self.running = True
+
+        if trigger_w.trigger():
+            State.transitCurrent(State.ACTION_RESUME, 'w')
+
         while self.running:
             try:
                 time.sleep(0.25)
+                if trigger_w.trigger():
+                    State.transitCurrent(State.ACTION_RESUME, 'w')
                 now = time.perf_counter()
                 if RedPendingConfirmation != 0.0:
                     if RedLED:
@@ -1616,6 +1687,10 @@ class ThreadPump(threading.Thread):
                 if YellowButton and (YellowButton.get() == 1):
                     if not self.paused:
                         self.setPause(True)  # Will make the pump stops !
+                if EmergencyButton and (EmergencyButton.get() == 1):
+                    if not self.paused:
+                        self.setPause(True)  # Will make the pump stops !
+                    T_DAC.set_temp(None, None)
                 if GreenButton and (GreenButton.get() == 1):
                     if self.paused:
                         self.setPause(False)
@@ -1924,24 +1999,36 @@ class WebApiAction:
             result = {'message':'RECHARGER CETTE PAGE'}
         else:
             message = ""
-            if letter == 'Y':  # Yaourt
+            # StateLessActions
+            if letter == 'J':  # Juice
+                menus.options['P'][3] = 75.0
+                menus.options['M'][3] = 15.0
+                menus.options['g'][3] = False
+                #menus.options['T'][3] = 45.0
+                message = "75°C"
+                reloadPasteurizationSpeed()
+            elif letter == 'Y':  # Yaourt
                 menus.options['P'][3] = 82.0
                 menus.options['M'][3] = 30.0
                 #menus.options['T'][3] = 45.0
+                menus.options['g'][3] = True
                 message = "82°C"
                 reloadPasteurizationSpeed()
             elif letter == 'L':  # Lait
                 menus.options['P'][3] = 72.0
                 menus.options['M'][3] = 15.0
                 #menus.options['T'][3] = 22.0
+                menus.options['g'][3] = True
                 message = "72°C"
                 reloadPasteurizationSpeed()
             elif letter == 'T':  # Thermiser
                 menus.options['P'][3] = 65.0
                 menus.options['M'][3] = 30.0
                 #menus.options['T'][3] = 35.0
+                menus.options['g'][3] = True
                 message = "65°C"
                 reloadPasteurizationSpeed()
+            # end of StateLessActions
             elif letter == "S":  # Pause
                 if not T_Pump.paused:
                    T_Pump.setPause(True)  # Will make the pump stops !
@@ -1969,16 +2056,18 @@ class WebApiAction:
                     T_Pump.currAction = 'X'
                     os.kill(os.getpid(),signal.SIGINT)
                     WebExit = True # SHUTDOWN !
-            else:
+            else: # State dependent Actions
                 if not T_Pump.setAction(letter):
                     message = str(ml.T("Invalide","Invalid","Ongeldig"))
             result = {  'date':str(datetime.fromtimestamp(int(time.time()))),
                         'actionletter':letter,
                         'action':str(menus.actionName[letter][1]),
                         'actiontitle':str(menus.actionName[letter][3]),
-                        'stateletter': (T_Pump.currState.letter if T_Pump.currState else ''),
-                        'state': (str(T_Pump.currState.labels) if T_Pump.currState else ''),
-                        'allowedActions' : (str(T_Pump.currState.allowedActions()) if T_Pump.currState else ''),
+                        'stateletter': (State.current.letter if State.current else ''),
+                        'empty': ('V' if State.empty else 'W'),
+                        'greasy': ('G' if State.greasy else 'J'),
+                        'state': (str(State.current.labels) if State.current else ''),
+                        'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[letter][2])+': '+message,
                         'output': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if letter in ['P','E','I'] else 1),
@@ -2000,15 +2089,25 @@ class WebApiState:
         if not connected:
             result = {'message':'RECHARGER CETTE PAGE'}
         else:
-            T_Pump.currStateStart = time.time()
-            T_Pump.currState = letter.lower()
+            empty = State.empty
+            greasy = State.greasy
+            if data: # Process saved options from options editing forms
+                empty = False
+                if ('empty' in data and data['empty'].lower() == 'on'):
+                    empty = True
+                greasy = False
+                if ('greasy' in data and data['greasy'].lower() == 'on'):
+                    greasy = True
+            State.setCurrent(letter,empty,greasy)
             result = {  'date':str(datetime.fromtimestamp(int(time.time()))),
                         'actionletter':T_Pump.currAction,
                         'action':str(menus.actionName[T_Pump.currAction][1]),
                         'actiontitle':str(menus.actionName[T_Pump.currAction][3]),
-                        'stateletter': (T_Pump.currState.letter if T_Pump.currState else ''),
-                        'state': (str(T_Pump.currState.labels) if T_Pump.currState else ''),
-                        'allowedActions' : (str(T_Pump.currState.allowedActions()) if T_Pump.currState else ''),
+                        'stateletter': (State.current.letter if State.current else ''),
+                        'empty': ('V' if State.empty else 'W'),
+                        'greasy': ('G' if State.greasy else 'J'),
+                        'state': (str(State.current.labels) if State.current else ''),
+                        'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[T_Pump.currAction][2]),
                         'output': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['P','E','I'] else 1),
@@ -2168,9 +2267,11 @@ class WebApiLog:
                             'actionletter': T_Pump.currAction, \
                             'action': str(menus.actionName[T_Pump.currAction][1]), \
                             'actiontitle': str(menus.actionName[T_Pump.currAction][3]), \
-                            'stateletter': (T_Pump.currState.letter if T_Pump.currState else ''),
-                            'state': (str(T_Pump.currState.labels) if T_Pump.currState else ''),
-                            'allowedActions' : (str(T_Pump.currState.allowedActions()) if T_Pump.currState else ''),
+                            'stateletter': (State.current.letter if State.current else ''),
+                            'empty': ('V' if State.empty else 'W'),
+                            'greasy': ('G' if State.greasy else 'J'),
+                            'state': (str(State.current.labels) if State.current else ''),
+                            'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                             'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "", \
                             'delay': durationRemaining, \
                             'remain': quantityRemaining, \
@@ -2345,14 +2446,14 @@ while T_Pump.currAction != 'X':
         menu_choice = str(getch()).upper()
         if menu_choice == ' ':
             display_pause = False
-        elif menu_choice in ['X','Z','R','V','F','A','P','I','E','M','D','N']: # 'C','K'
+        elif menu_choice in ['X','Z','R','V','F','A','P','I','E','M','D','C','N']: # 'C','K'
             menu_choice = menu_confirm(menu_choice,8.0)
             if menu_choice == 'X':
                 T_Pump.stopAction()
                 break
             if menu_choice == 'Z':
                 T_Pump.stopAction()
-            elif menu_choice in ['R','V','F','A','P','I','E','M','D','N']: # 'C','K'
+            elif menu_choice in ['R','V','F','A','P','I','E','M','D','C','N']: # 'C','K'
                 T_Pump.setAction(menu_choice)
         elif menu_choice == "Y": # Yaourt
             menus.options['P'][3] = 82.0
