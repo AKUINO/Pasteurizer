@@ -39,7 +39,7 @@ class button(sensor.Sensor):
             #traceback.print_stack()
             value = 0 if value > 0 else 1 # REVERSE because pressing is grounding !!!
         except:
-            print ("%s: %d=%d" % (self.address, self.param,value))
+            print ("%s: %d=%d" % (self.address, self.param, value if value != None else 9))
             traceback.print_exc()
         if value is not None:
             self.set(value)
