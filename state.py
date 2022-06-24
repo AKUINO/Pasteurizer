@@ -103,7 +103,7 @@ class State(object):
                 else:
                     return start, newState,empty,greasy
         print ("Unknown action=%s for state=%s"%(action,self.letter))
-        return start,self,None,empty,greasy
+        return start,self,empty,greasy
 
     def allowedActions (self):
         result = ""
