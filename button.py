@@ -30,7 +30,7 @@ class button(sensor.Sensor):
         value = None
         try:
             if self.param < 0:
-                hardConf.io.read_discrete( - self.param)
+                value = hardConf.io.read_discrete( - self.param)
             elif hardConf.localGPIOtype == 'gpio':
                 value = hardConf.localGPIO.input(self.param)
             elif hardConf.localGPIOtype == 'pigpio':
