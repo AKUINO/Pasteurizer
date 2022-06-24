@@ -389,8 +389,8 @@ if MICHA_device:
     DMP_close = MICHApast.VALVE1_DIR_REG
 
     # Solenoids to control water inputs
-    CLD = MICHApast.SOL_HOT_REG # Hot rinsing water
-    TAP = MICHApast.SOL_COLD_REG # Cooling water
+    TAP = MICHApast.SOL_HOT_REG # Hot rinsing water
+    CLD = MICHApast.SOL_COLD_REG # Cooling water
 
     if MICHA_version >= 40:
         inputPressure = MICHApast.PRESS_SENSOR_REG
