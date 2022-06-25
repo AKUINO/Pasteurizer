@@ -171,6 +171,8 @@ RINSE_TIME = 300.0
 WAIT_TIME = 1*3600
 STAY_CLEAN_TIME = 8*3600
 
+TANK_NOT_FILLED = 1.3 # If heating time remaining is decreasing more than expected (ratio above 1.3 and not 3), the tank may not be filled correctly...
+
 menus = Menus()
 menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,ml.T("Gradient de température","Temperature Gradient","Gradient van Temperatuur") \
@@ -853,7 +855,7 @@ class ThreadDAC(threading.Thread):
                         # coldTapSolenoid.set(0)
 
                 nowT = time.time()
-                durationRemaining = self.T_Pump.durationRemaining()
+                durationRemaining = self.T_Pump.durationRemaining(nowT)
                 quantityRemaining = self.T_Pump.quantityRemaining()
                 try:
                     data_file = open(DIR_DATA_CSV + fileName+".csv", "a")
@@ -1502,6 +1504,8 @@ class ThreadPump(threading.Thread):
         self.pumpLastVolume = 0
         self.pumpLastHeating = 0
         self.lastStop = 0
+        self.lastDurationEval = None
+        self.lastDurationEvalTime = None
 
     def pushContext(self,opContext):
         if opContext:
@@ -1586,25 +1590,38 @@ class ThreadPump(threading.Thread):
         if paused:
             T_Pump.pump.reset_pump()
         self.paused = paused
-        
-    def durationRemaining(self):
+
+    def durationRemaining(self,now):
+
+        now = int(now)
+        warning = False
         if not self.currOperation:
-            return 0
+            self.lastDurationEval = None
+            return 0, warning
         if not self.currOperation.duration:
             if self.currOperation.typeOp == 'HEAT':
                 heating = cohorts.getCalibratedValue('heating')
                 diffTemp = float(self.currOperation.tempRef()+menus.options['G'][3]-0.2)-float(heating)
                 if diffTemp <= 0.0:
-                    return 0
+                    self.lastDurationEval = None
+                    return 0, warning
                 else:
-                    return int( diffTemp * tank * kCalWatt / ( (HEAT_POWER-((heating-ROOM_TEMP)*WATT_LOSS)) * 3600.0 ) )
+                    newEval = int( diffTemp * tank * kCalWatt / ( (HEAT_POWER-((heating-ROOM_TEMP)*WATT_LOSS)) * 3600.0 ) );
+                    if self.lastDurationEval and self.lastDurationEvalTime and now > self.lastDurationEvalTime :
+                        if (self.lastDurationEval - newEval) / (now-self.lastDurationEvalTime) > TANK_NOT_FILLED:
+                            warning = True
+                    self.lastDurationEval = newEval
+                    self.lastDurationEvalTime = now
+                return newEval, warning
             else:
+                self.lastDurationEval = None
                 subr = self.topContext()
                 if subr and subr.operation and subr.operation.duration:
                     return subr.operation.duration()- subr.duration()
-                return 0
+                return 0, warning
         else:
-            return self.currOperation.duration() - self.currOpContext.duration()
+            self.lastDurationEval = None
+            return self.currOperation.duration() - self.currOpContext.duration(), warning
 
     def quantityRemaining(self):
         if not self.currOperation:
@@ -2239,7 +2256,7 @@ class WebApiLog:
             currLog = {'message':str(ml.T('RECHARGER CETTE PAGE',"RELOAD THIS PAGE","HERLAAD DEZE PAGINA"))}
         else:
             nowT = time.time()
-            durationRemaining = T_Pump.durationRemaining()
+            (durationRemaining, warning) = T_Pump.durationRemaining(nowT)
             quantityRemaining = T_Pump.quantityRemaining()
             #temper = menus.options['T'][3]
             opt_temp = menus.options['P'][3]
@@ -2292,7 +2309,7 @@ class WebApiLog:
                             'pressMin': isnull(cohorts.val('press',peak=-1), ''), \
                             'pressMax': isnull(cohorts.val('press',peak=1), ''), \
                             'reft': isnull(cohorts.reft.value, ''), \
-                            'message': message, \
+                            'message': message + (ml.T(' - Cuve mal remplie?',' - Tank not filled?',' - Tank niet gevuld?') if warning else ''), \
                             #'opt_T': temper if temper <  99.0 else '', \
                             'opt_M': menus.options['M'][3], \
                             'opt_temp': opt_temp, \
