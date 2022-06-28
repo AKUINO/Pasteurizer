@@ -855,7 +855,7 @@ class ThreadDAC(threading.Thread):
                         # coldTapSolenoid.set(0)
 
                 nowT = time.time()
-                durationRemaining = self.T_Pump.durationRemaining(nowT)
+                (durationRemaining, warning) = self.T_Pump.durationRemaining(nowT)
                 quantityRemaining = self.T_Pump.quantityRemaining()
                 try:
                     data_file = open(DIR_DATA_CSV + fileName+".csv", "a")
@@ -910,7 +910,7 @@ class ThreadDAC(threading.Thread):
                     term.write(' %4d"  ' % durationRemaining if durationRemaining > 0 else \
                                 '%5dmL ' % int(quantityRemaining*1000) if quantityRemaining != 0.0 else "      ", \
                                term.white, term.bold, term.bgwhite)
-                    term.writeLine("",term.bgwhite)
+                    term.writeLine("!" if warning else "",term.bgwhite)
 
                     term.pos(lines-3,1)
                     term.clearLineFromPos()
