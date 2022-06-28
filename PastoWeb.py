@@ -1414,10 +1414,14 @@ opSequences = {
           Operation('DesP','REVR',ref='D', base_speed=MAX_SPEED, qty=-2.0,dump=False)
         ],
     'C': # Désinfection thermique
-        [ Operation('DetT','HEAT',ref='C',dump=False,programmable=True),
-          Operation('DetF','FILL',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='C',dump=False),
-          Operation('NETY','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='C',dump=False),
-          Operation('DetH','TRAK','output','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='C', qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
+        [ Operation('Dett','HEAT',ref='C',dump=False,programmable=True),
+          Operation('Detf','FILL',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='C',dump=False),
+          Operation('Dety','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='C',dump=False),
+          Operation('DetT','HEAT',ref='C',dump=False),
+          Operation('DetA','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False),
+          Operation('Detr','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
+          Operation('DetH','TRAK','output','input', base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='C', qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False,cooling=True),
+          Operation('DetR','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
           Operation('DetS','PUMP',ref='C',base_speed=MAX_SPEED, duration=lambda:menus.options['c'][3],dump=False)
           ],
     'N': # Détergent
