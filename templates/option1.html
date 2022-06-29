@@ -12,7 +12,8 @@ $var title : Pasteurization and Cooling Parameters
 $for letter in menus.cleanOptions:
   <div class="form-group">
     <label for="opt_$(letter)">$(menus.options[letter][2]) ( $(menus.options[letter][5]) )</label>
-    <input class="form-control" id="opt_$(letter)" name="opt_$(letter)" aria-describedby="emailHelp" placeholder="$(menus.options[letter][4])" min="0.0" max="$(menus.options[letter][7])" step="$(menus.options[letter][8])" type="$(menus.options[letter][9])" value="$(menus.options[letter][3])">
+    <input class="form-control" id="opt_$(letter)" name="opt_$(letter)" aria-describedby="emailHelp" placeholder="$(menus.options[letter][4])"
+           min="$(menus.display(letter,'MIN')" max="$(menus.display(letter,'MAX')" step="$(menus.display(letter,'STP')" type="$(menus.options[letter][9])" value="$(menus.display(letter,'VAL')">
   </div>
 <button type="submit" class="btn btn-success">$(ml.T("Enregistrer","Save","Opslaan"))</button>
 </form>
