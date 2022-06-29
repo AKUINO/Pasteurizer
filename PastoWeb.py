@@ -1414,8 +1414,8 @@ opSequences = {
           #Operation('DetT','HEAT',ref='C',dump=False),
           #Operation('DetA','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False),
           #Operation('Detr','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
-          Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=OPT_SPEED, ref='C', qty=TOTAL_VOL*3, shake_qty=START_VOL,dump=False),
-          Operation('DetH','TRAK','output','input', base_speed=MAX_SPEED, min_speed=OPT_SPEED, ref='C', duration=lambda:menus.options['c'][3], shake_qty=START_VOL,dump=False)
+          Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.minimal_liters*3, ref='C', qty=TOTAL_VOL*3, shake_qty=START_VOL,dump=False),
+          Operation('DetH','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.minimal_liters*3, ref='C', duration=lambda:menus.options['c'][3], shake_qty=START_VOL,dump=False)
           #Operation('DetR','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
           #Operation('DetS','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL, dump=False)
           ],
@@ -1443,7 +1443,7 @@ opSequences = {
           ],
     'I': # Reprise d'une Pasteurisation
         [ Operation('PasT','HEAT',ref='P',dump=True,programmable=True),
-          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
     'E': # Eau pour finir une Pasteurisation en poussant juste ce qu'il faut le lait encore dans les tuyaux
