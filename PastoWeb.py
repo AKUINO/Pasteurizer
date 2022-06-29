@@ -994,7 +994,7 @@ class Operation(object):
     def tempWithGradient(self): # Current heating temperature along what is set in options
         if not self.ref: # do not heat !
             return 0.0
-        return menus.options[self.ref][3] + ( menus.options['G'][3] if self.ref in ['P','C'] else 0.0 )
+        return menus.options[self.ref][3] + ( menus.options['G'][3] if self.ref in ['P'] else (13.0 if self.ref in ['C'] else 0.0) )
 
     # def tempRef2(self): # Current heating temperature along what is set in options
         # if not self.ref2: # do not heat !
@@ -1414,7 +1414,7 @@ opSequences = {
           #Operation('DetT','HEAT',ref='C',dump=False),
           #Operation('DetA','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False),
           #Operation('Detr','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
-          Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.minimal_liters*3, ref='C', qty=TOTAL_VOL*3, shake_qty=START_VOL,dump=False),
+          Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.minimal_liters*3, ref='C', qty=TOTAL_VOL, shake_qty=START_VOL,dump=False),
           Operation('DetH','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.minimal_liters*3, ref='C', duration=lambda:menus.options['c'][3], shake_qty=START_VOL,dump=False)
           #Operation('DetR','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
           #Operation('DetS','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL, dump=False)
