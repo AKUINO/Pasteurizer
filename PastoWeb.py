@@ -1214,7 +1214,7 @@ class Operation(object):
                         speed = self.min_speed
                 #print("SHAK="+str(speed)+"\r")
             else:
-                if menus.options['g'][3]:
+                if menus.options['g'][3] and self.sensor1 == 'warranty':
                     State.greasy = True
                 totalVol,totalTime,beginTemp,endTemp = cohorts.evolution(self.sensor2,self.sensor1)
                 #print("EVOL="+str(totalVol)+"L/"+str(totalTime)+"s "+str(beginTemp)+"°C<"+str(endTemp)+"°C\r")
@@ -1414,8 +1414,8 @@ opSequences = {
           #Operation('DetT','HEAT',ref='C',dump=False),
           #Operation('DetA','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False),
           #Operation('Detr','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
-          Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=pumpy.minimal_liters*4, ref='C', qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('DetH','TRAK','output','input', base_speed=MAX_SPEED, min_speed=pumpy.minimal_liters*4, ref='C', duration=lambda:menus.options['c'][3], shake_qty=SHAKE_QTY,dump=False)
+          Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.minimal_liters*6, ref='C', qty=TOTAL_VOL, shake_qty=START_VOL,dump=False),
+          Operation('DetH','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.minimal_liters*6, ref='C', duration=lambda:menus.options['c'][3], shake_qty=START_VOL,dump=False)
           #Operation('DetR','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
           #Operation('DetS','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL, dump=False)
           ],
