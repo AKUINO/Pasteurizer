@@ -176,49 +176,46 @@ TANK_NOT_FILLED = 1.3 # If heating time remaining is decreasing more than expect
 menus = Menus()
 menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,ml.T("Gradient de température","Temperature Gradient","Gradient van Temperatuur") \
-                            ,3.0,3.0,"°C",False,7,0.1], # Gradient de Température
+                            ,3.0,3.0,"°C",False,7,0.1,"number"], # Gradient de Température
                     'g':['g',ml.T("Produit Gras","Fatty Product","Vet Product") \
                         ,ml.T("Nécessite de la soude(1) Pas toujours(0)","Needs Soda Cleaning(1) Not always(0)","Soda-reiniging nodig(1) Niet altijd(0)") \
-                        ,1,1,"-",False,1,1], # Faux=0, 1=Vrai
+                        ,1,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
                     'P':['P',ml.T("Pasteurisation°","Pasteurization°","Pasteurisatie°") \
                             ,ml.T("Température de pasteurisation","Pasteurisation Temperature","Pasteurisatie Temperatuur") \
-                            ,72.0,72.0,"°C",False,90,0.1], # Température normale de pasteurisation
-                    'W':['W',ml.T("Pause maximale","Max Pause","Max Pauze") \
-                        ,ml.T("Temps d'arrêt maximum autorisé","Maximum process stop duration","Maximaal toegestane uitvaltijd") \
-                        ,WAIT_TIME,WAIT_TIME,'"',False,3600*4,1], # Durée de pause en cours de production avant de devoir tout nettoyer
+                            ,72.0,72.0,"°C",False,90,0.1,"number"], # Température normale de pasteurisation
                     'w':['w',ml.T("Pause maximale","Max Pause","Max Pauze") \
                         ,ml.T("Temps d'arrêt maximum autorisé","Maximum process stop duration","Maximaal toegestane uitvaltijd") \
-                        ,STAY_CLEAN_TIME,STAY_CLEAN_TIME,'"',False,3600*12,1], # Durée où un tuyau propre le reste sans rinçage (le double avant de tout re-nettoyer)
+                        ,STAY_CLEAN_TIME,STAY_CLEAN_TIME,'"',False,3600*2,600,"time"], # Durée où un tuyau propre le reste sans rinçage (le double avant de tout re-nettoyer)
                     'R':['R',ml.T("Rinçage°","Rinse°","Spoelen°") \
                             ,ml.T("Température de rinçage","Rinse Temperature","Spoelen Temperatuur") \
-                            ,45.0,45.0,"°C",False,90,0.1], # Température du Bassin pour le prélavage
+                            ,45.0,45.0,"°C",False,90,0.1,"number"], # Température du Bassin pour le prélavage
                     'r':['r',ml.T("Rinçage\"","Rinse\"","Spoelen\"") \
                             ,ml.T("Durée de rinçage","Rinse Duration","Spoelen Tijd") \
-                            ,FLOOD_TIME,FLOOD_TIME,'"',False,9999,1], # Temps d'admission de l'eau courante
+                            ,FLOOD_TIME,FLOOD_TIME,'"',False,9999,60,"time"], # Temps d'admission de l'eau courante
                     's':['s',ml.T("Seau pour l'Eau","Bucket for Water","Emmer voor water\"") \
                         ,ml.T("Eau courante(0) ou amenée dans un seau(1)","Running water(0) or brought in a bucket(1)","Stromend water(0) of gebracht in een emmer(1)") \
-                        ,1,1,"-",False,1,1], # Faux=0, 1=Vrai
+                        ,0,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
                     'N':['N',ml.T("Nettoyage°","Cleaning°","Schoonmaak°") \
                             ,ml.T("Température de nettoyage","Cleaning Temperature","Schoonmaak Temperatuur") \
-                            ,70.0,70.0,"°C",False,90,0.1], # Température pour un passage au détergent
+                            ,70.0,70.0,"°C",False,90,0.1,"number"], # Température pour un passage au détergent
                     'n':['n',ml.T("Nettoyage\"","Cleaning\"","Schoonmaak\"") \
                             ,ml.T("Durée de nettoyage","Cleaning Duration","Schoonmaak Tijd") \
-                            ,CLEAN_TIME,CLEAN_TIME,'"',False,9999,1], # Température pour un passage au détergent
+                            ,CLEAN_TIME,CLEAN_TIME,'"',False,9999,60,"time"], # Température pour un passage au détergent
                     'C':['C',ml.T("Désinfection thermique°""Thermal Disinfection°","Thermisch Desinfectie°") \
                         ,ml.T("Température de désinfection","Disinfection Temperature","Desinfectie Temperatuur") \
-                        ,80.0,80.0,"°C",False,90,0.1], # Température pour un traitement à l'acide ou au percarbonate de soude
+                        ,80.0,80.0,"°C",False,90,0.1,"number"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'c':['c',ml.T("Désinfection thermique\"","Thermal Disinfection\"","Thermisch Desinfectie\"") \
                         ,ml.T("Durée de désinfection","Disinfection Duration","Desinfectie Tijd") \
-                        ,TH_DISINF_TIME,TH_DISINF_TIME,'"',False,9999,1], # Température pour un traitement à l'acide ou au percarbonate de soude
+                        ,TH_DISINF_TIME,TH_DISINF_TIME,'"',False,9999,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'D':['D',ml.T("Désinfection°""Disinfection°","Desinfectie°") \
                             ,ml.T("Température de désinfection","Disinfection Temperature","Desinfectie Temperatuur") \
-                            ,60.0,60.0,"°C",False,90,0.1], # Température pour un traitement à l'acide ou au percarbonate de soude
+                            ,60.0,60.0,"°C",False,90,0.1,"number"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'd':['d',ml.T("Désinfection\"","Disinfection\"","Desinfectie\"") \
                             ,ml.T("Durée de désinfection","Disinfection Duration","Desinfectie Tijd") \
-                            ,DISINF_TIME,DISINF_TIME,'"',False,9999,1], # Température pour un traitement à l'acide ou au percarbonate de soude
+                            ,DISINF_TIME,DISINF_TIME,'"',False,9999,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'M':['M',ml.T("Minimum","Minimum","Minimum") \
                             ,ml.T("Durée minimale de pasteurisation","Minimum pasteurization time","Minimale pasteurisatietijd") \
-                            ,15.0,15.0,'"',False,199,1], # Durée minimale de pasteurisation
+                            ,15.0,15.0,'"',False,199,1,"time"], # Durée minimale de pasteurisation
                     # 'T':['T',ml.T("Tempérisation Max°","Tempering Max°","Temperen Max°") \
                             # ,ml.T("Température d'ajout d'eau de refroidissement","Cooling water addition temperature","Koelwatertoevoegings Temperatuur") \
                             # ,0.0,0.0,"°C",True,90.0,0.1], # Température à laquelle on ajoute de l'eau de refroidissement,ZeroIsNone=True
@@ -230,10 +227,10 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             # ,midTemperTank,midTemperTank,"L",False,19.9,0.1], # Quantité d'eau froide à mettre dans le bassin de refroidissement
                     'Q':['Q',ml.T("Quantité","Quantity","Aantal") \
                             ,ml.T("Quantité de lait à entrer","Amount of milk to input","Aantal melk voor invoor") \
-                            ,0.0,0.0,"L",True,9999.9,0.1], # Quantité de lait à traiter,ZeroIsNone=True
+                            ,0.0,0.0,"L",True,9999.9,0.1,"number"], # Quantité de lait à traiter,ZeroIsNone=True
                     'H':['H',ml.T("Démarrage","Start","Start") \
                             ,ml.T("Heure de démarrage","Start Time","Starttijd") \
-                            ,0.0,0.0,"hh.m0",True,23.5,0.1], # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
+                            ,0.0,0.0,"hh.m0",True,23.5,600,"time"], # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
                     'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
                             ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
 menus.sortedOptions = "PMgGKWwQHRrsNnDdCcZ" #T
@@ -580,37 +577,34 @@ StateLessActions = "JYLT" # TO BE DUPLICATED in index.js !
 State('r',ml.T('Propre','Clean','Schoon'), \
     [ ('A','r'),('P','p'),('F',''),('V',['',['',True,None]]),('w','o') ] )
 
-State('o',ml.T('Vieux','Old','Oud'), \
-    [ ('F',''),('V',['',['',True,None]]),('R',['','r']),('w','l') ] )
-
-State('l',ml.T('Très Vieux','Very Old','Veel Oud'), \
-    [ ('F',''),('V',['',['',True,None]]),('C',['','r']) ] )
+State('o',ml.T('Eau','Water','Waser'), \
+    [ ('F',''),('V',['',['',True,None]]),('C',['','r']),('w','') ] )
 
 State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
-    [ ('N',['s',['n',None,False]]),                             ('F',''),('V',['',['',True,None]]) ]
+    [ ('N',['s',['n',None,False]]),                             ('F',''),('V',['',['',True,None]]),('w','') ]
     , [False,True],[True])
 State('s',ml.T('Sale','Dirty','Vies'), \
-    [ ('N',['s',['n',None,False]]),('D',['s',['d',None,False]]),('F',''),('V',['',['',True,None]]) ]
+    [ ('N',['s',['n',None,False]]),('D',['s',['d',None,False]]),('F',''),('V',['',['',True,None]]),('w','') ]
     , [False,True],[False] )
 
 State('n',ml.T('Soude','Soda','Natrium'), \
-    [ ('R',['','r']),('F',''),('V',['',['',True,None]]) ] )
+    [ ('R',['','l']),('F',''),('V',['',['',True,None]]),('w','') ] )
 
 State('d',ml.T('Acide','Acid','Zuur'), \
-    [ ('R',['','r']),('F',''),('V',['',['',True,None]]) ] )
+    [ ('R',['','l']),('F',''),('V',['',['',True,None]]),('w','') ] )
 
 State('p',ml.T('Produit','Product','Product'), \
-    [ ('I',''),('M',''),('E','e'),('D',['e','s','d']),('N',['e','s','n']),('F','e'),('V',[['p',True,None]]),('t','s') ]
+    [ ('I',''),('M',''),('E','e'),('D',['e','s','d']),('N',['e','s','n']),('F','e'),('V',[['p',True,None]]) ]
     , [False,True],[False] )
 State('p',ml.T('Produit Gras','Greasy Product','Vet Product'), \
-    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'), ('N',['e','s',['n',None,False]]),('F','e'),('V',[['p',True,None]]),('t','s') ]
+    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'), ('N',['e','s',['n',None,False]]),('F','e'),('V',[['p',True,None]]) ]
     , [False,True],[True] )
 
 State('e',ml.T('Eau+Produit Gras','Water+Greasy Product','Water+Vet Product'), \
-      [                     ('N',['e','s','n']),('P','p'),('F',''),('V',['e',['e',True,None]]),('t','s') ]
+      [                     ('N',['e','s','n']),('P','p'),('F',''),('V',['e',['e',True,None]]),('w','s') ]
       , [False,True],[True] )
 State('e',ml.T('Eau+Produit','Water+Product','Water+Product'), \
-      [ ('D',['e','s','d']),('N',['e','s','n']),('P','p'),('F',''),('V',['e',['e',True,None]]),('t','s') ]
+      [ ('D',['e','s','d']),('N',['e','s','n']),('P','p'),('F',''),('V',['e',['e',True,None]]),('w','s') ]
       , [False,True],[False] )
 
 def menu_confirm(choice,delay=None):
@@ -1000,7 +994,7 @@ class Operation(object):
     def tempWithGradient(self): # Current heating temperature along what is set in options
         if not self.ref: # do not heat !
             return 0.0
-        return menus.options[self.ref][3] + ( menus.options['G'][3] if self.ref == 'P' else 0.0 )
+        return menus.options[self.ref][3] + ( menus.options['G'][3] if self.ref in ['P','C'] else 0.0 )
 
     # def tempRef2(self): # Current heating temperature along what is set in options
         # if not self.ref2: # do not heat !
@@ -1417,12 +1411,13 @@ opSequences = {
         [ Operation('Dett','HEAT',ref='C',dump=False,programmable=True),
           Operation('Detf','FILL',duration=lambda:menus.options['r'][3],base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='C',dump=False),
           Operation('Dety','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='C',dump=False),
-          Operation('DetT','HEAT',ref='C',dump=False),
-          Operation('DetA','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False),
-          Operation('Detr','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
-          Operation('DetH','TRAK','output','input', base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='C', duration=lambda:menus.options['c'][3], shake_qty=SHAKE_QTY,dump=False),
-          Operation('DetR','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
-          Operation('DetS','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL, dump=False)
+          #Operation('DetT','HEAT',ref='C',dump=False),
+          #Operation('DetA','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False),
+          #Operation('Detr','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
+          Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=OPT_SPEED, ref='C', qty=TOTAL_VOL*3, shake_qty=START_VOL,dump=False),
+          Operation('DetH','TRAK','output','input', base_speed=MAX_SPEED, min_speed=OPT_SPEED, ref='C', duration=lambda:menus.options['c'][3], shake_qty=START_VOL,dump=False)
+          #Operation('DetR','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
+          #Operation('DetS','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL, dump=False)
           ],
     'N': # Détergent
         [ Operation('NetT','HEAT',ref='N',dump=False,programmable=True),
@@ -1605,7 +1600,7 @@ class ThreadPump(threading.Thread):
         if not self.currOperation.duration:
             if self.currOperation.typeOp == 'HEAT':
                 heating = cohorts.getCalibratedValue('heating')
-                diffTemp = float(self.currOperation.tempRef()+menus.options['G'][3]-0.2)-float(heating)
+                diffTemp = float(self.currOperation.tempWithGradient()-0.2)-float(heating)
                 if diffTemp <= 0.0:
                     self.lastDurationEval = None
                     return 0, warning
