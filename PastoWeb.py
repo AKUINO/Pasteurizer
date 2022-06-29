@@ -578,7 +578,7 @@ State('r',ml.T('Propre','Clean','Schoon'), \
     [ ('A','r'),('P','p'),('F',''),('V',['',['',True,None]]),('w','o') ] )
 
 State('o',ml.T('Eau','Water','Waser'), \
-    [ ('F',''),('V',['',['',True,None]]),('C',['','r']),('w','') ] )
+    [ ('F',''),('V',['',['',True,None]]),('C',['','','r']),('w','') ] )
 
 State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
     [ ('N',['s',['n',None,False]]),                             ('F',''),('V',['',['',True,None]]),('w','') ]
