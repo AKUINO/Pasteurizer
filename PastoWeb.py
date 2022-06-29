@@ -203,7 +203,7 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,CLEAN_TIME,CLEAN_TIME,'"',False,9999,60,"time"], # Température pour un passage au détergent
                     'C':['C',ml.T("Désinfection thermique°""Thermal Disinfection°","Thermisch Desinfectie°") \
                         ,ml.T("Température de désinfection","Disinfection Temperature","Desinfectie Temperatuur") \
-                        ,72.0,72.0,"°C",False,90,0.1,"number"], # Température normale de pasteurisation
+                        ,72.0,72.0,"°C",False,77,0.1,"number"], # Température normale de pasteurisation
                     'c':['c',ml.T("Désinfection thermique\"","Thermal Disinfection\"","Thermisch Desinfectie\"") \
                         ,ml.T("Durée de désinfection","Disinfection Duration","Desinfectie Tijd") \
                         ,TH_DISINF_TIME,TH_DISINF_TIME,'"',False,9999,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
@@ -1414,8 +1414,8 @@ opSequences = {
           #Operation('DetT','HEAT',ref='C',dump=False),
           #Operation('DetA','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False),
           #Operation('Detr','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
-          Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.minimal_liters*6, ref='C', qty=TOTAL_VOL, shake_qty=START_VOL,dump=False),
-          Operation('DetH','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.minimal_liters*6, ref='C', duration=lambda:menus.options['c'][3], shake_qty=START_VOL,dump=False)
+          Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='C', qty=TOTAL_VOL, shake_qty=START_VOL,dump=False),
+          Operation('DetH','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='C', duration=lambda:menus.options['c'][3], shake_qty=START_VOL,dump=False)
           #Operation('DetR','REVR',ref='C',base_speed=MAX_SPEED,qty=-TOTAL_VOL,dump=False),
           #Operation('DetS','PUMP',ref='C',base_speed=MAX_SPEED,qty=TOTAL_VOL, dump=False)
           ],
