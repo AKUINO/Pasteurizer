@@ -12,8 +12,7 @@ $var title : Cleaning Parameters
 $for letter in menus.dirtyOptions:
   <div class="form-group">
     <label for="opt_$(letter)">$(menus.options[letter][2]) ( $(menus.options[letter][5]) )</label>
-    <input class="form-control" id="opt_$(letter)" name="opt_$(letter)" aria-describedby="emailHelp" placeholder="$(menus.options[letter][4])"
-           min="$(menus.display(letter,'MIN')" max="$(menus.display(letter,'MAX')" step="$(menus.display(letter,'STP')" type="$(menus.options[letter][9])" value="$(menus.display(letter,'VAL')">
+    <input class="form-control" id="opt_$(letter)" name="opt_$(letter)" placeholder="$(menus.display(letter,Menus.INI))" min="$(menus.display(letter,Menus.MIN))" max="$(menus.display(letter,Menus.MAX))" step="$(menus.display(letter,Menus.STP))" type="$(menus.type(letter))" value="$(menus.display(letter,Menus.VAL))">
   </div>
 <button type="submit" class="btn btn-success">$(ml.T("Enregistrer","Save","Opslaan"))</button>
 </form>

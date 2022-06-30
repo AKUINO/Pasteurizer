@@ -185,13 +185,13 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,72.0,72.0,"°C",False,90,0.1,"number"], # Température normale de pasteurisation
                     'w':['w',ml.T("Pause maximale","Max Pause","Max Pauze") \
                         ,ml.T("Temps d'arrêt maximum autorisé","Maximum process stop duration","Maximaal toegestane uitvaltijd") \
-                        ,STAY_CLEAN_TIME,STAY_CLEAN_TIME,'"',False,3600*2,600,"time"], # Durée où un tuyau propre le reste sans rinçage (le double avant de tout re-nettoyer)
+                        ,STAY_CLEAN_TIME,STAY_CLEAN_TIME,"hh:mm",False,3600*2,600,"time"], # Durée où un tuyau propre le reste sans rinçage (le double avant de tout re-nettoyer)
                     'R':['R',ml.T("Rinçage°","Rinse°","Spoelen°") \
                             ,ml.T("Température de rinçage","Rinse Temperature","Spoelen Temperatuur") \
                             ,45.0,45.0,"°C",False,90,0.1,"number"], # Température du Bassin pour le prélavage
                     'r':['r',ml.T("Rinçage\"","Rinse\"","Spoelen\"") \
                             ,ml.T("Durée de rinçage","Rinse Duration","Spoelen Tijd") \
-                            ,FLOOD_TIME,FLOOD_TIME,'"',False,9999,60,"time"], # Temps d'admission de l'eau courante
+                            ,FLOOD_TIME,FLOOD_TIME,'"',False,300,1,"number"], # Temps d'admission de l'eau courante
                     's':['s',ml.T("Seau pour l'Eau","Bucket for Water","Emmer voor water\"") \
                         ,ml.T("Eau courante(0) ou amenée dans un seau(1)","Running water(0) or brought in a bucket(1)","Stromend water(0) of gebracht in een emmer(1)") \
                         ,0,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
@@ -200,22 +200,22 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,70.0,70.0,"°C",False,90,0.1,"number"], # Température pour un passage au détergent
                     'n':['n',ml.T("Nettoyage\"","Cleaning\"","Schoonmaak\"") \
                             ,ml.T("Durée de nettoyage","Cleaning Duration","Schoonmaak Tijd") \
-                            ,CLEAN_TIME,CLEAN_TIME,'"',False,9999,60,"time"], # Température pour un passage au détergent
+                            ,CLEAN_TIME,CLEAN_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un passage au détergent
                     'C':['C',ml.T("Désinfection thermique°""Thermal Disinfection°","Thermisch Desinfectie°") \
                         ,ml.T("Température de désinfection","Disinfection Temperature","Desinfectie Temperatuur") \
                         ,72.0,72.0,"°C",False,77,0.1,"number"], # Température normale de pasteurisation
                     'c':['c',ml.T("Désinfection thermique\"","Thermal Disinfection\"","Thermisch Desinfectie\"") \
                         ,ml.T("Durée de désinfection","Disinfection Duration","Desinfectie Tijd") \
-                        ,TH_DISINF_TIME,TH_DISINF_TIME,'"',False,9999,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
+                        ,TH_DISINF_TIME,TH_DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'D':['D',ml.T("Désinfection°""Disinfection°","Desinfectie°") \
                             ,ml.T("Température de désinfection","Disinfection Temperature","Desinfectie Temperatuur") \
                             ,60.0,60.0,"°C",False,90,0.1,"number"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'd':['d',ml.T("Désinfection\"","Disinfection\"","Desinfectie\"") \
                             ,ml.T("Durée de désinfection","Disinfection Duration","Desinfectie Tijd") \
-                            ,DISINF_TIME,DISINF_TIME,'"',False,9999,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
+                            ,DISINF_TIME,DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'M':['M',ml.T("Minimum","Minimum","Minimum") \
                             ,ml.T("Durée minimale de pasteurisation","Minimum pasteurization time","Minimale pasteurisatietijd") \
-                            ,15.0,15.0,'"',False,199,1,"time"], # Durée minimale de pasteurisation
+                            ,15.0,15.0,'"',False,120,1,"number"], # Durée minimale de pasteurisation
                     # 'T':['T',ml.T("Tempérisation Max°","Tempering Max°","Temperen Max°") \
                             # ,ml.T("Température d'ajout d'eau de refroidissement","Cooling water addition temperature","Koelwatertoevoegings Temperatuur") \
                             # ,0.0,0.0,"°C",True,90.0,0.1], # Température à laquelle on ajoute de l'eau de refroidissement,ZeroIsNone=True
@@ -230,12 +230,12 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,0.0,0.0,"L",True,9999.9,0.1,"number"], # Quantité de lait à traiter,ZeroIsNone=True
                     'H':['H',ml.T("Démarrage","Start","Start") \
                             ,ml.T("Heure de démarrage","Start Time","Starttijd") \
-                            ,0.0,0.0,"hh.m0",True,84000,600,"time"], # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
+                            ,0.0,0.0,"hh:mm",True,84000,600,"time"], # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
                     'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
                             ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
 menus.sortedOptions = "PMgGKwQHRrsNnDdCcZ" #T
 menus.cleanOptions = "PGMgQH" #TtK
-menus.dirtyOptions = "RgrsNnDdCcwH"
+menus.dirtyOptions = "RgrsNnDdwH" #Cc
 
 trigger_w = TimeTrigger('w',menus)
 #(options['P'][3] + BATH_TUBE) = 75.0  # Température du Bassin de chauffe
@@ -615,7 +615,7 @@ def menu_confirm(choice,delay=None):
     term.pos(lines-2,1)
     choice = choice.upper()
     term.write(str(menus.actionName[choice][1]), term.bgwhite, term.white, term.bold)
-    term.write(": "+str(menus.actionName[choice][3]), term.bgwhite, term.yellow, term.bold)
+    term.write(": "+str(menus.actionName[choice][Menus.VAL]), term.bgwhite, term.yellow, term.bold)
     term.clearLineFromPos()
     term.writeLine("", term.bgwhite, term.blue)
     term.write(str(menus.actionName[choice][2])+": ", term.bgwhite, term.blue)
@@ -682,7 +682,7 @@ def option_confirm(delay=8.0):
             if (conf == 'Z'):
                 for choice in menus.options:
                     if len(menus.options[choice]) > 3:
-                        menus.options[choice][3] = menus.options[choice][4]
+                        menus.options[choice][Menus.VAL] = menus.options[choice][Menus.INI]
                 term.write(menus.options[conf][2], term.bgwhite, term.green,term.bold)
                 term.clearLineFromPos()
                 term.writeLine("", term.bgwhite, term.blue)
@@ -1951,14 +1951,14 @@ class WebOption:
         if data: # Process saved options from options editing forms
             if ('reset' in data and data['reset'].lower() == 'on'):
                 for choice in (menus.cleanOptions if page == '1' else menus.dirtyOptions):
-                    if len(menus.options[choice]) > 3:
-                        menus.options[choice][3] = menus.options[choice][4]
+                    if len(menus.options[choice]) > Menus.INI:
+                        menus.options[choice][Menus.VAL] = menus.options[choice][Menus.INI]
             else:
                 for keys in menus.options.keys():
                   if 'opt_'+keys in data:
                     val = data['opt_'+keys]
                     if not val:
-                        menus.options[keys][3] = menus.options[keys][4]
+                        menus.options[keys][Menus.VAL] = menus.options[keys][Menus.INI]
                     else:
                         menus.store(keys, val)
             reloadPasteurizationSpeed()
@@ -2403,6 +2403,7 @@ try:
     web.template.Template.globals['round'] = round
     web.template.Template.globals['subprocess'] = subprocess
     web.template.Template.globals['menus'] = menus
+    web.template.Template.globals['Menus'] = Menus
     web.template.Template.globals['ml'] = ml
     web.template.Template.globals['web'] = web
     web.template.Template.globals['isnull'] = isnull
