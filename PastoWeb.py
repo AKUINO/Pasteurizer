@@ -1565,15 +1565,19 @@ class ThreadPump(threading.Thread):
         if not self.currOperation.duration:
             if self.currOperation.typeOp == 'HEAT':
                 heating = cohorts.getCalibratedValue('heating')
+                #print("heating=%d" % heating)
                 diffTemp = float(self.currOperation.tempWithGradient()-0.2)-float(heating)
+                #print("diffTemp=%f" % diffTemp)
                 if diffTemp <= 0.0:
                     self.lastDurationEval = None
                     newEval = 0
                 else:
-                    newEval = int( diffTemp * tank * kCalWatt / ( (HEAT_POWER-((heating-ROOM_TEMP)*WATT_LOSS)) * 3600.0 ) );
+                    newEval = int( diffTemp * tank * kCalWatt / ( (HEAT_POWER-((heating-ROOM_TEMP)*WATT_LOSS))) * 3600.0 )
+                    #print("Evaluation=%f tank=%f kCalW=%f HP=%f RT=%f WL=%f" % (newEval, tank, kCalWatt,HEAT_POWER,ROOM_TEMP,WATT_LOSS) )
                     if self.lastDurationEval and self.lastDurationEvalTime and now > self.lastDurationEvalTime :
                         if ((self.lastDurationEval - newEval) / (now-self.lastDurationEvalTime)) > TANK_NOT_FILLED:
                             warning = True
+                            print("!Warning: tank is heating too fast!")
                     self.lastDurationEval = newEval
                     self.lastDurationEvalTime = now
                 return newEval, warning
