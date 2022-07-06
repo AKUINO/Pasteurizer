@@ -153,19 +153,27 @@ $(document).ready(function() {
                     $('#heateff').text(floorDeci(data['heateff']));
                     $('#message').text(data['message']);
                     if (data['allowedActions'] != '') {
+                        console.log('AA='+data['allowedActions']);
                         for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
-                            if (data['allowedActions'].indexOf(ml) >= 0) {
-                                $('#menu'+ml).removeClass('disabled');
+                            if (ml = data['actionletter']) {
+                                $('#menu'+ml).addClass('disabled').addClass('current').removeClass('enabled');
                             }
-                            else if ("JYLTO".indexOf(ml) < 0) { // StateLessActions
-                                $('#menu'+ml).addClass('disabled');
+                            else if (data['allowedActions'].indexOf(ml) >= 0) {
+                                $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
+                            }
+                            else if ("JYLTO".indexOf(ml) >= 0) { // StateLessActions
+                                $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
+                            }
+                            else {
+                                $('#menu'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
                             }
                         }
                     } else {
+                        console.log('no AA');
                         for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
-                            $('#menu'+ml).removeClass('disabled');
+                            $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                         }
                     }
                     if (data['actif'] > 0) {

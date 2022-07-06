@@ -1,5 +1,7 @@
 $def with (sensor, calibrating, temp_ref_calib, means)
 $var title : Calibration
+<main role="main" class="container">
+    <div class="jumbotron" onclick="void(0);">
 <h3><b id="time"></b> $(ml.T("Calibration","Calibration","Calibratie")) <b>$sensor</b></h3>
 <p>
 $if calibrating:
@@ -51,3 +53,4 @@ $if len(temp_ref_calib) > 0:
            <tr><th><a href="/calibrate/$key">$key</a></th><td "align=right"><b>$(int(val*1000.0)/1000.0)</b>°C</td><td><span id="$(key)"></span>°</td></tr>
     </table>
 </ul>
+</div></main>

@@ -1,5 +1,7 @@
 $def with (connected,mail)
 $var title : Cleaning Parameters
+<main role="main" class="container">
+<div class="jumbotron" onclick="void(0);">
 <button onclick="action('Z')" class="btn btn-danger" id="STOP" style="float:right">STOP</button>
 <h3><b id="time"></b> <b id="actionletter"></b>:<b id="action"></b></h3>
 <p style="margin:auto"><span id="actiontitle"></span></p>
@@ -20,3 +22,4 @@ $for letter in menus.dirtyOptions:
 <a href="/index"><button class="btn btn-info">$(ml.T("Quitter","Cancel","Annuleer"))</button></a> &nbsp;
 <a href="/option2?reset=on"><button class="btn btn-warning">$(ml.T("Valeurs par défaut","Reset to default","Reset"))</button></a>
 <script type="text/javascript" src="/static/js/index.js"></script>
+</div></main>

@@ -1,301 +1,324 @@
-$def with (connected, mail, logtable, letter)
+$def with (connected, mail, logtable, letter, paving)
 $var title : Affordable Pasteurizer
-$if connected:
-    <button onclick="action('Z')" class="btn btn-danger" id="STOP" style="float:right">STOP</button>
+$if paving:
+    <div id="paving" class="jumbotron" onclick="void(0);"></div>
+    <script type="text/javascript">
+       $$("#paving").load("static/paving.svg", function() {
+            alert( "Load was performed." );
+          });
+    </script>
+$if not paving:
+    <main role="main" class="container">
+    <div class="jumbotron" onclick="void(0);">
+    $if logtable:
+        $if connected:
+            <button onclick="action('Z')" class="btn btn-danger" id="STOP" style="float:right">STOP</button>
 
-<h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; [<b id="stateletter"></b>:<b id="state"></b> -- <span id="empty"></span> <span id="greasy"></span>]</h3>
-<p style="margin:auto"><span id="actiontitle"></span></p>
-$if connected:
-    <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
-    <button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
-    <button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button>
-    
-<p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
-<hr/>
-$if not logtable:
-	<table class="Pshape">
-	    <tr>
-		<td class="Eshape"><span id="purge"/></td>
-		<td class="Eshape"><b id="extra"></b></td>
-		<td class="Eshape"><div><span class="glyphicon glyphicon-arrow-left"/></div><span id="rmeter"></span></td>
-		<!--td class="Ushape" rowspan="2"><b id="temper"></b>°</td-->
-		<!--td class="Eshape"><span class="glyphicon glyphicon-arrow-left"/></td-->
-		<td class="Bshape" rowspan="2"><span class="glyphicon glyphicon-random Drotate"/></td>
-		<td class="Eshape"><b id="output"></b>°<br/><div style="display:inline"><span class="glyphicon glyphicon-arrow-left"/></div></td>
-		<td class="Ushape" rowspan=2><div class="Xshape"><div class="Drotate"><span class="glyphicon glyphicon-random"/></div><b id="warranty"></b>°</div><b id="heating"></b>°</td>
-	    </tr>
-	    <tr>
-		<td class="Dshape"><span class="glyphicon glyphicon-arrow-right"/></td>
-		<td class="Oshape"><b id="vitesse"></b>L/h</td>
-		<td class="Dshape"><span class="glyphicon glyphicon-arrow-right"/></td>
-		<!--td class="Dshape"><span class="glyphicon glyphicon-arrow-right"/></td-->
-		<td class="Dshape"><div style="display:inline"><span class="glyphicon glyphicon-arrow-right"/></div><br><b id="input"></b>°</td>
-	    </tr>
-	    <tr>
-		<td></td>
-		<td valign="top" align="center"><span id="pressMin" font-color="blue"></span>&nbsp;&lt;&nbsp;<b id="press"></b>&nbsp;&lt;&nbsp;<span id="pressMax" font-color="red"></span>bar<br/>&sum;=<b id="volume"></b></br>L<br/><span id="remain"></span></td>
-		<!--td align="right" colspan="2"><span class="nobreak"><div style="display:inline;"><span class="glyphicon glyphicon-fire"/></div><b id="watts2"></b>W/h</span></td-->
-		<td></td>
-		<td align="center" colspan="2">&sum;=<b id="totalwatt"></b>W</td>
-		<td align="right"><span class="nobreak"><div style="display:inline;"><span class="glyphicon glyphicon-fire"/></div><b id="watts"></b>W/h</span></td>
-	    </tr>
-	    <tr>
-		<td></td>
-		<td align="center"><i id="pumpopt"></i><i>L/h</i></td>
-		<td></td>
-		<!--td align="center"><span id="cooling"><i id="opt_T"></i><i>°</i></span> <span id="cleaning"><i id="opt_tempbis"></i><i>°</i></span></td-->
-		<td align="right" colspan="4"><i id="opt_temp"></i><i>°, </i><i id="opt_M"></i><i>"</i></td>
-	    </tr>
-	    <tr id="eff">
-		<td></td>
-		<td align="center"><i id="pumpeff"></i><i>%</i></td>
-		<td></td>
-		<!--td align="center"><span id="cooling"><i id="opt_T"></i><i>°</i></span> <span id="cleaning"><i id="opt_tempbis"></i><i>°</i></span></td-->
-		<td align="right" colspan="4"><i id="heateff"></i><i>%</i></td>
-	    </tr>
-	</table>
-$else:
-	<script type="text/javascript">
-	$$('#logtable').hide();
-	</script>
-	<a href="/"><button class="btn btn-info">$(ml.T("Retour au Schéma","Back to schema","Terug naar schema"))</button></a>
+            <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; [<b id="stateletter"></b>:<b id="state"></b> -- <span id="empty"></span> <span id="greasy"></span>]</h3>
+            <p style="margin:auto"><span id="actiontitle"></span></p>
+            <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
+            <button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
+            <button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button>
+
+            <p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
+            <hr/>
+        <script type="text/javascript">
+                $$('#logtable').hide();
+        </script>
+        <a href="/"><button class="btn btn-info">$(ml.T("Retour au Schéma","Back to schema","Terug naar schema"))</button></a>
         <table id="tableau" class="display responsive compact hover" style="width:100%">
-	    <thead>
-		<tr id="topHeader">
-		    <th name="date">Heure</th>
-		    <th>Watts</th>
-		    <th>W/h</th>
-		    <th>$(ml.T("Qtité","Qtity","Aantal"))</th>
-		    <th>L/h</th>
-		    <th>$(ml.T("Entrée","Input","Invoer"))°</th>
-		    <th>$(ml.T("Chauffe","Heating","Verwarm."))°</th>
-		    <th>$(ml.T("Garantie","Guaranty","Garantie"))°</th>
-		    <th>$(ml.T("Fin.Chaud","Heat.End","EindeVerw."))°</th>
-		    <!--th>(ml.T("Tempér","Mitig","Mitig"))°</th-->
-		    <th>Extra°</th>
-		</tr>
-	    </thead>
-	    <tfoot>
-		<tr id="bottomHeader">
-		</tr>
-	    </tfoot>
+                <thead>
+                <tr id="topHeader">
+                    <th name="date">Heure</th>
+                    <th>Watts</th>
+                    <th>W/h</th>
+                    <th>$(ml.T("Qtité","Qtity","Aantal"))</th>
+                    <th>L/h</th>
+                    <th>$(ml.T("Entrée","Input","Invoer"))°</th>
+                    <th>$(ml.T("Chauffe","Heating","Verwarm."))°</th>
+                    <th>$(ml.T("Garantie","Guaranty","Garantie"))°</th>
+                    <th>$(ml.T("Fin.Chaud","Heat.End","EindeVerw."))°</th>
+                    <!--th>(ml.T("Tempér","Mitig","Mitig"))°</th-->
+                    <th>Extra°</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr id="bottomHeader">
+                </tr>
+                </tfoot>
         </table>
-	<script type="text/javascript">
-	    $$('#bottomHeader').html($$('#topHeader').html());
-	</script>
-$if connected and letter:
-	<hr/>
-	<a name="doc"></a>
-	<ul id="documentation">
-	$if letter == 'F':
-	  $if ml.lang == 'f':
-	    <li>Votre pasteurisateur contient du détergent ou du désinfectant ou a été à l’arrêt...
-	    <li>Branchez (« push-in ») le tuyau d’entrée et le tuyau de sortie ensemble dans un seau ou au dessus d'un égout.
-	    <li>Faîtes attention à ce que le seau fasse au moins 20L.
-	    <li>Le « Flush » utilise l’eau chaude sanitaire (45°C).
-	    <li>Il faut vraiment enlever les traces d’acide avant de pasteuriser.
-	    <li>L’eau de rinçage est vidée vers l’égout. Elle est chaude et peu souillée.
-	  $if ml.lang == 'e':
-	    <li> Your pasteurizer contains cleaner or disinfectant or has been turned off ...
-	    <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
-	    <li> Make sure the sewer pipe goes into a bucket of at least 20L.
-	    <li> The "Flush" uses domestic hot water (45 ° C).
-	    <li> You really have to remove all traces of acid before you pasteurize.
-	    <li> The rinse water is drained to the sewer. It is warm and lightly soiled.
-	$if letter == 'Q':
-	  $if ml.lang == 'f':
-	    <li>Vous désirez refroidir le lait qui sort du pasteurisateur...
-	    <li>6L d'eau froide peuvent être injectés dans le bac de tempérisation.
-	    <li>Faîtes attention que le tuyau de trop plein soit au niveau désiré (milieu ou haut du bac de 20L).
-	    <li>Le remplissage utilise l’eau froide sanitaire (autour de 20°C).
-	  $if ml.lang == 'e':
-	    <li> You want to cool the milk coming out of the pasteurizer ...
-	    <li> 6L of cold water can be injected into the tempering tank.
-	    <li> Make sure that the overflow pipe is at the desired level (middle or top of the 20L tank).
-	    <li> The filling uses cold sanitary water (around 20 ° C).
-	$if letter == 'A':
-	  $if ml.lang == 'f':
-	    <li>Votre pasteurisateur doit atteindre une température permettant un fonctionnement régulier avant de commencer à traiter du lait...
-	    <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
-	    <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
-	    <li>Le remplissage utilise l’eau chaude sanitaire (45°C) mais l’eau cyclée sera chauffée graduellement à la température de pasteurisation (72°C ou autre température que vous avez choisi).
-	    <li>Profitez en pour rincer le tampon de sortie avec l’eau ainsi pasteurisée.
-	    <li>L’eau d’amorçage est vidée vers l’égout. Elle est chaude et peu souillée.
-	  $if ml.lang == 'e':
-	    <li> Your pasteurizer must reach a temperature for regular operation before you start processing milk ...
-	    <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
-	    <li> Make sure the sewer pipe goes into a bucket of at least 20L.
-	    <li> The filling uses domestic hot water (45 ° C) but the cycled water will be gradually heated to the pasteurization temperature (72 ° C or other temperature you choose).
-	    <li> Take the opportunity to rinse the outlet pad with the pasteurized water.
-	    <li> The priming water is drained to the sewer. It is warm and lightly soiled.
-	$if letter == 'P':
-	  $if ml.lang == 'f':
-	    <li>La pasteurisation prend le lait crû et le chauffe le temps requis (entre 15 et 30 secondes) à la température requise (votre choix entre 60 et 85°C).
-	    <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
-	    <li>Mettre le tuyau d’entrée dans le bidon de lait crû et utiliser le tuyau de sortie avec la pince de Mohr pour embouteiller.
-	    <li>Pour l’arrêt (E), mettre 4L d’eau dans le bidon d’entrée pour chasser le lait qui reste dans le circuit.
-    	    <li>Un premier remplissage s’effectue et la pompe s’arrête ensuite : vous devez alors vous assurer que le tampon de sortie est vidé pour ne pas avoir du lait pasteurisé dilué avec de l’eau. Une confirmation permet de reprendre ensuite.
-	    <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
-	  $if ml.lang == 'e':
-	    <li> Pasteurization takes the raw milk and heats it for the required time (between 15 and 30 seconds) to the required temperature (your choice between 60 and 85 ° C).
-	    <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece that was inserted there)
-	    <li> Put the inlet hose into the raw milk container and use the outlet hose with Mohr's clamp to bottle.
-	    <li> For shutdown (E), put 4L of water in the inlet container to flush out the milk that remains in the circuit.
-	    <li> A first filling takes place and the pump then stops: you must then make sure that the outlet buffer is emptied so as not to have pasteurized milk diluted with water. A confirmation allows you to resume then.
-	    <li> A yellow button allows you to pause (then resume). A red button allows you to stop completely.
-    	$if letter == "I":
-	  $if ml.lang == 'f':
-	    <li>Si vous produisez du Lait puis du Yaourt, vous devrez interrompre pour changer la température de pasteurisation. Et il faut ensuite reprendre le traitement...
-	    <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
-	    <li>Mettre le tuyau d’entrée dans le bidon de lait crû et utiliser le tuyau de sortie avec la pince de Mohr pour embouteiller.
-	    <li>Pour l’arrêt (E), mettre 4L d’eau dans le bidon d’entrée pour chasser le lait qui reste dans le circuit.
-    	    <li>La pasteurisation reprend directement avec les paramètres éventuellement modifiés.
-	    <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
-	  $if ml.lang == 'e':
-	    <li> If you produce Milk and then Yogurt, you will need to interrupt to change the pasteurization temperature. And then you have to resume treatment ...
-	    <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece that was inserted there)
-	    <li> Put the inlet hose into the raw milk container and use the outlet hose with Mohr's clamp to bottle.
-	    <li> For shutdown (E), put 4L of water in the inlet container to flush out the milk that remains in the circuit.
-	    <li> Pasteurization resumes directly with any modified parameters.
-	    <li> A yellow button allows you to pause (then resume). A red button allows you to stop completely.
-    	$if letter == 'E':
-	  $if ml.lang == 'f':
-	    <li>Quand il n’y a plus de lait crû dans le bidon d’entrée, il faut encore chasser le lait qui reste dans la machine. De l’eau est nécessaire et la machine arrête juste à temps pour ne pas la mettre dans le tampon de sortie...</li>
-	    <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
-	    <li>Mettre le tuyau d’entrée dans le bidon de lait crû et utiliser le tuyau de sortie avec la pince de Mohr pour embouteiller.
-	    <li>Mettez au préalable 4L d’eau propre dans le bidon d’entrée.
-	    <li>La pompe sera automatiquement arrêtée quand assez d’eau aura été pompée pour chasser tout le lait restant dans la machine.
-	    <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
-	  $if ml.lang == 'e':
-	    <li> When there is no more raw milk in the input canister, you still have to flush out the milk that remains in the machine. Water is needed and the machine stops just in time so as not to put it in the outlet buffer ... </li>
-	    <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece that was inserted there)
-	    <li> Put the inlet hose into the raw milk container and use the outlet hose with Mohr's clamp to bottle.
-	    <li> First put 4L of clean water in the inlet container.
-	    <li> The pump will automatically stop when enough water has been pumped to flush all the milk remaining in the machine.
-	    <li> A yellow button allows you to pause (then resume). A red button allows you to stop completely.
-    	$if letter == 'M':
-	  $if ml.lang == 'f':
-	    <li>Quand on change de lait crû (autre exploitant, autre composition...), il faut en terminer avec le lait qui reste dans la machine. 
-		On met déjà le nouvau lait (ou mélange) en entrée et la machine arrête juste à temps pour d'abord changer la consigne de pasteurisation si désiré
-		et, une deuxième fois, pour changer le récipient de sortie...</li>
-	    <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
-	    <li>Mettre le tuyau d’entrée dans le bidon de lait crû et utiliser le tuyau de sortie avec la pince de Mohr pour embouteiller.
-	    <li>Mettez au préalable le nouveau lait/mélange en entrée.
-	    <li>La pompe sera automatiquement arrêtée une première fois quand assez aura été pompé pour amener le nouveau lait/mélange à la pasteurisation: vous pourrez alors changer la consigne de température si désiré.
-	    <li>La pompe sera automatiquement arrêtée une seconde fois quand assez aura été pompé pour chasser tout le lait restant dans la machine (et que le lait/mélange suivant commence à arriver).
-	    <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
-	  $if ml.lang == 'e':
-	    <li> When you change raw milk (other producer, other composition ...), you have to finish with the milk that remains in the machine.
-	    We already put the new milk (or mixture) in and the machine stops just in time to first change the pasteurization setpoint if desired.
-	    and, a second time, to change the outlet container ... </li>
-	    <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece inserted there)
-	    <li> Put the inlet hose into the raw milk container and use the outlet hose with Mohr's clamp to bottle.
-	    <li> Put the new milk / mixture as a starter first.
-	    <li> The pump will be automatically stopped for the first time when enough has been pumped to bring the new milk / mixture to pasteurization: you can then change the temperature set point if desired.
-	    <li> The pump will automatically be stopped a second time when enough has been pumped to drive out any milk remaining in the machine (and the next milk / mixture begins to flow).
-	    <li> A yellow button allows you to pause (then resume). A red button allows you to stop completely.
-    	$if letter == 'C':
-	  $if ml.lang == 'f':
-	    <li>Votre pasteurisateur a été utilisé et il est sale : il se nettoie presque tout seul...
-	    <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
-	    <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
-	    <li>TOUTES les opérations suivantes seront enchaînées automatiquement jusqu’à la désinfection incluse.
-	    <li>Des pauses sont insérées au moment où il faut mettre le détergent ou le désinfectant.
-	    <li>Il n’y a pas de rinçage final pour conserver l’acide dans les tuyaux.
-	    <li>Si vous faites une désinfection caustique (percarbonate de soude), il vaut sans doute mieux rincer sommairement à la fin (F).
-	  $if ml.lang == 'e':
-	    <li> Your pasteurizer has been used and it is dirty: it almost cleans itself ...
-	    <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
-	    <li> Make sure the sewer pipe goes into a bucket of at least 20L.
-	    <li> ALL the following operations will be chained automatically up to the included disinfection.
-	    <li> Pauses are inserted when the detergent or disinfectant needs to be put on.
-	    <li> There is no final rinse to keep the acid in the pipes.
-	    <li> If you are doing a caustic disinfection (sodium percarbonate), it is probably best to rinse briefly at the end (F).
-    	$if letter == 'R':
-	  $if ml.lang == 'f':
-	    <li>Votre pasteurisateur a été utilisé et il est sale...
-	    <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
-	    <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
-	    <li>Un « Flush » d’eau chaude sanitaire (45°C) est effectué au préalable.
-	    <li>L’eau de rinçage est cyclée 3 minutes à 45°C.
-	    <li>V : l’eau est vidée vers l’égout en fin de cycle (environ 5L).
-	  $if ml.lang == 'e':
-	    <li> Your pasteurizer has been used and it is dirty ...
-	    <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
-	    <li> Make sure the sewer pipe goes into a bucket of at least 20L.
-	    <li> A domestic hot water "flush" (45 ° C) is carried out beforehand.
-	    <li> The rinsing water is cycled for 3 minutes at 45 ° C.
-	    <li> V: the water is emptied to the sewer at the end of the cycle (about 5L).
-    	$if letter == 'N':
-	  $if ml.lang == 'f':
-	    <li>Votre pasteurisateur a été rincé sommairement mais il faut le nettoyer en profondeur.
-	    <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
-	    <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
-	    <li>Un remplissage d’eau chaude sanitaire (45°C) est effectué au préalable.
-	    <li>Vous pourrez y mettre un détergent (caustique) pour NEP (CIP) dilué dans le tampon de sortie selon les instructions du fabricant du détergent.
-	    <li>Tenez compte du niveau d’eau (graduations en Litres sur le tampon) et de l’eau dans le pasteurisateur (3.5L) pour calculer les quantités nécessaires.
-	    <li>Le détergent ainsi dilué est circulé 15 minutes à 45°C.
-	    <li>Il est vidé vers l’égout en fin de cycle (environ 5L).
-	  $if ml.lang == 'e':
-	    <li> Your pasteurizer has been briefly rinsed, but it needs to be cleaned thoroughly.
-	    <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
-	    <li> Make sure the sewer pipe goes into a bucket of at least 20L.
-	    <li> A filling of domestic hot water (45 ° C) is carried out beforehand.
-	    <li> You can add CIP (caustic) detergent diluted in outlet buffer according to the detergent manufacturer's instructions.
-	    <li> Take into account the water level (liter graduations on the pad) and the water in the pasteurizer (3.5L) to calculate the quantities needed.
-	    <li> The detergent thus diluted is circulated for 15 minutes at 45 ° C.
-	    <li> It is emptied to the sewer at the end of the cycle (about 5L).
-    	$if letter == 'D':
-	  $if ml.lang == 'f':
-	    <li>Votre pasteurisateur a été nettoyé mais il faut encore le désinfecter.
-	    <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
-	    <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
-	    <li>Un remplissage d’eau chaude sanitaire (45°C) est effectué au préalable pour obtenir l’eau nécessaire.
-	    <li>Vous pourrez y mettre un désinfectant (acide ou caustique) pour NEP (CIP) dilué dans le tampon de sortie selon les instructions du fabricant du désinfectant.
-	    <li>Tenez compte du niveau d’eau (graduations en Litres sur le tampon) et de l’eau dans le pasteurisateur (3.5L) pour calculer les quantités nécessaires.
-	    <li>Le désinfectant ainsi dilué est circulé 5 minutes à 55°C.
-	    <li>Il est vidé vers l’égout en fin de cycle (environ 5L).
-	  $if ml.lang == 'e':
-	    <li> Your pasteurizer has been cleaned but it still needs to be disinfected.
-	    <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
-	    <li> Make sure the sewer pipe goes into a bucket of at least 20L.
-	    <li> A filling of domestic hot water (45 ° C) is carried out beforehand to obtain the necessary water.
-	    <li> You can put a disinfectant (acid or caustic) for CIP (CIP) diluted in the outlet buffer according to the instructions of the disinfectant manufacturer.
-	    <li> Take into account the water level (liter graduations on the pad) and the water in the pasteurizer (3.5L) to calculate the quantities needed.
-	    <li> The disinfectant thus diluted is circulated for 5 minutes at 55 ° C.
-	    <li> It is emptied to the sewer at the end of the cycle (about 5L).
-	</ul>
-	<p class="alert alert-warning">$(menus.actionName[letter][2])</p>
-        <a class="btn btn-success" href="#" onclick="action('$letter')" id="confirm">$(ml.T("Confirmer","Confirm","Bevestigen")) $letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
-	<a class="btn btn-warning" href="/" id="cancel">$(ml.T("Annuler","Cancel","Annuleer"))</a>
-$if not connected :
-    <div>
-	<h4>$(ml.T("Cette application gère votre pasteurisateur accessible","This app manages your affordable flow pasteuriser","Deze app beheert uw betaalbare continu pasteurisator")).</h4>
-	<h1>$(ml.T("Veuillez vous identifier S.V.P","Please identify yourself","Identificeer u alstublieft"))</h1>
+        <script type="text/javascript">
+            $$('#bottomHeader').html($$('#topHeader').html());
+        </script>
+    $if not logtable:
+        $if connected:
+            <button onclick="action('Z')" class="btn btn-danger" id="STOP" style="float:right">STOP</button>
 
-	<form class="form-inline" method="post" action="/" id="loginForm" data-bv-message="This value is not valid"  data-bv-live="enabled" data-bv-container="tooltip"data-bv-submitButtons="#loginSubmit">
-	    <input type="hidden" name="erroruri" value=""/>
-	    <div class="form-group">
-		<input type="email" name="mail" placeholder="Email" class="form-control" size="20" autofocus/>
-	    </div>
-	    <div class="form-group">
-		<input type="password" name="password" placeholder="Password" class="form-control" size="8"/>
-	    </div>
-	    <span class="sr-only">Log in</span>
-	    <span class="totip" data-toggle="tooltip" data-placement="bottom" title="log-IN" style="pointer-events: auto;">
-		<input type="hidden" name="method" id="method" value="login">
-		<button type="submit" name="login" class="btn btn-warning" id="loginSubmit">
-		    <span class="glyphicon glyphicon-user"></span>
-		    <span class="glyphicon glyphicon-log-in"></span>
-		</button>
-	    </span>
-	</form>
-	$code:
-           result = subprocess.check_output(['ip','-4', '-o','addr'])
-           result = result.decode('utf-8').split('\n')
-           toDisplay = ""
-           for line in result:
-               line = line.split('scope')[0].split('brd')[0].strip()
-               toDisplay += line+'<br>'
-        <pre>$:toDisplay</pre>
+            <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; [<b id="stateletter"></b>:<b id="state"></b> -- <span id="empty"></span> <span id="greasy"></span>]</h3>
+            <p style="margin:auto"><span id="actiontitle"></span></p>
+            <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
+            <button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
+            <button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button>
+
+            <p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
+            <hr/>
+        <table class="Pshape">
+                <tr>
+                    <td class="Eshape"><span id="purge"/></td>
+                    <td class="Eshape"><b id="extra"></b></td>
+                    <td class="Eshape"><div><span class="glyphicon glyphicon-arrow-left"/></div><span id="rmeter"></span></td>
+                    <!--td class="Ushape" rowspan="2"><b id="temper"></b>°</td-->
+                    <!--td class="Eshape"><span class="glyphicon glyphicon-arrow-left"/></td-->
+                    <td class="Bshape" rowspan="2"><span class="glyphicon glyphicon-random Drotate"/></td>
+                    <td class="Eshape"><b id="output"></b>°<br/><div style="display:inline"><span class="glyphicon glyphicon-arrow-left"/></div></td>
+                    <td class="Ushape" rowspan=2><div class="Xshape"><div class="Drotate"><span class="glyphicon glyphicon-random"/></div><b id="warranty"></b>°</div><b id="heating"></b>°</td>
+                </tr>
+                <tr>
+                    <td class="Dshape"><span class="glyphicon glyphicon-arrow-right"/></td>
+                    <td class="Oshape"><b id="vitesse"></b>L/h</td>
+                    <td class="Dshape"><span class="glyphicon glyphicon-arrow-right"/></td>
+                    <!--td class="Dshape"><span class="glyphicon glyphicon-arrow-right"/></td-->
+                    <td class="Dshape"><div style="display:inline"><span class="glyphicon glyphicon-arrow-right"/></div><br><b id="input"></b>°</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td valign="top" align="center"><span id="pressMin" font-color="blue"></span>&nbsp;&lt;&nbsp;<b id="press"></b>&nbsp;&lt;&nbsp;<span id="pressMax" font-color="red"></span>bar<br/>&sum;=<b id="volume"></b></br>L<br/><span id="remain"></span></td>
+                    <!--td align="right" colspan="2"><span class="nobreak"><div style="display:inline;"><span class="glyphicon glyphicon-fire"/></div><b id="watts2"></b>W/h</span></td-->
+                    <td></td>
+                    <td align="center" colspan="2">&sum;=<b id="totalwatt"></b>W</td>
+                    <td align="right"><span class="nobreak"><div style="display:inline;"><span class="glyphicon glyphicon-fire"/></div><b id="watts"></b>W/h</span></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td align="center"><i id="pumpopt"></i><i>L/h</i></td>
+                    <td></td>
+                    <!--td align="center"><span id="cooling"><i id="opt_T"></i><i>°</i></span> <span id="cleaning"><i id="opt_tempbis"></i><i>°</i></span></td-->
+                    <td align="right" colspan="4"><i id="opt_temp"></i><i>°, </i><i id="opt_M"></i><i>"</i></td>
+                </tr>
+                <tr id="eff">
+                    <td></td>
+                    <td align="center"><i id="pumpeff"></i><i>%</i></td>
+                    <td></td>
+                    <!--td align="center"><span id="cooling"><i id="opt_T"></i><i>°</i></span> <span id="cleaning"><i id="opt_tempbis"></i><i>°</i></span></td-->
+                    <td align="right" colspan="4"><i id="heateff"></i><i>%</i></td>
+                </tr>
+        </table>
+    $if connected and letter:
+            <hr/>
+            <a name="doc"></a>
+            <ul id="documentation">
+            $if letter == 'F':
+              $if ml.lang == 'f':
+                <li>Votre pasteurisateur contient du détergent ou du désinfectant ou a été à l’arrêt...
+                <li>Branchez (« push-in ») le tuyau d’entrée et le tuyau de sortie ensemble dans un seau ou au dessus d'un égout.
+                <li>Faîtes attention à ce que le seau fasse au moins 20L.
+                <li>Le « Flush » utilise l’eau chaude sanitaire (45°C).
+                <li>Il faut vraiment enlever les traces d’acide avant de pasteuriser.
+                <li>L’eau de rinçage est vidée vers l’égout. Elle est chaude et peu souillée.
+              $if ml.lang == 'e':
+                <li> Your pasteurizer contains cleaner or disinfectant or has been turned off ...
+                <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
+                <li> Make sure the sewer pipe goes into a bucket of at least 20L.
+                <li> The "Flush" uses domestic hot water (45 ° C).
+                <li> You really have to remove all traces of acid before you pasteurize.
+                <li> The rinse water is drained to the sewer. It is warm and lightly soiled.
+            $if letter == 'Q':
+              $if ml.lang == 'f':
+                <li>Vous désirez refroidir le lait qui sort du pasteurisateur...
+                <li>6L d'eau froide peuvent être injectés dans le bac de tempérisation.
+                <li>Faîtes attention que le tuyau de trop plein soit au niveau désiré (milieu ou haut du bac de 20L).
+                <li>Le remplissage utilise l’eau froide sanitaire (autour de 20°C).
+              $if ml.lang == 'e':
+                <li> You want to cool the milk coming out of the pasteurizer ...
+                <li> 6L of cold water can be injected into the tempering tank.
+                <li> Make sure that the overflow pipe is at the desired level (middle or top of the 20L tank).
+                <li> The filling uses cold sanitary water (around 20 ° C).
+            $if letter == 'x':
+              $if ml.lang == 'f':
+                <li>Votre pasteurisateur doit atteindre une température permettant un fonctionnement régulier avant de commencer à traiter du lait...
+                <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
+                <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
+                <li>Le remplissage utilise l’eau chaude sanitaire (45°C) mais l’eau cyclée sera chauffée graduellement à la température de pasteurisation (72°C ou autre température que vous avez choisi).
+                <li>Profitez en pour rincer le tampon de sortie avec l’eau ainsi pasteurisée.
+                <li>L’eau d’amorçage est vidée vers l’égout. Elle est chaude et peu souillée.
+              $if ml.lang == 'e':
+                <li> Your pasteurizer must reach a temperature for regular operation before you start processing milk ...
+                <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
+                <li> Make sure the sewer pipe goes into a bucket of at least 20L.
+                <li> The filling uses domestic hot water (45 ° C) but the cycled water will be gradually heated to the pasteurization temperature (72 ° C or other temperature you choose).
+                <li> Take the opportunity to rinse the outlet pad with the pasteurized water.
+                <li> The priming water is drained to the sewer. It is warm and lightly soiled.
+            $if letter == 'P':
+              $if ml.lang == 'f':
+                <li>La pasteurisation prend le lait crû et le chauffe le temps requis (entre 15 et 30 secondes) à la température requise (votre choix entre 60 et 85°C).
+                <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
+                <li>Mettre le tuyau d’entrée dans le bidon de lait crû et utiliser le tuyau de sortie avec la pince de Mohr pour embouteiller.
+                <li>Pour l’arrêt (E), mettre 4L d’eau dans le bidon d’entrée pour chasser le lait qui reste dans le circuit.
+                <li>Un premier remplissage s’effectue et la pompe s’arrête ensuite : vous devez alors vous assurer que le tampon de sortie est vidé pour ne pas avoir du lait pasteurisé dilué avec de l’eau. Une confirmation permet de reprendre ensuite.
+                <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
+              $if ml.lang == 'e':
+                <li> Pasteurization takes the raw milk and heats it for the required time (between 15 and 30 seconds) to the required temperature (your choice between 60 and 85 ° C).
+                <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece that was inserted there)
+                <li> Put the inlet hose into the raw milk container and use the outlet hose with Mohr's clamp to bottle.
+                <li> For shutdown (E), put 4L of water in the inlet container to flush out the milk that remains in the circuit.
+                <li> A first filling takes place and the pump then stops: you must then make sure that the outlet buffer is emptied so as not to have pasteurized milk diluted with water. A confirmation allows you to resume then.
+                <li> A yellow button allows you to pause (then resume). A red button allows you to stop completely.
+            $if letter == "I":
+              $if ml.lang == 'f':
+                <li>Si vous produisez du Lait puis du Yaourt, vous devrez interrompre pour changer la température de pasteurisation. Et il faut ensuite reprendre le traitement...
+                <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
+                <li>Mettre le tuyau d’entrée dans le bidon de lait crû et utiliser le tuyau de sortie avec la pince de Mohr pour embouteiller.
+                <li>Pour l’arrêt (E), mettre 4L d’eau dans le bidon d’entrée pour chasser le lait qui reste dans le circuit.
+                <li>La pasteurisation reprend directement avec les paramètres éventuellement modifiés.
+                <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
+              $if ml.lang == 'e':
+                <li> If you produce Milk and then Yogurt, you will need to interrupt to change the pasteurization temperature. And then you have to resume treatment ...
+                <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece that was inserted there)
+                <li> Put the inlet hose into the raw milk container and use the outlet hose with Mohr's clamp to bottle.
+                <li> For shutdown (E), put 4L of water in the inlet container to flush out the milk that remains in the circuit.
+                <li> Pasteurization resumes directly with any modified parameters.
+                <li> A yellow button allows you to pause (then resume). A red button allows you to stop completely.
+            $if letter == 'E':
+              $if ml.lang == 'f':
+                <li>Quand il n’y a plus de lait crû dans le bidon d’entrée, il faut encore chasser le lait qui reste dans la machine. De l’eau est nécessaire et la machine arrête juste à temps pour ne pas la mettre dans le tampon de sortie...</li>
+                <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
+                <li>Mettre le tuyau d’entrée dans le bidon de lait crû et utiliser le tuyau de sortie avec la pince de Mohr pour embouteiller.
+                <li>Mettez au préalable 4L d’eau propre dans le bidon d’entrée.
+                <li>La pompe sera automatiquement arrêtée quand assez d’eau aura été pompée pour chasser tout le lait restant dans la machine.
+                <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
+              $if ml.lang == 'e':
+                <li> When there is no more raw milk in the input canister, you still have to flush out the milk that remains in the machine. Water is needed and the machine stops just in time so as not to put it in the outlet buffer ... </li>
+                <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece that was inserted there)
+                <li> Put the inlet hose into the raw milk container and use the outlet hose with Mohr's clamp to bottle.
+                <li> First put 4L of clean water in the inlet container.
+                <li> The pump will automatically stop when enough water has been pumped to flush all the milk remaining in the machine.
+                <li> A yellow button allows you to pause (then resume). A red button allows you to stop completely.
+            $if letter == 'M':
+              $if ml.lang == 'f':
+                <li>Quand on change de lait crû (autre exploitant, autre composition...), il faut en terminer avec le lait qui reste dans la machine.
+                    On met déjà le nouvau lait (ou mélange) en entrée et la machine arrête juste à temps pour d'abord changer la consigne de pasteurisation si désiré
+                    et, une deuxième fois, pour changer le récipient de sortie...</li>
+                <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
+                <li>Mettre le tuyau d’entrée dans le bidon de lait crû et utiliser le tuyau de sortie avec la pince de Mohr pour embouteiller.
+                <li>Mettez au préalable le nouveau lait/mélange en entrée.
+                <li>La pompe sera automatiquement arrêtée une première fois quand assez aura été pompé pour amener le nouveau lait/mélange à la pasteurisation: vous pourrez alors changer la consigne de température si désiré.
+                <li>La pompe sera automatiquement arrêtée une seconde fois quand assez aura été pompé pour chasser tout le lait restant dans la machine (et que le lait/mélange suivant commence à arriver).
+                <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
+              $if ml.lang == 'e':
+                <li> When you change raw milk (other producer, other composition ...), you have to finish with the milk that remains in the machine.
+                We already put the new milk (or mixture) in and the machine stops just in time to first change the pasteurization setpoint if desired.
+                and, a second time, to change the outlet container ... </li>
+                <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece inserted there)
+                <li> Put the inlet hose into the raw milk container and use the outlet hose with Mohr's clamp to bottle.
+                <li> Put the new milk / mixture as a starter first.
+                <li> The pump will be automatically stopped for the first time when enough has been pumped to bring the new milk / mixture to pasteurization: you can then change the temperature set point if desired.
+                <li> The pump will automatically be stopped a second time when enough has been pumped to drive out any milk remaining in the machine (and the next milk / mixture begins to flow).
+                <li> A yellow button allows you to pause (then resume). A red button allows you to stop completely.
+            $if letter == 'y':
+              $if ml.lang == 'f':
+                <li>Votre pasteurisateur a été utilisé et il est sale : il se nettoie presque tout seul...
+                <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
+                <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
+                <li>TOUTES les opérations suivantes seront enchaînées automatiquement jusqu’à la désinfection incluse.
+                <li>Des pauses sont insérées au moment où il faut mettre le détergent ou le désinfectant.
+                <li>Il n’y a pas de rinçage final pour conserver l’acide dans les tuyaux.
+                <li>Si vous faites une désinfection caustique (percarbonate de soude), il vaut sans doute mieux rincer sommairement à la fin (F).
+              $if ml.lang == 'e':
+                <li> Your pasteurizer has been used and it is dirty: it almost cleans itself ...
+                <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
+                <li> Make sure the sewer pipe goes into a bucket of at least 20L.
+                <li> ALL the following operations will be chained automatically up to the included disinfection.
+                <li> Pauses are inserted when the detergent or disinfectant needs to be put on.
+                <li> There is no final rinse to keep the acid in the pipes.
+                <li> If you are doing a caustic disinfection (sodium percarbonate), it is probably best to rinse briefly at the end (F).
+            $if letter == 'R':
+              $if ml.lang == 'f':
+                <li>Votre pasteurisateur a été utilisé et il est sale...
+                <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
+                <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
+                <li>Un « Flush » d’eau chaude sanitaire (45°C) est effectué au préalable.
+                <li>L’eau de rinçage est cyclée 3 minutes à 45°C.
+                <li>V : l’eau est vidée vers l’égout en fin de cycle (environ 5L).
+              $if ml.lang == 'e':
+                <li> Your pasteurizer has been used and it is dirty ...
+                <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
+                <li> Make sure the sewer pipe goes into a bucket of at least 20L.
+                <li> A domestic hot water "flush" (45 ° C) is carried out beforehand.
+                <li> The rinsing water is cycled for 3 minutes at 45 ° C.
+                <li> V: the water is emptied to the sewer at the end of the cycle (about 5L).
+            $if letter == 'C':
+              $if ml.lang == 'f':
+                <li>Votre pasteurisateur a été rincé sommairement mais il faut le nettoyer en profondeur.
+                <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
+                <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
+                <li>Un remplissage d’eau chaude sanitaire (45°C) est effectué au préalable.
+                <li>Vous pourrez y mettre un détergent (caustique) pour NEP (CIP) dilué dans le tampon de sortie selon les instructions du fabricant du détergent.
+                <li>Tenez compte du niveau d’eau (graduations en Litres sur le tampon) et de l’eau dans le pasteurisateur (3.5L) pour calculer les quantités nécessaires.
+                <li>Le détergent ainsi dilué est circulé 15 minutes à 45°C.
+                <li>Il est vidé vers l’égout en fin de cycle (environ 5L).
+              $if ml.lang == 'e':
+                <li> Your pasteurizer has been briefly rinsed, but it needs to be cleaned thoroughly.
+                <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
+                <li> Make sure the sewer pipe goes into a bucket of at least 20L.
+                <li> A filling of domestic hot water (45 ° C) is carried out beforehand.
+                <li> You can add CIP (caustic) detergent diluted in outlet buffer according to the detergent manufacturer's instructions.
+                <li> Take into account the water level (liter graduations on the pad) and the water in the pasteurizer (3.5L) to calculate the quantities needed.
+                <li> The detergent thus diluted is circulated for 15 minutes at 45 ° C.
+                <li> It is emptied to the sewer at the end of the cycle (about 5L).
+            $if letter == 'A':
+              $if ml.lang == 'f':
+                <li>Votre pasteurisateur a été nettoyé mais il faut encore le désinfecter.
+                <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
+                <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
+                <li>Un remplissage d’eau chaude sanitaire (45°C) est effectué au préalable pour obtenir l’eau nécessaire.
+                <li>Vous pourrez y mettre un désinfectant (acide ou caustique) pour NEP (CIP) dilué dans le tampon de sortie selon les instructions du fabricant du désinfectant.
+                <li>Tenez compte du niveau d’eau (graduations en Litres sur le tampon) et de l’eau dans le pasteurisateur (3.5L) pour calculer les quantités nécessaires.
+                <li>Le désinfectant ainsi dilué est circulé 5 minutes à 55°C.
+                <li>Il est vidé vers l’égout en fin de cycle (environ 5L).
+              $if ml.lang == 'e':
+                <li> Your pasteurizer has been cleaned but it still needs to be disinfected.
+                <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
+                <li> Make sure the sewer pipe goes into a bucket of at least 20L.
+                <li> A filling of domestic hot water (45 ° C) is carried out beforehand to obtain the necessary water.
+                <li> You can put a disinfectant (acid or caustic) for CIP (CIP) diluted in the outlet buffer according to the instructions of the disinfectant manufacturer.
+                <li> Take into account the water level (liter graduations on the pad) and the water in the pasteurizer (3.5L) to calculate the quantities needed.
+                <li> The disinfectant thus diluted is circulated for 5 minutes at 55 ° C.
+                <li> It is emptied to the sewer at the end of the cycle (about 5L).
+            </ul>
+            <p class="alert alert-warning">$(menus.actionName[letter][2])</p>
+            <a class="btn btn-success" href="#" onclick="action('$letter')" id="confirm">$(ml.T("Confirmer","Confirm","Bevestigen")) $letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
+            <a class="btn btn-warning" href="/" id="cancel">$(ml.T("Annuler","Cancel","Annuleer"))</a>
+    $if not connected :
+        <div>
+            <h4>$(ml.T("Cette application gère votre pasteurisateur accessible","This app manages your affordable flow pasteuriser","Deze app beheert uw betaalbare continu pasteurisator")).</h4>
+            <h1>$(ml.T("Veuillez vous identifier S.V.P","Please identify yourself","Identificeer u alstublieft"))</h1>
+
+            <form class="form-inline" method="post" action="/" id="loginForm" data-bv-message="This value is not valid"  data-bv-live="enabled" data-bv-container="tooltip"data-bv-submitButtons="#loginSubmit">
+                <input type="hidden" name="erroruri" value=""/>
+                <div class="form-group">
+                    <input type="email" name="mail" placeholder="Email" class="form-control" size="20" autofocus/>
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" placeholder="Password" class="form-control" size="8"/>
+                </div>
+                <span class="sr-only">Log in</span>
+                <span class="totip" data-toggle="tooltip" data-placement="bottom" title="log-IN" style="pointer-events: auto;">
+                    <input type="hidden" name="method" id="method" value="login">
+                    <button type="submit" name="login" class="btn btn-warning" id="loginSubmit">
+                        <span class="glyphicon glyphicon-user"></span>
+                        <span class="glyphicon glyphicon-log-in"></span>
+                    </button>
+                </span>
+            </form>
+            $code:
+               result = subprocess.check_output(['ip','-4', '-o','addr'])
+               result = result.decode('utf-8').split('\n')
+               toDisplay = ""
+               for line in result:
+                   line = line.split('scope')[0].split('brd')[0].strip()
+                   toDisplay += line+'<br>'
+            <pre>$:toDisplay</pre>
+        </div>
     </div>
+    </main>
+
