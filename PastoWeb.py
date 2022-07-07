@@ -2252,7 +2252,6 @@ class WebApiLog:
             else:
                 durationRemaining = ''
             quantityRemaining = T_Pump.quantityRemaining()
-            print (durationRemaining)
             #temper = menus.options['T'][3]
             opt_temp = menus.val('P')
             actif = False
