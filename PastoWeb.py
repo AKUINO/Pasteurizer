@@ -2317,7 +2317,7 @@ class WebApiLog:
                             'opt_temp': opt_temp, \
                             'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['P','E','I'] else 1), \
                             'pause': 1 if T_Pump.paused else 0, \
-                            'fill': taps['H'].get(), \
+                            'fill': taps['H'].get()[0], \
                             'pumpopt': optimal_speed, \
                             'pumpeff': (100.0*pumping_volume/(pumping_time/3600))/optimal_speed if pumping_time else 0, \
                             'heateff': (100.0*heating_volume/(pumping_time/3600))/HEAT_POWER if pumping_time else 0 \
