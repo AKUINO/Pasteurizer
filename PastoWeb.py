@@ -1601,9 +1601,10 @@ class ThreadPump(threading.Thread):
                     newEval = int( diffTemp * tank * kCalWatt / ( (HEAT_POWER-((heating-ROOM_TEMP)*WATT_LOSS))) * 3600.0 )
                     #print("Evaluation=%f tank=%f kCalW=%f HP=%f RT=%f WL=%f" % (newEval, tank, kCalWatt,HEAT_POWER,ROOM_TEMP,WATT_LOSS) )
                     if self.lastDurationEval and self.lastDurationEvalTime and now > self.lastDurationEvalTime :
-                        if (float(self.lastDurationEval - newEval) / float(now-self.lastDurationEvalTime)) > TANK_NOT_FILLED:
+                        Factor = float(self.lastDurationEval - newEval) / float(now-self.lastDurationEvalTime)
+                        if Factor > TANK_NOT_FILLED:
                             warning = True
-                            print("!Warning: tank is heating too fast!")
+                            print("!Warning: tank is heating too fast! Factor=%f" % Factor)
                     self.lastDurationEval = newEval
                     self.lastDurationEvalTime = now
                 return newEval, warning
