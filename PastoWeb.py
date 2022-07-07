@@ -956,10 +956,10 @@ class ThreadDAC(threading.Thread):
         #self.dacSetting2.close()
 
 def format_time(seconds):
-    if (seconds < 60):
-        return str(seconds)+'"'
+    if seconds == 0:
+        return ""
     else:
-        return '%02d:%02d' % (seconds // 3600, (seconds % 3600) // 60)
+        return '%02d:%02d:%02d' % (seconds // 3600, (seconds % 3600) // 60, seconds % 60)
 
 # Pump speed types
 NUL_SPEED = 0
