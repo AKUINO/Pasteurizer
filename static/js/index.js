@@ -136,6 +136,11 @@ $(document).ready(function() {
                     } else {
                         $('#delay').html('');
                     }
+                    if ('fill' in data && data['fill']>'0') {
+                        $('#fill').hide();
+                    } else {
+                        $('#fill').show();
+                    }
                     var speed = floorUni(data['speed']);
                     $('#vitesse').text(speed);
                     colorit($('#vitesse'),0.0,625*3.6/data['opt_M'],180.0);

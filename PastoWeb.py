@@ -12,8 +12,6 @@ import time
 import web
 from datetime import datetime
 
-global render, _lock_socket
-
 import tty
 import termios
 import subprocess
@@ -39,10 +37,11 @@ from button import button
 from sensor import Sensor
 from valve import Valve
 from menus import Menus
-import state
 from state import State
 
 from TimeTrigger import TimeTrigger
+
+global render, _lock_socket
 
 DEBUG = True
 
@@ -67,7 +66,7 @@ lines = 25
 
 WebExit = False
 
-def isnull(v,n):
+def isnull(v, n):
     if v is None:
         return n
     else:
@@ -578,37 +577,39 @@ menus.operName = { 'HEAT':ml.T('chauffer','heating','verwarm') \
 
 StateLessActions = "JYLT" # TO BE DUPLICATED in index.js !
 
+# Empty sub state is managed by underlying operations
+# Greasy sub state must be set
 State('r',ml.T('Propre','Clean','Schoon'), \
-    [ ('P','p'),('D',''),('H',''),('F','o'),('V',['',['',True,None]]),('w','o') ] )
+    [ ('P','p'),('D',''),('H',''),('F','o'),('V',''),('w','o') ] )
 
 State('o',ml.T('Eau','Water','Waser'), \
-    [ ('A',['o','o',['a',None,False]]),('C',['o','o',['c',None,False]]),('F',''),('V',['',['',True,None]]),('D',['','','r']),('w','') ] )
+    [ ('A',['o','o',['a',None,False]]),('C',['o','o',['c',None,False]]),('F',''),('V',''),('D',['','','r']),('w','') ] )
 
 State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
-    [ ('C',['s','s',['c',None,False]]),                                 ('F',''),('V',['',['',True,None]]),('w','') ]
+    [ ('C',['s','s',['c',None,False]]), ('F',''),('V',''),('w','') ]
     , [False,True],[True])
 State('s',ml.T('Sale','Dirty','Vies'), \
-    [ ('C',['s','s',['c',None,False]]),('A',['s','s',['a',None,False]]),('F',''),('V',['',['',True,None]]),('w','') ]
+    [ ('C',['s','s',['c',None,False]]),('A',['s','s',['a',None,False]]),('F',''),('V',''),('w','') ]
     , [False,True],[False] )
 
 State('c',ml.T('Soude','Soda','Natrium'), \
-    [ ('R',['','o']),('F',''),('V',['',['',True,None]]),('w','') ] )
+    [ ('R',['','o']),('F',''),('V',''),('w','') ] )
 
 State('a',ml.T('Acide','Acid','Zuur'), \
-    [ ('R',['','o']),('F',''),('V',['',['',True,None]]),('w','') ] )
+    [ ('R',['','o']),('F',''),('V',''),('w','') ] )
 
 State('p',ml.T('Produit','Product','Product'), \
-    [ ('I',''),('M',''),('E','e'),('A',['e','s',['a',None,False]]),('C',['e','s',['c',None,False]]),('F','e'),('V',[['p',True,None]]) ]
+    [ ('I',''),('M',''),('E','e'),('A',['e','s',['a',None,False]]),('C',['e','s',['c',None,False]]),('F','e'),('V','') ]
     , [False,True],[False] )
 State('p',ml.T('Produit Gras','Greasy Product','Vet Product'), \
-    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'),     ('C',['e','s',['c',None,False]]),('F','e'),('V',[['p',True,None]]) ]
+    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'),     ('C',['e','s',['c',None,False]]),('F','e'),('V','') ]
     , [False,True],[True] )
 
 State('e',ml.T('Eau+Produit Gras','Water+Greasy Product','Water+Vet Product'), \
-      [                                  ('C',['e','s',['c',None,False]]),('P','p'),('F',''),('V',['e',['e',True,None]]),('w','s') ]
+      [                                 ('C',['','s',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
       , [False,True],[True] )
 State('e',ml.T('Eau+Produit','Water+Product','Water+Product'), \
-      [ ('A',['e','s',['a',None,False]]),('C',['e','s',['c',None,False]]),('P','p'),('F',''),('V',['e',['e',True,None]]),('w','s') ]
+      [ ('A',['','s',['a',None,False]]),('C',['','s',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
       , [False,True],[False] )
 
 def menu_confirm(choice,delay=None):
@@ -1044,9 +1045,18 @@ class Operation(object):
                     taps[self.tap].set(1)
                 else: # Eau dans un seau..
                     pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
-        elif self.typeOp in ['FLOO','RFLO','HOTW']:
+        elif self.typeOp in ['FLOO','RFLO']:
             if menus.val('s') < 1:
                 taps[self.tap].set(1)
+            else: # Eau dans un seau..
+                pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
+        elif self.typeOp == 'HOTW':
+            if menus.val('s') < 1:
+                valSensor1 = cohorts.getCalibratedValue(self.sensor1)
+                if float(valSensor1) < float(self.tempRef()): # Shake
+                    taps[self.tap].set(0)
+                else:
+                    taps[self.tap].set(1)
             else: # Eau dans un seau..
                 pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
         elif self.typeOp == 'REVR':
@@ -1174,17 +1184,12 @@ class Operation(object):
             speed = self.desired_speed()
             if typeOpToDo == 'REVR':
                 speed = -speed
-            elif typeOpToDo == 'EMPT':
-                State.empty = True
-            else: # 'PUMP'
-                State.empty = False
         elif typeOpToDo == 'FILL' :
             if State.empty :
                 if menus.val('s') < 1:
                     taps[self.tap].set(1)
                 else: # Water by bucket, what  must be done
                     speed = self.desired_speed()
-                    State.empty = False
         elif typeOpToDo in ['FLOO', 'RFLO', 'HOTW']:
             if menus.val('s') < 1:
                 if typeOpToDo == 'RFLO':
@@ -1198,9 +1203,8 @@ class Operation(object):
                 else:
                     taps[self.tap].set(1)
             else: # Water by bucket, what  must be done
-                if typeOpToDo != 'FLOO':
+                if typeOpToDo == 'RFLO':
                     speed = self.desired_speed()
-                    State.empty = False
         elif typeOpToDo == 'SHAK':
             #print ("S=%f\r" % speed)
             if speed == 0.0:
@@ -1285,19 +1289,16 @@ class Operation(object):
         if self.programmable and menus.val('H') and menus.val('H') != 0.0 and (int(datetime.now()) % (24*60*60)) >= int(menus.val('H')):
             menus.store('H', 0.0)
         #T_Pump.T_DAC.set_cold(None)
-        if self.typeOp == 'FILL':
-            if State.empty:
-                T_Pump.pump.stop()
-                if menus.val('s') < 1:
-                    taps[self.tap].set(0)
-        elif self.typeOp in ['FLOO','RFLO','HOTW']:
+        if self.typeOp in ['FILL','FLOO','RFLO','HOTW']:
             T_Pump.pump.stop()
             if menus.val('s') < 1:
                 taps[self.tap].set(0)
+            State.empty = False
         elif self.typeOp in ['REVR']:
             T_Pump.pump.reset_pump()
         elif self.typeOp in ['PUMP','SHAK','TRAK','EMPT']:
             T_Pump.pump.stop()
+            State.empty = (self.typeOp == 'EMPT')
         if self.message:
             if self.typeOp != 'PAUS':
                 tell_message(self.message)
@@ -1367,7 +1368,7 @@ opSequences = {
     'H': # Distribution d'eau pasteurisée
         [ Operation('HotT','HEAT',ref='P', dump=True,programmable=True),
           Operation('HotF','FILL',duration=lambda:menus.val('r'),base_speed=OPT_SPEED,qty=START_VOL, ref='P',dump=True),
-          Operation('HotW','HOTW','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True)
+          Operation('HotW','HOTW','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=START_VOL,shake_qty=SHAKE_QTY,dump=True)
           ],
     'R': # Pré-rinçage 4 fois
         [ Operation('Pr1T','HEAT',ref='R', dump=True,programmable=True),
@@ -1560,7 +1561,7 @@ class ThreadPump(threading.Thread):
             self.startAction = time.perf_counter()
             State.transitCurrent( State.ACTION_BEGIN, action )
             self.pump.reset_volume()
-            self.setPause(False);
+            self.setPause(False)
             self.currSequence = []
             for op in opSequences[action]:
                 self.currSequence.append(op)
@@ -1569,6 +1570,9 @@ class ThreadPump(threading.Thread):
         return False
 
     def setPause(self,paused):
+
+        global taps
+
         if self.paused and not paused:
             if self.currOpContext:
                 self.currOpContext.extend_duration(time.perf_counter()-self.startPause)
@@ -1579,6 +1583,7 @@ class ThreadPump(threading.Thread):
             self.startPause = self.pumpLastChange
         if paused:
             T_Pump.pump.reset_pump()
+            taps[self.tap].set(0)
         self.paused = paused
 
     def durationRemaining(self,now):
@@ -2241,7 +2246,7 @@ class WebApiLog:
 
     def GET(self):
 
-        global T_DAC, T_Pump, menus, optimal_speed, cohorts
+        global T_DAC, T_Pump, menus, optimal_speed, cohorts, taps
 
         data, connected, mail, password = init_access()
         web.header('Content-type', 'application/json; charset=utf-8')
@@ -2312,6 +2317,7 @@ class WebApiLog:
                             'opt_temp': opt_temp, \
                             'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['P','E','I'] else 1), \
                             'pause': 1 if T_Pump.paused else 0, \
+                            'fill': taps['H'].get(), \
                             'pumpopt': optimal_speed, \
                             'pumpeff': (100.0*pumping_volume/(pumping_time/3600))/optimal_speed if pumping_time else 0, \
                             'heateff': (100.0*heating_volume/(pumping_time/3600))/HEAT_POWER if pumping_time else 0 \
