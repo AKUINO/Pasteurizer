@@ -171,7 +171,7 @@ RINSE_TIME = 300.0
 WAIT_TIME = 1*3600
 STAY_CLEAN_TIME = 8*3600
 
-TANK_NOT_FILLED = 1.3 # If heating time remaining is decreasing more than expected (ratio above 1.3 and not 3), the tank may not be filled correctly...
+TANK_NOT_FILLED = 1.5 # If heating time remaining is decreasing more than expected (ratio above 1.3 and not 3), the tank may not be filled correctly...
 
 menus = Menus()
 menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
@@ -1601,7 +1601,7 @@ class ThreadPump(threading.Thread):
                     newEval = int( diffTemp * tank * kCalWatt / ( (HEAT_POWER-((heating-ROOM_TEMP)*WATT_LOSS))) * 3600.0 )
                     #print("Evaluation=%f tank=%f kCalW=%f HP=%f RT=%f WL=%f" % (newEval, tank, kCalWatt,HEAT_POWER,ROOM_TEMP,WATT_LOSS) )
                     if self.lastDurationEval and self.lastDurationEvalTime and now > self.lastDurationEvalTime :
-                        if ((self.lastDurationEval - newEval) / (now-self.lastDurationEvalTime)) > TANK_NOT_FILLED:
+                        if (float(self.lastDurationEval - newEval) / float(now-self.lastDurationEvalTime)) > TANK_NOT_FILLED:
                             warning = True
                             print("!Warning: tank is heating too fast!")
                     self.lastDurationEval = newEval
