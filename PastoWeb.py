@@ -954,7 +954,13 @@ class ThreadDAC(threading.Thread):
         self.join()
         self.dacSetting.close()
         #self.dacSetting2.close()
-        
+
+def format_time(seconds):
+    if (seconds < 60):
+        return str(seconds)+'"'
+    else:
+        return '%02d:%02d' % (seconds // 3600, (seconds % 3600) // 60)
+
 # Pump speed types
 NUL_SPEED = 0
 OPT_SPEED = -1
@@ -2241,6 +2247,10 @@ class WebApiLog:
         else:
             nowT = time.time()
             (durationRemaining, warning) = T_Pump.durationRemaining(nowT)
+            if durationRemaining > 0:
+                durationRemaining = format_time(durationRemaining)
+            else:
+                durationRemaining = ''
             quantityRemaining = T_Pump.quantityRemaining()
             #temper = menus.options['T'][3]
             opt_temp = menus.val('P')
