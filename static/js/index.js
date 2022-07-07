@@ -127,7 +127,7 @@ $(document).ready(function() {
                     //$('#watts2').text(floorUni(data['watts2']));
                     $('#volume').text(floorDeci(data['volume']));
                     if ('remain' in data && data['remain']) {
-                        $('#remain').html('&blacktriangledown;<b>'+floorDeci(data['remain'])+'</b>L');
+                        $('#remain').html('&blacktriangledown;<b>'+data['remain']+'</b>L');
                     } else {
                         $('#remain').html('');
                     }
