@@ -2247,11 +2247,12 @@ class WebApiLog:
         else:
             nowT = time.time()
             (durationRemaining, warning) = T_Pump.durationRemaining(nowT)
-            if durationRemaining > 0:
+            if durationRemaining:
                 durationRemaining = format_time(durationRemaining)
             else:
                 durationRemaining = ''
             quantityRemaining = T_Pump.quantityRemaining()
+            print (durationRemaining)
             #temper = menus.options['T'][3]
             opt_temp = menus.val('P')
             actif = False
