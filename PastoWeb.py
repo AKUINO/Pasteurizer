@@ -1929,7 +1929,7 @@ class WebIndex:
 
     def GET(self):
         data, connected, mail, password = init_access()
-        return render.index(connected, mail, False, None, True)
+        return render.index(connected, mail, False, None, False) #True if Paving...
 
     def POST(self):
         return self.GET()

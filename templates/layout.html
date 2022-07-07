@@ -10,34 +10,38 @@ $ ip = web.ctx['ip']
     <meta name="theme-color" content="#563d7c">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-	  integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!--link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+	  integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"-->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css"/>
 
     <title>$content.title</title>
     <!-- Custom styles for these templates -->
     <link rel="stylesheet" type="text/css" href="/css/local.css"/>
-    <link href="/css/navbar-top-fixed.css" rel="stylesheet">
-    <link href="/css/sticky-footer-navbar.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/navbar-top-fixed.css">
+    <link rel="stylesheet" type="text/css" href="/css/sticky-footer-navbar.css">
     <link rel="icon" href="/static/favicon.png">
 
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/dataTables.bootstrap4.min.css"><!--href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css"/-->
     <!--link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet"-->
     <link href="/css/glyphicons-local.css" rel="stylesheet">
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    <script type="text/javascript" src="/js/jquery-3.3.1.min.js"></script><!--src="https://code.jquery.com/jquery-3.3.1.min.js"-->
+    <!--script-- src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
 	    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-	    crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+	    crossorigin="anonymous"></script-->
+    <script type="text/javascript" src="/js/popper.min.js"></script>
+    <!--script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
 	    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-	    crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.js"></script>
+	    crossorigin="anonymous"></script-->
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
 
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
-    <script type="text/javascript" src="/static/js/index.js"></script>
+    <script type="text/javascript" src="/js/datatables.min.js"></script><!--src="https://cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.js"-->
+
+    <script type="text/javascript" src="/js/jquery.dataTables.min.js"></script><!--src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"-->
+    <script type="text/javascript" src="/js/dataTables.bootstrap4.min.js"></script><!--https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js-->
+    <script type="text/javascript" src="/js/index.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" onclick="void(0);">
@@ -54,7 +58,7 @@ $ ip = web.ctx['ip']
 		  </a>
 		  <div class="dropdown-menu">
 		  $for letter in menus.cleanActions:
-		    <a id="menu$(letter)" class="dropdown-item"$:(freshHref("/explain/"+letter+"#doc"))>$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
+		    <a id="drop$(letter)" class="dropdown-item"$:(freshHref("/explain/"+letter+"#doc"))>$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
 		  <div class="dropdown-divider"></div>
 		  <a class="dropdown-item" href="/option1" onclick="closeMenu()">$(ml.T("Paramètres de Pasteurisation et Refroidissement","Pasteurisation and Cooling Parameters","Pasteurisatie- en koelparameters"))</a>
 		  </div>
@@ -65,7 +69,7 @@ $ ip = web.ctx['ip']
 		  </a>
 		  <div class="dropdown-menu">
 		  $for letter in menus.dirtyActions:
-		    <a id="menu$(letter)" class="dropdown-item"$:(freshHref("/explain/"+letter+"#doc"))>$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
+		    <a id="drop$(letter)" class="dropdown-item"$:(freshHref("/explain/"+letter+"#doc"))>$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
 		  <div class="dropdown-divider"></div>
 		  <a class="dropdown-item" href="/option2" onclick="closeMenu()">$(ml.T("Paramètres de Nettoyage","Cleansing Parameters","Reiniging parameters"))</a>
 		  </div>

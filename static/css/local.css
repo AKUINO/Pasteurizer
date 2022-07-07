@@ -74,3 +74,13 @@
     .flip-vertical {
         transform: scaleY(-1) rotate(270deg);
     }
+
+    g .enabled {
+        fill:#FFFFFF;
+        color: #000000;
+    }
+
+    g .disabled {
+        fill:#AAAAAA;
+        color: #777777;
+    }

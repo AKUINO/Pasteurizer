@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="ecran_menu" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 255.1 453.5" style="enable-background:new 0 0 255.1 453.5;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#F7941D;}
+	.st1{fill:none;stroke:#FFFFFF;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st2{fill:none;stroke:#FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st3{fill:#FFFFFF;}
+	.st4{font-family:'OpenSans-Semibold';}
+	.st5{font-size:10px;}
+	.st6{fill:#808285;}
+	.st7{fill:#939598;}
+	.st8{fill:none;stroke:#F7941D;stroke-miterlimit:10;}
+	.st9{font-family:'OpenSans';}
+	.st10{fill:#ED1C24;}
+	.st11{fill:#00A651;}
+	.st12{font-family:'OpenSans-Italic';}
+	.st13{fill:none;stroke:#939598;stroke-width:0.75;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st14{fill:none;stroke:#939598;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st15{fill:none;stroke:#939598;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st16{fill:none;stroke:#939598;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+	.st17{fill:none;stroke:#939598;stroke-width:0.75;stroke-miterlimit:10;}
+	.st18{font-size:2.4596px;}
+	.st19{font-size:8.4145px;}
+	.st20{fill:none;stroke:#323232;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st21{fill:none;stroke:#323232;stroke-linecap:round;stroke-linejoin:round;}
+	.st22{fill:none;stroke:#323232;stroke-width:0.5;stroke-linecap:round;stroke-miterlimit:10;}
+	.st23{fill:#323232;}
+	.st24{font-size:9px;}
+	.st25{fill:#00AEEF;}
+	.st26{fill:none;stroke:#FFFFFF;stroke-width:0.5;stroke-miterlimit:10;}
+	.st27{fill:none;stroke:#FFFFFF;stroke-width:0.5;stroke-linecap:round;stroke-miterlimit:10;}
+	.st28{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}
+	.st29{fill:none;stroke:#FFFFFF;stroke-width:0.25;stroke-miterlimit:10;}
+</style>
+<g id="menu_parametres">
+	<path id="menu_parametres_fond" class="st0" d="M231.9,344v62.6c0,3.1-2.5,5.6-5.6,5.6h-62.6V344H231.9z"/>
+	<g id="menu_parametres_logo">
+		<g id="menu_parametres_logo_vect">
+			<circle id="menu_parametres_logovect2" class="st1" cx="197.8" cy="367.5" r="7"/>
+			<path id="menu_parametres_logovect1" class="st2" d="M213.7,367.7v-0.4c0-1.4-1.2-2.6-2.6-2.6l0,0c-1,0-2-0.6-2.4-1.6
+				c0-0.1-0.1-0.2-0.1-0.2c-0.4-1-0.2-2.1,0.6-2.8l0,0c1-1,1-2.7,0-3.7l-0.3-0.3c-1-1-2.7-1-3.7,0l0,0c-0.7,0.7-1.9,1-2.8,0.6
+				c-0.1,0-0.2-0.1-0.2-0.1c-1-0.4-1.6-1.3-1.6-2.4l0,0c0-1.4-1.2-2.6-2.6-2.6h-0.4c-1.4,0-2.6,1.2-2.6,2.6l0,0c0,1-0.6,2-1.6,2.4
+				c-0.1,0-0.2,0.1-0.2,0.1c-1,0.4-2.1,0.2-2.8-0.6l0,0c-1-1-2.7-1-3.7,0l-0.3,0.3c-1,1-1,2.7,0,3.7l0,0c0.7,0.7,1,1.9,0.6,2.8
+				c0,0.1-0.1,0.2-0.1,0.2c-0.4,1-1.3,1.6-2.4,1.6l0,0c-1.4,0-2.6,1.2-2.6,2.6v0.4c0,1.4,1.2,2.6,2.6,2.6l0,0c1,0,2,0.6,2.4,1.6
+				c0,0.1,0.1,0.2,0.1,0.2c0.4,1,0.2,2.1-0.6,2.8l0,0c-1,1-1,2.7,0,3.7l0.3,0.3c1,1,2.7,1,3.7,0l0,0c0.7-0.7,1.9-1,2.8-0.6
+				c0.1,0,0.2,0.1,0.2,0.1c1,0.4,1.6,1.3,1.6,2.4l0,0c0,1.4,1.2,2.6,2.6,2.6h0.4c1.4,0,2.6-1.2,2.6-2.6l0,0c0-1,0.6-2,1.6-2.4
+				c0.1,0,0.2-0.1,0.2-0.1c1-0.4,2.1-0.2,2.8,0.6l0,0c1,1,2.7,1,3.7,0l0.3-0.3c1-1,1-2.7,0-3.7l0,0c-0.7-0.7-1-1.9-0.6-2.8
+				c0-0.1,0.1-0.2,0.1-0.2c0.4-1,1.3-1.6,2.4-1.6l0,0C212.5,370.3,213.7,369.1,213.7,367.7z"/>
+		</g>
+	</g>
+	<text id="menu_parametres_texte_1_" transform="matrix(1 0 0 1 169.6384 399.9183)" class="st3 st4 st5">Paramètres</text>
+</g>
+<g id="menu_avancer">
+	<rect id="menu_avancer_fond" x="93.5" y="344" class="st6" width="68.2" height="68.2"/>
+	<g id="menu_avancer_logo">
+		<g id="menu_avancer_logo_vect">
+			<path id="menu_avancer_logo_vect1" class="st7" d="M127.6,352.4c-8.8,0-15.9,7.1-15.9,15.9s7.1,15.9,15.9,15.9
+				s15.9-7.1,15.9-15.9S136.4,352.4,127.6,352.4z M138,368.7l-10,6.6c-0.3,0.2-0.7,0-0.7-0.4v-4l-6.7,4.4c-0.3,0.2-0.7,0-0.7-0.4
+				v-13.2c0-0.3,0.4-0.5,0.7-0.4l6.7,4.4v-4c0-0.3,0.4-0.5,0.7-0.4l10,6.6C138.2,368.1,138.2,368.5,138,368.7z"/>
+		</g>
+	</g>
+	<text id="menu_avancer_texte_1_" transform="matrix(1 0 0 1 107.995 400.7793)" class="st7 st4 st5">Avancer</text>
+</g>
+<g id="menu_status">
+	<path id="menu_status_fond" class="st8" d="M91.5,412.2H28.9c-3.1,0-5.7-2.5-5.7-5.7V344h68.2v68.2H91.5z"/>
+	<text id="menu_status_texte_1_" transform="matrix(1 0 0 1 33.7701 387.0984)" class="st3 st9 st5">Amorçage</text>
+	<g id="menu_status_titre_grp">
+		<line id="menu_status_trace" class="st2" x1="39.7" y1="361.3" x2="74.9" y2="361.3"/>
+		<text id="menu_status_titre_1_" transform="matrix(1 0 0 1 39.1778 359.2235)" class="st3 st4 st5">STATUS</text>
+	</g>
+</g>
+<g id="menu_stop">
+	<rect id="menu_stop_fond" x="163.7" y="273.8" class="st10" width="68.2" height="68.2"/>
+	<g id="menu_stop_logo">
+		<g id="menu_stop_logo_vect">
+			<path id="menu_stop_logo_vect1" class="st3" d="M197.8,282.2c-8.8,0-15.9,7.1-15.9,15.9S189,314,197.8,314s15.9-7.1,15.9-15.9
+				C213.7,289.3,206.6,282.2,197.8,282.2z M204.8,303.8c0,0.7-0.6,1.4-1.4,1.4h-11.3c-0.7,0-1.4-0.6-1.4-1.4v-11.3
+				c0-0.7,0.6-1.4,1.4-1.4h11.3c0.7,0,1.4,0.6,1.4,1.4V303.8z"/>
+		</g>
+	</g>
+	<text id="menu_stop_text_1_" transform="matrix(1 0 0 1 186.8845 330.571)" class="st3 st4 st5">Stop</text>
+</g>
+<g id="menu_pause">
+	<rect id="menu_pause_fond" x="93.5" y="273.8" class="st0" width="68.2" height="68.2"/>
+	<g id="menu_pause_logo">
+		<g id="menu_pause_logo_vect">
+			<path id="menu_pause_logo_vect1" class="st3" d="M127.6,282.2c-8.8,0-15.9,7.1-15.9,15.9s7.1,15.9,15.9,15.9s15.9-7.1,15.9-15.9
+				C143.5,289.3,136.4,282.2,127.6,282.2z M125.6,304.5c0,0.3-0.3,0.6-0.6,0.6h-3c-0.3,0-0.6-0.3-0.6-0.6v-12.8
+				c0-0.3,0.3-0.6,0.6-0.6h3c0.3,0,0.6,0.3,0.6,0.6V304.5z M133.7,304.5c0,0.3-0.3,0.6-0.6,0.6H130c-0.3,0-0.6-0.3-0.6-0.6v-12.8
+				c0-0.3,0.3-0.6,0.6-0.6h3.1c0.3,0,0.6,0.3,0.6,0.6L133.7,304.5L133.7,304.5z"/>
+		</g>
+	</g>
+	<text id="menu_pause_texte_1_" transform="matrix(1 0 0 1 113.0966 330.571)" class="st3 st4 st5">Pause</text>
+</g>
+<g id="menu_demarrer">
+	<rect id="menu_demarrer_fond" x="23.3" y="273.8" class="st11" width="68.2" height="68.2"/>
+	<g id="menu_demarrer_logo">
+		<g id="menu_demarrer_logo_vect">
+			<path id="menu_demarrer_logo_vect1" class="st3" d="M57.3,282.2c-8.8,0-15.9,7.1-15.9,15.9S48.5,314,57.3,314s15.9-7.1,15.9-15.9
+				C73.2,289.3,66.1,282.2,57.3,282.2z M65.9,298.4l-13.5,7.4c-0.3,0.1-0.6,0-0.6-0.3v-14.8c0-0.3,0.3-0.5,0.6-0.3l13.5,7.4
+				C66.2,297.9,66.2,298.3,65.9,298.4z"/>
+		</g>
+	</g>
+	<text id="menu_demarrer_texte_1_" transform="matrix(1 0 0 1 33.7135 330.571)" class="st3 st4 st5">Démarrer</text>
+</g>
+<g id="menu_tuyaux">
+	<rect id="menu_tuyau_fond" x="163.7" y="203.7" class="st8" width="68.2" height="68.2"/>
+	<g id="menu_tuyau_textes">
+		<text id="menu_tuyau_texte4_1_" transform="matrix(1 0 0 1 178.3811 267.8594)" class="st3 st12 st5">cuve eau</text>
+		<text id="menu_tuyau_texte3_1_" transform="matrix(1 0 0 1 182.7976 255.8594)" class="st3 st9 st5">Sortie:</text>
+		<text id="menu_tuyau_texte2_1_" transform="matrix(1 0 0 1 178.3811 243.8594)" class="st3 st12 st5">cuve eau</text>
+		<text id="menu_tuyau_texte1_1_" transform="matrix(1 0 0 1 181.1716 231.8594)" class="st3 st9 st5">Entrée:</text>
+	</g>
+	<g id="menu_tuyau_titre_grp">
+		<line id="menu_tuyau_trace" class="st2" x1="177.9" y1="218" x2="217.5" y2="218"/>
+		<text id="menu_tuyau_titre_1_" transform="matrix(1 0 0 1 178.1418 215.9475)" class="st3 st4 st5">TUYAUX</text>
+	</g>
+</g>
+<g id="menuV">
+	<rect id="menuV_fond" x="93.5" y="203.7" class="st6" width="68.2" height="68.2"/>
+	<g id="menuV_logo">
+		<g id="menuV_logotraces">
+			<g id="menuV_logo_trace11">
+				<path class="st7" d="M131.2,241.1c-1.6-1.7-2.6-4-2.5-6.3c0.2,2.3,1.5,4.2,3.2,5.6c0.2,0.2,0.2,0.5,0.1,0.7
+					C131.8,241.3,131.5,241.4,131.2,241.1C131.2,241.2,131.2,241.2,131.2,241.1z"/>
+			</g>
+			<g id="menuV_logo_trace10">
+				<path class="st7" d="M129.4,243.5c-0.5-0.6-0.7-1.2-0.9-1.9c-0.2-0.6-0.4-1.3-0.5-1.9c-0.2-1.3-0.3-2.6-0.4-3.9
+					c0.2,1.3,0.5,2.5,0.9,3.7c0.2,0.6,0.4,1.2,0.7,1.8s0.6,1.1,1,1.5c0.2,0.2,0.2,0.5,0,0.7S129.6,243.7,129.4,243.5L129.4,243.5z"
+					/>
+			</g>
+			<g id="menuV_logo_trace9">
+				<path class="st7" d="M125,243.9c0.2-0.3,0.4-0.7,0.6-1c0.2-0.4,0.3-0.8,0.5-1.2c0.3-0.8,0.5-1.7,0.7-2.5c0,0.9-0.1,1.7-0.3,2.6
+					c-0.1,0.4-0.1,0.9-0.3,1.3c-0.1,0.4-0.2,0.9-0.5,1.3l0,0c-0.1,0.2-0.4,0.3-0.7,0.2C124.9,244.6,124.8,244.3,125,243.9
+					C124.9,244,125,244,125,243.9z"/>
+			</g>
+			<g id="menuV_logo_trace8">
+				<path class="st7" d="M123.3,240.4c1.6-1.4,3-3.3,3.2-5.6c0.2,2.3-0.9,4.6-2.5,6.3c-0.2,0.2-0.5,0.2-0.7,0
+					C123.1,241,123,240.7,123.3,240.4C123.2,240.5,123.3,240.4,123.3,240.4z"/>
+			</g>
+			<g id="menuV_logo_trace7">
+				<path class="st7" d="M140.5,225.1c0.4-0.1,0.9,0.2,1.1,0.4c0.3,0.2,0.5,0.4,0.8,0.4s0.6-0.1,1-0.2c0.4-0.1,0.8-0.2,1.2,0
+					c-0.4,0.1-0.7,0.3-1,0.5s-0.8,0.4-1.2,0.4c-0.2,0-0.6-0.1-0.7-0.2c-0.2-0.1-0.3-0.3-0.4-0.5C141,225.6,140.9,225.3,140.5,225.1z
+					"/>
+			</g>
+			<g id="menuV_logo_trace6">
+				<path class="st7" d="M131.3,230.1c0.3-0.5,0.7-0.8,1.2-1c0.3-0.1,0.5-0.2,0.9-0.1c0.3,0.1,0.5,0.3,0.8,0.4
+					c0.2,0.1,0.4,0.3,0.5,0.3l0,0h0.1c0.1,0,0.1,0,0.2,0c0.1,0,0.2,0,0.3,0c0.2,0,0.4-0.1,0.6-0.3c0.2-0.1,0.5-0.3,0.8-0.2
+					c-0.2,0.1-0.4,0.3-0.6,0.5c-0.2,0.2-0.4,0.4-0.6,0.5c-0.1,0.1-0.3,0.1-0.4,0.1c-0.1,0-0.1,0-0.2,0h-0.1c-0.1,0-0.1,0-0.2,0
+					c-0.4-0.1-0.6-0.3-0.8-0.4c-0.2-0.1-0.4-0.3-0.5-0.3c-0.1-0.1-0.3,0-0.5,0C132.2,229.8,131.7,229.9,131.3,230.1z"/>
+			</g>
+			<g id="menuV_logo_trace5">
+				<path class="st7" d="M125.8,223.6c-0.5,0.1-1.1,0-1.5-0.2c-0.2-0.1-0.5-0.2-0.7-0.2c-0.2-0.1-0.3-0.1-0.6,0
+					c-0.4,0-0.9,0.1-1.3,0.3c-0.5,0.1-1,0.3-1.5,0.2c0.5-0.1,0.8-0.5,1.3-0.7c0.4-0.3,1-0.4,1.5-0.5c0.2,0,0.6,0,0.9,0.1
+					s0.5,0.2,0.7,0.4C125,223.2,125.3,223.4,125.8,223.6z"/>
+			</g>
+			<g id="menuV_logo_trace4">
+				<path class="st7" d="M108.8,226.3c0.4-0.3,0.8-0.6,1.2-0.8c0.2-0.1,0.5-0.2,0.8-0.2c0.2,0,0.6,0,0.9,0.1c0.5,0.3,0.9,0.6,1.2,1
+					c0.3,0.3,0.6,0.7,1.1,0.8c-0.5,0.1-1.1-0.1-1.5-0.4c-0.4-0.3-0.8-0.6-1.1-0.8c-0.3-0.1-0.8-0.1-1.2-0.1
+					C109.8,226.2,109.3,226.3,108.8,226.3z"/>
+			</g>
+			<path id="menuV_logo_trace3" class="st13" d="M105.2,219.8c1-0.7,3.7-0.8,4.9-0.6c1.7,0.2,5.5,1.1,7.4,1.1c3.4,0,5.8-1.1,7.5-1.2
+				c3-0.2,5.2,1.1,7.6,1.2c2.4,0.1,6.2-1,8.9-1.3c2.8-0.2,7.2,1.4,8.4,1.3"/>
+			<path id="menuV_logo_trace2" class="st14" d="M129.8,234.9v-2h14.6c3.1,0,5.6-3.2,5.6-7.2v-13.2"/>
+			<path id="menuV_logo_trace1" class="st14" d="M105.2,212.4v13.2c0,4,2.5,7.2,5.6,7.2h14.6v2"/>
+		</g>
+	</g>
+	<text id="menuV_texte_1_" transform="matrix(1 0 0 1 111.3714 261.3116)" class="st7 st4 st5">Purger</text>
+</g>
+<g id="menuR">
+	<rect id="menuR_fond" x="23.2" y="203.7" class="st6" width="68.2" height="68.2"/>
+	<g id="menuR_logo">
+		<g id="menuR_logo_vect">
+			<path id="menuR_logo_vect3" class="st15" d="M49.5,234l6.2-12.8l6.2,12.8c2.3,4.8-1,10.5-6.2,10.5l0,0
+				C50.5,244.5,47.2,238.8,49.5,234z"/>
+			<path id="menuR_logo_vect2" class="st13" d="M42.1,223.7l3.6-7.5l3.6,7.5c1.3,2.8-0.6,6.1-3.6,6.1l0,0
+				C42.7,229.8,40.7,226.5,42.1,223.7z"/>
+			<path id="menuR_logo_vect1" class="st13" d="M62.9,218.2l2.8-5.9l2.8,5.9c1.1,2.2-0.5,4.8-2.8,4.8l0,0
+				C63.3,223,61.8,220.4,62.9,218.2z"/>
+		</g>
+		<g id="menuR_logo_traces">
+			<path id="menuR_logo_trace1_2_" class="st7" d="M51.1,236c0.6,1,0.8,1.8,1,2.5c0.1,0.4,0.2,0.7,0.3,1.1l0.4,1.4l-0.1,0.1
+				c-0.4-0.3-0.7-0.6-1-1s-0.5-0.8-0.6-1.3C50.9,237.9,50.9,236.9,51.1,236L51.1,236z"/>
+			<path id="menuR_logo_trace1" class="st7" d="M43,224.9c0.4,0.6,0.6,1,0.7,1.4c0,0.2,0.1,0.4,0.1,0.6c0,0.2,0.1,0.5,0.1,0.8v0.1
+				c-0.5-0.3-0.8-0.8-0.9-1.4C42.9,226,42.9,225.4,43,224.9L43,224.9z"/>
+			<path id="menuR_logo_trace1_1_" class="st7" d="M63.6,219.1c0.4,0.5,0.6,0.8,0.7,1.1c0,0.2,0.1,0.3,0.1,0.5s0,0.4,0,0.7v0.1
+				c-0.4-0.2-0.6-0.6-0.7-1.1C63.5,220,63.5,219.6,63.6,219.1L63.6,219.1z"/>
+		</g>
+	</g>
+	<text id="menuR_texte_1_" transform="matrix(1 0 0 1 40.3924 261.3401)" class="st7 st4 st5">Rincer</text>
+</g>
+<g id="menuD">
+	<rect id="menuD_fond" x="163.7" y="133.5" class="st6" width="68.2" height="68.2"/>
+	<g id="menuD_logo">
+		<g id="menuD_logo_traces">
+			<path id="menuD_logo_trace3_1_" class="st16" d="M183.8,158.2c-0.3-1.2-0.5-2.4-0.5-3.7c0-2.6,0.7-5.1,1.9-7.2
+				c1-1.8,2.5-3.3,4.1-4.5"/>
+			<path id="menuD_logo_trace2_1_" class="st16" d="M207.9,164.6c-2.6,2.6-6.2,4.2-10.2,4.2c-2.1,0-4.2-0.5-6-1.3"/>
+			<path id="menuD_logo_trace1_1_" class="st16" d="M201.4,140.6c3.7,1,6.8,3.4,8.7,6.7c1,1.8,1.7,3.7,1.9,5.9"/>
+		</g>
+		<g id="menuD_logo_vect">
+			<path id="menuD_logo_vect4" class="st7" d="M194,140.6c-1.8,1.8-3.7,4.5-4.7,6.8l-0.5-4.2l-3.1-2.9
+				C188.1,140.8,191.5,140.9,194,140.6z"/>
+			<path id="menuD_logo_vect3" class="st7" d="M187.6,164.7c2.5,0.6,5.8,1,8.2,0.7l-3.4,2.5l-1,4.1
+				C190.7,169.6,189,166.7,187.6,164.7z"/>
+			<path id="menuD_logo_vect2" class="st7" d="M211.6,158.2c-0.7-2.4-2-5.5-3.5-7.4l3.9,1.7l4.1-1.2
+				C214.3,153,212.6,155.9,211.6,158.2z"/>
+			<rect id="menuD_logo_vect1" x="191.3" y="147.6" class="st17" width="13.4" height="14.2"/>
+		</g>
+		<g id="menuD_logo_textes">
+			<g id="menuD_logo_texte2">
+				<text transform="matrix(1 0 0 1 201.7175 150.6739)" class="st7 st4 st18">1</text>
+			</g>
+			<text id="menuD_logo_texte1" transform="matrix(1 0 0 1 194.5685 158.0493)" class="st7 st4 st19">H</text>
+		</g>
+	</g>
+	<text id="menuD_texte_1_" transform="matrix(1 0 0 1 170.3804 189.9268)" class="st7 st4 st5">Désinfecter</text>
+</g>
+<g id="menuC">
+	<rect id="menuC_fond" x="93.4" y="133.4" class="st6" width="68.2" height="68.2"/>
+	<g id="menuC_logo">
+		<g id="menuC_logo_traces">
+			<path id="menuC_logo_trace3_1_" class="st16" d="M113.6,158.1c-0.3-1.2-0.5-2.4-0.5-3.7c0-2.6,0.7-5.1,1.9-7.2
+				c1-1.8,2.5-3.3,4.1-4.5"/>
+			<path id="menuC_logo_trace2_1_" class="st16" d="M137.7,164.5c-2.6,2.6-6.2,4.2-10.2,4.2c-2.1,0-4.2-0.5-6-1.3"/>
+			<path id="menuC_logo_trace1_1_" class="st16" d="M131.2,140.5c3.7,1,6.8,3.4,8.7,6.7c1,1.8,1.7,3.7,1.9,5.9"/>
+		</g>
+		<g id="menuC_logo_vect">
+			<path id="menuC_logo_vect4" class="st7" d="M123.8,140.5c-1.8,1.8-3.7,4.5-4.7,6.8l-0.5-4.2l-3.1-2.9
+				C117.9,140.7,121.2,140.7,123.8,140.5z"/>
+			<path id="menuC_logo_vect3" class="st7" d="M117.4,164.5c2.5,0.6,5.8,1,8.2,0.7l-3.4,2.5l-1,4.1
+				C120.5,169.5,118.8,166.6,117.4,164.5z"/>
+			<path id="menuC_logo_vect2" class="st7" d="M141.4,158.1c-0.7-2.4-2-5.5-3.5-7.4l3.9,1.7l4.1-1.2
+				C144.1,152.9,142.4,155.8,141.4,158.1z"/>
+			<rect id="menuC_logo_vect1" x="121.1" y="147.5" class="st17" width="13.4" height="14.2"/>
+		</g>
+		<g id="menuC_logo_textes">
+			<g id="menuC_logo_texte2">
+				<text transform="matrix(1 0 0 1 130.8074 150.5617)" class="st7 st4 st18">11</text>
+			</g>
+			<text id="menuC_logo_texte1" transform="matrix(1 0 0 1 121.784 157.9372)" class="st7 st4 st19">Na</text>
+		</g>
+	</g>
+	<g id="menuC_texte">
+		<text id="menuC_texte2_1_" transform="matrix(1 0 0 1 103.3976 195.8145)" class="st7 st4 st5">à la soude</text>
+		<text id="menuC_texte1" transform="matrix(1 0 0 1 106.3976 183.8145)" class="st7 st4 st5">Nettoyer</text>
+	</g>
+</g>
+<g id="menuP">
+	<rect id="menuP_fond" x="23.2" y="133.3" class="st3" width="68.2" height="68.2"/>
+	<g id="menuP_logo">
+		<g id="menuP_traces">
+			<path id="menuP_trace7" class="st20" d="M51.1,141.5c0,0,0.4,5.4-1.6,8.2c-2,2.9-1.5,7-1.5,8.2c0,0.8,0,9.3,0,15
+				c0,2.9,2.3,5.2,5.2,5.2h4.2h4.2c2.9,0,5.2-2.3,5.2-5.2c0-5.7,0-14.2,0-15c0-1.2,0.5-5.3-1.5-8.2s-1.6-8.2-1.6-8.2"/>
+			<path id="menuP_trace6_1_" class="st21" d="M51.9,163.8c-0.1-0.5-0.2-0.9-0.2-1.4c0-1,0.3-2,0.7-2.8c0.2-0.3,0.3-0.5,0.5-0.8"/>
+			<path id="menuP_trace5_1_" class="st21" d="M61.2,166.3c-1,1-2.4,1.6-3.9,1.6c-0.3,0-0.6,0-0.9-0.1"/>
+			<path id="menuP_trace4_1_" class="st21" d="M59.7,157c1.4,0.4,2.6,1.3,3.4,2.6c0.2,0.3,0.3,0.5,0.4,0.8"/>
+			<path id="menuP_trace3" class="st22" d="M59,160.8c0.3,0.5,0.6,0.9,0,1.9s0,1.7,0,1.7"/>
+			<path id="menuP_trace2" class="st22" d="M57.2,160.8c0.3,0.5,0.6,0.9,0,1.9s0,1.7,0,1.7"/>
+			<path id="menuP_trace1" class="st22" d="M55.5,160.8c0.3,0.5,0.6,0.9,0,1.9s0,1.7,0,1.7"/>
+		</g>
+		<g id="menuP_vect">
+			<path id="menuP_vect3" class="st23" d="M55.9,157c-1,1.4-2,3.3-2.4,4.9l-0.7-2.7l-2.3-1.6C52,157.7,54.2,157.4,55.9,157z"/>
+			<path id="menuP_vect2" class="st23" d="M53.4,166.3c1.7,0.1,3.9,0.1,5.5-0.4l-2,2l-0.3,2.8C55.9,169.2,54.6,167.5,53.4,166.3z"/>
+			<path id="menuP_vect1_1_" class="st23" d="M63.7,163.8c-0.7-1.5-1.9-3.4-3-4.6l2.7,0.8l2.6-1.2C65,160.1,64.1,162.2,63.7,163.8z"
+				/>
+		</g>
+	</g>
+	<text id="menuP_texte_1_" transform="matrix(1 0 0 1 25.961 192.578)" class="st23 st4 st24">Pasteurisation</text>
+</g>
+<g id="menu_capteurs">
+	<path id="capteurs_fond" class="st8" d="M231.9,69v62.6H93.5V63.4h132.8C229.4,63.4,231.9,65.9,231.9,69z"/>
+	<g id="pompe_grp">
+		<g id="pompe_logo">
+			<path id="pompe_logo_fond" class="st25" d="M215.8,96.6v-1.4h-36.1v1.4h-4.6V89h4.6v1.5h9.1l-0.6-2.1c-0.3-0.9-0.4-1.9-0.4-2.9
+				c0-5.3,4.3-9.6,9.6-9.6s9.6,4.3,9.6,9.6c0,1-0.1,1.9-0.4,2.9l-0.6,2.1h9.9V89h4.6v7.6H215.8z"/>
+			<g id="pompe_logo_vect">
+				<g id="pompe_vect6">
+					<polygon class="st3" points="219.2,92.7 216.1,94 216.8,92.7 216.1,91.4 					"/>
+				</g>
+				<polygon id="pompe_vect5" class="st3" points="186.5,92.7 183.3,94 184,92.7 183.3,91.4 				"/>
+				<path id="pompe_vect4" class="st3" d="M202.8,85.5c0.9-0.3,2-0.6,2.6-1.6c0.3-0.5,0.5-1,0.6-1.5s0-1.1-0.2-1.7l-0.3-0.1
+					c-1.1,0.5-1.7,0.9-2.3,1.2c-0.6,0.3-0.9,1-1.5,1.5c-0.6,0.4-1.3,0.8-2.1,1.2c-0.6,0.3-1.3,0.5-1.9,0.7c0.5-0.6,0.9-1.2,1.3-1.8
+					c0.4-0.8,0.8-1.7,1-2.7c0.2-0.9,0.5-2.1,0-3.1c-0.3-0.5-0.6-0.9-1-1.3s-1-0.6-1.5-0.6l-0.2,0.2c-0.1,1.2-0.1,1.9-0.1,2.6
+					s0.4,1.3,0.5,2c0.1,0.8,0.1,1.6,0,2.4c0,0.7-0.2,1.4-0.3,2c-0.2-0.7-0.6-1.4-1-2c-0.5-0.8-1.1-1.5-1.8-2.2
+					c-0.7-0.6-1.6-1.5-2.7-1.5c-0.5,0-1.1,0-1.6,0.3c-0.5,0.2-1,0.6-1.3,1l0.1,0.3c1,0.7,1.6,1,2.2,1.4c0.6,0.4,1.3,0.3,2,0.6
+					c0.7,0.3,1.4,0.7,2.1,1.2c0.6,0.4,1.1,0.8,1.6,1.3c-0.7-0.1-1.5-0.2-2.2-0.2c-0.9,0-1.9,0.2-2.8,0.5c-0.9,0.3-2,0.6-2.6,1.6
+					c-0.3,0.5-0.5,1-0.6,1.5s0,1.1,0.2,1.7l0.3,0.1c1.1-0.5,1.7-0.9,2.3-1.2c0.6-0.3,0.9-1,1.5-1.5c0.6-0.4,1.3-0.8,2.1-1.2
+					c0.6-0.3,1.3-0.5,1.9-0.7c-0.5,0.6-0.9,1.2-1.3,1.8c-0.4,0.8-0.8,1.7-1,2.7c-0.2,0.9-0.5,2.1,0,3.1c0.3,0.5,0.6,0.9,1,1.3
+					s1,0.6,1.5,0.6l0.2-0.2c0.1-1.2,0.1-1.9,0.1-2.6s-0.4-1.3-0.5-2c-0.1-0.8-0.1-1.6,0-2.4c0-0.7,0.2-1.4,0.3-2
+					c0.2,0.7,0.6,1.4,1,2c0.5,0.8,1.1,1.5,1.8,2.2c0.7,0.6,1.6,1.5,2.7,1.5c0.5,0,1.1,0,1.6-0.3c0.5-0.2,1-0.6,1.3-1l-0.1-0.3
+					c-1-0.7-1.6-1-2.2-1.4c-0.6-0.4-1.3-0.3-2-0.6c-0.7-0.3-1.4-0.7-2.1-1.2c-0.6-0.4-1.1-0.8-1.6-1.3c0.7,0.1,1.5,0.2,2.2,0.2
+					C201,85.9,201.9,85.8,202.8,85.5z"/>
+				<path id="pompe_vect3" class="st26" d="M207.8,73.7h-20.9v-0.2c0-0.9,0.7-1.6,1.6-1.6h17.8c0.9,0,1.6,0.7,1.6,1.6v0.2H207.8z"/>
+				<path id="pompe_vect2" class="st26" d="M185.3,78.9h-2.1c-0.9,0-1.7-0.8-1.7-1.7v-0.4c0-0.9,0.8-1.7,1.7-1.7h2.1V78.9z"/>
+				<path id="pompe_vect1" class="st26" d="M185.9,80.2h1.5c1.9-3.5,5.6-5.9,9.9-5.9c4.3,0,8,2.4,9.9,5.9h1.5c0.3,0,0.6-0.3,0.6-0.6
+					v-5.3c0-0.3-0.3-0.6-0.6-0.6h-22.8c-0.3,0-0.6,0.3-0.6,0.6v5.3C185.3,80,185.6,80.2,185.9,80.2z"/>
+			</g>
+			<g id="pompe_logo_traces">
+				<path id="pompe_trace5" class="st27" d="M175.1,98.2h5.5c0.4,0,0.7-0.3,0.7-0.7v-0.7h32.9v0.8c0,0.4,0.3,0.7,0.7,0.7h5.5"/>
+				<path id="pompe_trace4" class="st27" d="M220.4,87.4h-5.5c-0.4,0-0.7,0.3-0.7,0.7v0.8h-6.1c0.3-1.1,0.5-2.2,0.5-3.3
+					c0-6.2-5-11.2-11.2-11.2s-11.2,5-11.2,11.2c0,1.2,0.2,2.3,0.5,3.3h-5.3v-0.8c0-0.4-0.3-0.7-0.7-0.7h-5.5"/>
+				<line id="pompe_trace3" class="st26" x1="183.4" y1="75" x2="183.4" y2="78.9"/>
+				<line id="pompe_trace2" class="st28" x1="209" y1="92.7" x2="217" y2="92.7"/>
+				<line id="pompe_trace1" class="st28" x1="176.2" y1="92.7" x2="184.2" y2="92.7"/>
+			</g>
+		</g>
+		<g id="pompe_texte">
+			<text id="pompe_texte2_1_" transform="matrix(1 0 0 1 188.9649 125.3597)" class="st3 st4 st24">12 L</text>
+			<text id="pompe_texte1" transform="matrix(1 0 0 1 184.3649 114.5597)" class="st3 st4 st24">10 L/h</text>
+		</g>
+	</g>
+	<g id="thermi_grp">
+		<g id="thermi_logo">
+			<path id="thermi_fond" class="st0" d="M128.2,100.7c-0.2,0-0.4,0-0.6,0c-2.1-0.2-3.8-1.9-4.1-3.9c-0.3-1.9,0.6-3.9,2.2-4.9
+				l0.7-0.4v-21c0-1,0.8-1.7,1.7-1.7s1.7,0.8,1.7,1.7v20.9l0.7,0.4c1.4,0.9,2.3,2.4,2.3,4.1c0,1.3-0.5,2.5-1.4,3.4
+				C130.6,100.2,129.4,100.7,128.2,100.7L128.2,100.7z"/>
+			<g id="thermi_logo_vect">
+				<path id="thermi_vect1" class="st26" d="M131.3,90.7V70.5c0-1.7-1.4-3.2-3.2-3.2l0,0c-1.7,0-3.2,1.4-3.2,3.2v20.1
+					c-2.1,1.2-3.3,3.6-2.9,6.3c0.4,2.7,2.7,4.8,5.3,5.1c3.7,0.4,6.9-2.5,6.9-6.1C134.3,93.7,133.1,91.8,131.3,90.7z"/>
+			</g>
+			<g id="thermi_logo_traces">
+				<line id="thermi_trace17" class="st26" x1="131.3" y1="88.2" x2="135.8" y2="88.2"/>
+				<line id="thermi_trace16" class="st29" x1="131.3" y1="86.9" x2="133.9" y2="86.9"/>
+				<line id="thermi_trace15" class="st29" x1="131.3" y1="85.9" x2="133.9" y2="85.9"/>
+				<line id="thermi_trace14" class="st29" x1="131.3" y1="84.8" x2="133.9" y2="84.8"/>
+				<line id="thermi_trace13" class="st29" x1="131.3" y1="83.7" x2="133.9" y2="83.7"/>
+				<line id="thermi_trace12" class="st29" x1="131.3" y1="82.6" x2="133.9" y2="82.6"/>
+				<line id="thermi_trace11" class="st29" x1="131.3" y1="81.5" x2="133.9" y2="81.5"/>
+				<line id="thermi_trace10" class="st29" x1="131.3" y1="80.4" x2="133.9" y2="80.4"/>
+				<line id="thermi_trace9" class="st26" x1="131.3" y1="79.2" x2="135.8" y2="79.2"/>
+				<line id="thermi_trace8" class="st29" x1="131.3" y1="78" x2="133.9" y2="78"/>
+				<line id="thermi_trace7" class="st29" x1="131.3" y1="76.9" x2="133.9" y2="76.9"/>
+				<line id="thermi_trace6" class="st29" x1="131.3" y1="75.9" x2="133.9" y2="75.9"/>
+				<line id="thermi_trace5" class="st29" x1="131.3" y1="74.8" x2="133.9" y2="74.8"/>
+				<line id="thermi_trace4" class="st29" x1="131.3" y1="73.7" x2="133.9" y2="73.7"/>
+				<line id="thermi_trace3" class="st29" x1="131.3" y1="72.6" x2="133.9" y2="72.6"/>
+				<line id="thermi_trace2" class="st29" x1="131.3" y1="71.5" x2="133.9" y2="71.5"/>
+				<line id="thermi_trace1" class="st26" x1="131.3" y1="70.3" x2="135.8" y2="70.3"/>
+			</g>
+		</g>
+		<g id="thermi_texte">
+			<text id="thermi_texte2" transform="matrix(1 0 0 1 118.3456 125.3597)" class="st3 st4 st24">532’’</text>
+			<text id="thermi_texte1_1_" transform="matrix(1 0 0 1 103.8456 114.5597)" class="st3 st4 st24">45°C / 72°C</text>
+		</g>
+	</g>
+</g>
+<g id="menu_etat">
+	<path id="menu_etat_fond" class="st8" d="M23.2,131.6V69.1c0-3.1,2.5-5.7,5.7-5.7h62.5v68.2L23.2,131.6L23.2,131.6z"/>
+	<g id="menu_etat_titre_grp">
+		<line id="menu-etat_trace" class="st2" x1="45.6" y1="80.7" x2="69" y2="80.7"/>
+		<text id="menu_etat_titre_1_" transform="matrix(1 0 0 1 45.5963 78.614)" class="st3 st4 st5">ÉTAT</text>
+	</g>
+	<text id="menu_etat_texte_1_" transform="matrix(1 0 0 1 41.3702 106.7081)" class="st3 st9 st5">Propre</text>
+</g>
+</svg>

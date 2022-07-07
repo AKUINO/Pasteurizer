@@ -3,9 +3,11 @@ $var title : Affordable Pasteurizer
 $if paving:
     <div id="paving" class="jumbotron" onclick="void(0);"></div>
     <script type="text/javascript">
-       $$("#paving").load("static/paving.svg", function() {
-            alert( "Load was performed." );
-          });
+       var here = $$("#paving");
+       here.load("static/ecran_accueil.svg", function() {
+       $for letter in menus.sysActions+menus.cleanActions+menus.dirtyActions:
+            SVGready($$("#menu${letter}"));
+       });
     </script>
 $if not paving:
     <main role="main" class="container">

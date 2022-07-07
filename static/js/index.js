@@ -73,6 +73,10 @@ function closeMenu() {
 
 var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+function SVGready(elements) {
+    elements.each( function() { var here = $(this); here.removeClass(); SVGready(here.children()) } );
+}
+
 $(document).ready(function() {
     var logging = ($("#tableau").length > 0);
     if (logging) {
@@ -157,15 +161,19 @@ $(document).ready(function() {
                         for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
                             if (ml = data['actionletter']) {
+                                $('#drop'+ml).addClass('disabled').addClass('current').removeClass('enabled');
                                 $('#menu'+ml).addClass('disabled').addClass('current').removeClass('enabled');
                             }
                             else if (data['allowedActions'].indexOf(ml) >= 0) {
+                                $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                                 $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                             }
                             else if ("JYLTO".indexOf(ml) >= 0) { // StateLessActions
+                                $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                                 $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                             }
                             else {
+                                $('#drop'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
                                 $('#menu'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
                             }
                         }
@@ -173,6 +181,7 @@ $(document).ready(function() {
                         console.log('no AA');
                         for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
+                            $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                             $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                         }
                     }
@@ -285,6 +294,7 @@ function action(letter) {
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
                         if (data['allowedActions'].indexOf(ml) >= 0) {
+                            $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                             $('#menu'+ml).removeClass('disabled');
                         }
                         else {
