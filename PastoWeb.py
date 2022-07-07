@@ -2293,7 +2293,7 @@ class WebApiLog:
                             'pressMin': isnull(cohorts.val('press',peak=-1), ''), \
                             'pressMax': isnull(cohorts.val('press',peak=1), ''), \
                             'reft': isnull(cohorts.reft.value, ''), \
-                            'message': message + (ml.T(' - Cuve mal remplie?',' - Tank not filled?',' - Tank niet gevuld?') if warning else ''), \
+                            'message': message + (str(ml.T(' - Cuve mal remplie?',' - Tank not filled?',' - Tank niet gevuld?')) if warning else ''), \
                             #'opt_T': temper if temper <  99.0 else '', \
                             'opt_M': menus.val('M'), \
                             'opt_temp': opt_temp, \
