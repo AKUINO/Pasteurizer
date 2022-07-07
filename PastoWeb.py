@@ -1583,7 +1583,7 @@ class ThreadPump(threading.Thread):
             self.startPause = self.pumpLastChange
         if paused:
             T_Pump.pump.reset_pump()
-            taps[self.tap].set(0)
+            taps['H'].set(0)
         self.paused = paused
 
     def durationRemaining(self,now):
