@@ -136,10 +136,10 @@ $(document).ready(function() {
                     } else {
                         $('#delay').html('');
                     }
-                    if ('fill' in data && data['fill']>'0') {
-                        $('#fill').hide();
-                    } else {
+                    if ('fill' in data && data['fill']>0) {
                         $('#fill').show();
+                    } else {
+                        $('#fill').hide();
                     }
                     var speed = floorUni(data['speed']);
                     $('#vitesse').text(speed);
