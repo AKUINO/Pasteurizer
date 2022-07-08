@@ -165,19 +165,23 @@ $(document).ready(function() {
                         console.log('AA='+data['allowedActions']);
                         for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
-                            if (ml = data['actionletter']) {
+                            if (ml == data['actionletter']) {
+                                //console.log('current='+
                                 $('#drop'+ml).addClass('disabled').addClass('current').removeClass('enabled');
                                 $('#menu'+ml).addClass('disabled').addClass('current').removeClass('enabled');
                             }
                             else if (data['allowedActions'].indexOf(ml) >= 0) {
+                                //console.log('enable='+
                                 $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                                 $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                             }
                             else if ("JYLTO".indexOf(ml) >= 0) { // StateLessActions
+                                //console.log('JYLTO='+
                                 $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                                 $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                             }
                             else {
+                                //console.log('disable='+
                                 $('#drop'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
                                 $('#menu'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
                             }
@@ -300,16 +304,18 @@ function action(letter) {
                         ml = ALPHABET.charAt(i);
                         if (data['allowedActions'].indexOf(ml) >= 0) {
                             $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
-                            $('#menu'+ml).removeClass('disabled');
+                            $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                         }
                         else {
-                            $('#menu'+ml).addClass('disabled');
+                            $('#drop'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
+                            $('#menu'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
                         }
                     }
                 } else {
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
-                        $('#menu'+ml).removeClass('disabled');
+                        $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
+                        $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                     }
                 }
                 if (data['pause'] != 0) {

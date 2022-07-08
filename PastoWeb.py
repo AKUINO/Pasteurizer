@@ -1031,7 +1031,8 @@ class Operation(object):
         time.sleep(0.01)
         dumpValve.set(1.0 if self.dump else 0.0)
         T_Pump.currOpContext = OperationContext(self,T_Pump.pump)
-        if not self.programmable or not menus.val('H') or (int(datetime.now()) % (24*60*60)) >= int(menus.val('H')):
+        #print("%d >= %d" % ( (int(datetime.now().timestamp()) % (24*60*60)), int(menus.val('H'))) )
+        if not self.programmable or not menus.val('H') or (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
             T_Pump.T_DAC.set_temp(self.tempWithGradient())
         else:
             T_Pump.T_DAC.set_temp(None) #,None) # Delayed start
@@ -1161,7 +1162,8 @@ class Operation(object):
 
         time.sleep(0.01)
         dumpValve.set(1.0 if self.dump else 0.0) # Will stop command if open/close duration is done
-        if not self.programmable or not menus.val('H') or (int(datetime.now()) % (24*60*60)) >= int(menus.val('H')):
+        #print("%d >= %d" % ( (int(datetime.now().timestamp()) % (24*60*60)), int(menus.val('H'))) )
+        if not self.programmable or not menus.val('H') or (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
             T_Pump.T_DAC.set_temp(self.tempWithGradient()) #,self.tempRef2()) # In case of a manual change
         else:
             T_Pump.T_DAC.set_temp(None) #, None) # Delayed start
