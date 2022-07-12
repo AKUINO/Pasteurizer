@@ -33,7 +33,7 @@ from thermistor import Thermistor
 from pressure import Pressure
 from solenoid import Solenoid
 from LED import LED
-from button import button
+from button import button, ThreadButtons
 from sensor import Sensor
 from valve import Valve
 from menus import Menus
@@ -1671,7 +1671,7 @@ class ThreadPump(threading.Thread):
                 if RedPendingConfirmation != 0.0:
                     if RedLED:
                         RedLED.blink(2)
-                if RedButton and (RedButton.get() == 1):
+                if RedButton and RedButton.acknowledge():
                     if RedPendingConfirmation > 0.0:
                         RedPendingConfirmation = 0.0
                         if not self.currAction in [None,'X','Z',' ']:
@@ -1705,14 +1705,14 @@ class ThreadPump(threading.Thread):
                                 RedLED.on()
                     elif RedLED:
                         RedLED.on()
-                if YellowButton and (YellowButton.get() == 1):
+                if YellowButton and YellowButton.acknowledge():
                     if not self.paused:
                         self.setPause(True)  # Will make the pump stops !
-                if EmergencyButton and (EmergencyButton.get() == 1):
+                if EmergencyButton and EmergencyButton.acknowledge():
                     if not self.paused:
                         self.setPause(True)  # Will make the pump stops !
                     T_DAC.set_temp(None, None)
-                if GreenButton and (GreenButton.get() == 1):
+                if GreenButton and GreenButton.acknowledge():
                     if self.paused:
                         self.setPause(False)
                 if Buzzer:
@@ -1846,6 +1846,7 @@ if not hardConf.MICHA_device:
 # Keeps heating bath at temperature following Setpoint
 T_DAC = ThreadDAC()
 # Manage pump at a higher level and execute operations for a given Action sequence
+T_Buttons = ThreadButtons([RedButton, YellowButton, GreenButton, EmergencyButton])
 T_Pump = ThreadPump(pumpy,T_DAC)
 
 dumpValve = None
@@ -1899,6 +1900,7 @@ T_Thermistor.start()
 T_DAC.T_Pump = T_Pump
 T_DAC.start()
 T_Pump.start()
+T_Buttons.start()
 
 APPLICATION_COOKIE = "pastOnomic"
 
@@ -2570,6 +2572,13 @@ try:
     T_Pump.close()
     term.write ("Pompe ", term.blue, term.bgwhite)
     term.writeLine ("éteinte.", term.green, term.bold, term.bgwhite)
+except:
+    traceback.print_exc()
+
+try:
+    T_Buttons.close()
+    term.write ("Boutons ", term.blue, term.bgwhite)
+    term.writeLine ("éteints.", term.green, term.bold, term.bgwhite)
 except:
     traceback.print_exc()
 

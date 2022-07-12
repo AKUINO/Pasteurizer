@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import term
+import time
 import sensor
+import threading
 import traceback
 
 import hardConf
@@ -26,7 +28,7 @@ class button(sensor.Sensor):
         self.lastwrite = 0
         super().__init__(button.typeNum,address,param)
 
-    def get(self):
+    def poll(self):
         value = None
         try:
             if self.param < 0:
@@ -41,9 +43,14 @@ class button(sensor.Sensor):
         except:
             print ("%s: %d=%d" % (self.address, self.param, value if value != None else 9))
             traceback.print_exc()
-        if value is not None:
-            self.set(value)
         return value
+
+    def acknowledge(self):
+        value = self.poll()
+        if (value and value > 0.0) or (self.value and self.value > 0.0):
+            self.set(0.0)
+            return True
+        return False
 
     def display(self,format=" %d"):
         if self.changed < 0.0:
@@ -53,3 +60,33 @@ class button(sensor.Sensor):
         else:
             attr = term.black
         term.write(format % self.value, attr, term.bgwhite)
+
+class ThreadButtons (threading.Thread):
+
+    def __init__(self,buttons):
+        threading.Thread.__init__(self)
+        self.running = False
+        self.buttons = []
+        for button in buttons: #Take only the existing buttons
+            if button:
+                self.buttons.append(button)
+
+    def run(self):
+        self.running = True
+        while self.running:
+            try:
+                time.sleep(0.1)
+                for button in self.buttons: #Take only the existing buttons
+                    time.sleep(0.01)
+                    if button.poll() > 0:
+                        button.set(1.0)
+            except KeyboardInterrupt:
+                self.running = False
+                break
+            except:
+                traceback.print_exc()
+
+    def close(self):
+        self.running = False
+        time.sleep(0.02)
+        self.join()
