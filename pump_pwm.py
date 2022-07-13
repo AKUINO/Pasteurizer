@@ -24,7 +24,7 @@ if hardConf.MICHA_device:
     SPEED_INCREMENT = None # Ramping is done by MICHA
     REAL_SPEED_INCREMENT = 20
 else:
-    SPEED_INCREMENT = 20 # When ramping up or down, speed change by tenth of a second
+    SPEED_INCREMENT = 20 # When ramping up or down, speed change by twentieth of a second
     REAL_SPEED_INCREMENT = 20
 
 
@@ -360,7 +360,7 @@ class pump_PWM(sensor.Sensor):
         if (currSpeed < 0) and (speed > 0):
             self.setSpeed(currSpeed,0)
             self.setSpeed(0,speed)
-        elif (currSpeed < 0) and (speed > 0):
+        elif (currSpeed > 0) and (speed < 0):
             self.setSpeed(currSpeed,0)
             self.setSpeed(0,speed)
         else:
@@ -427,15 +427,6 @@ class pump_PWM(sensor.Sensor):
                 self.setSpeed(-self.speed if self.reverse else self.speed, 0)
             except:
                 traceback.print_exc()
-            # GPIO.output(self.pinDirection, 1)
-            # if self.pinDirection > 0:
-                # hardConf.pi.write(self.pinDirection, 0)
-            # elif self.pinDirection < 0:
-                # self.IOextender.write_pin(-self.pinDirection, 0)
-            # self.pwm.ChangeDutyCycle(0)  # keep PWM quiet for now. Should be 50 when running
-            #hardConf.pi.set_PWM_dutycycle(self.pinPWM, 0)
-            # self.setPWM(0)
-            # time.sleep(0.01)
         else:
             self.lastError = ReadPump_PWM.errors[3]
         self.previous_volume = self.volume()
