@@ -2,14 +2,23 @@
 # -*- coding: utf-8 -*-
 import datetime
 import traceback
+import codecs
+import configparser
 
 class Menus(object):
 
-    VAL = 3
-    INI = 4
+    NAM = 1 #multilingual name
+    TIT = 2 #multilingual title
+    VAL = 3 #current value
+    INI = 4 #initial value
+    UNI = 5 #unit
     MIN = -1 #not assigned, always 0.0 ...
-    MAX = 7
-    STP = 8
+    MAX = 7 #max value
+    STP = 8 #step
+    TYP = 9 #number, time per HTML input type
+    REF = 10 #when a value is calculated another way
+
+    singleton = None #initialized after class definition is closed
 
     def __init__(self):
         self.options = None
@@ -24,11 +33,20 @@ class Menus(object):
         self.cleanOptions = None
         self.dirtyOptions = None
 
+    def nam(self,letter):
+        return self.options[letter][Menus.NAM]
+
+    def tit(self,letter):
+        return self.options[letter][Menus.TIT]
+
     def val(self,letter):
         return self.options[letter][Menus.VAL]
 
     def ini(self,letter):
         return self.options[letter][Menus.INI]
+
+    def uni(self,letter):
+        return self.options[letter][Menus.UNI]
 
     def max(self,letter):
         return self.options[letter][Menus.MAX]
@@ -37,7 +55,13 @@ class Menus(object):
         return self.options[letter][Menus.STP]
 
     def type(self,letter):
-        return self.options[letter][9]
+        return self.options[letter][Menus.TYP]
+
+    def ref(self,letter):
+        if len(self.options[letter] > Menus.REF):
+            return self.options[letter][Menus.REF]
+        else:
+            return None
 
     def display(self,letter, field, value = None):
         fieldType = None
@@ -79,3 +103,38 @@ class Menus(object):
                 self.options[letter][Menus.VAL] = float(value)
         except:
             traceback.print_exc()
+
+    def loadCurrent(self,DIR_DATA_CSV): # returns timestamp and current state
+
+        Menus.option_file = DIR_DATA_CSV + "options.ini"
+        configParsing = configparser.RawConfigParser()
+        try:
+            with codecs.open(Menus.option_file, 'r', 'utf8' ) as f:
+                configParsing.read_file(f)
+        except IOError:
+            print(Menus.option_file+' not found. Using default options values.')
+            configParsing = None
+
+        if configParsing:
+            if 'options' in configParsing.sections():
+                for anItem in configParsing.items('options'):
+                    if anItem[0] in self.options:
+                        if anItem[1]:
+                            try:
+                                self.options[anItem[0]] = float(anItem[1])
+                            except:
+                                print ('In '+Menus.option_file+', option '+anItem[0]+'='+anItem[1]+' not a floating point number like 3.14')
+
+        def save(self):
+            try:
+                with open(Menus.data_dir + "options.ini", "w") as data_file:
+                    data_file.write("[options]\n")
+                for (letter,anOption) in self.options.items():
+                    if anOption.val() != anOption.ini():
+                        data_file.write(letter+"="+anOption.val()+"\n")
+            except IOError: # unknown previous state
+                traceback.print_exc()
+
+Menus.singleton = Menus()
+
+
