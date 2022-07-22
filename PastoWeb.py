@@ -583,7 +583,7 @@ State('r',ml.T('Propre','Clean','Schoon'), \
     [ ('P','p'),('D',''),('H',''),('F','o'),('V',''),('w','o') ] )
 
 State('o',ml.T('Eau','Water','Waser'), \
-    [ ('A',['o','o',['a',None,False]]),('C',['o','o',['c',None,False]]),('F',''),('V',''),('D',['','','r']),('w','') ] )
+    [ ('A',['o','o',['a',None,False]]),('C',['o','o',['c',None,False]]),('F',''),('V',''),('D',['','','r']),('H',['','r']),('w','') ] )
 
 State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
     [ ('C',['s','s',['c',None,False]]), ('F',''),('V',''),('w','') ]
@@ -1941,13 +1941,18 @@ def init_access():
 def notfound():
     return web.notfound(render.notfound())
 
+paving = False
+
 class WebIndex:
     def __init(self):
         self.name = u"WebIndex"
 
     def GET(self):
+        global paving
         data, connected, mail, password = init_access()
-        return render.index(connected, mail, False, None, False) #True if Paving...
+        if 'paving' in data and len(data['paving']) > 0:
+            paving = data['paving'][0].lower() in ['o','y','d','s']
+        return render.index(connected, mail, False, None, paving) #True if Paving...
 
     def POST(self):
         return self.GET()
