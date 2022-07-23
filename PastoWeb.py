@@ -186,10 +186,10 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,45.0,45.0,"°C",False,90,0.1,"number"], # Température du Bassin pour le prélavage
                     'r':['r',ml.T("Rinçage\"","Rinse\"","Spoelen\"") \
                             ,ml.T("Durée du dernier Rinçage","Last Rinse duration","Laatste spoelduur") \
-                            ,0.0,0.0,'\"',False,300,5,"number"], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
+                            ,0.0,0.0,'\"',False,300,5,"number",60], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
                     'u':['u',ml.T("Rinçage(L)","Rinse(L)","Spoelen(L)") \
                             ,ml.T("Volume du dernier Rinçage","Last Rinse Volume","Laatste spoelvolume") \
-                            ,0.0,0.0,'L',False,20,0.1,"number",0.0], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
+                            ,0.0,0.0,'L',False,20,0.1,"number",4.0], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
                     's':['s',ml.T("Seau pour l'Eau","Bucket for Water","Emmer voor water\"") \
                         ,ml.T("Eau courante(0) ou amenée dans un seau(1)","Running water(0) or brought in a bucket(1)","Stromend water(0) of gebracht in een emmer(1)") \
                         ,0,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
@@ -228,12 +228,12 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,0.0,0.0,"L",True,9999.9,0.1,"number"], # Quantité de lait à traiter,ZeroIsNone=True
                     'H':['H',ml.T("Démarrage","Start","Start") \
                             ,ml.T("Heure de démarrage","Start Time","Starttijd") \
-                            ,0.0,0.0,"hh:mm",True,84000,600,"time"], # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
-                    'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
-                            ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
+                            ,0.0,0.0,"hh:mm",True,84000,600,"time"] } # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
+                    # 'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
+                    #         ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
 menus.sortedOptions = "PMGgwQHRrusCcAaZ" #T
 menus.cleanOptions = "PGMgQH" #TtK
-menus.dirtyOptions = "gRrusCcAaDdwH" #Cc
+menus.dirtyOptions = "gRrusCcAawH" #Cc
 
 menus.loadCurrent(DIR_DATA_CSV)
 
@@ -328,7 +328,9 @@ for curr_cohort in cohorts.sequence:
     TOTAL_VOL += curr_cohort[0]
 tell_message("Amorçage=%dmL, Pasteurisation=%dmL : %.1fL/h, Total=%dmL" % (int(START_VOL),int(pasteurization_tube),(pasteurization_tube / 15.0) * 3600.0 / 1000.0,int(TOTAL_VOL)))
 
-menus.options['u'][Menus.INI] = TOTAL_VOL
+xxx = menus.options['u']
+print (xxx[Menus.INI])
+xxx[Menus.INI] = TOTAL_VOL
 #Amorçage=1941mL, Pasteurisation=538mL, Total=3477mL
 #Amorçage=2031mL, Pasteurisation=538mL, Total=3676mL
 #Amorçage=2034mL, Pasteurisation=325mL, Total=3346mL
@@ -2004,27 +2006,18 @@ class WebOption:
             raise web.seeother('/')
 
         if data: # Process saved options from options editing forms
-            flood_q = None
-            flood_u = None
             if ('reset' in data and data['reset'].lower() == 'on'):
                 for choice in (menus.cleanOptions if page == '1' else menus.dirtyOptions):
                     if len(menus.options[choice]) > Menus.INI:
                         menus.options[choice][Menus.VAL] = menus.options[choice][Menus.INI]
             else:
                 for keys in menus.options.keys():
-                  if keys == 'u':
-                      flood_q = data['opt_u']
-                  elif keys == 'r':
-                      flood_d = data['opt_r']
-                  elif 'opt_'+keys in data:
+                  if 'opt_'+keys in data:
                     val = data['opt_'+keys]
                     if not val:
                         menus.options[keys][Menus.VAL] = menus.options[keys][Menus.INI]
                     else:
                         menus.store(keys, val)
-            if flood_q > 0.1 and flood_u >= 20:
-                menus.store('u', flood_q)
-                menus.store('r', flood_d)
             reloadPasteurizationSpeed()
             menus.save()
         render_page = getattr(render, 'option'+page)

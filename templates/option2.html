@@ -13,10 +13,11 @@ $var title : Cleaning Parameters
 <form method="post" action="/option2">
 $for letter in menus.dirtyOptions:
   <div class="form-group">
-    <label for="opt_$(letter)">$(menus.tit(letter)) ( $(menus.uni(letter)) )</label>
+    <label for="opt_$(letter)">$(menus.tit(letter)) ( $(menus.uni(letter)) )
+      $if menus.ref(letter):
+        $(ml.T("Dernier","Last","Laatse")): $(menus.ref(letter))
+    </label>
     <input class="form-control" id="opt_$(letter)" name="opt_$(letter)" placeholder="$(menus.display(letter,Menus.INI))" min="$(menus.display(letter,Menus.MIN))" max="$(menus.display(letter,Menus.MAX))" step="$(menus.display(letter,Menus.STP))" type="$(menus.type(letter))" value="$(menus.display(letter,Menus.VAL))">
-    $if menus.ref(letter):
-       ($(ml.T("Dernier","Last","Laatse")): $(menus.ref(letter)))
   </div>
 <button type="submit" class="btn btn-success">$(ml.T("Enregistrer","Save","Opslaan"))</button>
 </form>

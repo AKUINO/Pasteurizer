@@ -58,7 +58,7 @@ class Menus(object):
         return self.options[letter][Menus.TYP]
 
     def ref(self,letter):
-        if len(self.options[letter] > Menus.REF):
+        if len(self.options[letter]) > Menus.REF:
             return self.options[letter][Menus.REF]
         else:
             return None
@@ -121,19 +121,19 @@ class Menus(object):
                     if anItem[0] in self.options:
                         if anItem[1]:
                             try:
-                                self.options[anItem[0]] = float(anItem[1])
+                                self.options[anItem[0]][Menus.VAL] = float(anItem[1])
                             except:
                                 print ('In '+Menus.option_file+', option '+anItem[0]+'='+anItem[1]+' not a floating point number like 3.14')
 
-        def save(self):
-            try:
-                with open(Menus.data_dir + "options.ini", "w") as data_file:
-                    data_file.write("[options]\n")
+    def save(self):
+        try:
+            with open(Menus.option_file, "w") as data_file:
+                data_file.write("[options]\n")
                 for (letter,anOption) in self.options.items():
-                    if anOption.val() != anOption.ini():
-                        data_file.write(letter+"="+anOption.val()+"\n")
-            except IOError: # unknown previous state
-                traceback.print_exc()
+                    if anOption[Menus.VAL] != anOption[Menus.INI]:
+                        data_file.write(letter+"="+str(anOption[Menus.VAL])+"\n")
+        except IOError: # unknown previous state
+            traceback.print_exc()
 
 Menus.singleton = Menus()
 
