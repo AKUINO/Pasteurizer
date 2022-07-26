@@ -1055,9 +1055,16 @@ class Operation(object):
                     taps[self.tap].set(1)
                 else: # Eau dans un seau..
                     pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
-        elif self.typeOp in ['FLOO','RFLO']:
+        elif self.typeOp == 'RFLO':
             if menus.val('s') < 1.0:
                 taps[self.tap].set(1)
+            else: # Eau dans un seau..
+                pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
+        elif self.typeOp == 'FLOO':
+            if menus.val('s') < 1.0:
+                taps[self.tap].set(1)
+                Menus.options['u'][Menus.REF] = self.duration
+                Menus.options['r'][Menus.REF] = self.qty
             else: # Eau dans un seau..
                 pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
         elif self.typeOp == 'HOTW':
@@ -1310,9 +1317,6 @@ class Operation(object):
             T_Pump.pump.stop()
             if menus.val('s') < 1.0:
                 taps[self.tap].set(0)
-            elif self.typeOp in ['FILL','FLOO']:
-                Menus.options['u'][Menus.REF] = self.duration
-                Menus.options['r'][Menus.REF] = self.qty
             State.empty = False
         elif self.typeOp in ['REVR']:
             T_Pump.pump.reset_pump()
