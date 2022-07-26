@@ -328,9 +328,7 @@ for curr_cohort in cohorts.sequence:
     TOTAL_VOL += curr_cohort[0]
 tell_message("Amorçage=%dmL, Pasteurisation=%dmL : %.1fL/h, Total=%dmL" % (int(START_VOL),int(pasteurization_tube),(pasteurization_tube / 15.0) * 3600.0 / 1000.0,int(TOTAL_VOL)))
 
-xxx = menus.options['u']
-print (xxx[Menus.INI])
-xxx[Menus.INI] = TOTAL_VOL
+menus.options['u'][Menus.INI] = TOTAL_VOL
 #Amorçage=1941mL, Pasteurisation=538mL, Total=3477mL
 #Amorçage=2031mL, Pasteurisation=538mL, Total=3676mL
 #Amorçage=2034mL, Pasteurisation=325mL, Total=3346mL
@@ -1314,6 +1312,7 @@ class Operation(object):
                 taps[self.tap].set(0)
             elif self.typeOp in ['FILL','FLOO']:
                 Menus.options['u'][Menus.REF] = self.duration
+                Menus.options['r'][Menus.REF] = self.qty
             State.empty = False
         elif self.typeOp in ['REVR']:
             T_Pump.pump.reset_pump()
