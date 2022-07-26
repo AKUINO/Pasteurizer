@@ -167,8 +167,8 @@ $(document).ready(function() {
                             ml = ALPHABET.charAt(i);
                             if (ml == data['actionletter']) {
                                 //console.log('current='+
-                                $('#drop'+ml).addClass('disabled').addClass('current').removeClass('enabled');
-                                $('#menu'+ml).addClass('disabled').addClass('current').removeClass('enabled');
+                                $('#drop'+ml).removeClass('disabled').addClass('current').removeClass('enabled');
+                                $('#menu'+ml).removeClass('disabled').addClass('current').removeClass('enabled');
                             }
                             else if (data['allowedActions'].indexOf(ml) >= 0) {
                                 //console.log('enable='+
