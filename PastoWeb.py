@@ -1063,9 +1063,9 @@ class Operation(object):
         elif self.typeOp == 'FLOO':
             if menus.val('s') < 1.0:
                 taps[self.tap].set(1)
-                Menus.options['u'][Menus.REF] = self.duration
-                Menus.options['r'][Menus.REF] = self.qty
-                print("Set REF u="+str(self.duration)+", r="+str(self.qty))
+                menus.options['u'][Menus.REF] = self.duration
+                menus.options['r'][Menus.REF] = self.qty
+                #print("Set REF u="+str(self.duration)+", r="+str(self.qty))
             else: # Eau dans un seau..
                 pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
         elif self.typeOp == 'HOTW':
