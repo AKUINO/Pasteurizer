@@ -199,9 +199,9 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                     'c':['c',ml.T("net.Caustique\"","Caustic cleaning\"","Bijtende schoonmaak\"") \
                             ,ml.T("Durée de nettoyage","Cleaning Duration","Schoonmaak Tijd") \
                             ,CLEAN_TIME,CLEAN_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un passage au détergent
-                    # 'D': ['D', ml.T("Désinfection thermique°""Thermal Disinfection°", "Thermisch Desinfectie°") \
-                    #     , ml.T("Température de désinfection", "Disinfection Temperature", "Desinfectie Temperatuur") \
-                    #     , 72.0, 72.0, "°C", False, 77, 0.1, "number"],  # Température normale de pasteurisation
+                    'D': ['D', ml.T("Désinfection thermique°""Thermal Disinfection°", "Thermisch Desinfectie°") \
+                          , ml.T("Température de désinfection", "Disinfection Temperature", "Desinfectie Temperatuur") \
+                          , 72.0, 72.0, "°C", False, 77, 0.1, "number"],  # Température normale de pasteurisation
                     # 'd': ['d', ml.T("Désinfection thermique\"", "Thermal Disinfection\"", "Thermisch Desinfectie\"") \
                     #     , ml.T("Durée de désinfection", "Disinfection Duration", "Desinfectie Tijd") \
                     #     , TH_DISINF_TIME,TH_DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
@@ -231,9 +231,9 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,0.0,0.0,"hh:mm",True,84000,600,"time"] } # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
                     # 'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
                     #         ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
-menus.sortedOptions = "PMGgwQHRrusCcAaZ" #T
+menus.sortedOptions = "PMGgwQDHRrusCcAaZ" #T
 menus.cleanOptions = "PGMgQH" #TtK
-menus.dirtyOptions = "gRrusCcAawH" #Cc
+menus.dirtyOptions = "gRrusCcAawDH" #Cc
 
 menus.loadCurrent(DIR_DATA_CSV)
 
