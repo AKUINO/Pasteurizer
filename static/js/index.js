@@ -110,6 +110,7 @@ $(document).ready(function() {
                     var time = data['date'].substring(11,999);
                     $('#time').text(time);
                     $('#actionletter').text(data['actionletter']);
+                    $('#preconfigletter').text(data['preconfigletter']);
                     $('#action').text(data['action']);
                     $('#stateletter').text(data['stateletter']);
                     $('#state').text(data['state']);
@@ -287,6 +288,7 @@ function action(letter) {
                 var time = data['date'].substring(11,999);
                 $('#time').text(time);
                 $('#actionletter').text(data['actionletter']);
+                $('#preconfigletter').text(data['preconfigletter']);
                 $('#action').text(data['action']);
                 $('#stateletter').text(data['stateletter']);
                 $('#state').text(data['state']);

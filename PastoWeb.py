@@ -56,8 +56,8 @@ DIR_WEB_TEMP = os.path.join(DIR_STATIC, 'temp/')
 
 TEMPLATES_DIR = os.path.join(DIR_BASE, 'templates/')
 
-KEY_ADMIN = "user@pastonomic.solutions"  # Omnipotent user
-PWD = "BE.past0"
+KEY_ADMIN = "user@akuino.net"  # Omnipotent user
+PWD = "past0.NET"
 
 HEAT_EXCHANGER = True
 
@@ -206,10 +206,10 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                     #     , ml.T("Durée de désinfection", "Disinfection Duration", "Desinfectie Tijd") \
                     #     , TH_DISINF_TIME,TH_DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'A':['A',ml.T("net.Acide°""Acidic cleaning°","Zuur schoonmaak°") \
-                            ,ml.T("Température de désinfection","Disinfection Temperature","Desinfectie Temperatuur") \
+                            ,ml.T("Température de nettoyage acide","Acidic cleaning Temperature","Zuur schoomaak Temperatuur") \
                             ,60.0,60.0,"°C",False,90,0.1,"number"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'a':['a',ml.T("net.Acide\"","Acidic cleaning\"","Zuur schoonmaak\"") \
-                            ,ml.T("Durée de désinfection","Disinfection Duration","Desinfectie Tijd") \
+                            ,ml.T("Durée de nettoyage acide","Acidic cleaning Duration","Zuur schoomaak Tijd") \
                             ,DISINF_TIME,DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'M':['M',ml.T("Minimum","Minimum","Minimum") \
                             ,ml.T("Durée minimale de pasteurisation","Minimum pasteurization time","Minimale pasteurisatietijd") \
@@ -228,11 +228,14 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,0.0,0.0,"L",True,9999.9,0.1,"number"], # Quantité de lait à traiter,ZeroIsNone=True
                     'H':['H',ml.T("Démarrage","Start","Start") \
                             ,ml.T("Heure de démarrage","Start Time","Starttijd") \
-                            ,0.0,0.0,"hh:mm",True,84000,600,"time"] } # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
+                            ,0.0,0.0,"hh:mm",True,84000,600,"time"], # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
+                    'z':['z',ml.T("Pré-configuration","Pre-configuration","Pre-configuratie") \
+                        ,ml.T("Code de pré-configuration","Pre-configuration code","Pre-configuratiecode") \
+                        ,'L','L',"hh:mm",True,None,None,"text"] }
                     # 'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
                     #         ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
 menus.sortedOptions = "PMGgwQDHRrusCcAaZ" #T
-menus.cleanOptions = "PGMgQH" #TtK
+menus.cleanOptions = "PMGgQH" #TtK
 menus.dirtyOptions = "gRrusCcAawDH" #Cc
 
 menus.loadCurrent(DIR_DATA_CSV)
@@ -261,7 +264,7 @@ calibrating = False
 temp_ref_calib = []
 
 def manage_cmdline_arguments():
-    parser = argparse.ArgumentParser(description='pastOnomic: Pasteurisateur accessible')
+    parser = argparse.ArgumentParser(description='AKUINO: Pasteurisateur accessible')
     # Est interprété directement par WebPY
     parser.add_argument('port', type=int, help='Port number of the internal \
                                                 web server')
@@ -272,10 +275,10 @@ args = manage_cmdline_arguments()
 _lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
 
 try:
-    _lock_socket.bind('\0pastOnomic')
-    print('Socket pastOnomic now locked')
+    _lock_socket.bind('\0AKUINOpast')
+    print('Socket AKUINOpast now locked')
 except socket.error:
-    print('pastOnomic lock exists')
+    print('AKUINOpast lock exists')
     sys.exit()
 
 if not os.path.samefile(os.getcwd(), DIR_BASE):
@@ -600,10 +603,10 @@ State('s',ml.T('Sale','Dirty','Vies'), \
     , [False,True],[False] )
 
 State('c',ml.T('Soude','Soda','Natrium'), \
-    [ ('R',['','o']),('F',''),('V',''),('w','') ] )
+    [ ('R',['','r']),('F',''),('V',''),('w','') ] )
 
 State('a',ml.T('Acide','Acid','Zuur'), \
-    [ ('R',['','o']),('F',''),('V',''),('w','') ] )
+    [ ('R',['','r']),('F',''),('V',''),('w','') ] )
 
 State('p',ml.T('Produit','Product','Product'), \
     [ ('I',''),('M',''),('E','e'),('A',['e','s',['a',None,False]]),('C',['e','s',['c',None,False]]),('F','e'),('V','') ]
@@ -1830,7 +1833,7 @@ class ThreadPump(threading.Thread):
         except:
             traceback.print_exc()
 
-term.setTitle("pastOnomic, pasteurisation accessible")
+term.setTitle("AKUINO, pasteurisation accessible")
 (lines, columns) = termSize()
 term.pos(lines,1)
 for i in range(1,lines):
@@ -1945,7 +1948,7 @@ T_DAC.start()
 T_Pump.start()
 T_Buttons.start()
 
-APPLICATION_COOKIE = "pastOnomic"
+APPLICATION_COOKIE = "AKUINOpast"
 
 ### Web Server section
 def ensureLogin(mail, password):
@@ -2068,6 +2071,7 @@ class WebApiAction:
             message = ""
             # StateLessActions
             if letter == 'J':  # Juice
+                menus.store('z','J')
                 menus.store('P',75.0)
                 menus.store('M', 15.0)
                 menus.store('g', False)
@@ -2076,6 +2080,7 @@ class WebApiAction:
                 reloadPasteurizationSpeed()
                 menus.save()
             elif letter == 'Y':  # Yaourt
+                menus.store('z','Y')
                 menus.store('P', 82.0)
                 menus.store('M', 30.0)
                 #menus.options['T'][3] = 45.0
@@ -2084,6 +2089,7 @@ class WebApiAction:
                 reloadPasteurizationSpeed()
                 menus.save()
             elif letter == 'L':  # Lait
+                menus.store('z','L')
                 menus.store('P', 72.0)
                 menus.store('M', 15.0)
                 #menus.options['T'][3] = 22.0
@@ -2092,6 +2098,7 @@ class WebApiAction:
                 menus.save()
                 reloadPasteurizationSpeed()
             elif letter == 'T':  # Thermiser
+                menus.store('z','T')
                 menus.store('P', 65.0)
                 menus.store('M', 30.0)
                 #menus.options['T'][3] = 35.0
@@ -2132,6 +2139,7 @@ class WebApiAction:
                     message = str(ml.T("Invalide","Invalid","Ongeldig"))
             result = {  'date':str(datetime.fromtimestamp(int(time.time()))),
                         'actionletter':letter,
+                        'preconfigletter':menus.val('z'),
                         'action':str(menus.actionName[letter][1]),
                         'actiontitle':str(menus.actionName[letter][3]),
                         'stateletter': (State.current.letter if State.current else ''),
@@ -2172,6 +2180,7 @@ class WebApiState:
             State.setCurrent(letter,empty,greasy)
             result = {  'date':str(datetime.fromtimestamp(int(time.time()))),
                         'actionletter':T_Pump.currAction,
+                        'preconfigletter':menus.val('z'),
                         'action':str(menus.actionName[T_Pump.currAction][1]),
                         'actiontitle':str(menus.actionName[T_Pump.currAction][3]),
                         'stateletter': (State.current.letter if State.current else ''),
@@ -2340,6 +2349,7 @@ class WebApiLog:
             currLog = {     'date': str(datetime.fromtimestamp(int(nowT))), \
                             'actif': 1 if actif else 0, \
                             'actionletter': T_Pump.currAction, \
+                            'preconfigletter':menus.val('z'), \
                             'action': str(menus.actionName[T_Pump.currAction][1]), \
                             'actiontitle': str(menus.actionName[T_Pump.currAction][3]), \
                             'stateletter': (State.current.letter if State.current else ''),
