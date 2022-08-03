@@ -94,13 +94,16 @@ class Menus(object):
         try:
             if value is None or value == '':
                 self.options[letter][Menus.VAL] = None
-            fieldType = self.type(letter)
-            if fieldType == 'time':
-                date_time = datetime. datetime. strptime(value, "%H:%M") #%S:
-                a_timedelta = date_time - datetime. datetime(1900, 1, 1)
-                self.options[letter][Menus.VAL] = float( a_timedelta.total_seconds() )
             else:
-                self.options[letter][Menus.VAL] = float(value)
+                fieldType = self.type(letter)
+                if fieldType == 'time':
+                    date_time = datetime. datetime. strptime(value, "%H:%M") #%S:
+                    a_timedelta = date_time - datetime. datetime(1900, 1, 1)
+                    self.options[letter][Menus.VAL] = float( a_timedelta.total_seconds() )
+                elif fieldType == 'text':
+                    self.options[letter][Menus.VAL] = value
+                else:
+                    self.options[letter][Menus.VAL] = float(value)
         except:
             traceback.print_exc()
 
