@@ -119,6 +119,8 @@ class Menus(object):
         except IOError:
             print(Menus.option_file+' not found. Using default options values.')
             configParsing = None
+        except:
+            traceback.print_exc()
 
         if configParsing:
             if 'options' in configParsing.sections():
@@ -141,7 +143,7 @@ class Menus(object):
                 for (letter,anOption) in self.options.items():
                     if anOption[Menus.VAL] != anOption[Menus.INI]:
                         data_file.write(letter+('m' if letter in Menus.ALPHABET else '')+"="+str(anOption[Menus.VAL])+"\n")
-        except IOError: # unknown previous state
+        except: # unknown previous state
             traceback.print_exc()
 
 Menus.singleton = Menus()

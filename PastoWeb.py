@@ -186,7 +186,7 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,45.0,45.0,"°C",False,90,0.1,"number"], # Température du Bassin pour le prélavage
                     'r':['r',ml.T("Rinçage\"","Rinse\"","Spoelen\"") \
                             ,ml.T("Durée du dernier Rinçage","Last Rinse duration","Laatste spoelduur") \
-                            ,0.0,0.0,'\"',False,300,5,"number",60], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
+                            ,0.0,60.0,'\"',False,300,5,"number",60], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
                     'u':['u',ml.T("Rinçage(L)","Rinse(L)","Spoelen(L)") \
                             ,ml.T("Volume du dernier Rinçage","Last Rinse Volume","Laatste spoelvolume") \
                             ,0.0,0.0,'L',False,20,0.1,"number",4.0], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
@@ -331,7 +331,7 @@ for curr_cohort in cohorts.sequence:
     TOTAL_VOL += curr_cohort[0]
 tell_message("Amorçage=%dmL, Pasteurisation=%dmL : %.1fL/h, Total=%dmL" % (int(START_VOL),int(pasteurization_tube),(pasteurization_tube / 15.0) * 3600.0 / 1000.0,int(TOTAL_VOL)))
 
-menus.options['u'][Menus.INI] = TOTAL_VOL
+menus.options['u'][Menus.INI] = TOTAL_VOL/1000.0
 #Amorçage=1941mL, Pasteurisation=538mL, Total=3477mL
 #Amorçage=2031mL, Pasteurisation=538mL, Total=3676mL
 #Amorçage=2034mL, Pasteurisation=325mL, Total=3346mL
