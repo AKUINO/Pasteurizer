@@ -87,7 +87,7 @@ reversedPump = False
 tubing=None
 
 if hostname.startswith(prefixHostname):
-    i = hostname.index('-')
+    i = hostname.index('-',len(prefixHostname))
     if i < len(prefixHostname):
         print ("A '-'(dash) must precede the pasteurizer serial number in the hostname")
     else:
