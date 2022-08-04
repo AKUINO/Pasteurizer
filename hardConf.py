@@ -79,7 +79,7 @@ HARDdirectory = os.path.join(os.path.dirname(os.path.abspath(__file__)),"configs
 
 serialNumber = ""
 configCode = ""
-prefixHostname = "pasto"
+prefixHostname = "PASTO_"
 configFile = ""
 configParsing = None
 MICHA_version = None
@@ -87,7 +87,7 @@ reversedPump = False
 tubing=None
 
 if hostname.startswith(prefixHostname):
-    i = hostname.index('-')
+    i = hostname.index('_')
     if i < len(prefixHostname):
         print ("A '-'(dash) must precede the pasteurizer serial number in the hostname")
     else:
