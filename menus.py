@@ -20,6 +20,8 @@ class Menus(object):
 
     singleton = None #initialized after class definition is closed
 
+    ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
     def __init__(self):
         self.options = None
         self.sortedOptions = None
@@ -121,12 +123,16 @@ class Menus(object):
         if configParsing:
             if 'options' in configParsing.sections():
                 for anItem in configParsing.items('options'):
-                    if anItem[0] in self.options:
+                    if len(anItem[0]) > 1 and anItem[0][1] == 'm':
+                        letter = anItem[0][0].upper()
+                    else:
+                        letter = anItem[0][0].lower()
+                    if letter in self.options:
                         if anItem[1]:
                             try:
-                                self.options[anItem[0]][Menus.VAL] = float(anItem[1])
+                                self.options[letter][Menus.VAL] = float(anItem[1])
                             except:
-                                print ('In '+Menus.option_file+', option '+anItem[0]+'='+anItem[1]+' not a floating point number like 3.14')
+                                print ('In '+Menus.option_file+', option '+letter+'='+anItem[1]+' not a floating point number like 3.14')
 
     def save(self):
         try:
@@ -134,7 +140,7 @@ class Menus(object):
                 data_file.write("[options]\n")
                 for (letter,anOption) in self.options.items():
                     if anOption[Menus.VAL] != anOption[Menus.INI]:
-                        data_file.write(letter+"="+str(anOption[Menus.VAL])+"\n")
+                        data_file.write(letter+('m' if letter in Menus.ALPHABET else '')+"="+str(anOption[Menus.VAL])+"\n")
         except IOError: # unknown previous state
             traceback.print_exc()
 
