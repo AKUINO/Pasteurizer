@@ -284,6 +284,9 @@ function action(letter) {
    $.ajax({
         url: "/action/"+letter,
         cache: false,
+        error: function (jqXHR, textStatus, errorThrown ) {
+            $('#message').text('Application '+(textStatus?textStatus:'')+(errorThrown?(' '+errorThrown):''));
+        },
         success: function(data) {
             if (data) {
                 var date = data['date'].substring(0,10);
