@@ -106,6 +106,7 @@ $(document).ready(function() {
         error: function (jqXHR, textStatus, errorThrown ) {
             $('#message').text('Application '+(textStatus?textStatus:'')+(errorThrown?(' '+errorThrown):''));
         },
+        timeout: 3000, // sets timeout to 3 seconds
         success: function(data) {
                 if (data && 'date' in data) {
                     var date = data['date'].substring(0,10);
@@ -287,6 +288,7 @@ function action(letter) {
         error: function (jqXHR, textStatus, errorThrown ) {
             $('#message').text('Application '+(textStatus?textStatus:'')+(errorThrown?(' '+errorThrown):''));
         },
+        timeout: 3000, // sets timeout to 3 seconds
         success: function(data) {
             if (data) {
                 var date = data['date'].substring(0,10);
