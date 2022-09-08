@@ -195,10 +195,10 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                         ,0,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
                     'C':['C',ml.T("net.Caustique°","Caustic cleaning°","Bijtende schoonmaak°") \
                             ,ml.T("Température de nettoyage","Cleaning Temperature","Schoonmaak Temperatuur") \
-                            ,70.0,70.0,"°C",False,90,0.1,"number"], # Température pour un passage au détergent
+                            ,70.0,70.0,"°C",False,77,0.1,"number"], # Température pour un passage au détergent
                     'c':['c',ml.T("net.Caustique\"","Caustic cleaning\"","Bijtende schoonmaak\"") \
                             ,ml.T("Durée de nettoyage","Cleaning Duration","Schoonmaak Tijd") \
-                            ,CLEAN_TIME,CLEAN_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un passage au détergent
+                            ,CLEAN_TIME,CLEAN_TIME,"hh:mm",False,3600*2,60,"time"],
                     'D': ['D', ml.T("Désinfection thermique°""Thermal Disinfection°", "Thermisch Desinfectie°") \
                           , ml.T("Température de désinfection", "Disinfection Temperature", "Desinfectie Temperatuur") \
                           , 72.0, 72.0, "°C", False, 77, 0.1, "number"],  # Température normale de pasteurisation
@@ -207,7 +207,7 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                     #     , TH_DISINF_TIME,TH_DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'A':['A',ml.T("net.Acide°""Acidic cleaning°","Zuur schoonmaak°") \
                             ,ml.T("Température de nettoyage acide","Acidic cleaning Temperature","Zuur schoomaak Temperatuur") \
-                            ,60.0,60.0,"°C",False,90,0.1,"number"], # Température pour un traitement à l'acide ou au percarbonate de soude
+                            ,55.0,55.0,"°C",False,77,0.1,"number"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'a':['a',ml.T("net.Acide\"","Acidic cleaning\"","Zuur schoonmaak\"") \
                             ,ml.T("Durée de nettoyage acide","Acidic cleaning Duration","Zuur schoomaak Tijd") \
                             ,DISINF_TIME,DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
@@ -1017,7 +1017,7 @@ class Operation(object):
     def tempWithGradient(self): # Current heating temperature along what is set in options
         if not self.ref: # do not heat !
             return 0.0
-        return menus.val(self.ref) + ( menus.val('G') if self.ref == 'P' else (13.0 if self.ref == 'D' else 0.0) )
+        return menus.val(self.ref) + ( menus.val('G') if self.sensor1 == 'warranty' else (13.0 if self.sensor1 == 'output' else 0.0) )
 
     # def tempRef2(self): # Current heating temperature along what is set in options
         # if not self.ref2: # do not heat !
@@ -1435,13 +1435,14 @@ opSequences = {
         [ Operation('DesT','HEAT',ref='A',dump=False,programmable=True),
           Operation('DesS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
           Operation('DesF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
-          Operation('DesI','FLOO',duration=lambda:flood_liters_to_seconds(1.5*TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='A',dump=False),
-          Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
-          Operation('Desi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='A',dump=False),
+          #Operation('DesI','FLOO',duration=lambda:flood_liters_to_seconds(1.5*TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='A',dump=False),
+          #Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
+          Operation('DesN','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout avec un petit réservoir d'acide","Inlet and Outlet connected end to end with a small container with acid","Input en output aangesloten"),ref='A',dump=False),
+          Operation('Desh','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='A', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
+          #Operation('Desi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='A',dump=False),
           Operation('Desf','SUBR',duration=lambda:menus.val('a'),subSequence='a',dump=False),
-          #Operation('DesV','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,dump=True),
-          Operation('Dess','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
+          #Operation('Dess','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          #Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
           Operation('CLOS','MESS',message=ml.T("Acide réutilisable en sortie... Bien rincer!","Reusable Acid in output... Rinse well!","Herbruikbaar zuur in output... Goed uitspoelen!!"),dump=True)
         ],
     'a': # Étape répétée de la désinfection acide
@@ -2448,6 +2449,47 @@ class WebLog(object):
     def flush(self):
         pass
 
+SoftwareUpdate = False
+webServerThread = None
+inputProcessorThread = None
+
+class WebSoftwareUpdate:
+    def __init(self):
+        self.name = "WebSoftwareUpdate"
+
+    def GET(self):
+        data, connected, mail, password = init_access()
+
+        if not connected:
+            raise web.seeother('/')
+        subprocess.call(['git', 'pull'])
+        git_status_out = subprocess.check_output(['git', 'status']).decode("utf-8")
+        git_status_lines = git_status_out.split('\n')
+        try:
+            git_status_out = (git_status_lines[0]
+                              + '<br>'
+                              + git_status_lines[1])
+        except IndexError:
+            print(("Error reading git status output. " + git_status_out))
+            raise
+        return render.update(connected, git_status_out)
+
+    def POST(self):
+        global SoftwareUpdate, webServerThread, inputProcessorThread
+
+        data, connected, mail, password = init_access()
+
+        if not connected:
+            raise web.seeother('/')
+        if connected is not None and data.start_elsa_update is not None:
+            SoftwareUpdate = True
+            print ("stop requested...")
+            webServerThread.stop()
+            inputProcessorThread.stop()
+            raise web.seeother('/')
+        else:
+            raise web.seeother('/')
+
 class ThreadWebServer(threading.Thread):
 
     def __init__(self,app):
@@ -2474,7 +2516,94 @@ def freshHref(url):
     else:
         return ' href="'+url+'" onclick="closeMenu()"'
 
-webServerThread = None
+class ThreadInputProcessor(threading.Thread):
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+
+    def run(self):
+        global T_Pump, webServerThread, display_pause, menus
+
+        while T_Pump.currAction != 'X' and webServerThread.is_alive():
+            try:
+                time.sleep(0.2)
+                now = time.time()
+                menu_choice = str(getch()).upper() # BLOCKING I-O !
+                if menu_choice == ' ':
+                    display_pause = False
+                elif menu_choice in ['X','Z','R','V','F','P','I','E','M','A','C','D','H']: # 'C','K'
+                    menu_choice = menu_confirm(menu_choice,8.0)
+                    if menu_choice == 'X':
+                        T_Pump.stopAction()
+                        break
+                    if menu_choice == 'Z':
+                        T_Pump.stopAction()
+                    elif menu_choice in ['R','V','F','P','I','E','M','A','C','D','H']: # 'C','K'
+                        T_Pump.setAction(menu_choice)
+                elif menu_choice == "Y": # Yaourt
+                    menus.store('P', 82.0)
+                    menus.store('M', 30.0)
+                    #menus.options['T'][3] = 45.0
+                    menus.save()
+                    option_confirm(0.0)
+                elif menu_choice == "L": # Lait
+                    menus.store('P', 72.0)
+                    menus.store('M', 15.0)
+                    #menus.options['T'][3] = 22.0
+                    menus.save()
+                    option_confirm(0.0)
+                elif menu_choice == "T": # Thermiser
+                    menus.store('P', 65.0)
+                    menus.store('M', 30.0)
+                    #menus.options['T'][3] = 35.0
+                    menus.save()
+                    option_confirm(0.0)
+                elif menu_choice == "S": # Pause / Restart
+                    if not T_Pump.paused:
+                        T_Pump.setPause(True) # Will make the pump stops !
+                    menu_choice = menu_confirm(menu_choice)
+                    if menu_choice == "S":
+                        T_Pump.setPause(False)
+                    elif menu_choice == "V":
+                        T_Pump.setPause(False)
+                        T_Pump.setAction(menu_choice)
+                    elif menu_choice == 'Z':
+                        T_Pump.setPause(False)
+                        T_Pump.stopAction()
+                elif menu_choice == "O": # Options...
+                    option_confirm()
+                elif menu_choice:
+                    prec_pause = display_pause
+                    display_pause = True
+                    time.sleep(0.05)
+                    term.pos(lines,1)
+                    for choice in (menus.sortedActions1+menus.sortedActions2):
+                        term.write(choice, term.bgwhite, term.red)
+                        term.write((": "+str(menus.actionName[choice][1])+"       ")[:11], term.bgwhite, term.white, term.bold)
+                        term.write(" "+str(menus.actionName[choice][3]), term.bgwhite, term.blue)
+                        term.clearLineFromPos()
+                        term.writeLine("", term.bgwhite, term.blue)
+                    term.clearLineFromPos()
+                    term.writeLine("", term.bgwhite, term.blue)
+                    term.clearLineFromPos()
+                    term.writeLine("", term.bgwhite, term.blue)
+                    term.clearLineFromPos()
+                    term.writeLine("", term.bgwhite, term.blue)
+                    display_pause = prec_pause
+            except KeyboardInterrupt:
+                T_Pump.stopAction()
+                break
+            except:
+                traceback.print_exc()
+                time.sleep(5)
+            ## End of main loop.
+
+    def stop(self):
+        try:
+            T_Pump.setAction('X')
+            #self.join()
+        except:
+            traceback.print_exc()
 
 #web.wsgi.runwsgi = lambda func, addr=None: web.wsgi.runfcgi(func, addr)
 try:
@@ -2514,8 +2643,9 @@ try:
         '/js/(.+)', 'getJS',
         '/css/(.+)', 'getCSS',
         '/csv', 'getCSV',
-        '/disconnect', 'WebDisconnect',
-        #'/restarting', 'WebRestarting',
+        '/update', 'WebSoftwareUpdate',
+        '/disconnect', 'WebDisconnect'
+        #'/restarting', 'WebRestarting'
     )
     app = web.application(urls, globals())
     app.notfound = notfound
@@ -2527,82 +2657,6 @@ try:
 except:
     traceback.print_exc()
 
-### Console running in parallel with Web Server
-display_pause = True
-while T_Pump.currAction != 'X':
-    try:
-        time.sleep(0.2)
-        now = time.time()
-        menu_choice = str(getch()).upper()
-        if menu_choice == ' ':
-            display_pause = False
-        elif menu_choice in ['X','Z','R','V','F','P','I','E','M','A','C','D','H']: # 'C','K'
-            menu_choice = menu_confirm(menu_choice,8.0)
-            if menu_choice == 'X':
-                T_Pump.stopAction()
-                break
-            if menu_choice == 'Z':
-                T_Pump.stopAction()
-            elif menu_choice in ['R','V','F','P','I','E','M','A','C','D','H']: # 'C','K'
-                T_Pump.setAction(menu_choice)
-        elif menu_choice == "Y": # Yaourt
-            menus.store('P', 82.0)
-            menus.store('M', 30.0)
-            #menus.options['T'][3] = 45.0
-            menus.save()
-            option_confirm(0.0)
-        elif menu_choice == "L": # Lait
-            menus.store('P', 72.0)
-            menus.store('M', 15.0)
-            #menus.options['T'][3] = 22.0
-            menus.save()
-            option_confirm(0.0)
-        elif menu_choice == "T": # Thermiser
-            menus.store('P', 65.0)
-            menus.store('M', 30.0)
-            #menus.options['T'][3] = 35.0
-            menus.save()
-            option_confirm(0.0)
-        elif menu_choice == "S": # Pause / Restart
-            if not T_Pump.paused:
-                T_Pump.setPause(True) # Will make the pump stops !
-            menu_choice = menu_confirm(menu_choice)
-            if menu_choice == "S":
-                T_Pump.setPause(False)
-            elif menu_choice == "V":
-                T_Pump.setPause(False)
-                T_Pump.setAction(menu_choice)
-            elif menu_choice == 'Z':
-                T_Pump.setPause(False)
-                T_Pump.stopAction()
-        elif menu_choice == "O": # Options...
-            option_confirm()
-        elif menu_choice:
-            prec_pause = display_pause
-            display_pause = True
-            time.sleep(0.05)
-            term.pos(lines,1)
-            for choice in (menus.sortedActions1+menus.sortedActions2):
-                term.write(choice, term.bgwhite, term.red)
-                term.write((": "+str(menus.actionName[choice][1])+"       ")[:11], term.bgwhite, term.white, term.bold)
-                term.write(" "+str(menus.actionName[choice][3]), term.bgwhite, term.blue)
-                term.clearLineFromPos()
-                term.writeLine("", term.bgwhite, term.blue)
-            term.clearLineFromPos()
-            term.writeLine("", term.bgwhite, term.blue)
-            term.clearLineFromPos()
-            term.writeLine("", term.bgwhite, term.blue)
-            term.clearLineFromPos()
-            term.writeLine("", term.bgwhite, term.blue)
-            display_pause = prec_pause
-    except KeyboardInterrupt:
-        T_Pump.stopAction()
-        break
-    except:
-        traceback.print_exc()
-        time.sleep(5)
-## End of main loop.
-
 if GreenLED:
     GreenLED.on()
 if YellowLED:
@@ -2610,10 +2664,27 @@ if YellowLED:
 if RedLED:
     RedLED.on()
 
-if webServerThread:
+### Console running in parallel with Web Server
+inputProcessorThread = ThreadInputProcessor()
+inputProcessorThread.daemon = True
+display_pause = True
+inputProcessorThread.start()
+
+while T_Pump.currAction != 'X' and webServerThread.is_alive() and inputProcessorThread.is_alive():
+     time.sleep(0.2)
+
+if webServerThread.is_alive():
     try:
         # Stops Web Server...
         webServerThread.stop()
+        time.sleep(0.1)
+    except:
+        traceback.print_exc()
+
+if inputProcessorThread.is_alive():
+    try:
+        # Stops Web Server...
+        inputProcessorThread.stop()
         time.sleep(0.1)
     except:
         traceback.print_exc()
@@ -2686,3 +2757,8 @@ if hardConf.localGPIOtype == "gpio":
     hardConf.localGPIO.cleanup()
 elif hardConf.localGPIOtype == "pigpio":
     hardConf.localGPIO.stop()
+
+if SoftwareUpdate:
+    SoftwareUpdate = False
+    print("restart...")
+    restart_program()

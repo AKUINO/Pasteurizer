@@ -1,0 +1,12 @@
+$def with (connected,git_status)
+$var title : Cleaning Parameters
+<main role="main" class="container">
+    <div class="jumbotron" onclick="void(0);">
+
+    <h3>git status :</h3><em>$:git_status</em>
+    <form method="post" action="" id="selectAction" enctype="multipart/form-data">
+	<div class="form-group column">
+	    <input type="submit" value='$(ml.T("Mettre à Jour","Update","Update"))' class="form-control" name="start_elsa_update">
+	</div>
+    </form>
+</div></main>
