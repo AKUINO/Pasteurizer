@@ -1432,12 +1432,15 @@ opSequences = {
            Operation('CLOS','MESS',message=ml.T("Tuyaux vidés autant que possible.","Pipes emptied as much as possible.","Leidingen zoveel mogelijk geleegd."),dump=True)
         ],
     'A': # Désinfectant acide
-        [ Operation('DesT','HEAT',ref='A',dump=False,programmable=True),
+        [ Operation('DesT','HEAT','output',ref='A',dump=False,programmable=True),
           Operation('DesS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('DesF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
+          Operation('DesF','FILL','output',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
+          Operation('DesI','FLOO','output',duration=lambda:flood_liters_to_seconds(1.0),base_speed=MAX_SPEED,qty=1.0, ref='A',dump=False),
+          Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
+          Operation('Desi','PUMP','output',base_speed=MAX_SPEED,qty=2.0*TOTAL_VOL,ref='A',dump=False),
           #Operation('DesI','FLOO',duration=lambda:flood_liters_to_seconds(1.5*TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='A',dump=False),
           #Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
-          Operation('DesN','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout avec un petit réservoir d'acide","Inlet and Outlet connected end to end with a small container with acid","Input en output aangesloten"),ref='A',dump=False),
+          Operation('DesN','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='A',dump=False),
           Operation('Desh','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='A', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
           #Operation('Desi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='A',dump=False),
           Operation('Desf','SUBR',duration=lambda:menus.val('a'),subSequence='a',dump=False),
@@ -1446,8 +1449,8 @@ opSequences = {
           Operation('CLOS','MESS',message=ml.T("Acide réutilisable en sortie... Bien rincer!","Reusable Acid in output... Rinse well!","Herbruikbaar zuur in output... Goed uitspoelen!!"),dump=True)
         ],
     'a': # Étape répétée de la désinfection acide
-        [ Operation('DesA','PUMP',ref='A', base_speed=MAX_SPEED, qty=4.0,dump=False),
-          Operation('DesP','REVR',ref='A', base_speed=MAX_SPEED, qty=-2.0,dump=False)
+        [ Operation('DesA','PUMP','output',ref='A', base_speed=MAX_SPEED, qty=4.0,dump=False),
+          Operation('DesP','REVR','output',ref='A', base_speed=MAX_SPEED, qty=-2.0,dump=False)
         ],
     'D': # Désinfection thermique
         [ Operation('Dett','HEAT',ref='D',dump=False,programmable=True),
