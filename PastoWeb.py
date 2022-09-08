@@ -587,7 +587,7 @@ StateLessActions = "JYLT" # TO BE DUPLICATED in index.js !
 # Empty sub state is managed by underlying operations
 # Greasy sub state must be set
 State('r',ml.T('Propre','Clean','Schoon'), \
-    [ ('P','p'),('D',''),('H',''),('F','o'),('V',''),('w','o') ] )
+    [ ('P','p'),('D',''),('H',''),('F',''),('V',''),('w','o') ] )
 
 State('o',ml.T('Eau','Water','Waser'), \
     [ ('A',['o','o',['a',None,False]]),('C',['o','o',['c',None,False]]),('F',''),('V',''),('D',['','','r']),('H',['','r']),('w','v') ] )
