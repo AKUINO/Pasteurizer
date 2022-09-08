@@ -593,7 +593,7 @@ State('o',ml.T('Eau','Water','Waser'), \
     [ ('A',['o','o',['a',None,False]]),('C',['o','o',['c',None,False]]),('F',''),('V',''),('D',['','','r']),('H',['','r']),('w','v') ] )
 
 State('v',ml.T('Eau vieille','Old Water','Oude Waser'), \
-      [ ('A',['o','o',['a',None,False]]),('C',['o','o',['c',None,False]]),('F',''),('V',''),('D',['','','r']),('w','') ] )
+      [ ('A',['v','v',['a',None,False]]),('C',['v','v',['c',None,False]]),('F',''),('V',''),('D',['','','r']),('w','') ] )
 
 State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
     [ ('C',['s','s',['c',None,False]]), ('F',''),('V',''),('w','') ]
@@ -609,17 +609,17 @@ State('a',ml.T('Acide','Acid','Zuur'), \
     [ ('R',['','r']),('F',''),('V',''),('w','') ] )
 
 State('p',ml.T('Produit','Product','Product'), \
-    [ ('I',''),('M',''),('E','e'),('A',['e','s',['a',None,False]]),('C',['e','s',['c',None,False]]),('F','e'),('V','') ]
+    [ ('I',''),('M',''),('E','e'),('A',['e','e',['a',None,False]]),('C',['e','e',['c',None,False]]),('F','e'),('V','') ]
     , [False,True],[False] )
 State('p',ml.T('Produit Gras','Greasy Product','Vet Product'), \
-    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'),     ('C',['e','s',['c',None,False]]),('F','e'),('V','') ]
+    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'),     ('C',['e','e',['c',None,False]]),('F','e'),('V','') ]
     , [False,True],[True] )
 
 State('e',ml.T('Eau+Produit Gras','Water+Greasy Product','Water+Vet Product'), \
-      [                                 ('C',['','s',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
+      [                                 ('C',['e','e',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
       , [False,True],[True] )
 State('e',ml.T('Eau+Produit','Water+Product','Water+Product'), \
-      [ ('A',['','s',['a',None,False]]),('C',['','s',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
+      [ ('A',['e','e',['a',None,False]]),('C',['e','e',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
       , [False,True],[False] )
 
 def menu_confirm(choice,delay=None):
@@ -1453,9 +1453,9 @@ opSequences = {
           Operation('DesP','REVR','output',ref='A', base_speed=MAX_SPEED, qty=-2.0,dump=False)
         ],
     'D': # Désinfection thermique
-        [ Operation('Dett','HEAT',ref='D',dump=False,programmable=True),
+        [ Operation('Dett','HEAT','output',ref='D',dump=False,programmable=True),
           Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('DetI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=True),  #
+          Operation('DetI','FLOO','output',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=True),  #
           Operation('Dety','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='D',dump=False),
           Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='D', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
           Operation('CLOS','MESS',message=ml.T("DANGER: Eau chaude sous pression. Mettre des gants pour séparer les tuyaux!","DANGER: Hot water under pressure. Wear gloves to separate the pipes!","GEVAAR: Heet water onder druk. Draag handschoenen om de leidingen te scheiden!"),dump=True)
