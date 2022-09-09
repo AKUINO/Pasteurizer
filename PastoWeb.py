@@ -307,7 +307,8 @@ if hardConf.tubing == "horizontal":
     initial_tubing = up_to_thermistor-heating_tube
     final_tubing = 3587.0-up_to_thermistor-pasteurization_tube-vol_tube(8,1800)
 else:
-    exchanger_tube = 2.0*712.6 #mL
+    #exchanger_tube = 2.0*712.6 #mL
+    exchanger_tube = 0
     old_exchanger = vol_tube(8,8*1800)
     pasteurization_tube = vol_tube(9.5,8820) # = 625mL aussi
     up_to_thermistor = 2330.0
