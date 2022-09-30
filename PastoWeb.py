@@ -244,7 +244,7 @@ trigger_w = TimeTrigger('w',menus)
 #(options['P'][3] + BATH_TUBE) = 75.0  # Température du Bassin de chauffe
 ##reject = 71.7 # Température minimum de pasteurisation
 
-tank = 20.6 # litres dans le bassin de chauffe
+tank = 23.79 # litres dans le bassin de chauffe
 
 kCalWatt = 1.16 # watts per kilo calories
 HEAT_POWER = 2500.0 # watts per hour (puissance de la chauffe)
@@ -307,8 +307,7 @@ if hardConf.tubing == "horizontal":
     initial_tubing = up_to_thermistor-heating_tube
     final_tubing = 3587.0-up_to_thermistor-pasteurization_tube-vol_tube(8,1800)
 else:
-    #exchanger_tube = 2.0*712.6 #mL
-    exchanger_tube = 0
+    exchanger_tube = 2.0*712.6 #mL
     old_exchanger = vol_tube(8,8*1800)
     pasteurization_tube = vol_tube(9.5,8820) # = 625mL aussi
     up_to_thermistor = 2330.0
@@ -1433,20 +1432,20 @@ opSequences = {
            Operation('CLOS','MESS',message=ml.T("Tuyaux vidés autant que possible.","Pipes emptied as much as possible.","Leidingen zoveel mogelijk geleegd."),dump=True)
         ],
     'A': # Désinfectant acide
-        [ Operation('DesT','HEAT','output',ref='A',dump=False,programmable=True),
+        [ Operation('DesT','HEAT',ref='A',dump=False,programmable=True),
           Operation('DesS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('DesF','FILL','output',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
-          Operation('DesI','FLOO','output',duration=lambda:flood_liters_to_seconds(1.0),base_speed=MAX_SPEED,qty=1.0, ref='A',dump=False),
-          Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
-          Operation('Desi','PUMP','output',base_speed=MAX_SPEED,qty=2.0*TOTAL_VOL,ref='A',dump=False),
-          #Operation('DesI','FLOO',duration=lambda:flood_liters_to_seconds(1.5*TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='A',dump=False),
+          Operation('DesF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
+          #Operation('DesI','FLOO','output',duration=lambda:flood_liters_to_seconds(1.0),base_speed=MAX_SPEED,qty=1.0, ref='A',dump=False),
           #Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
-          Operation('DesN','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='A',dump=False),
-          Operation('Desh','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='A', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
-          #Operation('Desi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='A',dump=False),
+          #Operation('Desi','PUMP','output',base_speed=MAX_SPEED,qty=2.0*TOTAL_VOL,ref='A',dump=False),
+          Operation('DesI','FLOO',duration=lambda:flood_liters_to_seconds(1.5*TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='A',dump=False),
+          Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
+          #Operation('DesN','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='A',dump=False),
+          #Operation('Desh','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='A', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
+          Operation('Desi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='A',dump=False),
           Operation('Desf','SUBR',duration=lambda:menus.val('a'),subSequence='a',dump=False),
-          #Operation('Dess','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          #Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
+          Operation('Dess','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
           Operation('CLOS','MESS',message=ml.T("Acide réutilisable en sortie... Bien rincer!","Reusable Acid in output... Rinse well!","Herbruikbaar zuur in output... Goed uitspoelen!!"),dump=True)
         ],
     'a': # Étape répétée de la désinfection acide
