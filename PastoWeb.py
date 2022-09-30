@@ -964,7 +964,6 @@ class ThreadDAC(threading.Thread):
         #self.set_cold(None)
         self.running = False
         time.sleep(0.1)
-        self.join()
         self.dacSetting.close()
         #self.dacSetting2.close()
 
@@ -1832,10 +1831,6 @@ class ThreadPump(threading.Thread):
         time.sleep(0.1)
         if RedLED:
             RedLED.off()
-        try:
-            self.join()
-        except:
-            traceback.print_exc()
 
 term.setTitle("AKUINO, pasteurisation accessible")
 (lines, columns) = termSize()
@@ -2506,7 +2501,6 @@ class ThreadWebServer(threading.Thread):
     def stop(self):
         try:
             self.app.stop()
-            self.join()
         except:
             traceback.print_exc()
 
@@ -2604,7 +2598,6 @@ class ThreadInputProcessor(threading.Thread):
     def stop(self):
         try:
             T_Pump.setAction('X')
-            #self.join()
         except:
             traceback.print_exc()
 
@@ -2674,7 +2667,11 @@ display_pause = True
 inputProcessorThread.start()
 
 while T_Pump.currAction != 'X' and webServerThread.is_alive() and inputProcessorThread.is_alive():
-     time.sleep(0.2)
+    try:
+        time.sleep(0.2)
+    except:
+        traceback.print_exc()
+        break
 
 if webServerThread.is_alive():
     try:
@@ -2756,10 +2753,14 @@ if YellowLED:
 if GreenLED:
     GreenLED.off()
 
-if hardConf.localGPIOtype == "gpio":
-    hardConf.localGPIO.cleanup()
-elif hardConf.localGPIOtype == "pigpio":
-    hardConf.localGPIO.stop()
+try:
+    if hardConf.localGPIOtype == "gpio":
+        hardConf.localGPIO.cleanup()
+    elif hardConf.localGPIOtype == "pigpio":
+        hardConf.localGPIO.stop()
+except:
+    traceback.print_exc()
+    
 
 if SoftwareUpdate:
     SoftwareUpdate = False
