@@ -174,7 +174,7 @@ class pump_PWM(sensor.Sensor):
                  pinPWM = 12, # 12(board=32) or 18(board=12) CustardPi Digital out #2, RPi PWM
                  pinDirection = -14, # 17(board=11) CustardPi Digital out #2
                  pinStatus = -15,  # 23(board=16) CustardPi Digital in #1. RPi pin must be in "Pull-up"...
-                 maxSpeed = 300,#437, #600 in theory. 400 is possible when pumping air (previous value: 284)
+                 maxSpeed = 350,#437, #600 in theory. 400 is possible when pumping air (previous value: 284)
                  maximal_liters = None,
                  minimal_liters = 15.0
                  ):
@@ -211,8 +211,6 @@ class pump_PWM(sensor.Sensor):
     set = None
     avg3 = None
 
-
-
     # Those two functions are not perfectly reciprocal: beware!
     def litersHourSpeed(self,liters):
         reverse = False
@@ -222,7 +220,8 @@ class pump_PWM(sensor.Sensor):
             liters = -liters
             reverse = True
         #speed = 1.767022 + (1.27568*liters) - (0.0001245927*liters*liters)
-        speed = 2.862497 + (1.384241*liters) - (0.0002019344*liters*liters)
+        #speed = 2.862497 + (1.384241*liters) - (0.0002019344*liters*liters)
+        speed = 12.28124 + (1.03637*liters) + (0.001046376*liters*liters)
         if reverse:
             speed = -speed
         return speed
@@ -237,7 +236,8 @@ class pump_PWM(sensor.Sensor):
         #speed = speed / self.LitersHour_Speed
         #LH = -2.286407 + (2.275162*speed) - (0.009631488*speed*speed)
         #LH = -1.553908 + (0.7883528*speed) + (0.00004403381*speed*speed)
-        LH = -2.255906 + (0.7268268*speed) + (0.00006146902*speed*speed)
+        #LH = -2.255906 + (0.7268268*speed) + (0.00006146902*speed*speed)
+        LH = -9.831412 + (0.9269884*speed) - (0.0004694142*speed*speed)
         if LH <= 0.0:
             LH = 0.0
         elif reverse:
