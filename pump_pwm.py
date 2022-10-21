@@ -19,6 +19,9 @@ TEST = False
 # Must be coherent with switch setting on the stepping motor driver module:
 REVOLUTION_STEPS = 6400 #1000, 2000, 4000, 5000, 8000, 10000, 20000, 25000
                     #200, 400, 800, 1600, 3200, 6400, 12800, 25600
+
+# Max allowed speed (RPM) allowed for the pump (theoretical: 600)
+MAX_SPEED = 450 #350,#437, #600 in theory. 400 is possible when pumping air (previous value: 284)
                     
 if hardConf.MICHA_device:
     SPEED_INCREMENT = None # Ramping is done by MICHA
@@ -174,7 +177,7 @@ class pump_PWM(sensor.Sensor):
                  pinPWM = 12, # 12(board=32) or 18(board=12) CustardPi Digital out #2, RPi PWM
                  pinDirection = -14, # 17(board=11) CustardPi Digital out #2
                  pinStatus = -15,  # 23(board=16) CustardPi Digital in #1. RPi pin must be in "Pull-up"...
-                 maxSpeed = 350,#437, #600 in theory. 400 is possible when pumping air (previous value: 284)
+                 maxSpeed = MAX_SPEED,
                  maximal_liters = None,
                  minimal_liters = 15.0
                  ):
@@ -214,7 +217,7 @@ class pump_PWM(sensor.Sensor):
     # Those two functions are not perfectly reciprocal: beware!
     def litersHourSpeed(self,liters):
         reverse = False
-        if liters == 0:
+        if float(liters) == 0.0:
             return 0
         elif liters < 0:
             liters = -liters
@@ -228,7 +231,7 @@ class pump_PWM(sensor.Sensor):
 
     def speedLitersHour(self,speed):
         reverse = False
-        if speed == 0:
+        if float(speed) == 0.0:
             return 0.0
         elif speed < 0:
             speed = -speed
@@ -378,7 +381,7 @@ class pump_PWM(sensor.Sensor):
             else: #MICHA
                self.setPWM(speed)
                time.sleep(0.5)
-        if speed == 0 and SPEED_INCREMENT:
+        if float(speed) == 0.0 and SPEED_INCREMENT:
             self.setPWM(0)
         
     def run(self, speed=None, liters = None):
@@ -388,7 +391,7 @@ class pump_PWM(sensor.Sensor):
         if speed is None:
             speed = self.maxSpeed
         running = True
-        if self.speed ==0:
+        if float(self.speed) == 0.0:
             running = False
         self.previous_volume = self.volume()
         self.previous_speed = -self.speed if self.reverse else self.speed
@@ -535,11 +538,13 @@ if __name__ == "__main__":
                     liters = float(liters)
                     prec = now
                     precL = liters
-                    if liters == 0:
+                    if float(liters) == 0:
                         if not pumpy.stop():
                            print ("Error stopping!")
                         print ("Stop!")
                     else:
+                        if liters == 0.1:
+                            liters = 0.0
                         if RPM:
                             if not pumpy.run(liters):
                                 print ("Error running!")

@@ -17,10 +17,10 @@ class State(object):
     empty = False
     greasy = False
 
-    def get(letter,empty,greasy):
+    def get(letter,empty,greasy=False):
         return State.knownStates[letter][empty][greasy]
 
-    def setCurrent(letter,empty,greasy):
+    def setCurrent(letter,empty,greasy=False):
         State.current = State.get(letter,empty,greasy)
         State.empty = empty
         State.greasy = greasy
@@ -111,7 +111,7 @@ class State(object):
             result += actDone
         return result
 
-    def save(self, empty, greasy, now=int(time.time()) ):
+    def save(self, empty, greasy=False, now=int(time.time()) ):
         try:
             with open(State.data_dir + "state.csv", "w") as data_file:
                 data_file.write("epoch_sec\tstate\tempty\tgreasy\n")

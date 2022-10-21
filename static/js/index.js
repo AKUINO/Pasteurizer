@@ -119,7 +119,7 @@ $(document).ready(function() {
                     $('#stateletter').text(data['stateletter']);
                     $('#state').text(data['state']);
                     $('#empty').text(data['empty']);
-                    $('#greasy').text(data['greasy']);
+                    // $('#greasy').text(data['greasy']);
                     $('#actiontitle').text(data['actiontitle']);
                     var accro = "";
                     if ('accro' in data && data['accro'].length >= 4) {
@@ -301,7 +301,7 @@ function action(letter) {
                 $('#stateletter').text(data['stateletter']);
                 $('#state').text(data['state']);
                 $('#empty').text(data['empty']);
-                $('#greasy').text(data['greasy']);
+                // $('#greasy').text(data['greasy']);
                 $('#actiontitle').text(data['actiontitle']);
                 var accro = "";
                 if ('accro' in data && data['accro'].length >= 4) {

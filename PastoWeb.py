@@ -158,7 +158,7 @@ if hardConf.In_Emergency:
 #BATH_TUBE = 4.6 # degrees Celsius. Margin between temperature in bath and temperature wished in the tube
 
 CLEAN_TIME = 1800.0
-DISINF_TIME = 300.0
+DISINF_TIME = 900.0
 TH_DISINF_TIME = 300.0
 STAY_CLEAN_TIME = 2*3600
 
@@ -172,9 +172,9 @@ menus = Menus.singleton
 menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,ml.T("Gradient de température","Temperature Gradient","Gradient van Temperatuur") \
                             ,3.0,3.0,"°C",False,7,0.1,"number"], # Gradient de Température
-                    'g':['g',ml.T("Produit Gras","Fatty Product","Vet Product") \
-                        ,ml.T("Nécessite de la soude(1) Pas toujours(0)","Needs Soda Cleaning(1) Not always(0)","Soda-reiniging nodig(1) Niet altijd(0)") \
-                        ,1,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
+                    #'g':['g',ml.T("Produit Gras","Fatty Product","Vet Product") \
+                    #    ,ml.T("Nécessite de la soude(1) Pas toujours(0)","Needs Soda Cleaning(1) Not always(0)","Soda-reiniging nodig(1) Niet altijd(0)") \
+                    #    ,1,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
                     'P':['P',ml.T("Pasteurisation°","Pasteurization°","Pasteurisatie°") \
                             ,ml.T("Température de pasteurisation","Pasteurisation Temperature","Pasteurisatie Temperatuur") \
                             ,72.0,72.0,"°C",False,90,0.1,"number"], # Température normale de pasteurisation
@@ -202,12 +202,12 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                     'D': ['D', ml.T("Désinfection thermique°""Thermal Disinfection°", "Thermisch Desinfectie°") \
                           , ml.T("Température de désinfection", "Disinfection Temperature", "Desinfectie Temperatuur") \
                           , 72.0, 72.0, "°C", False, 77, 0.1, "number"],  # Température normale de pasteurisation
-                    # 'd': ['d', ml.T("Désinfection thermique\"", "Thermal Disinfection\"", "Thermisch Desinfectie\"") \
-                    #     , ml.T("Durée de désinfection", "Disinfection Duration", "Desinfectie Tijd") \
-                    #     , TH_DISINF_TIME,TH_DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
+                    'd': ['d', ml.T("Désinfection thermique\"", "Thermal Disinfection\"", "Thermisch Desinfectie\"") \
+                         , ml.T("Durée de désinfection", "Disinfection Duration", "Desinfectie Tijd") \
+                         , TH_DISINF_TIME,TH_DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'A':['A',ml.T("net.Acide°""Acidic cleaning°","Zuur schoonmaak°") \
                             ,ml.T("Température de nettoyage acide","Acidic cleaning Temperature","Zuur schoomaak Temperatuur") \
-                            ,55.0,55.0,"°C",False,77,0.1,"number"], # Température pour un traitement à l'acide ou au percarbonate de soude
+                            ,55.0,55.0,"°C",False,90,0.1,"number"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'a':['a',ml.T("net.Acide\"","Acidic cleaning\"","Zuur schoonmaak\"") \
                             ,ml.T("Durée de nettoyage acide","Acidic cleaning Duration","Zuur schoomaak Tijd") \
                             ,DISINF_TIME,DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
@@ -234,9 +234,9 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                         ,'L','L',"hh:mm",True,None,None,"text"] }
                     # 'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
                     #         ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
-menus.sortedOptions = "PMGgwQDHRrusCcAaZ" #T
-menus.cleanOptions = "PMGgQH" #TtK
-menus.dirtyOptions = "gRrusCcAawDH" #Cc
+menus.sortedOptions = "PMGwQDdHRrusCcAaZ" #T
+menus.cleanOptions = "PMGQH" #TtK
+menus.dirtyOptions = "RrusCcAawDdH" #Cc
 
 menus.loadCurrent(DIR_DATA_CSV)
 
@@ -595,12 +595,12 @@ State('o',ml.T('Eau','Water','Waser'), \
 State('v',ml.T('Eau vieille','Old Water','Oude Waser'), \
       [ ('A',['v','v',['a',None,False]]),('C',['v','v',['c',None,False]]),('F',''),('V',''),('D',['','','r']),('w','') ] )
 
-State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
-    [ ('C',['s','s',['c',None,False]]), ('F',''),('V',''),('w','') ]
-    , [False,True],[True])
+#State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
+#    [ ('C',['s','s',['c',None,False]]), ('F',''),('V',''),('w','') ]
+#    , [False,True],[True])
 State('s',ml.T('Sale','Dirty','Vies'), \
     [ ('C',['s','s',['c',None,False]]),('A',['s','s',['a',None,False]]),('F',''),('V',''),('w','') ]
-    , [False,True],[False] )
+    , [False,True],[True,False] )
 
 State('c',ml.T('Soude','Soda','Natrium'), \
     [ ('R',['','r']),('F',''),('V',''),('w','') ] )
@@ -610,17 +610,17 @@ State('a',ml.T('Acide','Acid','Zuur'), \
 
 State('p',ml.T('Produit','Product','Product'), \
     [ ('I',''),('M',''),('E','e'),('A',['e','e',['a',None,False]]),('C',['e','e',['c',None,False]]),('F','e'),('V','') ]
-    , [False,True],[False] )
-State('p',ml.T('Produit Gras','Greasy Product','Vet Product'), \
-    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'),     ('C',['e','e',['c',None,False]]),('F','e'),('V','') ]
-    , [False,True],[True] )
+    , [False,True],[True,False] )
+#State('p',ml.T('Produit Gras','Greasy Product','Vet Product'), \
+#    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'),     ('C',['e','e',['c',None,False]]),('F','e'),('V','') ]
+#    , [False,True],[True] )
 
-State('e',ml.T('Eau+Produit Gras','Water+Greasy Product','Water+Vet Product'), \
-      [                                 ('C',['e','e',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
-      , [False,True],[True] )
+#State('e',ml.T('Eau+Produit Gras','Water+Greasy Product','Water+Vet Product'), \
+#      [                                 ('C',['e','e',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
+#      , [False,True],[True] )
 State('e',ml.T('Eau+Produit','Water+Product','Water+Product'), \
       [ ('A',['e','e',['a',None,False]]),('C',['e','e',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
-      , [False,True],[False] )
+      , [False,True],[True,False] )
 
 def menu_confirm(choice,delay=None):
     global display_pause, lines
@@ -1266,8 +1266,8 @@ class Operation(object):
                         speed = self.min_speed
                 #print("SHAK="+str(speed)+"\r")
             else:
-                if menus.val('g') and self.sensor1 == 'warranty':
-                    State.greasy = True
+                #if menus.val('g') and self.sensor1 == 'warranty':
+                #    State.greasy = True
                 totalVol,totalTime,beginTemp,endTemp = cohorts.evolution(self.sensor2,self.sensor1)
                 #print("EVOL="+str(totalVol)+"L/"+str(totalTime)+"s "+str(beginTemp)+"°C<"+str(endTemp)+"°C\r")
                 if not totalVol or (totalVol <= 0.0) or (endTemp <= beginTemp) or (self.tempRef() <= beginTemp): # no data
@@ -1410,6 +1410,7 @@ opSequences = {
     'R': # Pré-rinçage 4 fois
         [ Operation('Pr1T','HEAT',ref='R', dump=True,programmable=True),
           Operation('Pr1S','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          Operation('Pr1F','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=False),
           Operation('Pr1I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
           Operation('Pr1R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('1END','MESS',message=ml.T("1 rinçage effectué!","1 flush done!","1 keer doorspoelen!"),dump=True),
@@ -1437,7 +1438,7 @@ opSequences = {
           #Operation('DesI','FLOO','output',duration=lambda:flood_liters_to_seconds(1.0),base_speed=MAX_SPEED,qty=1.0, ref='A',dump=False),
           #Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
           #Operation('Desi','PUMP','output',base_speed=MAX_SPEED,qty=2.0*TOTAL_VOL,ref='A',dump=False),
-          Operation('DesI','FLOO',duration=lambda:flood_liters_to_seconds(1.5*TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='A',dump=False),
+          Operation('DesI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='A',dump=False),
           Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
           #Operation('DesN','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='A',dump=False),
           #Operation('Desh','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='A', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
@@ -1448,8 +1449,8 @@ opSequences = {
           Operation('CLOS','MESS',message=ml.T("Acide réutilisable en sortie... Bien rincer!","Reusable Acid in output... Rinse well!","Herbruikbaar zuur in output... Goed uitspoelen!!"),dump=True)
         ],
     'a': # Étape répétée de la désinfection acide
-        [ Operation('DesA','PUMP','output',ref='A', base_speed=MAX_SPEED, qty=4.0,dump=False),
-          Operation('DesP','REVR','output',ref='A', base_speed=MAX_SPEED, qty=-2.0,dump=False)
+        [ Operation('DesA','PUMP',ref='A', base_speed=MAX_SPEED, qty=4.0,dump=False),
+          Operation('DesP','REVR',ref='A', base_speed=MAX_SPEED, qty=-2.0,dump=False)
         ],
     'D': # Désinfection thermique
         [ Operation('Dett','HEAT','output',ref='D',dump=False,programmable=True),
@@ -1463,7 +1464,7 @@ opSequences = {
         [ Operation('NetT','HEAT',ref='C',dump=False,programmable=True),
           Operation('NetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
           Operation('NetF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='C',dump=False),
-          Operation('NetI','FLOO',duration=lambda:flood_liters_to_seconds(1.5*TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='C',dump=False),
+          Operation('NetI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='C',dump=False),
           Operation('NETY','PAUS',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),ref='C',dump=False),
           Operation('Neti','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='C',dump=False),
           Operation('Neto','SUBR',duration=lambda:menus.val('c'),subSequence='c',dump=False),
@@ -1493,7 +1494,7 @@ opSequences = {
         [ Operation('EauT','HEAT',ref='P',dump=True,programmable=True),
           Operation('EauI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('EauP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('EauV','PUMP', base_speed=MAX_SPEED, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,dump=True,cooling=True),
+          Operation('EauV','PUMP', base_speed=OPT_SPEED, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites C quand vous voulez nettoyer!","Press C when you want to clean!","Druk op C als u wilt reinigen!"),dump=True)
           ],
     'M': # Passer à un lait d'un autre provenance en chassant celui de la pasteurisation précédente
@@ -2073,7 +2074,7 @@ class WebApiAction:
                 menus.store('z','J')
                 menus.store('P',75.0)
                 menus.store('M', 15.0)
-                menus.store('g', False)
+                #menus.store('g', False)
                 #menus.options['T'][3] = 45.0
                 message = "75°C"
                 reloadPasteurizationSpeed()
@@ -2083,7 +2084,7 @@ class WebApiAction:
                 menus.store('P', 82.0)
                 menus.store('M', 30.0)
                 #menus.options['T'][3] = 45.0
-                menus.store('g', True)
+                #menus.store('g', True)
                 message = "82°C"
                 reloadPasteurizationSpeed()
                 menus.save()
@@ -2092,7 +2093,7 @@ class WebApiAction:
                 menus.store('P', 72.0)
                 menus.store('M', 15.0)
                 #menus.options['T'][3] = 22.0
-                menus.store('g', True)
+                #menus.store('g', True)
                 message = "72°C"
                 menus.save()
                 reloadPasteurizationSpeed()
@@ -2101,7 +2102,7 @@ class WebApiAction:
                 menus.store('P', 65.0)
                 menus.store('M', 30.0)
                 #menus.options['T'][3] = 35.0
-                menus.store('g', True)
+                #menus.store('g', True)
                 message = "65°C"
                 reloadPasteurizationSpeed()
                 menus.save()
@@ -2143,7 +2144,7 @@ class WebApiAction:
                         'actiontitle':str(menus.actionName[letter][3]),
                         'stateletter': (State.current.letter if State.current else ''),
                         'empty': ('V' if State.empty else 'W'),
-                        'greasy': ('G' if State.greasy else 'J'),
+                        #'greasy': ('G' if State.greasy else 'J'),
                         'state': (str(State.current.labels) if State.current else ''),
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
@@ -2168,15 +2169,15 @@ class WebApiState:
             result = {'message':'RECHARGER CETTE PAGE'}
         else:
             empty = State.empty
-            greasy = State.greasy
+            #greasy = State.greasy
             if data: # Process saved options from options editing forms
                 empty = False
                 if ('empty' in data and data['empty'].lower() == 'on'):
                     empty = True
-                greasy = False
-                if ('greasy' in data and data['greasy'].lower() == 'on'):
-                    greasy = True
-            State.setCurrent(letter,empty,greasy)
+                #greasy = False
+                #if ('greasy' in data and data['greasy'].lower() == 'on'):
+                    #greasy = True
+            State.setCurrent(letter,empty,False) #greasy
             result = {  'date':str(datetime.fromtimestamp(int(time.time()))),
                         'actionletter':T_Pump.currAction,
                         'preconfigletter':menus.val('z'),
@@ -2184,7 +2185,7 @@ class WebApiState:
                         'actiontitle':str(menus.actionName[T_Pump.currAction][3]),
                         'stateletter': (State.current.letter if State.current else ''),
                         'empty': ('V' if State.empty else 'W'),
-                        'greasy': ('G' if State.greasy else 'J'),
+                        #'greasy': ('G' if State.greasy else 'J'),
                         'state': (str(State.current.labels) if State.current else ''),
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
@@ -2353,7 +2354,7 @@ class WebApiLog:
                             'actiontitle': str(menus.actionName[T_Pump.currAction][3]), \
                             'stateletter': (State.current.letter if State.current else ''),
                             'empty': ('V' if State.empty else 'W'),
-                            'greasy': ('G' if State.greasy else 'J'),
+                            #'greasy': ('G' if State.greasy else 'J'),
                             'state': (str(State.current.labels) if State.current else ''),
                             'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                             'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "", \
