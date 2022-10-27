@@ -77,12 +77,13 @@ class State(object):
                 if nextState == None:
                     newState = State.get(self.letter,empty,greasy)
                 elif isinstance(nextState, list):
-                    if step == State.ACTION_BEGIN:
-                        newLetter = nextState[0]
-                    elif step == State.ACTION_RESUME:
-                        newLetter = nextState[(len(nextState)-1) if (len(nextState) > 2) else 1]
-                    else: # ACTION_END
-                        newLetter = nextState[len(nextState) - 1]
+                    if len(nextState):
+                        if step == State.ACTION_BEGIN:
+                            newLetter = nextState[0]
+                        elif step == State.ACTION_RESUME:
+                            newLetter = nextState[(len(nextState)-1) if (len(nextState) <= 1) else 1]
+                        else: # ACTION_END
+                            newLetter = nextState[len(nextState) - 1]
                     if isinstance(newLetter, list):
                         if newLetter[1] != None:
                             empty = newLetter[1]

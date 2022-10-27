@@ -65,10 +65,43 @@ function floorCenti2(tx,tx2) {
     return ((~~((parseFloat(tx)+parseFloat(tx2))*100.0)) / 100.0).toString()
 }
 
-function closeMenu() {
-  $('.navbar-collapse').collapse('hide');
-  $('#confirm').hide();
-  $('#cancel').hide();
+var allowedActions = '';
+var currentLetter = '';
+
+function goToLetter(pageLetter,letter,PleaseClick) {
+    if (pageLetter == letter) {
+        location.reload();
+        $('#drop'+letter).attr("href", "#doc");
+        console.log("/explain/"+letter+"#doc (reload)")
+    } else {
+        $('.navbar-collapse').collapse('hide');
+        $('#confirm').hide();
+        $('#cancel').hide();
+        console.log("/explain/"+letter+"#doc");
+        window.location.href = "/explain/"+letter+"#doc";
+    }
+    currentLetter = letter;
+}
+
+function fromHereTo(pageLetter,letter) {
+    if (allowedActions.indexOf(letter) >= 0) {
+        goToLetter(pageLetter,letter,false);
+        return true;
+    } else {
+        $('.pageLetter').text(pageLetter);
+        $('.currLetter').text(letter);
+        var myModal = new bootstrap.Modal(document.getElementById('ModalConfirm'), {
+          keyboard: false, focus: true
+        });
+        $('#ModalConfirmContinue').click ( function() {
+          console.log(letter+" confirmed.");
+          myModal.hide();
+          goToLetter(pageLetter,letter,true);
+        } );
+        myModal.show();
+        console.log(myModal);
+        return false;
+    }
 }
 
 var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -114,6 +147,7 @@ $(document).ready(function() {
                     var time = data['date'].substring(11,999);
                     $('#time').text(time);
                     $('#actionletter').text(data['actionletter']);
+                    currentLetter = data['actionletter'];
                     $('#preconfigletter').text(data['preconfigletter']);
                     $('#action').text(data['action']);
                     $('#stateletter').text(data['stateletter']);
@@ -168,35 +202,32 @@ $(document).ready(function() {
                     $('#message').text(data['message']);
                     if (data['allowedActions'] != '') {
                         console.log('AA='+data['allowedActions']);
+                        allowedActions = data['allowedActions']+'JYLTOXZ';
                         for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
                             if (ml == data['actionletter']) {
                                 //console.log('current='+
-                                $('#drop'+ml).removeClass('disabled').addClass('current').removeClass('enabled');
-                                $('#menu'+ml).removeClass('disabled').addClass('current').removeClass('enabled');
+                                $('#drop'+ml).removeClass('dropdown-grayed').addClass('current').removeClass('enabled');
+                                //$('#menu'+ml).removeClass('disabled').addClass('current').removeClass('enabled');
                             }
-                            else if (data['allowedActions'].indexOf(ml) >= 0) {
+                            else if (allowedActions.indexOf(ml) >= 0) {
                                 //console.log('enable='+
-                                $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
-                                $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
-                            }
-                            else if ("JYLTO".indexOf(ml) >= 0) { // StateLessActions
-                                //console.log('JYLTO='+
-                                $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
-                                $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
+                                $('#drop'+ml).removeClass('dropdown-grayed').removeClass('current').addClass('enabled');
+                                //$('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                             }
                             else {
                                 //console.log('disable='+
-                                $('#drop'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
-                                $('#menu'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
+                                $('#drop'+ml).addClass('dropdown-grayed').removeClass('current').removeClass('enabled');
+                                //$('#menu'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
                             }
                         }
                     } else {
                         console.log('no AA');
+                        allowedActions = 'JYLTOXZ';
                         for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
-                            $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
-                            $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
+                            $('#drop'+ml).removeClass('dropdown-grayed').removeClass('current').addClass('enabled');
+                            //$('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                         }
                     }
                     if (data['actif'] > 0) {
@@ -296,6 +327,7 @@ function action(letter) {
                 var time = data['date'].substring(11,999);
                 $('#time').text(time);
                 $('#actionletter').text(data['actionletter']);
+                currentLetter = data['actionletter'];
                 $('#preconfigletter').text(data['preconfigletter']);
                 $('#action').text(data['action']);
                 $('#stateletter').text(data['stateletter']);
@@ -310,22 +342,23 @@ function action(letter) {
                 $('#accro').text(accro);
                 $('#message').text(data['message']);
                 if (data['allowedActions'] != '') {
+                    allowedActions = data['allowedActions']+'JYLTOXZ';
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
-                        if (data['allowedActions'].indexOf(ml) >= 0) {
-                            $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
-                            $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
+                        if (allowedActions.indexOf(ml) >= 0) {
+                            $('#drop'+ml).removeClass('dropdown-grayed').removeClass('current').addClass('enabled');
+                            //$('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                         }
                         else {
-                            $('#drop'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
-                            $('#menu'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
+                            $('#drop'+ml).removeClass('current').removeClass('enabled').addClass('dropdown-grayed');
+                            //$('#menu'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
                         }
                     }
                 } else {
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
-                        $('#drop'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
-                        $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
+                        $('#drop'+ml).removeClass('dropdown-grayed').removeClass('current').addClass('enabled');
+                        //$('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                     }
                 }
                 if (data['pause'] != 0) {

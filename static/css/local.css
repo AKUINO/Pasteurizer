@@ -71,6 +71,11 @@
     .dropdown-item {
       font-size: 1.2em !important;
     }
+    .dropdown-grayed {
+      color: grey !important;
+      font-style: italic;
+    }
+
     .flip-vertical {
         transform: scaleY(-1) rotate(270deg);
     }

@@ -34,6 +34,7 @@ class Menus(object):
         self.operName = None
         self.cleanOptions = None
         self.dirtyOptions = None
+        self.currAction = None
 
     def nam(self,letter):
         return self.options[letter][Menus.NAM]

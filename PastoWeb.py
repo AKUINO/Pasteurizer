@@ -1533,8 +1533,7 @@ class ThreadPump(threading.Thread):
         self.running = False
         self.pump = pumpy
         self.T_DAC = T_DAC
-        self.currAction = 'Z'
-        self.startAction = time.perf_counter()
+        self.manAction('Z')
         since, current, empty, greasy = State.loadCurrent(DIR_DATA_CSV)
         trigger_w.base = since
         self.currSequence = None
@@ -1600,17 +1599,23 @@ class ThreadPump(threading.Thread):
         time.sleep(0.01)
         self.pump.reset_pump() # to be sure that no situation ends with a running pump...
         time.sleep(0.01)
-        self.currAction = 'Z' # Should stop operations...
+        self.manAction('Z') # Should stop operations...
         self.setPause(False)
         self.lastStop = time.perf_counter()
+
+    def manAction(self,action):
+        global menus
+
+        menus.currAction = action
+        self.currAction = action
+        self.startAction = time.perf_counter()
 
     def setAction(self,action):
         global opSequences
         action = action.upper()
         if action in opSequences:
             self.stopAction()
-            self.currAction = action
-            self.startAction = time.perf_counter()
+            self.manAction(action)
             State.transitCurrent( State.ACTION_BEGIN, action )
             self.pump.reset_volume()
             self.setPause(False)
@@ -1728,7 +1733,7 @@ class ThreadPump(threading.Thread):
                             self.stopAction()
                         else:
                             self.close()
-                            self.currAction = 'X'
+                            self.manAction('X')
                             WebExit = True # SHUTDOWN requested
                             try:
                                 os.kill(os.getpid(),signal.SIGINT)
@@ -2131,7 +2136,7 @@ class WebApiAction:
             elif letter in ['X','Z']:
                 T_Pump.stopAction()
                 if letter == 'X':
-                    T_Pump.currAction = 'X'
+                    T_Pump.manAction('X')
                     os.kill(os.getpid(),signal.SIGINT)
                     WebExit = True # SHUTDOWN !
             else: # State dependent Actions
@@ -2505,14 +2510,14 @@ class ThreadWebServer(threading.Thread):
         except:
             traceback.print_exc()
 
-def freshHref(url):
+def freshHref(letter,url):
     pieces = url.split('#')
     if len(pieces) < 2:
         pieces.append('')
     if pieces[0] == web.ctx.fullpath:
-        return ' onclick="location.reload();" href="#'+pieces[1]+'"'
+        return ' onclick="reloadHere("'+letter+'")" href="#'+pieces[1]+'"'
     else:
-        return ' href="'+url+'" onclick="closeMenu()"'
+        return ' href="'+url+'" onclick="closeMenu("'+letter+'")"'
 
 class ThreadInputProcessor(threading.Thread):
 
@@ -2617,7 +2622,6 @@ try:
     web.template.Template.globals['isnull'] = isnull
     web.template.Template.globals['zeroIsNone'] = zeroIsNone
     web.template.Template.globals['datetime'] = datetime
-    web.template.Template.globals['freshHref'] = freshHref
     layout = web.template.frender(TEMPLATES_DIR + '/layout.html')
     render = web.template.render(TEMPLATES_DIR, base=layout)
     web.httpserver.sys.stderr = WebLog()
