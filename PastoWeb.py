@@ -1250,7 +1250,10 @@ class Operation(object):
         elif typeOpToDo == 'TRAK':
             valSensor1 = cohorts.getCalibratedValue(self.sensor1)
             if float(valSensor1) < float(self.tempRef()): # Shake
-                if self.min_speed >= 0.0:
+                pressed = GreenButton.poll() # Pressing the GreenButton forces slow speed forward...
+                if (pressed and pressed > 0.0):
+                    speed = self.min_speed
+                elif self.min_speed >= 0.0:
                     speed = self.min_speed
                 elif speed == 0.0:
                     speed = self.min_speed
@@ -1719,7 +1722,7 @@ class ThreadPump(threading.Thread):
 
         while self.running:
             try:
-                time.sleep(0.25)
+                time.sleep(0.2)
                 if trigger_w.trigger():
                     State.transitCurrent(State.ACTION_RESUME, 'w')
                 now = time.perf_counter()
