@@ -22,8 +22,8 @@ THERMI_WIRE = 0.6 # value of the twin wire resistor
 
 # coils
 THERMIS_POW_REG             = 0x00  # 4.0 register which stores the thermistor power state
-LEVEL1_FLAG_REG             = 0x01  # 4.0 register which stores the flag which enables/disables the level 1 sensor management
-LEVEL2_FLAG_REG             = 0x02  # 4.0 register which stores the flag which enables/disables the level 2 sensor management
+LEVEL1_FLAG_REG             = 0x01  # 4.0 register which stores the default value of the level sensor 1 when unplugged
+LEVEL2_FLAG_REG             = 0x02  # 4.0 register which stores the default value of the level sensor 2 when unplugged
 PRESS_FLAG_REG              = 0x03  # 4.0 register which stores the flag which enables/disables the pressure sensor management
 
 PUMP_DIR_REG                = 0x10  # register which stores the pump direction
