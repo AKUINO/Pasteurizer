@@ -1772,7 +1772,8 @@ class ThreadPump(threading.Thread):
                         self.setPause(False)
 
                 if hardConf.MICHA_device and T_Pump.currAction in ['M','I','P','H','E']: # Output probably in the buffer tank
-                    if hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR1_REG):
+                    hardConf.io.write_discrete(hardConf.MICHApast.LEVEL2_FLAG_REG,0) # PULLDOWN
+                    if hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR2_REG):
                         self.setPause(True)
                 if Buzzer:
                     Buzzer.off()
