@@ -153,6 +153,8 @@ $(document).ready(function() {
                     $('#stateletter').text(data['stateletter']);
                     $('#state').text(data['state']);
                     $('#empty').text(data['empty']);
+                    $('#level1').text(data['level1']); //linput
+                    $('#level2').text(data['level2']); //loutput
                     // $('#greasy').text(data['greasy']);
                     $('#actiontitle').text(data['actiontitle']);
                     var accro = "";
@@ -333,6 +335,8 @@ function action(letter) {
                 $('#stateletter').text(data['stateletter']);
                 $('#state').text(data['state']);
                 $('#empty').text(data['empty']);
+                $('#level1').text(data['level1']); //linput
+                $('#level2').text(data['level2']); //loutput
                 // $('#greasy').text(data['greasy']);
                 $('#actiontitle').text(data['actiontitle']);
                 var accro = "";

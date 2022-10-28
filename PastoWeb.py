@@ -870,7 +870,7 @@ class ThreadDAC(threading.Thread):
                 quantityRemaining = self.T_Pump.quantityRemaining()
                 try:
                     data_file = open(DIR_DATA_CSV + fileName+".csv", "a")
-                    data_file.write("%d\t%s%s%s\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
+                    data_file.write("%d\t%s%s%s\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
                                     % (int(nowT), \
                                        State.current.letter if State.current else '', \
                                        'V' if State.empty else 'W', \
@@ -889,7 +889,9 @@ class ThreadDAC(threading.Thread):
                                        cohorts.val('output'), \
                                        cohorts.catalog['DAC1'].val(), \
                                        cohorts.val('heating'), \
-                                       cohorts.val('press' if hardConf.inputPressure else 'rmeter') ) )
+                                       cohorts.val('press' if hardConf.inputPressure else 'rmeter') , \
+                                       self.T_Pump.level1, \
+                                       self.T_Pump.level2 ) )
                                        #self.totalWatts2, \
                                        #cohorts.val('temper'),
                                        #cohorts.catalog['DAC2'].val(), \
@@ -1551,6 +1553,8 @@ class ThreadPump(threading.Thread):
         self.lastStop = 0
         self.lastDurationEval = None
         self.lastDurationEvalTime = None
+        self.level1 = 1
+        self.level2 = 0
 
     def pushContext(self,opContext):
         if opContext:
@@ -1774,12 +1778,14 @@ class ThreadPump(threading.Thread):
                     if self.paused:
                         self.setPause(False)
 
-                if hardConf.MICHA_device and T_Pump.currAction in ['M','I','P','H','E']: # Output probably in the buffer tank
+                if hardConf.MICHA_device and hardConf.io and T_Pump.currAction in ['M','E','P','H','I']: # Output probably in the buffer tank
                     hardConf.io.write_pin(hardConf.MICHApast.LEVEL1_FLAG_REG,1) # PULLUP
-                    if hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR1_REG) == 0:
+                    self.level1 = hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR1_REG)
+                    if self.level1 == 0:
                         self.setPause(True)
                     hardConf.io.write_pin(hardConf.MICHApast.LEVEL2_FLAG_REG,0) # PULLDOWN
-                    if hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR2_REG):
+                    self.level2 = hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR2_REG)
+                    if self.level2:
                         self.setPause(True)
                 if Buzzer:
                     Buzzer.off()
@@ -1931,7 +1937,8 @@ defFile = datetime.now().strftime("%Y_%m%d_%H%M")
 fileName = defFile
 data_file = open(DIR_DATA_CSV + fileName+".csv", "w")
 data_file.write("epoch_sec\tstate\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\textra\tinput\twarant\toutput\theat\theatbath\t"
-                +("press" if hardConf.inputPressure else "rmeter")+"\n") #\twatt2\ttemper\theat
+                +("press" if hardConf.inputPressure else "rmeter")
+                +"\tlinput\tloutput\n") #\twatt2\ttemper\theat
 term.write("Données stockées dans ",term.blue, term.bgwhite)
 term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
 data_file.close()
@@ -2402,8 +2409,10 @@ class WebApiLog:
                             'fill': taps['H'].get()[0], \
                             'pumpopt': optimal_speed, \
                             'pumpeff': (100.0*pumping_volume/(pumping_time/3600))/optimal_speed if pumping_time else 0, \
-                            'heateff': (100.0*heating_volume/(pumping_time/3600))/HEAT_POWER if pumping_time else 0 \
-                       }
+                            'heateff': (100.0*heating_volume/(pumping_time/3600))/HEAT_POWER if pumping_time else 0, \
+                            'level1': T_Pump.level1, \
+                            'level2': T_Pump.level2 \
+                            }
         return json.dumps(currLog)
 
     def POST(self):
