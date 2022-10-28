@@ -1770,6 +1770,10 @@ class ThreadPump(threading.Thread):
                 if GreenButton and GreenButton.acknowledge():
                     if self.paused:
                         self.setPause(False)
+
+                if hardConf.MICHA_device and T_Pump.currAction in ['M','I','P','H','E']: # Output probably in the buffer tank
+                    if hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR1_REG):
+                        self.setPause(True)
                 if Buzzer:
                     Buzzer.off()
                 if self.paused:
