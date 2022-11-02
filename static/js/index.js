@@ -153,8 +153,18 @@ $(document).ready(function() {
                     $('#stateletter').text(data['stateletter']);
                     $('#state').text(data['state']);
                     $('#empty').text(data['empty']);
-                    $('#level1').text(data['level1']); //linput
-                    $('#level2').text(data['level2']); //loutput
+                    //$('#level1').text(data['level1']); //linput
+                    //$('#level2').text(data['level2']); //loutput
+                    if (data[level1]=='0') {
+                        $('#level1').show()
+                    } else {
+                        $('#level1').hide()
+                    }
+                    if (data[level2]=='1') {
+                        $('#level2').show()
+                    } else {
+                        $('#level2').hide()
+                    }
                     // $('#greasy').text(data['greasy']);
                     $('#actiontitle').text(data['actiontitle']);
                     var accro = "";
@@ -247,6 +257,17 @@ $(document).ready(function() {
                         $('#pause').hide();
                         $('#restart').hide();
                     }
+                    if (data['actif'] > 0 && data['added'] == 1) {
+                        if (data['pause'] > 0) {
+                            $('#addbutton').hide();
+                        } else {
+                            $('#addbutton').show().addClass("btn-success").removeClass("btn-light").removeClass("disabled");
+                        }
+                    } else if (data['added'] >= 2) {
+                        $('#addbutton').show().removeClass("btn-success").addClass("btn-light").addClass("disabled");
+                    } else {
+                        $('#addbutton').hide();
+                    }
                     if (data['purge'] == 1) {
                         $('#dumpbutton').show();
                         $('#purge').removeClass("glyphicon-trash");
@@ -335,8 +356,16 @@ function action(letter) {
                 $('#stateletter').text(data['stateletter']);
                 $('#state').text(data['state']);
                 $('#empty').text(data['empty']);
-                $('#level1').text(data['level1']); //linput
-                $('#level2').text(data['level2']); //loutput
+                if (data[level1]=='0') {
+                    $('#level1').show()
+                } else {
+                    $('#level1').hide()
+                }
+                if (data[level2]=='1') {
+                    $('#level2').show()
+                } else {
+                    $('#level2').hide()
+                }
                 // $('#greasy').text(data['greasy']);
                 $('#actiontitle').text(data['actiontitle']);
                 var accro = "";

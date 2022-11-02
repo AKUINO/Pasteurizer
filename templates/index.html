@@ -19,6 +19,7 @@ $if not paving:
             <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; [<b id="stateletter"></b>:<b id="state"></b> -- <span id="empty"></span> <span id="greasy"></span>]</h3>
             <p style="margin:auto"><span id="actiontitle"></span></p>
             <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
+            <button onclick="action('+')" class="btn btn-success" id="addbutton" style="float:right">$(ml.T("Produit ajouté","Product added","Product toegevoegd"))</button>
             <button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
             <button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button>
 
@@ -59,6 +60,7 @@ $if not paving:
             <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; [<b id="stateletter"></b>:<b id="state"></b> -- <span id="empty"></span> <span id="greasy"></span> <span id="preconfigletter"></span>]</h3>
             <p style="margin:auto"><span id="actiontitle"></span></p>
             <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
+            <button onclick="action('+')" class="btn btn-success" id="addbutton" style="float:right">$(ml.T("Produit ajouté","Product added","Product toegevoegd"))</button>
             <button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
             <button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button>
 
@@ -66,7 +68,7 @@ $if not paving:
             <hr/>
         <table class="Pshape">
                 <tr>
-                    <td class="Eshape"><span id="purge"/><span id="level2"/></td>
+                    <td class="Eshape"><span id="purge"/><span id="level2"><big><b style="color:red">X</b></big></span></td>
                     <td class="Eshape"><b id="extra"></b></td>
                     <td class="Eshape"><div><span class="glyphicon glyphicon-arrow-left"/></div><span id="rmeter"></span></td>
                     <!--td class="Ushape" rowspan="2"><b id="temper"></b>°</td-->
@@ -76,7 +78,7 @@ $if not paving:
                     <td class="Ushape" rowspan=2><div class="Xshape"><div class="Drotate"><span class="glyphicon glyphicon-random"/></div><b id="warranty"></b>°</div><b id="heating"></b>°</td>
                 </tr>
                 <tr>
-                    <td class="Dshape"><span id="level1"/><span class="glyphicon glyphicon-arrow-right"/></td>
+                    <td class="Dshape"><span id="level1"><big><b style="color:blue">X</b></big></span><span class="glyphicon glyphicon-arrow-right"/></td>
                     <td class="Oshape"><b id="vitesse"></b>L/h</td>
                     <td class="Dshape"><span class="glyphicon glyphicon-arrow-right"></span><br/><b id="output"></b>°<br/><span class="glyphicon glyphicon-log-in" id="fill" style="color:blue"></span></td>
                     <!--td class="Dshape"><span class="glyphicon glyphicon-arrow-right"/></td-->

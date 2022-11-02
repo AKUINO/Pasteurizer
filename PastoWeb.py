@@ -538,6 +538,9 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                'Z':['Z',ml.T("STOP","STOP","STOP") \
                        ,ml.T("Pas d'opération en cours.","No operation in progress.","Er wordt geen bewerking uitgevoerd.") \
                        ,ml.T("Arrêt complet de l'opération en cours","Complete stop of the current operation","Volledige stopzetting van de huidige bewerking")],
+               '+':['+',ml.T("Ajouté","Added","Toegevoegd") \
+                     ,ml.T("Produit chimique ajouté.","Chemical product added.","Chemisch product toegevoegd.") \
+                     ,ml.T("L'opération en cours ne doit plus s'interrompre","Current operation does not have to stop.","Huidige bewerking hoeft niet te stoppen.")],
                '_':['_',ml.T("Redémar.","Restart","Herstart") \
                        ,ml.T("Redémarrage de l'opération en cours.","Restart of the current operation.","Herstart van de huidige bewerking.") \
                        ,ml.T("Redémarrer l'opération en cours","Restart the current operation","Herstart de huidige bewerking")]}
@@ -985,7 +988,8 @@ class Operation(object):
 
     global menus,lines,columns, taps, optimal_speed
 
-    def __init__(self, acronym, typeOp, sensor1=None, sensor2=None, ref=None, ref2=None, base_speed=None, min_speed=None, qty=None, shake_qty=None, duration=None, subSequence = None, dump=False, inject=None, message=None, tap=None, cooling=False, programmable=False):
+    def __init__(self, acronym, typeOp, sensor1=None, sensor2=None, ref=None, ref2=None, base_speed=None, min_speed=None, qty=None, shake_qty=None, \
+                 duration=None, subSequence = None, dump=False, inject=None, message=None, tap=None, cooling=False, programmable=False, waitAdd=False):
         self.acronym = acronym
         self.typeOp = typeOp
         self.sensor1 = sensor1
@@ -1003,6 +1007,7 @@ class Operation(object):
         self.dump = dump
         self.inject = inject
         self.message = message
+        self.waitAdd = waitAdd
         if not tap:
             self.tap = 'H'
         else:
@@ -1053,6 +1058,8 @@ class Operation(object):
             # T_Pump.T_DAC.set_cold(menus.options['T'][3])
         # else:
             # T_Pump.T_DAC.set_cold(None)
+        if self.waitAdd:
+            T_Pump.waitingAdd = True
         if self.typeOp == 'FILL' :
             if State.empty :
                 if menus.val('s') < 1.0:
@@ -1084,10 +1091,13 @@ class Operation(object):
         elif self.typeOp == 'REVR':
             T_Pump.pump.reset_pump()
         elif self.typeOp == 'PAUS':
-            if Buzzer:
-                Buzzer.on()
-            T_Pump.setPause(True)
-            tell_message(self.message)
+            if not T_Pump.added:
+                if Buzzer:
+                    Buzzer.on()
+                T_Pump.setPause(True)
+                tell_message(self.message)
+            T_Pump.added = False
+            T_Pump.waitingAdd = False
             State.transitCurrent(State.ACTION_RESUME, T_Pump.currAction)
         elif self.typeOp == 'SEAU':
             if menus.val('s') >= 1.0:
@@ -1437,7 +1447,7 @@ opSequences = {
            Operation('CLOS','MESS',message=ml.T("Tuyaux vidés autant que possible.","Pipes emptied as much as possible.","Leidingen zoveel mogelijk geleegd."),dump=True)
         ],
     'A': # Désinfectant acide
-        [ Operation('DesT','HEAT',ref='A',dump=False,programmable=True),
+        [ Operation('DesT','HEAT',ref='A',dump=False,programmable=True,waitAdd=True),
           Operation('DesS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
           Operation('DesF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
           #Operation('DesI','FLOO','output',duration=lambda:flood_liters_to_seconds(1.0),base_speed=MAX_SPEED,qty=1.0, ref='A',dump=False),
@@ -1466,7 +1476,7 @@ opSequences = {
           Operation('CLOS','MESS',message=ml.T("DANGER: Eau chaude sous pression. Mettre des gants pour séparer les tuyaux!","DANGER: Hot water under pressure. Wear gloves to separate the pipes!","GEVAAR: Heet water onder druk. Draag handschoenen om de leidingen te scheiden!"),dump=True)
           ],
     'C': # Détergent
-        [ Operation('NetT','HEAT',ref='C',dump=False,programmable=True),
+        [ Operation('NetT','HEAT',ref='C',dump=False,programmable=True,waitAdd=True),
           Operation('NetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
           Operation('NetF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='C',dump=False),
           Operation('NetI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='C',dump=False),
@@ -1555,6 +1565,8 @@ class ThreadPump(threading.Thread):
         self.lastDurationEvalTime = None
         self.level1 = 1
         self.level2 = 0
+        self.waitingAdd = False
+        self.added = False
 
     def pushContext(self,opContext):
         if opContext:
@@ -1615,6 +1627,8 @@ class ThreadPump(threading.Thread):
 
         menus.currAction = action
         self.currAction = action
+        self.added = False
+        self.waitingAdd = False
         self.startAction = time.perf_counter()
 
     def setAction(self,action):
@@ -2130,14 +2144,14 @@ class WebApiAction:
                 reloadPasteurizationSpeed()
                 menus.save()
             # end of StateLessActions
-            elif letter == "S":  # Pause
+            elif letter == 'S':  # Pause
                 if not T_Pump.paused:
                    T_Pump.setPause(True)  # Will make the pump stops !
                    message = str(ml.T("Pause","Pause","Pauze"))
                 else:
                    message = str(ml.T("Déjà en Pause","Already Paused","Al gepauzeerd"))
                 time.sleep(0.01)
-            elif letter == "_":  # Restart
+            elif letter == '_':  # Restart
                    if not T_Pump.paused:
                        message = str(ml.T("Pas en Pause","Not Paused","Niet gepauzeerd"))
                    else:
@@ -2147,7 +2161,12 @@ class WebApiAction:
                    if T_Pump.currOperation and (not T_Pump.currOperation.dump) and dumpValve.value != 0.0:
                        dumpValve.setWait(0.0)
                    time.sleep(0.01)
-            elif letter == "U":  # Purge
+            elif letter == '+':  # Restart
+                T_Pump.added = True
+                T_Pump.waitingAdd = False
+                message = str(ml.T("Produit ajouté","Product added","Product toegevoegd"))
+                time.sleep(0.01)
+            elif letter == 'U':  # Purge
                    dumpValve.setWait(1.0)
                    message = str(ml.T("Purge en cours","Purge bagan","Zuivering..."))
                    time.sleep(0.01)
@@ -2404,6 +2423,7 @@ class WebApiLog:
                             #'opt_T': temper if temper <  99.0 else '', \
                             'opt_M': menus.val('M'), \
                             'opt_temp': opt_temp, \
+                            'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0), \
                             'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['P','E','I'] else 1), \
                             'pause': 1 if T_Pump.paused else 0, \
                             'fill': taps['H'].get()[0], \
@@ -2563,37 +2583,37 @@ class ThreadInputProcessor(threading.Thread):
                         T_Pump.stopAction()
                     elif menu_choice in ['R','V','F','P','I','E','M','A','C','D','H']: # 'C','K'
                         T_Pump.setAction(menu_choice)
-                elif menu_choice == "Y": # Yaourt
+                elif menu_choice == 'Y': # Yaourt
                     menus.store('P', 82.0)
                     menus.store('M', 30.0)
                     #menus.options['T'][3] = 45.0
                     menus.save()
                     option_confirm(0.0)
-                elif menu_choice == "L": # Lait
+                elif menu_choice == 'L': # Lait
                     menus.store('P', 72.0)
                     menus.store('M', 15.0)
                     #menus.options['T'][3] = 22.0
                     menus.save()
                     option_confirm(0.0)
-                elif menu_choice == "T": # Thermiser
+                elif menu_choice == 'T': # Thermiser
                     menus.store('P', 65.0)
                     menus.store('M', 30.0)
                     #menus.options['T'][3] = 35.0
                     menus.save()
                     option_confirm(0.0)
-                elif menu_choice == "S": # Pause / Restart
+                elif menu_choice == 'S': # Pause / Restart
                     if not T_Pump.paused:
                         T_Pump.setPause(True) # Will make the pump stops !
                     menu_choice = menu_confirm(menu_choice)
-                    if menu_choice == "S":
+                    if menu_choice == 'S':
                         T_Pump.setPause(False)
-                    elif menu_choice == "V":
+                    elif menu_choice == 'V':
                         T_Pump.setPause(False)
                         T_Pump.setAction(menu_choice)
                     elif menu_choice == 'Z':
                         T_Pump.setPause(False)
                         T_Pump.stopAction()
-                elif menu_choice == "O": # Options...
+                elif menu_choice == 'O': # Options...
                     option_confirm()
                 elif menu_choice:
                     prec_pause = display_pause
