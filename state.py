@@ -77,6 +77,7 @@ class State(object):
                 if nextState == None:
                     newState = State.get(self.letter,empty,greasy)
                 elif isinstance(nextState, list):
+                    newLetter = None
                     if len(nextState):
                         if step == State.ACTION_BEGIN:
                             newLetter = nextState[0]

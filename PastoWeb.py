@@ -199,10 +199,10 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                     'c':['c',ml.T("net.Caustique\"","Caustic cleaning\"","Bijtende schoonmaak\"") \
                             ,ml.T("Durée de nettoyage","Cleaning Duration","Schoonmaak Tijd") \
                             ,CLEAN_TIME,CLEAN_TIME,"hh:mm",False,3600*2,60,"time"],
-                    'D': ['D', ml.T("Désinfection thermique°""Thermal Disinfection°", "Thermisch Desinfectie°") \
-                          , ml.T("Température de désinfection", "Disinfection Temperature", "Desinfectie Temperatuur") \
-                          , 72.0, 72.0, "°C", False, 77, 0.1, "number"],  # Température normale de pasteurisation
-                    'd': ['d', ml.T("Désinfection thermique\"", "Thermal Disinfection\"", "Thermisch Desinfectie\"") \
+                    #'D': ['D', ml.T("Désinfection thermique°""Thermal Disinfection°", "Thermisch Desinfectie°") \
+                          #, ml.T("Température de désinfection", "Disinfection Temperature", "Desinfectie Temperatuur") \
+                          #, 72.0, 72.0, "°C", False, 77, 0.1, "number"],  # Température normale de pasteurisation
+                    'd': ['d', ml.T("Désinfection \"", "Disinfection \"", "Desinfectie \"") \
                          , ml.T("Durée de désinfection", "Disinfection Duration", "Desinfectie Tijd") \
                          , TH_DISINF_TIME,TH_DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'A':['A',ml.T("net.Acide°""Acidic cleaning°","Zuur schoonmaak°") \
@@ -346,6 +346,8 @@ START_VOL = START_VOL / 1000.0 # 1.9L
 TOTAL_VOL = TOTAL_VOL / 1000.0 # 3.5L
 
 DRY_VOLUME = TOTAL_VOL*1.5 # (air) liters to pump to empty the tubes...
+
+DILUTE_VOL = 2.0 #L added in the bucket to dilute the cleaning products
 
 #i=input(str(START_VOL*1000.0)+"/"+str(pasteurization_tube)+"/"+str(vol_tube(8,400)+vol_coil(8,250,10)+vol_tube(8,2000)))
 SHAKE_QTY = pasteurization_tube / 1000.0 / 4 # liters
@@ -509,11 +511,11 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                        ,ml.T("Entrée et Sortie connectés, Vidange...","Inlet and Outlet connected, Drain ...","Inlaat bij de klep, Uitlaat bij de blauwe klep, Afvoer ...") \
                        ,ml.T("Rincer à fond les tuyaux","Rinse the pipes thoroughly","Spoel de leidingen grondig af")],
                'C':['C',ml.T("net.Caustique","Caustic clean","Bijtend Schoon") \
-                       ,ml.T("Entrée et Sortie connectés et dans un seau, Ajouter le Détergent...","Inlet and Outlet connected and in a bucket, Add Detergent ...","Input en output aangesloten en in een emmer, Wasmiddel toevoegen ...") \
+                       ,ml.T("Entrée et Sortie dans un seau, Ajouter le Détergent...","Inlet and Outlet connected and in a bucket, Add Detergent ...","Input en output aangesloten en in een emmer, Wasmiddel toevoegen ...") \
                        ,ml.T("Nettoyer avec un détergent (caustique)","Clean with detergent (caustic)","Reinig met afwasmiddel (bijtend)")],
-               'D':['D',ml.T("Désinfection th.","th.Disinfct","th.Desinfect.") \
+               'D':['D',ml.T("Désinfection","Disinfct","Desinfect.") \
                        ,ml.T("Entrée et Sortie connectés et dans un seau","Inlet and Outlet connected and in a bucket","Input en output aangesloten en in een emmer") \
-                       ,ml.T("Désinfecter les tuyaux thermiquement","Disinfect pipes (thermal)","Desinfecteer leidingen (thermisch)")], \
+                       ,ml.T("Désinfecter avec le produit approprié","Disinfect with sanitizer","Desinfecteren met ontsmettingsmiddel")], \
                'A':['A',ml.T("net.Acide","Acidic clean","Zuur") \
                        ,ml.T("Entrée et Sortie connectés et dans un seau, Ajouter le Désinfectant...","Inlet and Outlet connected and in a bucket, Add Disinfectant ...","Input en output aangesloten en in een emmer, Desinfectiemiddel toevoegen ...") \
                        ,ml.T("Désinfecter les tuyaux (acide)","Disinfect pipes (acid)","Desinfecteer leidingen (zuur)")], \
@@ -590,20 +592,13 @@ StateLessActions = "JYLT" # TO BE DUPLICATED in index.js !
 # Empty sub state is managed by underlying operations
 # Greasy sub state must be set
 State('r',ml.T('Propre','Clean','Schoon'), \
-    [ ('P','p'),('D',''),('H',''),('F',''),('V',''),('w','o') ] )
+    [ ('A',['r','r',['a',None,False]]),('P','p'),('D',''),('H',''),('F',''),('V',''),('w','o') ] )
 
 State('o',ml.T('Eau','Water','Waser'), \
-    [ ('A',['o','o',['a',None,False]]),('C',['o','o',['c',None,False]]),('F',''),('V',''),('D',['','','r']),('H',['','r']),('w','v') ] )
+    [ ('A',['o','o',['a',None,False]]),('F',''),('V',''),('D',['','','r']),('H',['','r']),('w','v') ] )
 
 State('v',ml.T('Eau vieille','Old Water','Oude Waser'), \
       [ ('A',['v','v',['a',None,False]]),('C',['v','v',['c',None,False]]),('F',''),('V',''),('D',['','','r']),('w','') ] )
-
-#State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
-#    [ ('C',['s','s',['c',None,False]]), ('F',''),('V',''),('w','') ]
-#    , [False,True],[True])
-State('s',ml.T('Sale','Dirty','Vies'), \
-    [ ('C',['s','s',['c',None,False]]),('A',['s','s',['a',None,False]]),('F',''),('V',''),('w','') ]
-    , [False,True],[True,False] )
 
 State('c',ml.T('Soude','Soda','Natrium'), \
     [ ('R',['','r']),('F',''),('V',''),('w','') ] )
@@ -611,19 +606,23 @@ State('c',ml.T('Soude','Soda','Natrium'), \
 State('a',ml.T('Acide','Acid','Zuur'), \
     [ ('R',['','r']),('F',''),('V',''),('w','') ] )
 
-State('p',ml.T('Produit','Product','Product'), \
-    [ ('I',''),('M',''),('E','e'),('A',['e','e',['a',None,False]]),('C',['e','e',['c',None,False]]),('F','e'),('V','') ]
-    , [False,True],[True,False] )
 #State('p',ml.T('Produit Gras','Greasy Product','Vet Product'), \
 #    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'),     ('C',['e','e',['c',None,False]]),('F','e'),('V','') ]
 #    , [False,True],[True] )
+State('p',ml.T('Produit','Product','Product'), \
+    [ ('I',''),('M',''),('E',''),('R','e'),('F',''),('V','') ] )
 
 #State('e',ml.T('Eau+Produit Gras','Water+Greasy Product','Water+Vet Product'), \
 #      [                                 ('C',['e','e',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
 #      , [False,True],[True] )
 State('e',ml.T('Eau+Produit','Water+Product','Water+Product'), \
-      [ ('A',['e','e',['a',None,False]]),('C',['e','e',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
-      , [False,True],[True,False] )
+      [ ('C',['e','e',['c',None,False]]),('P','p'),('R',''),('F',''),('V',''),('w','s') ] )
+
+#State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
+#    [ ('C',['s','s',['c',None,False]]), ('F',''),('V',''),('w','') ]
+#    , [False,True],[True])
+State('s',ml.T('Sale','Dirty','Vies'), \
+      [ ('C',['s','s',['c',None,False]]), ('R',''),('F',''),('V',''),('w','') ] )
 
 def menu_confirm(choice,delay=None):
     global display_pause, lines
@@ -1425,20 +1424,23 @@ opSequences = {
     'R': # Pré-rinçage 4 fois
         [ Operation('Pr1T','HEAT',ref='R', dump=True,programmable=True),
           Operation('Pr1S','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('Pr1F','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=False),
-          Operation('Pr1I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          Operation('Pr1F','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),
+          Operation('Pr1I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True),
           Operation('Pr1R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('1END','MESS',message=ml.T("1 rinçage effectué!","1 flush done!","1 keer doorspoelen!"),dump=True),
           Operation('Pr2T','HEAT',ref='R', dump=True,programmable=True),
-          Operation('Pr2I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          #Operation('Pr2I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          Operation('Pr2I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True),
           Operation('Pr2R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('2END','MESS',message=ml.T("2 rinçages effectués!","2 flushes done!","2 keer doorspoelen!"),dump=True),
           Operation('Pr3T','HEAT',ref='R', dump=True,programmable=True),
-          Operation('Pr3I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          #Operation('Pr3I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          Operation('Pr3I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True),
           Operation('Pr3R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('3END','MESS',message=ml.T("3 rinçages effectués!","3 flushes done!","3 keer doorspoelen!"),dump=True),
           Operation('Pr4T','HEAT',ref='R', dump=True,programmable=True),
-          Operation('Pr4I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          #Operation('Pr4I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          Operation('Pr4I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True),
           Operation('Pr4R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('CLOS','MESS',message=ml.T("4 rinçages effectués!","4 flushes done!","4 keer doorspoelen!"),dump=True)
           ],
@@ -1448,18 +1450,18 @@ opSequences = {
         ],
     'A': # Désinfectant acide
         [ Operation('DesT','HEAT',ref='A',dump=False,programmable=True,waitAdd=True),
-          Operation('DesS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          Operation('DesS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False),
           Operation('DesF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
           #Operation('DesI','FLOO','output',duration=lambda:flood_liters_to_seconds(1.0),base_speed=MAX_SPEED,qty=1.0, ref='A',dump=False),
           #Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
           #Operation('Desi','PUMP','output',base_speed=MAX_SPEED,qty=2.0*TOTAL_VOL,ref='A',dump=False),
-          Operation('DesI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='A',dump=False),
+          Operation('DesI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, ref='A',dump=False),
           Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
           #Operation('DesN','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='A',dump=False),
           #Operation('Desh','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='A', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
           Operation('Desi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='A',dump=False),
           Operation('Desf','SUBR',duration=lambda:menus.val('a'),subSequence='a',dump=False),
-          Operation('Dess','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          Operation('Dess','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False),
           Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
           Operation('CLOS','MESS',message=ml.T("Acide réutilisable en sortie... Bien rincer!","Reusable Acid in output... Rinse well!","Herbruikbaar zuur in output... Goed uitspoelen!!"),dump=True)
         ],
@@ -1467,19 +1469,30 @@ opSequences = {
         [ Operation('DesA','PUMP',ref='A', base_speed=MAX_SPEED, qty=4.0,dump=False),
           Operation('DesP','REVR',ref='A', base_speed=MAX_SPEED, qty=-2.0,dump=False)
         ],
-    'D': # Désinfection thermique
-        [ Operation('Dett','HEAT','output',ref='D',dump=False,programmable=True),
-          Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('DetI','FLOO','output',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=True),  #
-          Operation('Dety','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='D',dump=False),
-          Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='D', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
-          Operation('CLOS','MESS',message=ml.T("DANGER: Eau chaude sous pression. Mettre des gants pour séparer les tuyaux!","DANGER: Hot water under pressure. Wear gloves to separate the pipes!","GEVAAR: Heet water onder druk. Draag handschoenen om de leidingen te scheiden!"),dump=True)
-          ],
+    'D': # Désinfection (fut thermique)
+        # [ Operation('Dett','HEAT','output',ref='R',dump=False,programmable=True),
+        #   Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+        #   Operation('DetI','FLOO','output',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=True),  #
+        #   Operation('Dety','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='D',dump=False),
+        #   Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='D', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
+        #   Operation('CLOS','MESS',message=ml.T("DANGER: Eau chaude sous pression. Mettre des gants pour séparer les tuyaux!","DANGER: Hot water under pressure. Wear gloves to separate the pipes!","GEVAAR: Heet water onder druk. Draag handschoenen om de leidingen te scheiden!"),dump=True)
+        #   ],
+        [ Operation('DetT','HEAT',ref='R',dump=False,programmable=True,waitAdd=True),
+          Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='R',dump=False),
+          Operation('DetF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=False),
+          Operation('DetI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, ref='R',dump=False),
+          Operation('DetN','PAUS',message=ml.T("Mettre dans le seau le désinfectant acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the sanitizer and the 2 pipes, then restart!","Doe het ontsmettingsmiddel en de 2 pijpen in de emmer, en herstart!"),ref='R',dump=False),
+          Operation('Deti','PUMP',base_speed=OPT_SPEED,qty=TOTAL_VOL*1.5,ref='R',dump=False),
+          Operation('Detn','PAUS',message=ml.T("Laisser tremper si désiré puis redémarrer!","Let soak for a while if desired then restart!","Laat eventueel weken, en herstart!"),ref='R',dump=False),
+          Operation('Dets','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='R',dump=False),
+          Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=False),
+          Operation('CLOS','MESS',message=ml.T("Prêt à l'emploi!","Ready to use!","Klaar voor gebruik!"),dump=True)
+        ],
     'C': # Détergent
         [ Operation('NetT','HEAT',ref='C',dump=False,programmable=True,waitAdd=True),
           Operation('NetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
           Operation('NetF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='C',dump=False),
-          Operation('NetI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='C',dump=False),
+          Operation('NetI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, ref='C',dump=False),
           Operation('NETY','PAUS',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),ref='C',dump=False),
           Operation('Neti','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='C',dump=False),
           Operation('Neto','SUBR',duration=lambda:menus.val('c'),subSequence='c',dump=False),
@@ -1613,10 +1626,14 @@ class ThreadPump(threading.Thread):
             self.currSequence = None
 
     def stopAction(self):
+
+        global taps
+
         # do whatever is needed
         self.closeSequence()
         time.sleep(0.01)
         self.pump.reset_pump() # to be sure that no situation ends with a running pump...
+        taps['H'].set(0) # and tap are closed !
         time.sleep(0.01)
         self.manAction('Z') # Should stop operations...
         self.setPause(False)
