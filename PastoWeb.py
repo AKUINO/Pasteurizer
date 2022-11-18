@@ -340,7 +340,7 @@ menus.options['u'][Menus.INI] = TOTAL_VOL/1000.0
 #New exchanger:
 #Amorçage=3031mL, Pasteurisation=625mL, Total=4989mL
 
-
+KICKBACK = 13 # Haw many seconds the pump turns toward input after a flush in order to rinse the input pipe
 
 START_VOL = START_VOL / 1000.0 # 1.9L
 TOTAL_VOL = TOTAL_VOL / 1000.0 # 3.5L
@@ -352,6 +352,8 @@ DILUTE_VOL = 2.0 #L added in the bucket to dilute the cleaning products
 #i=input(str(START_VOL*1000.0)+"/"+str(pasteurization_tube)+"/"+str(vol_tube(8,400)+vol_coil(8,250,10)+vol_tube(8,2000)))
 SHAKE_QTY = pasteurization_tube / 1000.0 / 4 # liters
 SHAKE_TIME = 10.0 # seconds shaking while cleaning, rincing or disinfecting
+
+GRADIENT_FOR_INPUT = 13.0  # How many degrees do we heat the tank more than the desired temperature just after the pump
 
 class ThreadOneWire(threading.Thread):
 
@@ -1022,7 +1024,7 @@ class Operation(object):
     def tempWithGradient(self): # Current heating temperature along what is set in options
         if not self.ref: # do not heat !
             return 0.0
-        return menus.val(self.ref) + ( menus.val('G') if self.sensor1 == 'warranty' else (13.0 if self.sensor1 == 'output' else 0.0) )
+        return menus.val(self.ref) + ( menus.val('G') if self.sensor1 == 'warranty' else (GRADIENT_FOR_INPUT if self.sensor1 == 'output' else 0.0) )
 
     # def tempRef2(self): # Current heating temperature along what is set in options
         # if not self.ref2: # do not heat !
@@ -1412,7 +1414,7 @@ opSequences = {
         [ Operation('PreT','HEAT',ref='R', dump=True,programmable=True),
           Operation('PreS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
           Operation('PreI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
-          Operation('PreR','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+          Operation('PreR','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('CLOS','MESS',message=ml.T("Recommencer au besoin!","Repeat if needed!","Herhaal indien nodig!"),dump=True)
           ],
     'H': # Distribution d'eau pasteurisée
