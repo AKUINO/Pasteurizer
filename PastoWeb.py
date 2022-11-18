@@ -1449,21 +1449,17 @@ opSequences = {
            Operation('CLOS','MESS',message=ml.T("Tuyaux vidés autant que possible.","Pipes emptied as much as possible.","Leidingen zoveel mogelijk geleegd."),dump=True)
         ],
     'A': # Désinfectant acide
-        [ Operation('DesT','HEAT',ref='A',dump=False,programmable=True,waitAdd=True),
-          Operation('DesS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False),
-          Operation('DesF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
-          #Operation('DesI','FLOO','output',duration=lambda:flood_liters_to_seconds(1.0),base_speed=MAX_SPEED,qty=1.0, ref='A',dump=False),
-          #Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
-          #Operation('Desi','PUMP','output',base_speed=MAX_SPEED,qty=2.0*TOTAL_VOL,ref='A',dump=False),
-          Operation('DesI','FLOO',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, ref='A',dump=False),
-          Operation('DesN','PAUS',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),ref='A',dump=False),
-          #Operation('DesN','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='A',dump=False),
-          #Operation('Desh','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='A', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
-          Operation('Desi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='A',dump=False),
+        [ Operation('DesT','HEAT','output','input',ref='R',dump=False,programmable=True,waitAdd=True),
+          Operation('DesS','SEAU','output','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False),
+          Operation('DesF','FILL','output','input',ref='R',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False),
+          Operation('DesI','FLOO','output','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, dump=False),
+          Operation('DesN','PAUS','output','input',ref='R',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),dump=False),
+          Operation('Desi','PUMP','output','input',ref='R',base_speed=MAX_SPEED,qty=START_VOL,dump=False),
+          Operation('Desh','TRAK','output','input',ref='R',base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
           Operation('Desf','SUBR',duration=lambda:menus.val('a'),subSequence='a',dump=False),
           Operation('Dess','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False),
           Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
-          Operation('CLOS','MESS',message=ml.T("Acide réutilisable en sortie... Bien rincer!","Reusable Acid in output... Rinse well!","Herbruikbaar zuur in output... Goed uitspoelen!!"),dump=True)
+          Operation('CLOS','MESS',message=ml.T("Seau d'Acide réutilisable en sortie... Bien rincer!","Reusable Acid Bucket in output... Rinse well!","Herbruikbaar zuur emmer in output... Goed uitspoelen!!"),dump=True)
         ],
     'a': # Étape répétée de la désinfection acide
         [ Operation('DesA','PUMP',ref='A', base_speed=MAX_SPEED, qty=4.0,dump=False),
@@ -1489,17 +1485,18 @@ opSequences = {
           Operation('CLOS','MESS',message=ml.T("Prêt à l'emploi!","Ready to use!","Klaar voor gebruik!"),dump=True)
         ],
     'C': # Détergent
-        [ Operation('NetT','HEAT',ref='C',dump=False,programmable=True,waitAdd=True),
-          Operation('NetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('NetF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='C',dump=False),
-          Operation('NetI','FLOO',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, ref='C',dump=False),
-          Operation('NETY','PAUS',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),ref='C',dump=False),
-          Operation('Neti','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='C',dump=False),
+        [ Operation('NetT','HEAT','output','input',ref='R',dump=False,programmable=True,waitAdd=True),
+          Operation('NetS','SEAU','output','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          Operation('NetF','FILL','output','input',ref='R',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, dump=False),
+          Operation('NetI','FLOO','output','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL,dump=False),
+          Operation('NetY','PAUS','output','input',ref='R',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),dump=False),
+          Operation('Neti','PUMP','output','input',ref='R',base_speed=MAX_SPEED,qty=START_VOL,dump=False),
+          Operation('Neth','TRAK','output','input',ref='R',base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
           Operation('Neto','SUBR',duration=lambda:menus.val('c'),subSequence='c',dump=False),
           #Operation('NetV','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,dump=True),
           Operation('Nets','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
           Operation('Netf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
-          Operation('CLOS','MESS',message=ml.T("Soude réutilisable en sortie... Bien rincer!","Reusable Soda in output... Rinse well!","Herbruikbaar soda in output... Goed uitspoelen!!"),dump=True)
+          Operation('CLOS','MESS',message=ml.T("Seau de Soude réutilisable en sortie... Bien rincer!","Reusable Soda Bucket in output... Rinse well!","Herbruikbaar soda emmer in output... Goed uitspoelen!!"),dump=True)
         ],
     'c': # Étape répétée du nettoyage
         [ Operation('NetC','PUMP',ref='C',base_speed=MAX_SPEED, qty=4.0,dump=False),
