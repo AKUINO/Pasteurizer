@@ -26,8 +26,9 @@ function color(value,mini,typi,maxi) {
 }
 
 function textcolor(red, green, blue) {
-    var total =( (0.299*parseInt(red,16))+(0.587*parseInt(green,16))+(0.114*parseInt(blue,16)) / 255 )
-    if (total > 0.4) return "000000"; //357
+    var total =( (0.299*parseInt(red,16))+(0.587*parseInt(green,16))+(0.114*parseInt(blue,16)) / 255.0 )
+    console.log(red+'.'+green+'.'+blue+", luminance="+total.toString());
+    if (total > 0.5) return "000000"; //357
     else return "EEEEEE";
 }
 
