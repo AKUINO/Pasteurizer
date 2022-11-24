@@ -196,7 +196,7 @@ $(document).ready(function() {
                     $('#vitesse').text(speed);
                     colorit($('#vitesse'),0.0,625*3.6/data['opt_M'],180.0);
                     $('#input').text(floorDeci(data['input']));
-                    $('#output').text(floorDeci(data['output']));
+                    $('#intake').text(floorDeci(data['intake']));
                     $('#warranty').text(floorDeci(data['warranty']));
                     colorit($('#sp9'),45.0,data['opt_temp'],90.0);
                     $('#reft').text(floorDeci(data['reft']));
@@ -318,7 +318,7 @@ $(document).ready(function() {
                                     floorCenti(data['totalwatts']), floorCenti(data['watts']),
                                     floorCenti(data['volume']), floorCenti(data['speed']),
                                     floorCenti(data['input']), floorCenti(data['heating']),
-                                    floorCenti(data['warranty']), floorCenti(data['output']),
+                                    floorCenti(data['warranty']), floorCenti(data['intake']),
                                     //floorCenti(data['temper']),
                                     floorCenti(data['extra'])
                         ]

@@ -199,9 +199,9 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                     'c':['c',ml.T("net.Caustique\"","Caustic cleaning\"","Bijtende schoonmaak\"") \
                             ,ml.T("Durée de nettoyage","Cleaning Duration","Schoonmaak Tijd") \
                             ,CLEAN_TIME,CLEAN_TIME,"hh:mm",False,3600*2,60,"time"],
-                    #'D': ['D', ml.T("Désinfection thermique°""Thermal Disinfection°", "Thermisch Desinfectie°") \
-                          #, ml.T("Température de désinfection", "Disinfection Temperature", "Desinfectie Temperatuur") \
-                          #, 72.0, 72.0, "°C", False, 77, 0.1, "number"],  # Température normale de pasteurisation
+                    'D': ['D', ml.T("Désinfection°""Disinfection°", "Desinfectie°") \
+                          , ml.T("Température de désinfection", "Disinfection Temperature", "Desinfectie Temperatuur") \
+                          , 25.0, 25.0, "°C", False, 30, 0.1, "number"],  # Température normale de désinfection vinaigre + peroxyde
                     'd': ['d', ml.T("Désinfection \"", "Disinfection \"", "Desinfectie \"") \
                          , ml.T("Durée de désinfection", "Disinfection Duration", "Desinfectie Tijd") \
                          , TH_DISINF_TIME,TH_DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
@@ -304,22 +304,26 @@ if hardConf.tubing == "horizontal":
     pasteurization_tube = 625 #vol_tube(8,15000) # 15m of expensive pump tube
     up_to_thermistor = 2330.0
     heating_tube = vol_tube(10.5,500)+vol_coil(10.5,220,18)+vol_tube(8,200)+vol_coil(7,250,20)
+    intake_tubing = vol_tube(8,1800)+vol_tube(8,600)
     initial_tubing = up_to_thermistor-heating_tube
+    input_tubing = initial_tubing - intake_tubing
     final_tubing = 3587.0-up_to_thermistor-pasteurization_tube-vol_tube(8,1800)
 else:
     exchanger_tube = 2.0*712.6 #mL
     old_exchanger = vol_tube(8,8*1800)
     pasteurization_tube = vol_tube(9.5,8820) # = 625mL aussi
     up_to_thermistor = 2330.0
-    heating_tube = vol_tube(10.5,500)+5127-3860 #1267   1444-336=1108
+    heating_tube = vol_tube(9.5,500)+5127-3860 #1267   1444-336=1108
+    intake_tubing = vol_tube(8,2000)+vol_tube(9.5,577)
     initial_tubing = up_to_thermistor-heating_tube+exchanger_tube-old_exchanger
-    final_tubing = 3587.0-up_to_thermistor-pasteurization_tube-vol_tube(8,1800)+exchanger_tube-old_exchanger
+    input_tubing = initial_tubing - intake_tubing
+    final_tubing = 3587.0-up_to_thermistor-pasteurization_tube-vol_tube(8,2200)+exchanger_tube-old_exchanger
 
 cohorts.sequence = [ # Tubing and Sensor Sequence of the Pasteurizer
-                    [initial_tubing,'input'], #input de la chauffe
+                    [intake_tubing,'intake'], # apres la pompe
+                    [input_tubing,'input'], #input de la chauffe
                     [heating_tube,'warranty'], # Garantie
-                    [pasteurization_tube,'output'], # Bassin
-                    [final_tubing+vol_tube(8,1800),'extra'] ] # Sortie
+                    [pasteurization_tube+final_tubing+vol_tube(8,1800),'extra'] ] # Sortie
 START_VOL = 0.0
 for curr_cohort in cohorts.sequence:
     START_VOL += curr_cohort[0]
@@ -890,7 +894,7 @@ class ThreadDAC(threading.Thread):
                                        cohorts.val('extra'), \
                                        cohorts.val('input'), \
                                        cohorts.val('warranty'), \
-                                       cohorts.val('output'), \
+                                       cohorts.val('intake'), \
                                        cohorts.catalog['DAC1'].val(), \
                                        cohorts.val('heating'), \
                                        cohorts.val('press' if hardConf.inputPressure else 'rmeter') , \
@@ -900,7 +904,7 @@ class ThreadDAC(threading.Thread):
                                        #cohorts.val('temper'),
                                        #cohorts.catalog['DAC2'].val(), \
                                        #cohorts.catalog['sp9b'].value
-                                       #cohorts.catalog['output'].value, batt
+                                       #cohorts.catalog['intake'].value, batt
                     data_file.close()
                 except:
                     traceback.print_exc()
@@ -918,12 +922,12 @@ class ThreadDAC(threading.Thread):
                     cohorts.display(term,'extra',format=" %5.1f° ") #Echgeur
                     cohorts.display(term,'input',format=" %5.1f° ") # Entrée de la Chauffe
                     cohorts.display(term,'warranty',format=" %5.1f° ") # Garant
-                    cohorts.display(term,'output',format=" %5.1f° ") # Garant
+                    cohorts.display(term,'intake',format=" %5.1f° ") # Garant
                     term.write(' %1d ' % int(isnull(cohorts.catalog['DAC1'].value,0)),term.black,term.bgwhite) # Watts #+isnull(cohorts.catalog['DAC2'].value,0)
                     cohorts.display(term,'heating',format=" %5.1f° ") # Bassin
                     #cohorts.display(term,'temper',format=" %5.1f° ") # Bassin de tempérisation
                     #cohorts.catalog['sp9b'].display() # Garant
-                    #cohorts.catalog['output'].display() # Sortie
+                    #cohorts.catalog['intake'].display() # Sortie
                     term.write(' %4d"  ' % durationRemaining if durationRemaining > 0 else \
                                 '%5dmL ' % int(quantityRemaining*1000) if quantityRemaining != 0.0 else "      ", \
                                term.white, term.bold, term.bgwhite)
@@ -1019,12 +1023,12 @@ class Operation(object):
     def tempRef(self): # Current heating temperature along what is set in options
         if not self.ref: # do not heat !
             return 0.0
-        return menus.val(self.ref)
+        return (menus.val(self.ref) - GRADIENT_FOR_INPUT) if self.sensor1 == 'intake' else menus.val(self.ref)
 
     def tempWithGradient(self): # Current heating temperature along what is set in options
         if not self.ref: # do not heat !
             return 0.0
-        return menus.val(self.ref) + ( menus.val('G') if self.sensor1 == 'warranty' else (GRADIENT_FOR_INPUT if self.sensor1 == 'output' else 0.0) )
+        return menus.val(self.ref) + ( menus.val('G') if self.sensor1 == 'warranty' else 0.0 )
 
     # def tempRef2(self): # Current heating temperature along what is set in options
         # if not self.ref2: # do not heat !
@@ -1451,13 +1455,13 @@ opSequences = {
            Operation('CLOS','MESS',message=ml.T("Tuyaux vidés autant que possible.","Pipes emptied as much as possible.","Leidingen zoveel mogelijk geleegd."),dump=True)
         ],
     'A': # Désinfectant acide
-        [ Operation('DesT','HEAT','output','input',ref='R',dump=False,programmable=True,waitAdd=True),
-          Operation('DesS','SEAU','output','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False),
-          Operation('DesF','FILL','output','input',ref='R',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False),
-          Operation('DesI','FLOO','output','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, dump=False),
-          Operation('DesN','PAUS','output','input',ref='R',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),dump=False),
-          Operation('Desi','PUMP','output','input',ref='R',base_speed=MAX_SPEED,qty=START_VOL,dump=False),
-          Operation('Desh','TRAK','output','input',ref='R',base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
+        [ Operation('DesT','HEAT','intake','input',ref='R',dump=False,programmable=True,waitAdd=True),
+          Operation('DesS','SEAU','intake','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False),
+          Operation('DesF','FILL','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False),
+          Operation('DesI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, dump=False),
+          Operation('DesN','PAUS','intake','input',ref='A',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),dump=False),
+          Operation('Desi','PUMP','intake','input',ref='A',base_speed=MAX_SPEED,qty=START_VOL,dump=False),
+          Operation('Desh','TRAK','intake','input',ref='A',base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
           Operation('Desf','SUBR',duration=lambda:menus.val('a'),subSequence='a',dump=False),
           Operation('Dess','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False),
           Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
@@ -1468,32 +1472,32 @@ opSequences = {
           Operation('DesP','REVR',ref='A', base_speed=MAX_SPEED, qty=-2.0,dump=False)
         ],
     'D': # Désinfection (fut thermique)
-        # [ Operation('Dett','HEAT','output',ref='R',dump=False,programmable=True),
+        # [ Operation('Dett','HEAT','intake',ref='R',dump=False,programmable=True),
         #   Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-        #   Operation('DetI','FLOO','output',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=True),  #
+        #   Operation('DetI','FLOO','intake',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=True),  #
         #   Operation('Dety','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='D',dump=False),
-        #   Operation('Deth','TRAK','output','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='D', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
+        #   Operation('Deth','TRAK','intake','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='D', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
         #   Operation('CLOS','MESS',message=ml.T("DANGER: Eau chaude sous pression. Mettre des gants pour séparer les tuyaux!","DANGER: Hot water under pressure. Wear gloves to separate the pipes!","GEVAAR: Heet water onder druk. Draag handschoenen om de leidingen te scheiden!"),dump=True)
         #   ],
-        [ Operation('DetT','HEAT',ref='R',dump=False,programmable=True,waitAdd=True),
-          Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='R',dump=False),
-          Operation('DetF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=False),
-          Operation('DetI','FLOO',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, ref='R',dump=False),
+        [ Operation('DetT','HEAT',ref='D',dump=False,programmable=True,waitAdd=True),
+          Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='D',dump=False),
+          Operation('DetF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=False),
+          Operation('DetI','FLOO',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, ref='D',dump=False),
           Operation('DetN','PAUS',message=ml.T("Mettre dans le seau le désinfectant acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the sanitizer and the 2 pipes, then restart!","Doe het ontsmettingsmiddel en de 2 pijpen in de emmer, en herstart!"),ref='R',dump=False),
-          Operation('Deti','PUMP',base_speed=OPT_SPEED,qty=TOTAL_VOL*1.5,ref='R',dump=False),
-          Operation('Detn','PAUS',message=ml.T("Laisser tremper si désiré puis redémarrer!","Let soak for a while if desired then restart!","Laat eventueel weken, en herstart!"),ref='R',dump=False),
-          Operation('Dets','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='R',dump=False),
-          Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=False),
+          Operation('Deti','PUMP',base_speed=OPT_SPEED,qty=TOTAL_VOL*1.5,ref='D',dump=False),
+          Operation('Detn','PAUS',message=ml.T("Laisser tremper si désiré puis redémarrer!","Let soak for a while if desired then restart!","Laat eventueel weken, en herstart!"),ref='D',dump=False),
+          Operation('Dets','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='D',dump=False),
+          Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=False),
           Operation('CLOS','MESS',message=ml.T("Prêt à l'emploi!","Ready to use!","Klaar voor gebruik!"),dump=True)
         ],
     'C': # Détergent
-        [ Operation('NetT','HEAT','output','input',ref='R',dump=False,programmable=True,waitAdd=True),
-          Operation('NetS','SEAU','output','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('NetF','FILL','output','input',ref='R',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, dump=False),
-          Operation('NetI','FLOO','output','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL,dump=False),
-          Operation('NetY','PAUS','output','input',ref='R',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),dump=False),
-          Operation('Neti','PUMP','output','input',ref='R',base_speed=MAX_SPEED,qty=START_VOL,dump=False),
-          Operation('Neth','TRAK','output','input',ref='R',base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
+        [ Operation('NetT','HEAT','intake','input',ref='R',dump=False,programmable=True,waitAdd=True),
+          Operation('NetS','SEAU','intake','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          Operation('NetF','FILL','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, dump=False),
+          Operation('NetI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL,dump=False),
+          Operation('NetY','PAUS','intake','input',ref='C',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),dump=False),
+          Operation('Neti','PUMP','intake','input',ref='C',base_speed=MAX_SPEED,qty=START_VOL,dump=False),
+          Operation('Neth','TRAK','intake','input',ref='C',base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
           Operation('Neto','SUBR',duration=lambda:menus.val('c'),subSequence='c',dump=False),
           #Operation('NetV','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,dump=True),
           Operation('Nets','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
@@ -1921,7 +1925,7 @@ else:
 T_Thermistor = ThreadThermistor()
 T_Thermistor.daemon = True
 T_Thermistor.sensorParam("input",hardConf.T_input) # Entrée
-T_Thermistor.sensorParam("output",hardConf.T_output) # Sortie
+T_Thermistor.sensorParam("intake",hardConf.T_intake) # Sortie
 T_Thermistor.sensorParam("warranty", hardConf.T_warranty) # Garantie sortie serpentin long
 #T_Thermistor.sensorParam("temper",hardConf.T_sp9b) # Garantie entrée serpentin court
 if hardConf.T_heating:
@@ -1966,7 +1970,7 @@ defFile = datetime.now().strftime("%Y_%m%d_%H%M")
 #if not fileName:
 fileName = defFile
 data_file = open(DIR_DATA_CSV + fileName+".csv", "w")
-data_file.write("epoch_sec\tstate\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\textra\tinput\twarant\toutput\theat\theatbath\t"
+data_file.write("epoch_sec\tstate\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\textra\tinput\twarant\tintake\theat\theatbath\t"
                 +("press" if hardConf.inputPressure else "rmeter")
                 +"\tlinput\tloutput\n") #\twatt2\ttemper\theat
 term.write("Données stockées dans ",term.blue, term.bgwhite)
@@ -2207,7 +2211,7 @@ class WebApiAction:
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[letter][2])+': '+message,
-                        'output': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if letter in ['P','E','I'] else 1),
+                        'dumping': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if letter in ['P','E','I'] else 1),
                         'pause': 1 if T_Pump.paused else 0 }
         return json.dumps(result)
 
@@ -2248,7 +2252,7 @@ class WebApiState:
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[T_Pump.currAction][2]),
-                        'output': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['P','E','I'] else 1),
+                        'dumping': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['P','E','I'] else 1),
                         'pause': 1 if T_Pump.paused else 0 }
         return json.dumps(result)
 
@@ -2344,7 +2348,7 @@ class WebApiPut:
                         temp_ref_calib.append({'time':now,'reft':ref_val, \
                                     'extra': cohorts.catalog['extra'].value, \
                                     'input': cohorts.catalog['input'].value, \
-                                    'output': cohorts.catalog['output'].value, \
+                                    'intake': cohorts.catalog['intake'].value, \
                                     'warranty': cohorts.catalog['warranty'].value, \
                                     'heating': cohorts.catalog['heating'].value })
         return "" # Status 200 is enough !
@@ -2424,7 +2428,7 @@ class WebApiLog:
                             'speed': T_Pump.pump.liters() if not T_Pump.paused else 0, \
                             'extra': isnull(cohorts.getCalibratedValue('extra'), ''), \
                             'input': isnull(cohorts.getCalibratedValue('input'), ''), \
-                            'output': isnull(cohorts.getCalibratedValue('output'), ''), \
+                            'intake': isnull(cohorts.getCalibratedValue('intake'), ''), \
                             'watts': isnull(cohorts.catalog['DAC1'].value*HEAT_POWER, ''), \
                             #'watts2': isnull(cohorts.catalog['DAC2'].value*MITIG_POWER, ''), \
                             'warranty': isnull(cohorts.getCalibratedValue('warranty'), ''), \

@@ -38,7 +38,7 @@ CLD = 4 # Cooling water
 
 # Thermistors number
 T_input = 1 # Entrée
-T_output = 2 # Sortie
+T_intake = 2 # Juste après la pompe
 T_warranty = 3 # Garantie sortie serpentin long
 T_heating = 4 # If no OneWire, this will be T_sp9b
 T_extra = None
@@ -320,17 +320,17 @@ if configParsing:
             else:
                 print('[input] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
 
-    if 'output' in configParsing.sections():
-        for anItem in configParsing.items('output'):
+    if 'intake' in configParsing.sections():
+        for anItem in configParsing.items('intake'):
             if anItem[0].lower() == 'port':
                 try:
-                    T_output = int(anItem[1])
+                    T_intake = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
             elif anItem[0].lower == 'onewire':
                 OW_output = anItem[1]
             else:
-                print('[output] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
+                print('[intake] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
 
     if 'warranty' in configParsing.sections():
         for anItem in configParsing.items('warranty'):
