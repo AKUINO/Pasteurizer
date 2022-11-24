@@ -27,7 +27,7 @@ function color(value,mini,typi,maxi) {
 
 function textcolor(red, green, blue) {
     var total = parseInt(red,16)+parseInt(green,16)+parseInt(blue,16)
-    if (total > 300) return "000000"; //357
+    if (total > 340) return "000000"; //357
     else return "EEEEEE";
 }
 
