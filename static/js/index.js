@@ -27,7 +27,7 @@ function color(value,mini,typi,maxi) {
 
 function textcolor(red, green, blue) {
     var total = parseInt(red,16)+parseInt(green,16)+parseInt(blue,16)
-    if (total >= 357) return "000000";
+    if (total >= 257) return "000000"; //357
     else return "EEEEEE";
 }
 
@@ -42,7 +42,7 @@ function colorit(cell,mini,typi,maxi) {
     cell.parent().css("background-color",'#'+col);
     cell.parent().css("color",'#'+txcol);
     cell.parent().css("border-color",'#000000');
-    return color
+    return col
 }
 
 function floorUni(tx) {
