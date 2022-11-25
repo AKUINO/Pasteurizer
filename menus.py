@@ -67,7 +67,7 @@ class Menus(object):
             return None
 
     def display(self,letter, field, value = None):
-        fieldType = None
+        fieldType = self.type(letter)
         if value is None and field:
             if field == Menus.MAX:
                 value = self.max(letter)
@@ -79,18 +79,16 @@ class Menus(object):
                 value = self.ini(letter)
             elif field == Menus.STP:
                 value = self.stp(letter)
-            fieldType = self.type(letter)
+                if fieldType == 'time':
+                    if value >= 60.0:
+                        return ''
+                return str(value)
         if value is None:
             return ''
         if fieldType == 'time':
-            if field == Menus.STP:
-                if value >= 60.0:
-                    return ''
-                else:
-                    return str(value)
-            else:
-                #return datetime.timedelta(seconds=value).strftime("%H:%M")
-                return '%02d:%02d' % (value // 3600, (value % 3600) // 60)
+            return '%02d:%02d' % (value // 3600, (value % 3600) // 60)
+        scale = self.stp(letter)
+        value = float(int(0.5+(value * (1.0 / scale )))) * scale
         return str(value)
 
     def store(self,letter, value):

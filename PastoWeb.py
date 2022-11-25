@@ -189,7 +189,7 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,0.0,60.0,'\"',False,300,5,"number",60], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
                     'u':['u',ml.T("Rinçage(L)","Rinse(L)","Spoelen(L)") \
                             ,ml.T("Volume du dernier Rinçage","Last Rinse Volume","Laatste spoelvolume") \
-                            ,0.0,0.0,'L',False,20,0.1,"number",4.0], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
+                            ,0.0,0.0,'L',False,20,0.01,"number",4.0], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
                     's':['s',ml.T("Seau pour l'Eau","Bucket for Water","Emmer voor water\"") \
                         ,ml.T("Eau courante(0) ou amenée dans un seau(1)","Running water(0) or brought in a bucket(1)","Stromend water(0) of gebracht in een emmer(1)") \
                         ,0,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
