@@ -186,7 +186,7 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,45.0,45.0,"°C",False,90,0.1,"number"], # Température du Bassin pour le prélavage
                     'r':['r',ml.T("Rinçage\"","Rinse\"","Spoelen\"") \
                             ,ml.T("Durée du dernier Rinçage","Last Rinse duration","Laatste spoelduur") \
-                            ,0.0,60.0,'\"',False,300,5,"number",60], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
+                            ,0.0,60.0,'\"',False,300,1,"number",60], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
                     'u':['u',ml.T("Rinçage(L)","Rinse(L)","Spoelen(L)") \
                             ,ml.T("Volume du dernier Rinçage","Last Rinse Volume","Laatste spoelvolume") \
                             ,0.0,0.0,'L',False,20,0.01,"number",4.0], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
