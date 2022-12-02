@@ -27,7 +27,7 @@ function color(value,mini,typi,maxi) {
 
 function textcolor(red, green, blue) {
     var total =( (0.299*parseInt(red,16))+(0.587*parseInt(green,16))+(0.114*parseInt(blue,16)) ) / 255.0
-    console.log(red+'.'+green+'.'+blue+", luminance="+total.toString());
+    //console.log(red+'.'+green+'.'+blue+", luminance="+total.toString());
     if (total > 0.5) return "000000"; //357
     else return "EEEEEE";
 }
@@ -153,6 +153,7 @@ $(document).ready(function() {
                     $('#action').text(data['action']);
                     $('#stateletter').text(data['stateletter']);
                     $('#state').text(data['state']);
+                    $('.show-flow').css('color',data['statecolor']);
                     $('#empty').text(data['empty']);
                     //$('#level1').text(data['level1']); //linput
                     //$('#level2').text(data['level2']); //loutput
@@ -214,7 +215,7 @@ $(document).ready(function() {
                     $('#heateff').text(floorDeci(data['heateff']));
                     $('#message').text(data['message']);
                     if (data['allowedActions'] != '') {
-                        console.log('AA='+data['allowedActions']);
+                        //console.log('AA='+data['allowedActions']);
                         allowedActions = data['allowedActions']+'JYLTOXZ';
                         for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
@@ -235,7 +236,7 @@ $(document).ready(function() {
                             }
                         }
                     } else {
-                        console.log('no AA');
+                        //console.log('no AA');
                         allowedActions = 'JYLTOXZ';
                         for (var i=0; i < ALPHABET.length; i++) {
                             ml = ALPHABET.charAt(i);
@@ -248,15 +249,23 @@ $(document).ready(function() {
                         if (data['pause'] > 0) {
                             $('#pause').hide();
                             $('#restart').show();
+                            $('#force').hide()
                         } else {
                             $('#pause').show();
-                            if (data['purge'] > 2) { $('#restart').show() }
-                            else { $('#restart').hide() }
+                            if (data['purge'] > 2) {
+                                $('#restart').show();
+                                $('#force').hide()
+                            }
+                            else {
+                                $('#restart').hide();
+                                $('#force').show()
+                            }
                         }
                     } else {
                         $('#STOP').hide();
                         $('#pause').hide();
                         $('#restart').hide();
+                        $('#force').hide()
                     }
                     if (data['actif'] > 0 && data['added'] == 1) {
                         if (data['pause'] > 0) {
@@ -270,18 +279,18 @@ $(document).ready(function() {
                         $('#addbutton').hide();
                     }
                     if (data['purge'] == 1) {
-                        $('#dumpbutton').show();
+                        //$('#dumpbutton').show();
                         $('#purge').removeClass("glyphicon-trash");
                         $('#purge').removeClass("glyphicon-arrow-left");
                         $('#purge').addClass("glyphicon glyphicon-share-alt flip-vertical")
                     } else if (data['purge'] >= 2) {
-                        $('#dumpbutton').hide();
+                        //$('#dumpbutton').hide();
                         $('#purge').removeClass("glyphicon-arrow-left");
                         $('#purge').removeClass("glyphicon-share-alt");
                         $('#purge').removeClass("flip-vertical");
                         $('#purge').addClass("glyphicon glyphicon-trash")
                     } else {
-                        $('#dumpbutton').hide();
+                        //$('#dumpbutton').hide();
                         $('#purge').removeClass("glyphicon-trash");
                         $('#purge').removeClass("glyphicon-share-alt");
                         $('#purge').removeClass("flip-vertical");
@@ -356,6 +365,7 @@ function action(letter) {
                 $('#action').text(data['action']);
                 $('#stateletter').text(data['stateletter']);
                 $('#state').text(data['state']);
+                $('.show-flow').css('color',data['statecolor']);
                 $('#empty').text(data['empty']);
                 if (data[level1]=='0') {
                     $('#level1').show()

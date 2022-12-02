@@ -60,9 +60,10 @@ class State(object):
     def saveCurrent(now=int(time.time()) ):
         State.current.save(State.empty,State.greasy,State.start)
 
-    def __init__(self,letter,labels,transitions,emptiness=[False,True],greasiness=[False,True]):
+    def __init__(self,letter,labels,color,transitions,emptiness=[False,True],greasiness=[False,True]):
         #cohorts.catalog[address] = self Done by the threading class...
         self.letter = letter
+        self.color = color
         self.labels = labels
         self.transitions = transitions
         if not letter in State.knownStates:
@@ -105,7 +106,11 @@ class State(object):
                 else:
                     return start, newState,empty,greasy
         print ("Unknown action=%s for state=%s"%(action,self.letter))
-        return start,self,empty,greasy
+        try:
+            return State.get('?',empty,greasy).transit(empty,greasy,step,action, start, now )
+        except:
+            print ("IMPOSSIBLE action=%s for state=%s"%(action,self.letter))
+            return start,self,empty,greasy
 
     def allowedActions (self):
         result = ""

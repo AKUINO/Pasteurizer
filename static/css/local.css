@@ -54,6 +54,9 @@
 	     transform: rotate(-90deg);
 	    }
 
+    .flowing { color: rgba(15,15,255,1) }
+    .empty   { color: rgba(224,168,00,1) }
+
 	span.nobreak {
 	  white-space: nowrap;
 	}

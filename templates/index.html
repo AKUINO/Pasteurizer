@@ -14,14 +14,15 @@ $if not paving:
     <div class="jumbotron" onclick="void(0);">
     $if logtable:
         $if connected:
-            <button onclick="action('Z')" class="btn btn-danger" id="STOP" style="float:right">STOP</button>
+            <button onclick='fromHereTo("$(letter)","Z")' class="btn btn-danger" id="STOP" style="float:right">STOP</button>
 
-            <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; [<b id="stateletter"></b>:<b id="state"></b> -- <span id="empty"></span> <!--span id="greasy"></span--> <span id="preconfigletter"></span>]</h3>
+            <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; [<b id="stateletter" class="show-flow"></b>:<b id="state"></b> -- <span id="preconfigletter"></span>]</h3>
             <p style="margin:auto"><span id="actiontitle"></span></p>
             <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
             <button onclick="action('+')" class="btn btn-success" id="addbutton" style="float:right">$(ml.T("Produit ajouté","Product added","Product toegevoegd"))</button>
+            <!--button onclick="action('&gt;')" class="btn btn-info" id="force" style="float:right">$(ml.T("Forcer>","Force>","Kracht>"))</button-->
             <button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
-            <button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button>
+            <!--button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button-->
 
             <p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
             <hr/>
@@ -55,14 +56,15 @@ $if not paving:
         </script>
     $if not logtable:
         $if connected:
-            <button onclick="action('Z')" class="btn btn-danger" id="STOP" style="float:right">STOP</button>
+            <button onclick='fromHereTo("$(letter)","Z")' class="btn btn-danger" id="STOP" style="float:right">STOP</button>
 
-            <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; [<b id="stateletter"></b>:<b id="state"></b> -- <span id="empty"></span> <!--span id="greasy"></span--> <span id="preconfigletter"></span>]</h3>
+            <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; [<b id="stateletter" class="show-flow"></b>:<b id="state"></b> -- <span id="preconfigletter"></span>]</h3>
             <p style="margin:auto"><span id="actiontitle"></span></p>
             <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
             <button onclick="action('+')" class="btn btn-success" id="addbutton" style="float:right">$(ml.T("Produit ajouté","Product added","Product toegevoegd"))</button>
+            <!--button onclick="action('&gt;')" class="btn btn-info" id="force" style="float:right">$(ml.T("Forcer>","Force>","Kracht>"))</button-->
             <button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
-            <button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button>
+            <!--button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button-->
 
             <p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
             <hr/>
@@ -70,19 +72,19 @@ $if not paving:
                 <tr>
                     <td class="Eshape"><span id="purge"/><span id="level2"><big><b style="color:red">X</b></big></span></td>
                     <td class="Eshape"><b id="extra"></b></td>
-                    <td class="Eshape"><div><span class="glyphicon glyphicon-arrow-left"/></div><span id="rmeter"></span></td>
+                    <td class="Eshape"><div><span class="glyphicon glyphicon-arrow-left show-flow"/></div><span id="rmeter"></span></td>
                     <!--td class="Ushape" rowspan="2"><b id="temper"></b>°</td-->
                     <!--td class="Eshape"><span class="glyphicon glyphicon-arrow-left"/></td-->
-                    <td class="Bshape" rowspan="2"><span class="glyphicon glyphicon-random Drotate"/></td>
-                    <td class="Eshape"><div style="display:inline"><span class="glyphicon glyphicon-arrow-left"/></div></td>
-                    <td class="Ushape" rowspan=2><div class="Xshape"><div class="Drotate"><span class="glyphicon glyphicon-random"/></div><b id="warranty"></b>°</div><b id="heating"></b>°</td>
+                    <td class="Bshape" rowspan="2"><span class="glyphicon glyphicon-random Drotate show-flow"/></td>
+                    <td class="Eshape"><div style="display:inline"><span class="glyphicon glyphicon-arrow-left show-flow"/></div></td>
+                    <td class="Ushape" rowspan=2><div class="Xshape"><div class="Drotate"><span class="glyphicon glyphicon-random show-flow"/></div><b id="warranty"></b>°</div><b id="heating"></b>°</td>
                 </tr>
                 <tr>
-                    <td class="Dshape"><span id="level1"><big><b style="color:blue">X</b></big></span><span class="glyphicon glyphicon-arrow-right"/></td>
+                    <td class="Dshape"><span id="level1"><big><b style="color:blue">X</b></big></span><span class="glyphicon glyphicon-arrow-right show-flow"/></td>
                     <td class="Oshape"><b id="vitesse"></b>L/h</td>
-                    <td class="Dshape"><span class="glyphicon glyphicon-arrow-right"></span><br/><b id="intake"></b>°<br/><span class="glyphicon glyphicon-log-in" id="fill" style="color:blue"></span></td>
+                    <td class="Dshape"><span class="glyphicon glyphicon-arrow-right show-flow"></span><br/><b id="intake"></b>°<br/><span class="glyphicon glyphicon-log-in" id="fill" style="color:blue"></span></td>
                     <!--td class="Dshape"><span class="glyphicon glyphicon-arrow-right"/></td-->
-                    <td class="Dshape"><div style="display:inline"><span class="glyphicon glyphicon-arrow-right"/></div><br><b id="input"></b>°</td>
+                    <td class="Dshape"><div style="display:inline"><span class="glyphicon glyphicon-arrow-right show-flow"/></div><br><b id="input"></b>°</td>
                 </tr>
                 <tr>
                     <td></td>

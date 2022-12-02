@@ -549,6 +549,9 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                '+':['+',ml.T("Ajouté","Added","Toegevoegd") \
                      ,ml.T("Produit chimique ajouté.","Chemical product added.","Chemisch product toegevoegd.") \
                      ,ml.T("L'opération en cours ne doit plus s'interrompre","Current operation does not have to stop.","Huidige bewerking hoeft niet te stoppen.")],
+               '>':['>',ml.T("Forcer>","Force>","Kracht>") \
+                     ,ml.T("Avancer / Ajouter de l'eau.","Advance / Add water","Vooruit / Voeg water toe.") \
+                     ,ml.T("Surmonter une bulle d'air / Augmenter l'eau de lavage","Overcome an air bubble / Increase wash water","Overwin een luchtbel / verhoog het waswater")],
                '_':['_',ml.T("Redémar.","Restart","Herstart") \
                        ,ml.T("Redémarrage de l'opération en cours.","Restart of the current operation.","Herstart van de huidige bewerking.") \
                        ,ml.T("Redémarrer l'opération en cours","Restart the current operation","Herstart de huidige bewerking")]}
@@ -597,38 +600,45 @@ StateLessActions = "JYLT" # TO BE DUPLICATED in index.js !
 
 # Empty sub state is managed by underlying operations
 # Greasy sub state must be set
-State('r',ml.T('Propre','Clean','Schoon'), \
-    [ ('A',['r','r',['a',None,False]]),('P','p'),('D',''),('H',''),('F',''),('V',''),('w','o') ] )
+State('r',ml.T('Propre','Clean','Schoon'),'aqua', \
+    [ ('A',['r','r',['a',None,False]]),('P','p'),('D',['','d','d']),('H',''),('F',''),('V',''),('w','o') ] )
 
-State('o',ml.T('Eau','Water','Waser'), \
-    [ ('A',['o','o',['a',None,False]]),('F',''),('V',''),('D',['','','r']),('H',['','r']),('w','v') ] )
+State('o',ml.T('Eau','Water','Waser'),'navy', \
+    [ ('A',['o','o',['a',None,False]]),('F',''),('V',''),('D',['','d','d']),('H',['','r']),('w','v') ] )
 
-State('v',ml.T('Eau vieille','Old Water','Oude Waser'), \
-      [ ('A',['v','v',['a',None,False]]),('C',['v','v',['c',None,False]]),('F',''),('V',''),('D',['','','r']),('w','') ] )
+State('v',ml.T('Eau vieille','Old Water','Oude Waser'),'darkcyan', \
+      [ ('A',['v','v',['a',None,False]]),('C',['v','v',['c',None,False]]),('F',''),('V',''),('D',['','d','d']),('w','') ] )
 
-State('c',ml.T('Soude','Soda','Natrium'), \
+State('c',ml.T('Soude','Soda','Natrium'),'blue', \
     [ ('R',['','r']),('F',''),('V',''),('w','') ] )
 
-State('a',ml.T('Acide','Acid','Zuur'), \
+State('a',ml.T('Acide','Acid','Zuur'),'red', \
     [ ('R',['','r']),('F',''),('V',''),('w','') ] )
+
+State('d',ml.T('Désinfectant','Sanitizer','ontsmettingsmiddel'),'fuchsia', \
+      [ ('F',['','r']),('V',''),('w','') ] )
 
 #State('p',ml.T('Produit Gras','Greasy Product','Vet Product'), \
 #    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'),     ('C',['e','e',['c',None,False]]),('F','e'),('V','') ]
 #    , [False,True],[True] )
-State('p',ml.T('Produit','Product','Product'), \
+State('p',ml.T('Produit','Product','Product'),'orange', \
     [ ('I',''),('M',''),('E',''),('R','e'),('F',''),('V','') ] )
 
 #State('e',ml.T('Eau+Produit Gras','Water+Greasy Product','Water+Vet Product'), \
 #      [                                 ('C',['e','e',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
 #      , [False,True],[True] )
-State('e',ml.T('Eau+Produit','Water+Product','Water+Product'), \
+State('e',ml.T('Eau+Produit','Water+Product','Water+Product'),'darkorange', \
       [ ('C',['e','e',['c',None,False]]),('P','p'),('R',''),('F',''),('V',''),('w','s') ] )
 
 #State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
 #    [ ('C',['s','s',['c',None,False]]), ('F',''),('V',''),('w','') ]
 #    , [False,True],[True])
-State('s',ml.T('Sale','Dirty','Vies'), \
+State('s',ml.T('Sale','Dirty','Vies'),'brown', \
       [ ('C',['s','s',['c',None,False]]), ('R',''),('F',''),('V',''),('w','') ] )
+
+State('?',ml.T('INCONNU','UNKNOWN','???'),'black', \
+      [ ('A',['a']),('C',['c']),('D',['d']), ('H','o'),('R','o'),('F','o'),('V','v'),('w','v'),('M','p'),('E','e'),('P','p'),('I','p') ] )
+
 
 def menu_confirm(choice,delay=None):
     global display_pause, lines
@@ -1100,7 +1110,7 @@ class Operation(object):
                 if Buzzer:
                     Buzzer.on()
                 T_Pump.setPause(True)
-                tell_message(self.message)
+                T_Pump.setMessage(self.message)
             T_Pump.added = False
             T_Pump.waitingAdd = False
             State.transitCurrent(State.ACTION_RESUME, T_Pump.currAction)
@@ -1109,7 +1119,7 @@ class Operation(object):
                 if Buzzer:
                     Buzzer.on()
                 T_Pump.setPause(True)
-                tell_message(self.message)
+                T_Pump.setMessage(self.message)
         elif self.typeOp == 'SUBR': # 1st Call a subroutine and loop...
             i = 0
             for op in opSequences[self.subSequence]:
@@ -1341,14 +1351,14 @@ class Operation(object):
             if menus.val('s') < 1.0:
                 taps[self.tap].set(0)
             State.empty = False
-        elif self.typeOp in ['REVR']:
+        elif self.typeOp == 'REVR':
             T_Pump.pump.reset_pump()
         elif self.typeOp in ['PUMP','SHAK','TRAK','EMPT']:
             T_Pump.pump.stop()
             State.empty = (self.typeOp == 'EMPT')
         if self.message:
             if self.typeOp not in ['PAUS','SEAU']:
-                tell_message(self.message)
+                T_Pump.setMessage(self.message)
         T_Pump.T_DAC.set_temp(None, None)
         dumpValve.setWait(1.0 if self.dump else 0.0)
 
@@ -1488,6 +1498,8 @@ opSequences = {
           Operation('Detn','PAUS',message=ml.T("Laisser tremper si désiré puis redémarrer!","Let soak for a while if desired then restart!","Laat eventueel weken, en herstart!"),ref='D',dump=False),
           Operation('Dets','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='D',dump=False),
           Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=False),
+          Operation('Detr','PAUS',message=ml.T("Evacuer le seau de désinfectant et lancer un dernier rinçage!","Remove the bucket with sanitizer and restart for a last rinse!","Verwijder de emmer met ontsmettingsmiddel en herstart aan een laatste spoeling!"),ref='D',dump=False),
+          Operation('DesR','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=False),
           Operation('CLOS','MESS',message=ml.T("Prêt à l'emploi!","Ready to use!","Klaar voor gebruik!"),dump=True)
         ],
     'C': # Détergent
@@ -1513,7 +1525,7 @@ opSequences = {
           Operation('PasI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('Pasi','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('PasE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',dump=True),
-          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
     'I': # Reprise d'une Pasteurisation
@@ -1603,12 +1615,14 @@ class ThreadPump(threading.Thread):
 
     def startOperation(self,op):
         self.currOperation = op
+        self.message = None
         op.start(self)
 
     def nextOperation(self):
         if self.currOperation:
             self.currOperation.close(self)
             self.currOperation = None
+            self.message = None
         if self.currSequence and len(self.currSequence):
             self.currOperation = self.currSequence[0]
             self.currSequence = self.currSequence[1:]
@@ -1620,6 +1634,7 @@ class ThreadPump(threading.Thread):
         if self.currOperation and self.currOperation.acronym != 'CLOS':
             self.currOperation.close(self)
             self.currOperation = None
+            self.message = None
         if self.currSequence and len(self.currSequence):
             lastOp = self.currSequence[len(self.currSequence)-1]
             self.currSequence = None
@@ -1666,6 +1681,10 @@ class ThreadPump(threading.Thread):
             self.nextOperation()
             return True
         return False
+
+    def setMessage(self,message):
+        self.message = str(datetime.fromtimestamp(int(time.time())))[11:]+' : '+str(message)
+        tell_message(message)
 
     def setPause(self,paused):
 
@@ -2181,12 +2200,14 @@ class WebApiAction:
                    if T_Pump.currOperation and (not T_Pump.currOperation.dump) and dumpValve.value != 0.0:
                        dumpValve.setWait(0.0)
                    time.sleep(0.01)
-            elif letter == '+':  # Restart
+            elif letter == '>':  # Forcer
+                time.sleep(0.01)
+            elif letter == '+':  # Product added
                 T_Pump.added = True
                 T_Pump.waitingAdd = False
                 message = str(ml.T("Produit ajouté","Product added","Product toegevoegd"))
                 time.sleep(0.01)
-            elif letter == 'U':  # Purge
+            elif letter == 'U':  # Dump output tank
                    dumpValve.setWait(1.0)
                    message = str(ml.T("Purge en cours","Purge bagan","Zuivering..."))
                    time.sleep(0.01)
@@ -2208,10 +2229,11 @@ class WebApiAction:
                         'empty': ('V' if State.empty else 'W'),
                         #'greasy': ('G' if State.greasy else 'J'),
                         'state': (str(State.current.labels) if State.current else ''),
+                        'statecolor': (str(State.current.color) if State.current else 'black'),
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[letter][2])+': '+message,
-                        'dumping': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if letter in ['P','E','I'] else 1),
+                        'dumping': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if letter in ['M','E','P','H','I'] else 1),
                         'pause': 1 if T_Pump.paused else 0 }
         return json.dumps(result)
 
@@ -2249,10 +2271,11 @@ class WebApiState:
                         'empty': ('V' if State.empty else 'W'),
                         #'greasy': ('G' if State.greasy else 'J'),
                         'state': (str(State.current.labels) if State.current else ''),
+                        'statecolor': (str(State.current.color) if State.current else 'black'),
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[T_Pump.currAction][2]),
-                        'dumping': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['P','E','I'] else 1),
+                        'dumping': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['M','E','P','H','I'] else 1),
                         'pause': 1 if T_Pump.paused else 0 }
         return json.dumps(result)
 
@@ -2397,7 +2420,9 @@ class WebApiLog:
                     opt_temp = T_Pump.currOperation.tempRef()
                     if opt_temp == 0.0:
                         opt_temp = menus.val('P')
-                    if T_Pump.currOperation.message:
+                    if T_Pump.message:
+                        message = str(T_Pump.message)
+                    elif T_Pump.currOperation.message:
                         message = str(T_Pump.currOperation.message)
                     else:
                         message = str(menus.operName[T_Pump.currOperation.typeOp])
@@ -2418,6 +2443,7 @@ class WebApiLog:
                             'empty': ('V' if State.empty else 'W'),
                             #'greasy': ('G' if State.greasy else 'J'),
                             'state': (str(State.current.labels) if State.current else ''),
+                            'statecolor': (str(State.current.color) if State.current else 'black'),
                             'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                             'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "", \
                             'delay': durationRemaining, \
@@ -2444,7 +2470,7 @@ class WebApiLog:
                             'opt_M': menus.val('M'), \
                             'opt_temp': opt_temp, \
                             'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0), \
-                            'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['P','E','I'] else 1), \
+                            'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['M','E','P','H','I'] else 1), \
                             'pause': 1 if T_Pump.paused else 0, \
                             'fill': taps['H'].get()[0], \
                             'pumpopt': optimal_speed, \
@@ -2594,14 +2620,14 @@ class ThreadInputProcessor(threading.Thread):
                 menu_choice = str(getch()).upper() # BLOCKING I-O !
                 if menu_choice == ' ':
                     display_pause = False
-                elif menu_choice in ['X','Z','R','V','F','P','I','E','M','A','C','D','H']: # 'C','K'
+                elif menu_choice in ['M','E','P','H','I','R','V','F','A','C','D','X','Z']: # 'C','K'
                     menu_choice = menu_confirm(menu_choice,8.0)
                     if menu_choice == 'X':
                         T_Pump.stopAction()
                         break
                     if menu_choice == 'Z':
                         T_Pump.stopAction()
-                    elif menu_choice in ['R','V','F','P','I','E','M','A','C','D','H']: # 'C','K'
+                    elif menu_choice in ['M','E','P','H','I','R','V','F','A','C','D']: # 'C','K'
                         T_Pump.setAction(menu_choice)
                 elif menu_choice == 'Y': # Yaourt
                     menus.store('P', 82.0)
