@@ -253,7 +253,7 @@ function fillDisplay(data,logging) {
                 } else {
                     $('#added').removeClass("glyphicon-checked").addClass("glyphicon-unchecked");
                 }
-                if (data['bucket'] >= 1.0) {
+                if (data['bucket'] >= 1) {
                     $('#bucket').removeClass("glyphicon-unchecked").addClass("glyphicon-checked");
                 } else {
                     $('#bucket').removeClass("glyphicon-checked").addClass("glyphicon-unchecked");
