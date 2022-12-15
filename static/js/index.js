@@ -70,16 +70,16 @@ var allowedActions = '';
 var currentLetter = '';
 
 function goToLetter(pageLetter,letter,PleaseClick) {
-    if (pageLetter == letter) {
+    /* if (pageLetter == letter) {
         location.reload();
         $('#drop'+letter).attr("href", "#doc");
         console.log("/explain/"+letter+"#doc (reload)")
-    } else {
+    } else */ {
         $('.navbar-collapse').collapse('hide');
         $('#confirm').hide();
         $('#cancel').hide();
         console.log("/explain/"+letter+"#doc");
-        window.location.href = "/explain/"+letter+"#doc";
+        window.location.href = "/explain/"+letter+"?x="+str(Math.random())+"#doc";
     }
     currentLetter = letter;
 }

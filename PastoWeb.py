@@ -555,11 +555,11 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                '_':['_',ml.T("Redémar.","Restart","Herstart") \
                        ,ml.T("Redémarrage de l'opération en cours.","Restart of the current operation.","Herstart van de huidige bewerking.") \
                        ,ml.T("Redémarrer l'opération en cours","Restart the current operation","Herstart de huidige bewerking")]}
-menus.sortedActions1 = "PIMERCADH"
+menus.sortedActions1 = "PIMERDCAH"
 menus.sortedActions2 = "FVOYLTZSX" #K
 
-menus.cleanActions = "HLYJTPIMEV" #K
-menus.dirtyActions = "RFCADV"
+menus.cleanActions = "LYJTPIMEHV" #K
+menus.dirtyActions = "RFDCAV"
 menus.sysActions = "ZX"
 
 menus.operName = { 'HEAT':ml.T('chauffer','heating','verwarm') \
