@@ -79,7 +79,7 @@ function goToLetter(pageLetter,letter,PleaseClick) {
         $('#confirm').hide();
         $('#cancel').hide();
         console.log("/explain/"+letter+"#doc");
-        window.location.href = "/explain/"+letter+"?x="+Math.random().ToString()+"#doc";
+        window.location.href = "/explain/"+letter+"?x="+Math.random().toString()+"#doc";
     }
     currentLetter = letter;
 }
