@@ -118,7 +118,7 @@ function fillDisplay(data,logging) {
                 var time = data['date'].substring(11,999);
                 $('#time').text(time);
                 $('#actionletter').text(data['actionletter']);
-                currentLetter = data['actionletter'];
+                //currentLetter = data['actionletter'];
                 $('#preconfigletter').text(data['preconfigletter']);
                 $('#action').text(data['action']);
                 $('#stateletter').text(data['stateletter']);
