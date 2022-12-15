@@ -249,14 +249,14 @@ function fillDisplay(data,logging) {
                     $('#addbutton').hide();
                 }
                 if (data['added'] >= 2) {
-                    $('#added').removeClass("glyphicon-unchecked").addClass("glyphicon-checked");
+                    $('#added').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
                 } else {
-                    $('#added').removeClass("glyphicon-checked").addClass("glyphicon-unchecked");
+                    $('#added').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
                 }
                 if (data['bucket'] >= 1) {
-                    $('#bucket').removeClass("glyphicon-unchecked").addClass("glyphicon-checked");
+                    $('#bucket').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
                 } else {
-                    $('#bucket').removeClass("glyphicon-checked").addClass("glyphicon-unchecked");
+                    $('#bucket').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
                 }
                  if (data['purge'] == 1) {
                     //$('#dumpbutton').show();
