@@ -137,6 +137,11 @@ function fillDisplay(data,logging) {
                 } else {
                     $('#level2').hide()
                 }
+                if (data['forcing'] > 0) {
+                    $('#forcing').show()
+                } else {
+                    $('#forcing').hide()
+                }
                 // $('#greasy').text(data['greasy']);
                 $('#actiontitle').text(data['actiontitle']);
                 var accro = "";
@@ -219,23 +224,29 @@ function fillDisplay(data,logging) {
                     if (data['pause'] > 0) {
                         $('#pause').hide();
                         $('#restart').show();
-                        $('#force').hide()
+                        $('#forcing').hide()
                     } else {
                         $('#pause').show();
                         if (data['purge'] > 2) {
                             $('#restart').show();
-                            $('#force').hide()
+                            $('#forcing').hide()
                         }
                         else {
                             $('#restart').hide();
-                            $('#force').show()
+                            if (data['actif'] > 0 && data['forcing'] == 1) {
+                                $('#forcing').show().addClass("btn-success").removeClass("btn-light").removeClass("disabled");
+                            } else if (data['forcing'] >= 2) {
+                                $('#forcing').show().removeClass("btn-success").addClass("btn-light").addClass("disabled");
+                            } else {
+                                $('#forcing').hide();
+                            }
                         }
                     }
                 } else {
                     $('#STOP').hide();
                     $('#pause').hide();
                     $('#restart').hide();
-                    $('#force').hide()
+                    $('#forcing').hide()
                 }
                 if (data['actif'] > 0 && data['added'] == 1) {
                     if (data['pause'] > 0) {

@@ -1070,6 +1070,7 @@ class Operation(object):
         time.sleep(0.01)
         dumpValve.set(1.0 if self.dump else 0.0)
         T_Pump.currOpContext = OperationContext(self,T_Pump.pump)
+        T_Pump.forcible = False # unless TRAK...
         #print("%d >= %d" % ( (int(datetime.now().timestamp()) % (24*60*60)), int(menus.val('H'))) )
         if not self.programmable or not menus.val('H') or (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
             T_Pump.T_DAC.set_temp(self.tempWithGradient())
@@ -1111,6 +1112,8 @@ class Operation(object):
                 pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
         elif self.typeOp == 'REVR':
             T_Pump.pump.reset_pump()
+        elif self.typeOp == 'TRAK':
+            T_Pump.forcible = True
         elif self.typeOp == 'PAUS':
             if not T_Pump.added:
                 if Buzzer:
@@ -1362,6 +1365,7 @@ class Operation(object):
         elif self.typeOp == 'REVR':
             T_Pump.pump.reset_pump()
         elif self.typeOp in ['PUMP','SHAK','TRAK','EMPT']:
+            T_Pump.forcible = False
             T_Pump.pump.stop()
             State.empty = (self.typeOp == 'EMPT')
         if self.message:
@@ -2221,9 +2225,14 @@ class WebApiAction:
                     T_Pump.forcing = int(time.time()) + DEFAULT_FORCING_TIME
                 time.sleep(0.01)
             elif letter == '+':  # Product added
-                T_Pump.added = True
-                T_Pump.waitingAdd = False
-                message = str(ml.T("Produit ajouté","Product added","Product toegevoegd"))
+                if T_Pump.added:
+                    T_Pump.added = False
+                    T_Pump.waitingAdd = True
+                    message = str(ml.T("Produit PAS ajouté","Product NOT added","Product NIET toegevoegd"))
+                else:
+                    T_Pump.added = True
+                    T_Pump.waitingAdd = False
+                    message = str(ml.T("Produit ajouté","Product added","Product toegevoegd"))
                 time.sleep(0.01)
             elif letter == '!':  # Seau fourni
                 if menus.val('s') < 1.0:
@@ -2301,6 +2310,7 @@ class WebApiState:
                         'statecolor': (str(State.current.color) if State.current else 'black'),
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
+                        'forcing': 2 if T_Pump.forcing else (1 if T_Pump.forcible else 0),
                         'bucket': 1 if menus.val('s') >= 1.0 else 0,
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[T_Pump.currAction][2]),
