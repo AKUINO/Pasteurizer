@@ -248,7 +248,17 @@ function fillDisplay(data,logging) {
                 } else {
                     $('#addbutton').hide();
                 }
-                if (data['purge'] == 1) {
+                if (data['added'] >= 2) {
+                    $('#added').removeClass("glyphicon-unchecked").addClass("glyphicon-checked");
+                } else {
+                    $('#added').removeClass("glyphicon-checked").addClass("glyphicon-unchecked");
+                }
+                if (data['bucket'] >= 1.0) {
+                    $('#bucket').removeClass("glyphicon-unchecked").addClass("glyphicon-checked");
+                } else {
+                    $('#bucket').removeClass("glyphicon-checked").addClass("glyphicon-unchecked");
+                }
+                 if (data['purge'] == 1) {
                     //$('#dumpbutton').show();
                     $('#purge').removeClass("glyphicon-trash");
                     $('#purge').removeClass("glyphicon-arrow-left");

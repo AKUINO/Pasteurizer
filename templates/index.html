@@ -12,20 +12,21 @@ $if paving:
 $if not paving:
     <main role="main" class="container">
     <div class="jumbotron" onclick="void(0);">
+    $if connected:
+        <button onclick='fromHereTo("$(letter)","Z")' class="btn btn-danger" id="STOP" style="float:right">STOP</button>
+
+        <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; <b id="stateletter" class="show-flow"></b>:<b id="state"></b></h3>
+        <p style="margin:auto"><span id="actiontitle"></span></p>
+        <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
+        <button onclick="action('!')" class="btn btn-info" id="buckbutton" style="float:right">$(ml.T("Seau fourni","Bucket provided","Emmer voorzien"))<span id="bucket" class="glyphicon"></span></button>
+        <button onclick="action('+')" class="btn btn-info" id="addbutton" style="float:right">$(ml.T("Produit ajouté","Product added","Product toegevoegd"))<span id="added" class="glyphicon"></span></button>
+        <!--button onclick="action('&gt;')" class="btn btn-info" id="force" style="float:right">$(ml.T("Forcer>","Force>","Kracht>"))</button-->
+        <button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
+        <!--button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button-->
+
+        <p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
+        <hr/>
     $if logtable:
-        $if connected:
-            <button onclick='fromHereTo("$(letter)","Z")' class="btn btn-danger" id="STOP" style="float:right">STOP</button>
-
-            <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; <b id="stateletter" class="show-flow"></b>:<b id="state"></b></h3>
-            <p style="margin:auto"><span id="actiontitle"></span></p>
-            <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
-            <button onclick="action('+')" class="btn btn-success" id="addbutton" style="float:right">$(ml.T("Produit ajouté","Product added","Product toegevoegd"))</button>
-            <!--button onclick="action('&gt;')" class="btn btn-info" id="force" style="float:right">$(ml.T("Forcer>","Force>","Kracht>"))</button-->
-            <button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
-            <!--button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button-->
-
-            <p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
-            <hr/>
         <script type="text/javascript">
                 $$('#logtable').hide();
         </script>
@@ -38,10 +39,10 @@ $if not paving:
                     <th>W/h</th>
                     <th>$(ml.T("Qtité","Qtity","Aantal"))</th>
                     <th>L/h</th>
-                    <th>$(ml.T("Entrée","Input","Invoer"))°</th>
+                    <th>$(ml.T("Déb.Chaud","Heat.Beg","BeginVerw."))°</th>
                     <th>$(ml.T("Chauffe","Heating","Verwarm."))°</th>
                     <th>$(ml.T("Garantie","Guaranty","Garantie"))°</th>
-                    <th>$(ml.T("Fin.Chaud","Heat.End","EindeVerw."))°</th>
+                    <th>$(ml.T("Entrée","Input","Invoer"))°</th>
                     <!--th>(ml.T("Tempér","Mitig","Mitig"))°</th-->
                     <th>Extra°</th>
                 </tr>
@@ -55,19 +56,6 @@ $if not paving:
             $$('#bottomHeader').html($$('#topHeader').html());
         </script>
     $if not logtable:
-        $if connected:
-            <button onclick='fromHereTo("$(letter)","Z")' class="btn btn-danger" id="STOP" style="float:right">STOP</button>
-
-            <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; <b id="stateletter" class="show-flow"></b>:<b id="state"></b></h3>
-            <p style="margin:auto"><span id="actiontitle"></span></p>
-            <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
-            <button onclick="action('+')" class="btn btn-success" id="addbutton" style="float:right">$(ml.T("Produit ajouté","Product added","Product toegevoegd"))</button>
-            <!--button onclick="action('&gt;')" class="btn btn-info" id="force" style="float:right">$(ml.T("Forcer>","Force>","Kracht>"))</button-->
-            <button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
-            <!--button onclick="action('V')" class="btn btn-warning" id="dumpbutton" style="float:right">$(ml.T("Vider","purge","zuiVering"))</button-->
-
-            <p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
-            <hr/>
         <table class="Pshape">
                 <tr>
                     <td class="Eshape"><span id="purge" class="show-flow"/><span id="level2"><big><b style="color:red">X</b></big></span></td>

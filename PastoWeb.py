@@ -162,6 +162,9 @@ DISINF_TIME = 900.0
 TH_DISINF_TIME = 300.0
 STAY_CLEAN_TIME = 2*3600
 
+DEFAULT_FORCING_TIME = 30 # Each time the user forces pumping, normal operation resumes after this number of seconds
+
+
 #FLOOD_TIME = 60.0 # 90 seconds of hot water tap flushing (when a pump is in the way. 60 if not) to FILL an EMPTY machine
 #floodLitersMinute = 3.5 # 4.0 si pas de pompe dans le chemin; 3 sinon    DEPEND DE LA PRESSION, PAS UTILISABLE
 FLOOD_PER_MINUTE = 4.0 # liters in a one minute flood from the tap (also used with water coming from a bucket)
@@ -546,6 +549,9 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                'Z':['Z',ml.T("STOP","STOP","STOP") \
                        ,ml.T("Pas d'opération en cours.","No operation in progress.","Er wordt geen bewerking uitgevoerd.") \
                        ,ml.T("Arrêt complet de l'opération en cours","Complete stop of the current operation","Volledige stopzetting van de huidige bewerking")],
+               '!':['!',ml.T("Seau fourni","Bucket provided","Emmer voorzien") \
+                     ,ml.T("Seau pour fournir l'eau ou le mélange.","Bucket providing water or mix.","Emmer om water of mengsel aan te voeren.") \
+                     ,ml.T("Prenez soin d'avoir au moins 7 litres.","You need at least 7 liters.","Zorg dat je minstens 7 liter hebt.")],
                '+':['+',ml.T("Ajouté","Added","Toegevoegd") \
                      ,ml.T("Produit chimique ajouté.","Chemical product added.","Chemisch product toegevoegd.") \
                      ,ml.T("L'opération en cours ne doit plus s'interrompre","Current operation does not have to stop.","Huidige bewerking hoeft niet te stoppen.")],
@@ -1280,6 +1286,8 @@ class Operation(object):
                 pressed = GreenButton.poll() # Pressing the GreenButton forces slow speed forward...
                 if (pressed and pressed > 0.0):
                     speed = self.min_speed
+                elif (T_Pump.forcing):
+                    speed = self.min_speed
                 elif self.min_speed >= 0.0:
                     speed = self.min_speed
                 elif speed == 0.0:
@@ -1595,6 +1603,7 @@ class ThreadPump(threading.Thread):
         self.level2 = 0
         self.waitingAdd = False
         self.added = False
+        self.forcing = 0
 
     def pushContext(self,opContext):
         if opContext:
@@ -1773,6 +1782,11 @@ class ThreadPump(threading.Thread):
             RedLED.on()
         RedPendingConfirmation = 0.0
         self.running = True
+
+        if self.forcing:
+            now = int(time.time())
+            if now > self.forcing:
+                self.forcing = 0
 
         if trigger_w.trigger():
             State.transitCurrent(State.ACTION_RESUME, 'w')
@@ -2201,11 +2215,22 @@ class WebApiAction:
                        dumpValve.setWait(0.0)
                    time.sleep(0.01)
             elif letter == '>':  # Forcer
+                if T_Pump.forcing:
+                    T_Pump.forcing = 0
+                else:
+                    T_Pump.forcing = int(time.time()) + DEFAULT_FORCING_TIME
                 time.sleep(0.01)
             elif letter == '+':  # Product added
                 T_Pump.added = True
                 T_Pump.waitingAdd = False
                 message = str(ml.T("Produit ajouté","Product added","Product toegevoegd"))
+                time.sleep(0.01)
+            elif letter == '!':  # Seau fourni
+                if menus.val('s') < 1.0:
+                    menus.store('s',1.0)
+                else:
+                    menus.store('s',0.0)
+                message = str(ml.T("Seau","Bucket","Emmer"))+'='+str(menus.val('s'))
                 time.sleep(0.01)
             elif letter == 'U':  # Dump output tank
                    dumpValve.setWait(1.0)
