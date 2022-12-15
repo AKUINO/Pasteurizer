@@ -224,6 +224,7 @@ function fillDisplay(data,logging) {
                     if (data['pause'] > 0) {
                         $('#pause').hide();
                         $('#restart').show();
+                        $('#buckbutton').hide()
                         $('#forcing').hide()
                     } else {
                         $('#pause').show();
@@ -251,20 +252,24 @@ function fillDisplay(data,logging) {
                 if (data['actif'] > 0 && data['added'] == 1) {
                     if (data['pause'] > 0) {
                         $('#addbutton').hide();
+                        $('#buckbutton').hide()
                     } else {
                         $('#addbutton').show().addClass("btn-success").removeClass("btn-light").removeClass("disabled");
+                        $('#buckbutton').show()
                     }
                 } else if (data['added'] >= 2) {
                     $('#addbutton').show().removeClass("btn-success").addClass("btn-light").addClass("disabled");
+                    $('#buckbutton').show()
                 } else {
                     $('#addbutton').hide();
+                    $('#buckbutton').hide()
                 }
                 if (data['added'] >= 2) {
                     $('#added').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
                 } else {
                     $('#added').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
                 }
-                if (data['bucket'] >= 1) {
+                if (data['bucket'] >= 2) {
                     $('#bucket').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
                 } else {
                     $('#bucket').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
