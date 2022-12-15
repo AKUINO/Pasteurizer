@@ -111,7 +111,7 @@ function SVGready(elements) {
     elements.each( function() { var here = $(this); here.removeClass(); SVGready(here.children()) } );
 }
 
-function fillDisplay(data) {
+function fillDisplay(data,logging) {
             if (data && 'date' in data) {
                 var date = data['date'].substring(0,10);
                 $('[name=date]').text(date);
@@ -342,7 +342,7 @@ $(document).ready(function() {
             $('#message').text('Application '+(textStatus?textStatus:'')+(errorThrown?(' '+errorThrown):''));
         },
         timeout: 3000, // sets timeout to 3 seconds
-        success: function(data) { fillDisplay(data); }
+        success: function(data) { fillDisplay(data,logging); }
         });
     }, 3000);   //number of mili seconds between each call
 } );
@@ -355,7 +355,7 @@ function action(letter) {
             $('#message').text('Application '+(textStatus?textStatus:'')+(errorThrown?(' '+errorThrown):''));
         },
         timeout: 3000, // sets timeout to 3 seconds
-        success: function(data) { fillDisplay(data); } /*
+        success: function(data) { fillDisplay(data,false); } /*
             if (data) {
                 var date = data['date'].substring(0,10);
                 $('[name=date]').text(date);
