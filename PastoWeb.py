@@ -2578,6 +2578,8 @@ class getCSV:
             for fileName in sorted(res):
                 with open(DIR_DATA_CSV + fileName ) as f:
                     try:
+                        if result:
+                            f.readline(); # skip header if result is not empty
                         result = result + f.read()
                     except IOError:
                         traceback.print_exc()
