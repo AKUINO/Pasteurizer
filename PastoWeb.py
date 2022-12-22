@@ -2575,7 +2575,7 @@ class getCSVdir:
                 # check if current path is a file
                 if os.path.isfile(os.path.join(DIR_DATA_CSV, path)) and (path.endswith(".csv")):
                     res.append(path)
-            return render.csvdir(res)
+            return render.csvdir(sorted(res))
 
 def restart_program():
     """Restarts the current program, with file objects and descriptors
