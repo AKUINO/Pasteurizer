@@ -2543,14 +2543,14 @@ class getJS:
                 web.notfound()
 
 class getCSV:
-    def GET(self, fileParam=None):
+    def GET(self, fileParam=None, endParam=None):
 
         global fileName
 
         data, connected, mail, password = init_access()
         if not connected:
             raise web.seeother('/')
-        else:
+        elif not endParam:
             if not fileParam:
                 fileParam = fileName
             web.header('Content-type', 'text/csv')
@@ -2559,6 +2559,30 @@ class getCSV:
                     return f.read()
                 except IOError:
                     web.notfound()
+        else: # Two YYYY_MMDD_HHmm
+            web.header('Content-type', 'text/csv')
+            # list to store files
+            res = []
+            gotSmall = False
+            # Iterate directory
+            for path in sorted(os.listdir(DIR_DATA_CSV),reverse=True):
+                # check if current path is a file
+                if os.path.isfile(os.path.join(DIR_DATA_CSV, path)) and len(path) == 18  and path.startswith("2") \
+                        and path.endswith(".csv") and path <= endParam:
+                    if gotSmall:
+                        break
+                    res.append(path)
+                    if path < fileParam:
+                        gotSmall = True
+            result = ""
+            for fileName in sorted(res):
+                with open(DIR_DATA_CSV + fileName ) as f:
+                    try:
+                        result = result + f.read()
+                    except IOError:
+                        traceback.print_exc()
+                        pass
+            return result
 
 class getCSVdir:
     def GET(self):
@@ -2789,6 +2813,7 @@ try:
         '/js/(.+)', 'getJS',
         '/css/(.+)', 'getCSS',
         '/csvdir', 'getCSVdir',
+        '/csv/(.+)/(.+)', 'getCSV',
         '/csv/(.+)', 'getCSV',
         '/csv', 'getCSV',
         '/update', 'WebSoftwareUpdate',
