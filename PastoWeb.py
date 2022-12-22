@@ -2543,7 +2543,7 @@ class getJS:
                 web.notfound()
 
 class getCSV:
-    def GET(self):
+    def GET(self, fileParam=None):
 
         global fileName
 
@@ -2551,8 +2551,10 @@ class getCSV:
         if not connected:
             raise web.seeother('/')
         else:
+            if not fileParam:
+                fileParam = fileName
             web.header('Content-type', 'text/csv')
-            with open(DIR_DATA_CSV + fileName + ".csv") as f:
+            with open(DIR_DATA_CSV + fileParam + ".csv") as f:
                 try:
                     return f.read()
                 except IOError:
@@ -2769,6 +2771,7 @@ try:
         '/static/css/(.+)', 'getCSS',
         '/js/(.+)', 'getJS',
         '/css/(.+)', 'getCSS',
+        '/csv/(.+)', 'getCSV',
         '/csv', 'getCSV',
         '/update', 'WebSoftwareUpdate',
         '/disconnect', 'WebDisconnect'
