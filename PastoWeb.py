@@ -2573,7 +2573,7 @@ class getCSVdir:
             # Iterate directory
             for path in os.listdir(DIR_DATA_CSV):
                 # check if current path is a file
-                if os.path.isfile(os.path.join(DIR_DATA_CSV, path)) and (path.endswith(".csv")):
+                if os.path.isfile(os.path.join(DIR_DATA_CSV, path)) and path.startswith("2") and path.endswith(".csv"):
                     res.append(path)
             return render.csvdir(sorted(res))
 
