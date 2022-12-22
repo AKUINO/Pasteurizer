@@ -3,6 +3,6 @@ $var title : Available CSV files
 <main role="main" class="container">
     <ul>
         $for csvpath in csvs:
-            <li><a href="/csv/$(csvpath[0:-4])">$(csvpath[0:-4])</li>
+            <li><a href="/csv/$(csvpath[0:-4])">$(csvpath[0:4])/$(csvpath[5:7])/$(csvpath[7:9]) $(csvpath[10:12]):$(csvpath[12:14]) <!--$(csvpath)--></li>
     </ul>
 </main>
