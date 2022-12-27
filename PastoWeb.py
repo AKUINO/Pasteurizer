@@ -2504,7 +2504,7 @@ class WebApiLog:
                 danger = ml.T('Capteur cassé?',"Sensor broken?","Sensor kapot?")
             elif T_DAC.empty_tank:
                 danger = str(ml.T('Cuve de chauffe VIDE?','Heating tank EMPTY?','Verwarmingstank LEEG?'))
-            elif warning or T_Pump.not_heating:
+            elif warning:
                 danger = ml.T('Cuve de chauffe mal remplie?','Heating tank not correctly filled?','Verwarmingstank niet correct gevuld?')
             currLog = {     'date': str(datetime.fromtimestamp(int(nowT))), \
                             'actif': 1 if actif else 0, \
