@@ -15,7 +15,7 @@ $if not paving:
     $if connected:
         <button onclick='fromHereTo("$(letter)","Z")' class="btn btn-danger" id="STOP" style="float:right">STOP</button>
 
-        <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; <b id="stateletter" class="show-flow"></b>:<b id="state"></b></h3>
+        <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; (<b id="stateletter" class="show-flow"></b>:<b id="state"></b>)  <span id="danger" class="danger"></span></h3>
         <p style="margin:auto"><span id="actiontitle"></span></p>
         <button onclick="action('>')" class="btn btn-success" id="forcing" style="float:right")>&gt;&gt;</button>
         <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
@@ -61,19 +61,19 @@ $if not paving:
                 <tr>
                     <td class="Eshape"><span id="purge" class="show-flow"/><span id="level2"><big><b style="color:red">X</b></big></span></td>
                     <td class="Eshape"><b id="extra"></b></td>
-                    <td class="Eshape"><div><span class="glyphicon glyphicon-arrow-left show-flow"/></div><span id="rmeter"></span></td>
+                    <td class="Eshape"><div><span class="glyphicon glyphicon-arrow-left show-flow show-empty"/></div><span id="rmeter"></span></td>
                     <!--td class="Ushape" rowspan="2"><b id="temper"></b>°</td-->
                     <!--td class="Eshape"><span class="glyphicon glyphicon-arrow-left"/></td-->
                     <td class="Bshape" rowspan="2"><span class="glyphicon glyphicon-random Drotate show-flow"/></td>
-                    <td class="Eshape"><div style="display:inline"><span class="glyphicon glyphicon-arrow-left show-flow"/></div></td>
-                    <td class="Ushape" rowspan=2><div class="Xshape"><div class="Drotate"><span class="glyphicon glyphicon-random show-flow"/></div><b id="warranty"></b>°</div><b id="heating"></b>°</td>
+                    <td class="Eshape"><div style="display:inline"><span class="glyphicon glyphicon-arrow-left show-flow show-empty"/></div></td>
+                    <td class="Ushape" rowspan=2><div class="Xshape"><div class="Drotate"><span class="glyphicon glyphicon-random show-flow"/></div><span id="Dwarranty">&nbsp;<b id="warranty"></b>°&nbsp;</span></div><span id="Dheating">&nbsp;<b id="heating"></b>°&nbsp;</span></td>
                 </tr>
                 <tr>
-                    <td class="Dshape"><span id="level1"><big><b style="color:blue">X</b></big></span><span class="glyphicon glyphicon-arrow-right show-flow"/></td>
+                    <td class="Dshape"><span id="level1"><big><b style="color:blue">X</b></big></span><span class="glyphicon glyphicon-arrow-right show-flow show-empty"/></td>
                     <td class="Oshape"><b id="vitesse"></b>L/h</td>
-                    <td class="Dshape"><span class="glyphicon glyphicon-arrow-right show-flow"></span><br/><b id="intake"></b>°<br/><span class="glyphicon glyphicon-log-in" id="fill" style="color:blue"></span></td>
+                    <td class="Dshape"><span class="glyphicon glyphicon-arrow-right show-flow show-empty"></span><br/><span id="Dintake">&nbsp;<b id="intake"></b>°&nbsp;</span><br/><span class="glyphicon glyphicon-log-in" id="fill" style="color:blue"></span></td>
                     <!--td class="Dshape"><span class="glyphicon glyphicon-arrow-right"/></td-->
-                    <td class="Dshape"><div style="display:inline"><span class="glyphicon glyphicon-arrow-right show-flow"/></div><br><b id="input"></b>°</td>
+                    <td class="Dshape"><div style="display:inline"><span class="glyphicon glyphicon-arrow-right show-flow show-empty"/></div><br><span id="Dinput">&nbsp;<b id="input"></b>°&nbsp;</span></td>
                 </tr>
                 <tr>
                     <td></td>

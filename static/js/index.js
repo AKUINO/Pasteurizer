@@ -111,6 +111,17 @@ function SVGready(elements) {
     elements.each( function() { var here = $(this); here.removeClass(); SVGready(here.children()) } );
 }
 
+function setTemp(data,label) {
+  val = data[label];
+  if (val && val >= 1.0 && val <= 99.0) {
+    $('#D'+label).removeClass('danger')
+  } else {
+    $('#D'+label).addClass('danger')
+  }
+  $('#'+label).text(floorDeci(val));
+
+}
+
 function fillDisplay(data,logging) {
             if (data && 'date' in data) {
                 var date = data['date'].substring(0,10);
@@ -123,8 +134,13 @@ function fillDisplay(data,logging) {
                 $('#action').text(data['action']);
                 $('#stateletter').text(data['stateletter']);
                 $('#state').text(data['state']);
+                $('#danger').text(data['danger']);
                 $('.show-flow').css('color',data['statecolor']);
-                $('#empty').text(data['empty']);
+                if (data['empty'] == 'V') {
+                    $('.show-empty').addClass('empty_pipe')
+                } else {
+                    $('.show-empty').removeClass('empty_pipe')
+                }
                 //$('#level1').text(data['level1']); //linput
                 //$('#level2').text(data['level2']); //loutput
                 if (data[level1]=='0') {
@@ -172,12 +188,12 @@ function fillDisplay(data,logging) {
                 var speed = floorUni(data['speed']);
                 $('#vitesse').text(speed);
                 colorit($('#vitesse'),0.0,625*3.6/data['opt_M'],180.0);
-                $('#input').text(floorDeci(data['input']));
-                $('#intake').text(floorDeci(data['intake']));
-                $('#warranty').text(floorDeci(data['warranty']));
+                setTemp(data,'input');
+                setTemp(data,'intake');
+                setTemp(data,'warranty');
+                setTemp(data,'heating');
                 colorit($('#sp9'),45.0,data['opt_temp'],90.0);
                 $('#reft').text(floorDeci(data['reft']));
-                $('#heating').text(floorDeci(data['heating']));
                 colorit($('#heating'),45.0,data['opt_temp']+3,90.0);
                 //$('#temper').text(floorDeci(data['temper']));
                 //colorit($('#temper'),4.0,(data['watts2'] <= 0) ? data['opt_T'] : data['opt_temp'],70.0);

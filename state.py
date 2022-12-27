@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import time
-import datetime
 import traceback
 from TimeTrigger import TimeTrigger
 

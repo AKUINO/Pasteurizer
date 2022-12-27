@@ -5,7 +5,6 @@ import socket
 import sys
 import os
 import signal
-import subprocess
 import argparse
 import json
 import time
@@ -16,14 +15,14 @@ import tty
 import termios
 import subprocess
 import traceback
-import math
+
+import ml # Not unused !!!
 
 import pyownet
 import term
 import threading
 
 import hardConf
-import ml
 import sensor
 #import pump
 import pump_pwm
@@ -1072,7 +1071,7 @@ class Operation(object):
         T_Pump.currOpContext = OperationContext(self,T_Pump.pump)
         T_Pump.forcible = False # unless TRAK...
         #print("%d >= %d" % ( (int(datetime.now().timestamp()) % (24*60*60)), int(menus.val('H'))) )
-        if not self.programmable or not menus.val('H') or (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
+        if not self.programmable or not menus.val('H') or (int(time.time()) % (24*60*60)) >= int(menus.val('H')):
             T_Pump.T_DAC.set_temp(self.tempWithGradient())
         else:
             T_Pump.T_DAC.set_temp(None) #,None) # Delayed start
@@ -1354,7 +1353,7 @@ class Operation(object):
         
         global menus, taps
 
-        if self.programmable and menus.val('H') and menus.val('H') != 0.0 and (int(datetime.now()) % (24*60*60)) >= int(menus.val('H')):
+        if self.programmable and menus.val('H') and menus.val('H') != 0.0 and (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
             menus.store('H', 0.0)
         #T_Pump.T_DAC.set_cold(None)
         if self.typeOp in ['FILL','FLOO','RFLO','HOTW']:
@@ -1608,6 +1607,7 @@ class ThreadPump(threading.Thread):
         self.waitingAdd = False
         self.added = False
         self.forcing = 0
+        self.forcible = False
 
     def pushContext(self,opContext):
         if opContext:
@@ -2472,6 +2472,15 @@ class WebApiLog:
             pumping_time = time.perf_counter() - T_Pump.pumpLastChange
             pumping_volume = T_Pump.pump.volume() - T_Pump.pumpLastVolume
             heating_volume = T_DAC.totalWatts - T_Pump.pumpLastHeating
+            danger = ''
+            intake = cohorts.getCalibratedValue('intake')
+            input = cohorts.getCalibratedValue('input')
+            warranty = cohorts.getCalibratedValue('warranty')
+            heating = cohorts.getCalibratedValue('warranty')
+            if intake < 1.0 or input < 1.0 or warranty < 1.0 or heating < 1.0:
+                danger = str(ml.T('Capteur déconnecté?',"Sensor disconnected?","Sensor losgekoppeld?"))
+            elif intake > 99.0 or input > 99.0 or warranty > 99.0 or heating > 99.0:
+                danger = ml.T('Capteur cassé?',"Sensor broken?","Sensor kapot?")
             currLog = {     'date': str(datetime.fromtimestamp(int(nowT))), \
                             'actif': 1 if actif else 0, \
                             'actionletter': T_Pump.currAction, \
@@ -2480,6 +2489,7 @@ class WebApiLog:
                             'actiontitle': str(menus.actionName[T_Pump.currAction][3]), \
                             'stateletter': (State.current.letter if State.current else ''),
                             'empty': ('V' if State.empty else 'W'),
+                            'danger': danger,
                             #'greasy': ('G' if State.greasy else 'J'),
                             'state': (str(State.current.labels) if State.current else ''),
                             'statecolor': (str(State.current.color) if State.current else 'black'),
@@ -2492,12 +2502,12 @@ class WebApiLog:
                             'volume': T_Pump.pump.volume(), \
                             'speed': T_Pump.pump.liters() if not T_Pump.paused else 0, \
                             'extra': isnull(cohorts.getCalibratedValue('extra'), ''), \
-                            'input': isnull(cohorts.getCalibratedValue('input'), ''), \
-                            'intake': isnull(cohorts.getCalibratedValue('intake'), ''), \
+                            'input': isnull(input, ''), \
+                            'intake': isnull(intake, ''), \
                             'watts': isnull(cohorts.catalog['DAC1'].value*HEAT_POWER, ''), \
                             #'watts2': isnull(cohorts.catalog['DAC2'].value*MITIG_POWER, ''), \
-                            'warranty': isnull(cohorts.getCalibratedValue('warranty'), ''), \
-                            'heating': isnull(cohorts.getCalibratedValue('heating'), ''), \
+                            'warranty': isnull(warranty, ''), \
+                            'heating': isnull(heating, ''), \
                             #'temper': isnull(cohorts.getCalibratedValue('temper'), ''), \
                             'rmeter': isnull(cohorts.val('rmeter'), ''), \
                             'press': isnull(cohorts.val('press',peak=0), ''), \
@@ -2579,7 +2589,7 @@ class getCSV:
                 with open(DIR_DATA_CSV + fileName ) as f:
                     try:
                         if result:
-                            f.readline(); # skip header if result is not empty
+                            f.readline() # skip header if result is not empty
                         result = result + f.read()
                     except IOError:
                         traceback.print_exc()

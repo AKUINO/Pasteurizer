@@ -19,6 +19,7 @@ class Menus(object):
     REF = 10 #when a value is calculated another way
 
     singleton = None #initialized after class definition is closed
+    option_file = None
 
     ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
