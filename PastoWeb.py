@@ -163,12 +163,15 @@ STAY_CLEAN_TIME = 2*3600
 
 DEFAULT_FORCING_TIME = 30 # Each time the user forces pumping, normal operation resumes after this number of seconds
 
+HYSTERESIS = 0.2 # degrees below / over setpoint to open / close heating
 
 #FLOOD_TIME = 60.0 # 90 seconds of hot water tap flushing (when a pump is in the way. 60 if not) to FILL an EMPTY machine
 #floodLitersMinute = 3.5 # 4.0 si pas de pompe dans le chemin; 3 sinon    DEPEND DE LA PRESSION, PAS UTILISABLE
 FLOOD_PER_MINUTE = 4.0 # liters in a one minute flood from the tap (also used with water coming from a bucket)
 
 TANK_NOT_FILLED = 1.5 # If heating time remaining is decreasing more than expected (ratio above 1.3 and not 3), the tank may not be filled correctly...
+
+TANK_EMPTY_LIMIT = 60 # If heating time has not diminished in the last 60 seconds, the heating tank may be empty...
 
 menus = Menus.singleton
 menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
@@ -765,6 +768,7 @@ class ThreadDAC(threading.Thread):
         self.totalWatts = 0.0
         self.totalWatts2 = 0.0
         self.currLog = None
+        self.empty_tank = False
 
     def set_temp(self,setpoint=None, setpoint2=None):
         if setpoint:
@@ -794,6 +798,8 @@ class ThreadDAC(threading.Thread):
         lastLoop = time.perf_counter()
         prec_relay = -1
         lastWatt = 0
+        prec_heating = None
+        some_heating = False
         # TODO: allow to balance both heating tanks to reduce power demand
         while self.running:
             time.sleep(0.01)
@@ -822,24 +828,38 @@ class ThreadDAC(threading.Thread):
                 if self.setpoint and cohorts.catalog['heating'].value:
                     currHeat = int(self.dacSetting.value)
                     #print("%d %f / %f" % (currHeat, cohorts.catalog['heating'].value , self.setpoint) )
+                    heating = cohorts.getCalibratedValue('heating')
                     if currHeat > 0: # ON
-                        if cohorts.getCalibratedValue('heating') < (self.setpoint+0.2):
+                        if heating < (self.setpoint+HYSTERESIS):
                             wattHour = True
                     else: # Off
-                        if cohorts.getCalibratedValue('heating') < (self.setpoint-0.2):
+                        if heating < (self.setpoint-HYSTERESIS):
                             wattHour = True
 
-                    if wattHour:
+                    if wattHour and not self.empty_tank:
                         self.dacSetting.set(1)
                         self.totalWatts += (HEAT_POWER/3600.0 * delay)
                         if not lastWatt:
                             lastWatt = now
+                            prec_heating = heating
+                            some_heating = False
+                        else:
+                            if heating > prec_heating + 0.1:
+                                some_heating = True
+                            if (now - lastWatt) > TANK_EMPTY_LIMIT and not some_heating:
+                                self.empty_tank = True
+                                print("EMPTY TANK, stop heating!")
+                                self.dacSetting.set(0)
                     else:
                         self.dacSetting.set(0)
                         lastWatt = 0
+                        prec_heating = None
+                        some_heating = False
                 else:
                     self.dacSetting.set(0)
                     lastWatt = 0
+                    prec_heating = None
+                    some_heating = False
                 #self.dacSetting.set(wattHour)
                 #self.totalWatts += (wattHour/3600.0 * delay)
                     
@@ -1166,7 +1186,7 @@ class Operation(object):
         if requiredTime and T_Pump.currOpContext and (T_Pump.currOpContext.duration() >= requiredTime):
             return True
         if self.typeOp == 'HEAT':
-            if float(cohorts.getCalibratedValue('heating')) >= float(self.tempWithGradient()-0.2):
+            if float(cohorts.getCalibratedValue('heating')) >= float(self.tempWithGradient()-HYSTERESIS):
                 return True
         elif self.typeOp == 'FILL' :
             if State.empty :
@@ -1678,6 +1698,7 @@ class ThreadPump(threading.Thread):
         self.added = False
         self.waitingAdd = False
         self.startAction = time.perf_counter()
+        self.T_DAC.empty_tank = False # Reset a detected empty tank
 
     def setAction(self,action):
         global opSequences
@@ -1726,7 +1747,7 @@ class ThreadPump(threading.Thread):
             if self.currOperation.typeOp == 'HEAT':
                 heating = cohorts.getCalibratedValue('heating')
                 #print("heating=%d" % heating)
-                diffTemp = float(self.currOperation.tempWithGradient()-0.2)-float(heating)
+                diffTemp = float(self.currOperation.tempWithGradient()-HYSTERESIS)-float(heating)
                 #print("diffTemp=%f" % diffTemp)
                 if diffTemp <= 0.0:
                     self.lastDurationEval = None
@@ -1737,7 +1758,7 @@ class ThreadPump(threading.Thread):
                     if not self.lastDurationEval or not self.lastDurationEvalTime:
                         self.lastDurationEval = newEval
                         self.lastDurationEvalTime = now
-                    elif now > (self.lastDurationEvalTime+10.0) :
+                    elif now > (self.lastDurationEvalTime+TANK_EMPTY_LIMIT) :
                         Factor = (self.lastDurationEval - newEval) / (now-self.lastDurationEvalTime)
                         if Factor > TANK_NOT_FILLED:
                             warning = True
@@ -2481,6 +2502,10 @@ class WebApiLog:
                 danger = str(ml.T('Capteur déconnecté?',"Sensor disconnected?","Sensor losgekoppeld?"))
             elif intake > 99.0 or input > 99.0 or warranty > 99.0 or heating > 99.0:
                 danger = ml.T('Capteur cassé?',"Sensor broken?","Sensor kapot?")
+            elif T_DAC.empty_tank:
+                danger = str(ml.T('Cuve de chauffe VIDE?','Heating tank EMPTY?','Verwarmingstank LEEG?'))
+            elif warning or T_Pump.not_heating:
+                danger = ml.T('Cuve de chauffe mal remplie?','Heating tank not correctly filled?','Verwarmingstank niet correct gevuld?')
             currLog = {     'date': str(datetime.fromtimestamp(int(nowT))), \
                             'actif': 1 if actif else 0, \
                             'actionletter': T_Pump.currAction, \
