@@ -70,7 +70,7 @@
 
     .danger { color: #FFFFFF; background-color: red; }
 
-    .greenToRed { background: linear-gradient(.25turn, #00FF00, #FF0000); color:white; }
+    .greenToRed { background: linear-gradient(.25turn, #00AAFF, #FF0000); color:white; }
 
 	span.nobreak {
 	  white-space: nowrap;
