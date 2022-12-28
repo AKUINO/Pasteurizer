@@ -839,7 +839,7 @@ class ThreadDAC(threading.Thread):
                     if wattHour and not self.empty_tank:
                         self.dacSetting.set(1)
                         self.totalWatts += (HEAT_POWER/3600.0 * delay)
-                        if not lastWatt:
+                        if not lastWatt or self.T_Pump.pump.speed == 0.0:
                             lastWatt = now
                             prec_heating = heating
                             some_heating = False
