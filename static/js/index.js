@@ -122,6 +122,32 @@ function setTemp(data,label) {
 
 }
 
+function LitersOnLiters(q,k,input) {
+    var result = "";
+    if (input) {
+        if (k) {
+           if (q) {
+                result = floorDeci(k) + " - "+floorDeci(q) + " = " + floorDeci(k-q)
+           } else {
+               result = '/ '+floorDeci(k)
+           }
+           result += 'L'
+        } else {
+           if (q) {
+                result = floorDeci(q) + 'L'
+           }
+        }
+    } else { //output
+        if (q) {
+            result = floorDeci(q) + 'L'
+        }
+        if (k) {
+          result += ' / '+floorDeci(k)+'L';
+        }
+    }
+    return result;
+}
+
 function fillDisplay(data,logging) {
             if (data && 'date' in data) {
                 var date = data['date'].substring(0,10);
@@ -135,11 +161,20 @@ function fillDisplay(data,logging) {
                 $('#stateletter').text(data['stateletter']);
                 $('#state').text(data['state']);
                 $('#danger').text(data['danger']);
+                $('#INbucket').attr( "class", "bucketIN"+(data['bin']==data['bout']? '1' : '2')+" in"+data['bin'] );
+                $('#tbin').text(data['tbin']);
+                $('#qbin').html(LitersOnLiters(data['qbin'],data['kbin'], true));
+                $('#OUTbucket').attr( "class", "bucketOUT"+(data['bin']==data['bout']? '1' : '2')+" in"+data['bout'] );
+                $('#tbout').text(data['tbout'])
+                $('#qbout').html(LitersOnLiters(data['qbout'],data['kbout'], false));
+
                 $('.show-flow').css('color',data['statecolor']);
                 if (data['empty'] == 'V') {
-                    $('.show-empty').addClass('empty_pipe')
+                    $('.show-empty').addClass('empty_pipe');
+                    $('#emptied').show()
                 } else {
-                    $('.show-empty').removeClass('empty_pipe')
+                    $('.show-empty').removeClass('empty_pipe');
+                    $('#emptied').hide()
                 }
                 //$('#level1').text(data['level1']); //linput
                 //$('#level2').text(data['level2']); //loutput
@@ -188,6 +223,13 @@ function fillDisplay(data,logging) {
                 var speed = floorUni(data['speed']);
                 $('#vitesse').text(speed);
                 colorit($('#vitesse'),0.0,625*3.6/data['opt_M'],180.0);
+                if (speed >= 0) {
+                    $('.forward').removeClass('glyphicon-arrow-left').addClass('glyphicon-arrow-right')
+                    $('.backward').removeClass('glyphicon-arrow-right').addClass('glyphicon-arrow-left')
+                } else {
+                    $('.forward').removeClass('glyphicon-arrow-right').addClass('glyphicon-arrow-left')
+                    $('.backward').removeClass('glyphicon-arrow-left').addClass('glyphicon-arrow-right')
+                }
                 setTemp(data,'input');
                 setTemp(data,'intake');
                 setTemp(data,'warranty');
@@ -202,7 +244,7 @@ function fillDisplay(data,logging) {
                 $('#pressMin').text(data['pressMin'] > 0.0 ? floorCenti(data['pressMin']) : "?");
                 $('#pressMax').text(data['pressMax'] > 0.0 ? floorCenti(data['pressMax']) : "?");
                 $('#extra').text(data['extra'] != 0.0 ? (floorDeci(data['extra'])+'°'):"");
-                $('#pumpeff').text(floorDeci(data['pumpeff']));
+                $('#pumpeff').text(floorUni(data['pumpeff']));
                 $('#heateff').text(floorDeci(data['heateff']));
                 $('#message').text(data['message']);
                 if (data['allowedActions'] != '') {
@@ -265,30 +307,24 @@ function fillDisplay(data,logging) {
                     $('#restart').hide();
                     $('#forcing').hide()
                 }
-                if (data['actif'] > 0 && data['added'] == 1) {
-                    if (data['pause'] > 0) {
-                        $('#addbutton').hide();
-                        $('#buckbutton').hide()
-                    } else {
-                        $('#addbutton').show().addClass("btn-success").removeClass("btn-light").removeClass("disabled");
-                        $('#buckbutton').show()
-                    }
-                } else if (data['added'] >= 2) {
-                    $('#addbutton').show().removeClass("btn-success").addClass("btn-light").addClass("disabled");
-                    $('#buckbutton').show()
-                } else {
-                    $('#addbutton').hide();
-                    $('#buckbutton').hide()
-                }
                 if (data['added'] >= 2) {
                     $('#added').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
-                } else {
+                    $('#addbutton').show().addClass("btn-success").removeClass("btn-light");
+                } else if (data['added'] >= 1) {
                     $('#added').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
+                    $('#addbutton').show().removeClass("btn-success").addClass("btn-light");
+                } else {
+                    $('#addbutton').hide();
                 }
                 if (data['bucket'] >= 2) {
                     $('#bucket').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
-                } else {
+                    $('#buckbutton').show()
+                } else if (data['bucket'] >= 1) {
                     $('#bucket').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
+                    $('#buckbutton').show()
+                } else {
+                    $('#buckbutton').hide();
+                    $('#bucket').removeClass("glyphicon-check").removeClass("glyphicon-unchecked");
                 }
                  if (data['purge'] == 1) {
                     //$('#dumpbutton').show();
@@ -329,7 +365,7 @@ function fillDisplay(data,logging) {
                 if ('pumpopt' in data && data['pumpopt']) {
                     $('#pumpopt').text(floorDeci(data['pumpopt']));
                 }
-                if (data['pumpeff'] > 0 && speed != 0 ) {
+                if (data['actionletter'] in ['M','E','P','I'] && data['pumpeff'] > 0 && speed != 0 ) {
                     $('#eff').show();
                 } else {
                     $('#eff').hide();

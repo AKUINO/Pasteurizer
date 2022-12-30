@@ -16,6 +16,12 @@ class State(object):
     empty = False
     greasy = False
 
+    delayed = None
+    dstart = 0
+    dempty = False
+    dgreasy = False
+
+
     def get(letter,empty,greasy=False):
         return State.knownStates[letter][empty][greasy]
 
@@ -27,8 +33,12 @@ class State(object):
         return State.current
 
     def transitCurrent(step, action, now=int(time.time()) ):
-        (State.start,State.current, State.empty, State.greasy) = State.current.transit(State.empty, State.greasy, step, action, State.start, now)
+        (State.start,State.current, State.empty, State.greasy) = State.current.transit(State.empty, State.greasy, step, action, State.start, now=now)
         # print (State.current.letter)
+
+    def transitDelayed(step, action, now=int(time.time()) ):
+        (State.dstart,State.delayed, State.dempty, State.dgreasy) = State.current.transit(State.empty, State.greasy, step, action, State.start, toBeSaved=False, now=now)
+        # print (State.delayed.letter)
 
     data_dir = None
 
@@ -56,8 +66,18 @@ class State(object):
         State.setCurrent('s',False,False)
         return 0,State.current,False,False # If state unknown, it is dirty !
 
-    def saveCurrent(now=int(time.time()) ):
+    def saveCurrent(now=int(time.time())):
         State.current.save(State.empty,State.greasy,State.start)
+
+    def popDelayed(now=int(time.time())):
+        if State.delayed:
+            State.start = now
+            State.empty = State.dempty
+            State.greasy = State.dgreasy
+            State.current = State.delayed
+            TimeTrigger.resets()
+            State.saveCurrent()
+            State.delayed = None
 
     def __init__(self,letter,labels,color,transitions,emptiness=[False,True],greasiness=[False,True]):
         #cohorts.catalog[address] = self Done by the threading class...
@@ -71,7 +91,7 @@ class State(object):
             for greasy in greasiness:
                 State.knownStates[letter][empty][greasy] = self
 
-    def transit(self,empty,greasy,step,action, start, now=int(time.time()) ):
+    def transit(self,empty,greasy,step,action, start, toBeSaved=True, now=int(time.time()) ):
         for (actDone,nextState) in self.transitions:
             if actDone == action:
                 if nextState == None:
@@ -82,7 +102,7 @@ class State(object):
                         if step == State.ACTION_BEGIN:
                             newLetter = nextState[0]
                         elif step == State.ACTION_RESUME:
-                            newLetter = nextState[(len(nextState)-1) if (len(nextState) <= 1) else 1]
+                            newLetter = nextState[0 if (len(nextState) <= 1) else 1]
                         else: # ACTION_END
                             newLetter = nextState[len(nextState) - 1]
                     if isinstance(newLetter, list):
@@ -99,14 +119,15 @@ class State(object):
                 else: # empty = same state
                     newState = State.get(self.letter,empty,greasy)
                 if newState.letter != self.letter:
-                    TimeTrigger.resets()
-                    newState.save(empty, greasy, now)
+                    if toBeSaved:
+                        TimeTrigger.resets()
+                        newState.save(empty, greasy, now)
                     return now, newState,empty, greasy
                 else:
                     return start, newState,empty,greasy
         print ("Unknown action=%s for state=%s"%(action,self.letter))
         try:
-            return State.get('?',empty,greasy).transit(empty,greasy,step,action, start, now )
+            return State.get('?',empty,greasy).transit(empty,greasy,step,action, start, toBeSaved=toBeSaved, now=now )
         except:
             print ("IMPOSSIBLE action=%s for state=%s"%(action,self.letter))
             return start,self,empty,greasy
@@ -122,5 +143,6 @@ class State(object):
             with open(State.data_dir + "state.csv", "w") as data_file:
                 data_file.write("epoch_sec\tstate\tempty\tgreasy\n")
                 data_file.write("%d\t%s\t%d\t%d\n"%(now, self.letter, empty, greasy))
+                # print ("%d\t%s\t%d\t%d\n"%(now, self.letter, empty, greasy))
         except IOError: # unknown previous state
             traceback.print_exc()

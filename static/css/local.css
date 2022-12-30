@@ -29,6 +29,20 @@
 		    text-align: center;
 	    }
 
+     .OTshape { border:solid;
+            border-color: black;
+		    border-width: 2px;
+		    border-radius: 20px 20px 6px 6px;
+		    text-align: center;
+	    }
+
+     .OBshape { border:solid;
+            border-color: black;
+		    border-width: 2px;
+		    border-radius: 6px 6px 20px 20px;
+		    text-align: center;
+	    }
+
      .Xshape { border:solid;
 		    border-width: 1px;
 		 	margin: 10px;
@@ -66,7 +80,7 @@
     .flowing { color: rgba(15,15,255,1) }
     .empty   { color: rgba(224,168,00,1) }
 
-    .empty_pipe { opacity:0.3; text-shadow: 0px 8px #666666; }
+    .empty_pipe { opacity:0.3; text-shadow: 2px 4px #666666; }
 
     .danger { color: #FFFFFF; background-color: red; }
 
@@ -151,3 +165,39 @@
 	.st27{fill:none;stroke:#FFFFFF;stroke-width:0.5;stroke-linecap:round;stroke-miterlimit:10;}
 	.st28{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}
 	.st29{fill:none;stroke:#FFFFFF;stroke-width:0.25;stroke-miterlimit:10;}
+
+    .bucketIN2  { padding: 3px;
+                  border-style: solid solid solid solid;
+                  border-color: #e9ecef black black black;
+                  border-width: 3px;
+                  border-radius: 0px 0px 10px 10px;
+                  text-align: center; }
+    .bucketOUT2  { padding: 3px;
+                  border-style: none solid solid solid;
+                  border-color: black black black black;
+                  border-width: 3px;
+                  border-radius: 0px 0px 10px 10px;
+                  text-align: center; }
+    .bucketIN1  { padding: 3px;
+                  border-style: none solid solid solid;
+                  border-color: black black black black;
+                  border-width: 3px;
+                  border-radius: 0px 0px 10px 10px;
+                  text-align: center; }
+    .bucketOUT1  { padding: 3px;
+                  border-style: none solid none solid;
+                  border-color: black black black black;
+                  border-width: 3px;
+                  text-align: center; }
+	.in      { color: black; background-color : #e9ecef }
+    .inWPOT  { color: black; background-color : white }
+    .inDESI  { color: white; background-color : black }
+    .inRECUP { color: black; background-color : yellow }
+    .inPAST  { color: black; background-color : white }
+    .inACID  { color: white; background-color : red }
+    .inCAUS  { color: white; background-color : blue }
+    .inAIR   { color: black; background-color : #e9ecef }
+    .inRAW   { color: black; background-color : #fff3cd }
+    .inSEWR  { color: white; background-color : brown }
+    .inPAST2 { color: black; background-color : white }
+    .inRAW2  { color: black; background-color : #fff3cd }
