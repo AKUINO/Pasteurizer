@@ -169,25 +169,25 @@
     .bucketIN2  { padding: 3px;
                   border-style: solid solid solid solid;
                   border-color: #e9ecef black black black;
-                  border-width: 3px;
+                  border-width: 10px 3px 3px 3px;
                   border-radius: 0px 0px 10px 10px;
                   text-align: center; }
     .bucketOUT2  { padding: 3px;
-                  border-style: none solid solid solid;
-                  border-color: black black black black;
-                  border-width: 3px;
+                  border-style: solid solid solid solid;
+                  border-color: #e9ecef black black black;
+                  border-width: 10px 3px 3px 3px;
                   border-radius: 0px 0px 10px 10px;
                   text-align: center; }
     .bucketIN1  { padding: 3px;
                   border-style: none solid solid solid;
-                  border-color: black black black black;
-                  border-width: 3px;
+                  border-color: #e9ecef black black black;
+                  border-width: 10px 3px 3px 3px;
                   border-radius: 0px 0px 10px 10px;
                   text-align: center; }
     .bucketOUT1  { padding: 3px;
-                  border-style: none solid none solid;
-                  border-color: black black black black;
-                  border-width: 3px;
+                  border-style: solid solid none solid;
+                  border-color: #e9ecef black black black;
+                  border-width: 10px 3px 3px 3px;
                   text-align: center; }
 	.in      { color: black; background-color : #e9ecef }
     .inWPOT  { color: black; background-color : white }
