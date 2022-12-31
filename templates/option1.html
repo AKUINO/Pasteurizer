@@ -2,13 +2,10 @@ $def with (connected,mail)
 $var title : Pasteurization and Cooling Parameters
 <main role="main" class="container">
   <div class="jumbotron" onclick="void(0);">
-<button onclick="action('Z')" class="btn btn-danger" id="STOP" style="float:right">STOP</button>
-<h3><b id="time"></b> <b id="actionletter"></b>:<b id="action"></b></h3>
-<p style="margin:auto"><span id="actiontitle"></span></p>
-<button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
-<button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
-<p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
-<hr/>
+    <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; (<span id="emptied">$(ml.T("Circuit vidé","Emptied circuit","Leeg circuit")), </span><b id="stateletter" class="show-flow"></b>:<b id="state"></b>)<br/><span id="danger" class="danger"></span></h3>
+    <p style="margin:auto"><span id="actiontitle"></span></p>
+    <p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
+    <hr/>
 <h2>$(ml.T("Paramètres de Pasteurisation et Refroidissement","Pasteurisation and Cooling Parameters","Pasteurisatie- en koelparameters"))</h2>
 <form method="post" action="/option1">
 $for letter in menus.cleanOptions:

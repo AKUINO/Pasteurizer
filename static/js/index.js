@@ -178,17 +178,17 @@ function fillDisplay(data,logging) {
                 }
                 //$('#level1').text(data['level1']); //linput
                 //$('#level2').text(data['level2']); //loutput
-                if (data[level1]=='0') {
+                if ('level1' in data && data['level1']=='0') {
                     $('#level1').show()
                 } else {
                     $('#level1').hide()
                 }
-                if (data[level2]=='1') {
+                if ('level2' in data && data['level2']=='1') {
                     $('#level2').show()
                 } else {
                     $('#level2').hide()
                 }
-                if (data['forcing'] > 0) {
+                if ('forcing' in data && data['forcing'] > 0) {
                     $('#forcing').show()
                 } else {
                     $('#forcing').hide()
@@ -234,7 +234,7 @@ function fillDisplay(data,logging) {
                 setTemp(data,'intake');
                 setTemp(data,'warranty');
                 setTemp(data,'heating');
-                colorit($('#sp9'),45.0,data['opt_temp'],90.0);
+                //colorit($('#sp9'),45.0,data['opt_temp'],90.0);
                 $('#reft').text(floorDeci(data['reft']));
                 colorit($('#heating'),45.0,data['opt_temp']+3,90.0);
                 //$('#temper').text(floorDeci(data['temper']));
@@ -277,7 +277,7 @@ function fillDisplay(data,logging) {
                         //$('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                     }
                 }
-                if (data['actif'] > 0) {
+                if ('actif' in data && data['actif'] > 0) {
                     $('#STOP').show();
                     if (data['pause'] > 0) {
                         $('#pause').hide();
@@ -301,31 +301,38 @@ function fillDisplay(data,logging) {
                             }
                         }
                     }
+                    if ('added' in data) {
+                        if (data['added'] >= 2) {
+                            $('#added').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
+                            $('#addbutton').show().addClass("btn-success").removeClass("btn-light");
+                        } else if (data['added'] >= 1) {
+                            $('#added').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
+                            $('#addbutton').show().removeClass("btn-success").addClass("btn-light");
+                        } else {
+                            $('#addbutton').hide();
+                        }
+                    }
+                    if ('bucket' in data) {
+                        if (data['bucket'] >= 2) {
+                            $('#bucket').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
+                            $('#buckbutton').show()
+                        } else if (data['bucket'] >= 1) {
+                            $('#bucket').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
+                            $('#buckbutton').show()
+                        } else {
+                            $('#buckbutton').hide();
+                            $('#bucket').removeClass("glyphicon-check").removeClass("glyphicon-unchecked");
+                        }
+                    }
                 } else {
                     $('#STOP').hide();
                     $('#pause').hide();
                     $('#restart').hide();
                     $('#forcing').hide()
-                }
-                if (data['added'] >= 2) {
-                    $('#added').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
-                    $('#addbutton').show().addClass("btn-success").removeClass("btn-light");
-                } else if (data['added'] >= 1) {
-                    $('#added').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
-                    $('#addbutton').show().removeClass("btn-success").addClass("btn-light");
-                } else {
                     $('#addbutton').hide();
-                }
-                if (data['bucket'] >= 2) {
-                    $('#bucket').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
-                    $('#buckbutton').show()
-                } else if (data['bucket'] >= 1) {
-                    $('#bucket').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
-                    $('#buckbutton').show()
-                } else {
                     $('#buckbutton').hide();
-                    $('#bucket').removeClass("glyphicon-check").removeClass("glyphicon-unchecked");
                 }
+                /*
                  if (data['purge'] == 1) {
                     //$('#dumpbutton').show();
                     $('#purge').removeClass("glyphicon-trash");
@@ -343,8 +350,9 @@ function fillDisplay(data,logging) {
                     $('#purge').removeClass("glyphicon-share-alt");
                     $('#purge').removeClass("flip-vertical");
                     $('#purge').addClass("glyphicon glyphicon-arrow-left")
-                }
+                } */
                 var temptext = ''
+                /*
                 if ('opt_T' in data && data['opt_T']) {
                     temptext = floorDeci(data['opt_T'])
                     $('#opt_T').text(temptext);
@@ -353,7 +361,7 @@ function fillDisplay(data,logging) {
                     $('#cooling').show();
                 } else{
                     $('#cooling').hide();
-                }
+                } */
                 if ('opt_M' in data && data['opt_M']) {
                     $('#opt_M').text(floorDeci(data['opt_M']));
                 }
@@ -433,67 +441,7 @@ function action(letter) {
             $('#message').text('Application '+(textStatus?textStatus:'')+(errorThrown?(' '+errorThrown):''));
         },
         timeout: 3000, // sets timeout to 3 seconds
-        success: function(data) { fillDisplay(data,false); } /*
-            if (data) {
-                var date = data['date'].substring(0,10);
-                $('[name=date]').text(date);
-                var time = data['date'].substring(11,999);
-                $('#time').text(time);
-                $('#actionletter').text(data['actionletter']);
-                currentLetter = data['actionletter'];
-                $('#preconfigletter').text(data['preconfigletter']);
-                $('#action').text(data['action']);
-                $('#stateletter').text(data['stateletter']);
-                $('#state').text(data['state']);
-                $('.show-flow').css('color',data['statecolor']);
-                $('#empty').text(data['empty']);
-                if (data[level1]=='0') {
-                    $('#level1').show()
-                } else {
-                    $('#level1').hide()
-                }
-                if (data[level2]=='1') {
-                    $('#level2').show()
-                } else {
-                    $('#level2').hide()
-                }
-                // $('#greasy').text(data['greasy']);
-                $('#actiontitle').text(data['actiontitle']);
-                var accro = "";
-                if ('accro' in data && data['accro'].length >= 4) {
-                    accro = data['accro'].substring(3,4)
-                }
-                $('#accro').text(accro);
-                $('#message').text(data['message']);
-                if (data['allowedActions'] != '') {
-                    allowedActions = data['allowedActions']+'JYLTOXZ';
-                    for (var i=0; i < ALPHABET.length; i++) {
-                        ml = ALPHABET.charAt(i);
-                        if (allowedActions.indexOf(ml) >= 0) {
-                            $('#drop'+ml).removeClass('dropdown-grayed').removeClass('current').addClass('enabled');
-                            //$('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
-                        }
-                        else {
-                            $('#drop'+ml).removeClass('current').removeClass('enabled').addClass('dropdown-grayed');
-                            //$('#menu'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
-                        }
-                    }
-                } else {
-                    for (var i=0; i < ALPHABET.length; i++) {
-                        ml = ALPHABET.charAt(i);
-                        $('#drop'+ml).removeClass('dropdown-grayed').removeClass('current').addClass('enabled');
-                        //$('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
-                    }
-                }
-                if (data['pause'] != 0) {
-                    $('#pause').hide();
-                    $('#restart').show();
-                } else {
-                    $('#pause').show();
-                    $('#restart').hide();
-                }
-            }
-        }*/
+        success: function(data) { fillDisplay(data,false); }
   });
   $('#confirm').hide();
   $('#cancel').hide();

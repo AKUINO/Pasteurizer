@@ -1302,8 +1302,7 @@ class Operation(object):
                 else:
                     taps[self.tap].set(1)
             else: # Water by bucket, what  must be done
-                if typeOpToDo == 'RFLO':
-                    speed = self.desired_speed()
+                speed = self.desired_speed()
         elif typeOpToDo == 'SHAK':
             #print ("S=%f\r" % speed)
             if speed == 0.0:
@@ -1498,61 +1497,61 @@ opSequences = {
 
     'F': # Pré-rinçage (Flush)
         [ Operation('PreT','HEAT',ref='R', dump=True,programmable=True,bin=[buck.RECUP,buck.WPOT],bout=buck.RECUP,kbin=TOTAL_VOL),
-          Operation('PreS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True,bin=[buck.RECUP,buck.WPOT],bout=buck.RECUP),
-          Operation('PreI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True,bin=[buck.RECUP,buck.WPOT],bout=buck.RECUP),  #
-          Operation('PreR','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True,bin=[buck.RECUP,buck.WPOT],bout=buck.RECUP),
-          Operation('CLOS','MESS',message=ml.T("Recommencer au besoin!","Repeat if needed!","Herhaal indien nodig!"),dump=True,bin=[buck.RECUP,buck.WPOT],bout=buck.RECUP)
+          Operation('PreS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          Operation('PreI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          Operation('PreR','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+          Operation('CLOS','MESS',message=ml.T("Recommencer au besoin!","Repeat if needed!","Herhaal indien nodig!"),dump=True)
           ],
     'H': # Distribution d'eau pasteurisée: GROSSIERE ERREUR: ne fonctionne que sur un circuit vide !!!
         [ Operation('HotT','HEAT',ref='P', dump=True,programmable=True,bin=buck.WPOT,bout=buck.PAST,kbin=lambda:(START_VOL if State.empty else 0.0)+TOTAL_VOL,kbout=START_VOL),
-          Operation('HotS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True,bin=buck.WPOT,bout=buck.PAST),
-          Operation('HotF','FILL',duration=lambda:flood_liters_to_seconds(START_VOL),base_speed=OPT_SPEED,qty=START_VOL, ref='P',dump=True,bin=buck.WPOT,bout=buck.PAST),
-          Operation('HotW','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True,bin=buck.WPOT,bout=buck.PAST)
+          Operation('HotS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          Operation('HotF','FILL',duration=lambda:flood_liters_to_seconds(START_VOL),base_speed=OPT_SPEED,qty=START_VOL, ref='P',dump=True),
+          Operation('HotW','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True)
           ],
     'R': # Pré-rinçage 4 fois
-        [ Operation('Pr1T','HEAT',ref='R', dump=True,programmable=True,bin=buck.RECUP,bout=[buck.RECUP,buck.SEWR], kbin=(TOTAL_VOL if State.empty else 0.0)+(4*TOTAL_VOL),kbout=4*TOTAL_VOL),
-          Operation('Pr1S','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True,bin=buck.RECUP,bout=[buck.RECUP,buck.SEWR]),
-          Operation('Pr1F','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True,bin=buck.RECUP,bout=[buck.RECUP,buck.SEWR]),
-          Operation('Pr1I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True,bin=buck.RECUP,bout=[buck.RECUP,buck.SEWR]),
-          Operation('Pr1R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True,bin=buck.RECUP,bout=[buck.RECUP,buck.SEWR]),
-          Operation('1END','MESS',message=ml.T("1 rinçage effectué!","1 flush done!","1 keer doorspoelen!"),dump=True,bin=buck.RECUP,bout=[buck.RECUP,buck.SEWR]),
-          Operation('Pr2T','HEAT',ref='R', dump=True,programmable=True,bin=buck.RECUP,bout=[buck.RECUP,buck.SEWR]),
+        [ Operation('Pr1T','HEAT',ref='R', dump=True,programmable=True,bin=buck.RECUP,bout=[buck.RECUP,buck.SEWR], kbin=lambda:(TOTAL_VOL if State.empty else 0.0)+(4*TOTAL_VOL),kbout=4*TOTAL_VOL),
+          Operation('Pr1S','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          Operation('Pr1F','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),
+          Operation('Pr1I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True),
+          Operation('Pr1R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+          Operation('1END','MESS',message=ml.T("1 rinçage effectué!","1 flush done!","1 keer doorspoelen!"),dump=True),
+          Operation('Pr2T','HEAT',ref='R', dump=True,programmable=True),
           #Operation('Pr2I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
-          Operation('Pr2I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True,bin=buck.RECUP,bout=[buck.RECUP,buck.SEWR]),
-          Operation('Pr2R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True,bin=buck.RECUP,bout=[buck.RECUP,buck.SEWR]),
+          Operation('Pr2I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True),
+          Operation('Pr2R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('2END','MESS',message=ml.T("2 rinçages effectués!","2 flushes done!","2 keer doorspoelen!"),dump=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
-          Operation('CLEA','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
-          Operation('Pr3T','HEAT',ref='R', dump=True,programmable=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
+          Operation('CLEA','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          Operation('Pr3T','HEAT',ref='R', dump=True,programmable=True),
           #Operation('Pr3I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
-          Operation('Pr3I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
-          Operation('Pr3R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
-          Operation('3END','MESS',message=ml.T("3 rinçages effectués!","3 flushes done!","3 keer doorspoelen!"),dump=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
-          Operation('Pr4T','HEAT',ref='R', dump=True,programmable=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
+          Operation('Pr3I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True),
+          Operation('Pr3R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+          Operation('3END','MESS',message=ml.T("3 rinçages effectués!","3 flushes done!","3 keer doorspoelen!"),dump=True),
+          Operation('Pr4T','HEAT',ref='R', dump=True,programmable=True),
           #Operation('Pr4I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
-          Operation('Pr4I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
-          Operation('Pr4R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
-          Operation('CLOS','MESS',message=ml.T("4 rinçages effectués!","4 flushes done!","4 keer doorspoelen!"),dump=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP)
+          Operation('Pr4I','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='R',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True),
+          Operation('Pr4R','RFLO',duration=lambda:13,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True,),
+          Operation('CLOS','MESS',message=ml.T("4 rinçages effectués!","4 flushes done!","4 keer doorspoelen!"),dump=True,)
           ],
     'V': # Vider le réservoir (aux égouts la plupart du temps)
         [  Operation('VidV','EMPT',base_speed=MAX_SPEED, qty=DRY_VOLUME,dump=True,bin=buck.AIR,bout=buck.RECUP,kbin=DRY_VOLUME,kbout=TOTAL_VOL),
            Operation('CLOS','MESS',message=ml.T("Tuyaux vidés autant que possible.","Pipes emptied as much as possible.","Leidingen zoveel mogelijk geleegd."),dump=True)
         ],
     'A': # Désinfectant acide
-        [ Operation('DesT','HEAT','intake','input',ref='R',dump=False,programmable=True,waitAdd=True,bin=[buck.ACID,buck.WPOT],bout=buck.ACID,kbin=TOTAL_VOL+DILUTE_VOL),
-          Operation('DesS','SEAU','intake','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False,bin=[buck.ACID,buck.WPOT],bout=buck.ACID),
-          Operation('DesF','FILL','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False,bin=[buck.ACID,buck.WPOT],bout=buck.ACID),
-          Operation('DesI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, dump=False,bin=[buck.ACID,buck.WPOT],bout=buck.ACID),
-          Operation('DesN','PAUS','intake','input',ref='A',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),dump=False,bin=buck.ACID,bout=buck.ACID),
-          Operation('Desi','PUMP','intake','input',ref='A',base_speed=MAX_SPEED,qty=START_VOL,dump=False,bin=buck.ACID,bout=buck.ACID),
-          Operation('Desh','TRAK','intake','input',ref='A',base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False,bin=buck.ACID,bout=buck.ACID),
-          Operation('Desf','SUBR',duration=lambda:menus.val('a'),subSequence='a',dump=False,bin=buck.ACID,bout=buck.ACID),
-          Operation('Dess','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False,bin=[buck.ACID,buck.RECUP],bout=buck.ACID),
-          Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False,bin=[buck.ACID,buck.RECUP],bout=buck.ACID),
-          Operation('CLOS','MESS',message=ml.T("Seau d'Acide réutilisable en sortie... Bien rincer!","Reusable Acid Bucket in output... Rinse well!","Herbruikbaar zuur emmer in output... Goed uitspoelen!!"),dump=True,bin=[buck.ACID,buck.RECUP],bout=buck.ACID)
+        [ Operation('DesT','HEAT','intake','input',ref='R',dump=False,programmable=True,waitAdd=True,bin=[buck.ACID,buck.WPOT],bout=buck.ACID,kbin=lambda:(TOTAL_VOL if State.empty else 0.0)+DILUTE_VOL),
+          Operation('DesS','SEAU','intake','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False),
+          Operation('DesF','FILL','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL,dump=False),
+          Operation('DesI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, dump=False),
+          Operation('DesN','PAUS','intake','input',ref='A',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),dump=False,bin=buck.ACID,bout=buck.ACID,kbin=0.0,qbout=True),
+          Operation('Desi','PUMP','intake','input',ref='A',base_speed=MAX_SPEED,qty=START_VOL,dump=False),
+          Operation('Desh','TRAK','intake','input',ref='A',base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
+          Operation('Desf','SUBR',duration=lambda:menus.val('a'),subSequence='a',dump=False),
+          Operation('Dess','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False,bin=[buck.ACID,buck.RECUP],bout=buck.ACID,kbin=TOTAL_VOL,qbin=True,qbout=True),
+          Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
+          Operation('CLOS','MESS',message=ml.T("Seau d'Acide réutilisable en sortie... Bien rincer!","Reusable Acid Bucket in output... Rinse well!","Herbruikbaar zuur emmer in output... Goed uitspoelen!!"),dump=True)
         ],
     'a': # Étape répétée de la désinfection acide
         [ Operation('DesA','PUMP',ref='A', base_speed=MAX_SPEED, qty=4.0,dump=False,bin=buck.ACID,bout=buck.ACID),
-          Operation('DesP','REVR',ref='A', base_speed=MAX_SPEED, qty=-2.0,dump=False,bin=buck.ACID,bout=buck.ACID)
+          Operation('DesP','REVR',ref='A', base_speed=MAX_SPEED, qty=-2.0,dump=False)
         ],
     'D': # Désinfection (fut thermique)
         # [ Operation('Dett','HEAT','intake',ref='R',dump=False,programmable=True),
@@ -1562,68 +1561,68 @@ opSequences = {
         #   Operation('Deth','TRAK','intake','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='D', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
         #   Operation('CLOS','MESS',message=ml.T("DANGER: Eau chaude sous pression. Mettre des gants pour séparer les tuyaux!","DANGER: Hot water under pressure. Wear gloves to separate the pipes!","GEVAAR: Heet water onder druk. Draag handschoenen om de leidingen te scheiden!"),dump=True)
         #   ],
-        [ Operation('DetT','HEAT',ref='D',dump=False,programmable=True,waitAdd=True,bin=[buck.DESI,buck.WPOT],bout=buck.DESI,kbin=TOTAL_VOL+DILUTE_VOL),
-          Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='D',dump=False,bin=[buck.DESI,buck.WPOT],bout=buck.DESI),
-          Operation('DetF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=False,bin=[buck.DESI,buck.WPOT],bout=buck.DESI),
-          Operation('DetI','FLOO',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, ref='D',dump=False,bin=[buck.DESI,buck.WPOT],bout=buck.DESI),
-          Operation('DetN','PAUS',message=ml.T("Mettre dans le seau le désinfectant acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the sanitizer and the 2 pipes, then restart!","Doe het ontsmettingsmiddel en de 2 pijpen in de emmer, en herstart!"),ref='R',dump=False,bin=buck.DESI,bout=buck.DESI),
-          Operation('Deti','PUMP',base_speed=OPT_SPEED,qty=TOTAL_VOL*1.5,ref='D',dump=False,bin=buck.DESI,bout=buck.DESI),
-          Operation('Detn','PAUS',message=ml.T("Laisser tremper si désiré puis redémarrer!","Let soak for a while if desired then restart!","Laat eventueel weken, en herstart!"),ref='D',dump=False,bin=buck.DESI,bout=buck.DESI),
-          Operation('Dets','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='D',dump=False,bin=[buck.DESI,buck.WPOT],bout=buck.DESI),
-          Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=False,bin=[buck.DESI,buck.WPOT],bout=buck.DESI),
-          Operation('Detr','PAUS',message=ml.T("Evacuer le seau de désinfectant et lancer un dernier rinçage!","Remove the bucket with sanitizer and restart for a last rinse!","Verwijder de emmer met ontsmettingsmiddel en herstart aan een laatste spoeling!"),ref='D',dump=False,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
-          Operation('DesR','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=False,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
-          Operation('CLOS','MESS',message=ml.T("Prêt à l'emploi!","Ready to use!","Klaar voor gebruik!"),dump=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP)
+        [ Operation('DetT','HEAT',ref='D',dump=False,programmable=True,waitAdd=True,bin=[buck.DESI,buck.WPOT],bout=buck.DESI,kbin=lambda:(TOTAL_VOL if State.empty else 0.0)+DILUTE_VOL),
+          Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='D',dump=False),
+          Operation('DetF','FILL',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=False),
+          Operation('DetI','FLOO',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, ref='D',dump=False),
+          Operation('DetN','PAUS',message=ml.T("Mettre dans le seau le désinfectant acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the sanitizer and the 2 pipes, then restart!","Doe het ontsmettingsmiddel en de 2 pijpen in de emmer, en herstart!"),ref='R',dump=False,bin=buck.DESI,bout=buck.DESI,kbin=0.0,qbout=True),
+          Operation('Deti','PUMP',base_speed=OPT_SPEED,qty=TOTAL_VOL*1.5,ref='D',dump=False),
+          Operation('Detn','PAUS',message=ml.T("Laisser tremper si désiré puis redémarrer!","Let soak for a while if desired then restart!","Laat eventueel weken, en herstart!"),ref='D',dump=False),
+          Operation('Dets','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='D',dump=False,bin=[buck.DESI,buck.WPOT],bout=buck.DESI,kbin=TOTAL_VOL,qbin=True,qbout=True),
+          Operation('Desf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=False),
+          Operation('Detr','PAUS',message=ml.T("Evacuer le seau de désinfectant et lancer un dernier rinçage!","Remove the bucket with sanitizer and restart for a last rinse!","Verwijder de emmer met ontsmettingsmiddel en herstart aan een laatste spoeling!"),ref='D',dump=False,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP,kbin=TOTAL_VOL,qbout=True),
+          Operation('DesR','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=False),
+          Operation('CLOS','MESS',message=ml.T("Prêt à l'emploi!","Ready to use!","Klaar voor gebruik!"),dump=True)
         ],
     'C': # Détergent
-        [ Operation('NetT','HEAT','intake','input',ref='R',dump=False,programmable=True,waitAdd=True,bin=[buck.CAUS,buck.WPOT],bout=buck.CAUS,kbin=TOTAL_VOL+DILUTE_VOL),
-          Operation('NetS','SEAU','intake','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True,bin=[buck.CAUS,buck.WPOT],bout=buck.CAUS),
-          Operation('NetF','FILL','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, dump=False,bin=[buck.CAUS,buck.WPOT],bout=buck.CAUS),
-          Operation('NetI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL,dump=False,bin=[buck.CAUS,buck.WPOT],bout=buck.CAUS),
-          Operation('NetY','PAUS','intake','input',ref='C',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),dump=False,bin=buck.CAUS,bout=buck.CAUS),
-          Operation('Neti','PUMP','intake','input',ref='C',base_speed=MAX_SPEED,qty=START_VOL,dump=False,bin=buck.CAUS,bout=buck.CAUS),
-          Operation('Neth','TRAK','intake','input',ref='C',base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False,bin=buck.CAUS,bout=buck.CAUS),
-          Operation('Neto','SUBR',duration=lambda:menus.val('c'),subSequence='c',dump=False,bin=buck.CAUS,bout=buck.CAUS),
+        [ Operation('NetT','HEAT','intake','input',ref='R',dump=False,programmable=True,waitAdd=True,bin=[buck.CAUS,buck.WPOT],bout=buck.CAUS,kbin=lambda:(TOTAL_VOL if State.empty else 0.0)+DILUTE_VOL),
+          Operation('NetS','SEAU','intake','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
+          Operation('NetF','FILL','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, dump=False),
+          Operation('NetI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL,dump=False),
+          Operation('NetY','PAUS','intake','input',ref='C',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),dump=False,bin=buck.CAUS,bout=buck.CAUS,kbin=0.0,qbout=True),
+          Operation('Neti','PUMP','intake','input',ref='C',base_speed=MAX_SPEED,qty=START_VOL,dump=False),
+          Operation('Neth','TRAK','intake','input',ref='C',base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
+          Operation('Neto','SUBR',duration=lambda:menus.val('c'),subSequence='c',dump=False),
           #Operation('NetV','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,dump=True),
-          Operation('Nets','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True,bin=[buck.CAUS,buck.WPOT],bout=buck.CAUS),
-          Operation('Netf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False,bin=[buck.CAUS,buck.WPOT],bout=buck.CAUS),
-          Operation('CLOS','MESS',message=ml.T("Seau de Soude réutilisable en sortie... Bien rincer!","Reusable Soda Bucket in output... Rinse well!","Herbruikbaar soda emmer in output... Goed uitspoelen!!"),dump=True,bin=[buck.CAUS,buck.WPOT],bout=buck.CAUS)
+          Operation('Nets','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True,bin=[buck.CAUS,buck.WPOT],bout=buck.CAUS,kbin=TOTAL_VOL,qbin=True,qbout=True),
+          Operation('Netf','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='A',dump=False),
+          Operation('CLOS','MESS',message=ml.T("Seau de Soude réutilisable en sortie... Bien rincer!","Reusable Soda Bucket in output... Rinse well!","Herbruikbaar soda emmer in output... Goed uitspoelen!!"),dump=True)
         ],
     'c': # Étape répétée du nettoyage
         [ Operation('NetC','PUMP',ref='C',base_speed=MAX_SPEED, qty=4.0,dump=False,bin=buck.CAUS,bout=buck.CAUS),
-          Operation('NetP','REVR',ref='C',base_speed=MAX_SPEED, qty=-2.0,dump=False,bin=buck.CAUS,bout=buck.CAUS)
+          Operation('NetP','REVR',ref='C',base_speed=MAX_SPEED, qty=-2.0,dump=False)
           ],
     'P': # Pasteurisation
         [ Operation('PasT','HEAT',ref='P',dump=True,programmable=True,bin=buck.RAW,bout=buck.SEWR,kbin=TOTAL_VOL),
-          Operation('PasI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True,bin=buck.RAW,bout=buck.SEWR),
-          Operation('Pasi','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True,bin=buck.RAW,bout=buck.SEWR),
+          Operation('PasI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Pasi','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('PasE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',dump=True,bin=buck.RAW,bout=buck.PAST,kbin=0.0,qbout=True),
-          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True,bin=buck.RAW,bout=buck.PAST),
-          Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True,bin=buck.RAW,bout=buck.PAST)
+          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
     'I': # Reprise d'une Pasteurisation
         [ Operation('PasT','HEAT',ref='P',dump=True,programmable=True,bin=buck.RAW,bout=buck.PAST,kbin=0.0),
-          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True,bin=buck.RAW,bout=buck.PAST),
-          Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True,bin=buck.RAW,bout=buck.PAST)
+          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
     'E': # Eau pour finir une Pasteurisation en poussant juste ce qu'il faut le lait encore dans les tuyaux
         [ Operation('EauT','HEAT',ref='P',dump=True,programmable=True,bin=buck.WPOT,bout=buck.PAST,kbin=TOTAL_VOL*0.96),
-          Operation('EauI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True,bin=buck.WPOT,bout=buck.PAST),
-          Operation('EauP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True,bin=buck.WPOT,bout=buck.PAST),
-          Operation('EauV','PUMP', base_speed=OPT_SPEED, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,dump=True,cooling=True,bin=buck.WPOT,bout=buck.PAST),
-          Operation('CLOS','MESS',message=ml.T("Faites C quand vous voulez nettoyer!","Press C when you want to clean!","Druk op C als u wilt reinigen!"),dump=True,bin=buck.WPOT,bout=buck.PAST)
+          Operation('EauI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('EauP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('EauV','PUMP', base_speed=OPT_SPEED, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,dump=True,cooling=True),
+          Operation('CLOS','MESS',message=ml.T("Faites C quand vous voulez nettoyer!","Press C when you want to clean!","Druk op C als u wilt reinigen!"),dump=True)
           ],
     'M': # Passer à un lait d'un autre provenance en chassant celui de la pasteurisation précédente
         [ Operation('Mult','HEAT',ref='P',dump=True,programmable=True,bin=buck.RAW2,bout=buck.PAST,kbin=0.0,kbout=TOTAL_VOL*0.96),
-          Operation('Muli','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True,bin=buck.RAW2,bout=buck.PAST),
-          Operation('Mulp','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True,bin=buck.RAW2,bout=buck.PAST),
-          Operation('MulC','PAUS',message=ml.T("Consigne nouveau lait puis une touche pour finir de chasser le 1er lait","Setpoint for New milk then press a key to finish bottling 1st","Instelpunt voor nieuwe melk en druk vervolgens op een toets om het bottelen eerst te beëindigen"),ref='P',dump=True,bin=buck.RAW,bout=buck.PAST),
-          Operation('MulT','HEAT',ref='P',dump=True,bin=buck.RAW2,bout=buck.PAST),
-          Operation('MulP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True,bin=buck.RAW2,bout=buck.PAST),
+          Operation('Muli','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Mulp','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=START_VOL-SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('MulC','PAUS',message=ml.T("Consigne nouveau lait puis une touche pour finir de chasser le 1er lait","Setpoint for New milk then press a key to finish bottling 1st","Instelpunt voor nieuwe melk en druk vervolgens op een toets om het bottelen eerst te beëindigen"),ref='P',dump=True),
+          Operation('MulT','HEAT',ref='P',dump=True),
+          Operation('MulP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('MulE','PAUS',message=ml.T("Contenant pour le nouveau lait!","New Milk container!","Houder voor nieuwe melk!"),ref='P',dump=True,bin=buck.RAW2,bout=buck.PAST2,kbin=0.0,kbout=0.0,qbout=True),
-          Operation('MulH','HEAT',ref='P',dump=True,bin=buck.RAW2,bout=buck.PAST2),
-          Operation('MulI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True,bin=buck.RAW2,bout=buck.PAST2),
-          Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True,bin=buck.RAW2,bout=buck.PAST2)
+          Operation('MulH','HEAT',ref='P',dump=True),
+          Operation('MulI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ]
     }
 
@@ -1670,6 +1669,8 @@ class ThreadPump(threading.Thread):
         self.added = False
         self.forcing = 0
         self.forcible = False
+        self.bin = None
+        self.bout = None
         self.kbin = None
         self.kbout = None
         self.qbin = None
@@ -1695,11 +1696,16 @@ class ThreadPump(threading.Thread):
 
     def startOperation(self,op):
         self.currOperation = op
+        if op.bin is not None:
+            self.bin = op.bin
+            self.bout = op.bin
+        if op.bout is not None:
+            self.bout = op.bout
         if op.kbin is not None:
-            self.kbin = op.kbin
-            self.kbout = op.kbin
+            self.kbin = op.kbin() if callable(op.kbin) else op.kbin
+            self.kbout = self.kbin
         if op.kbout is not None:
-            self.kbout = op.kbout
+            self.kbout = op.kbout() if callable(op.kbout) else op.kbout
         if op.qbin is not None:
             if op.qbin:
                 self.qbin = self.pump.volume()
@@ -2374,7 +2380,7 @@ class WebApiAction:
                         'state': (str(State.current.labels) if State.current else ''),
                         'statecolor': (str(State.current.color) if State.current else 'black'),
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
-                        'added': 2 if T_Pump.added else (1 if letter in DILUTION_ACTIONS else 0),
+                        'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
                         'bucket': 2 if menus.val('s') >= 1.0 else (1 if letter in CITY_WATER_ACTIONS else 0),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[letter][2])+': '+message,
@@ -2418,7 +2424,7 @@ class WebApiState:
                         'state': (str(State.current.labels) if State.current else ''),
                         'statecolor': (str(State.current.color) if State.current else 'black'),
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
-                        'added': 2 if T_Pump.added else (1 if letter in DILUTION_ACTIONS else 0),
+                        'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
                         'bucket': 2 if menus.val('s') >= 1.0 else (1 if letter in CITY_WATER_ACTIONS else 0),
                         'forcing': 2 if T_Pump.forcing else (1 if T_Pump.forcible else 0),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
@@ -2578,13 +2584,13 @@ class WebApiLog:
                         message = str(T_Pump.currOperation.message)
                     else:
                         message = str(menus.operName[T_Pump.currOperation.typeOp])
-                    bin = T_Pump.currOperation.bin
+                    bin = T_Pump.bin
                     if isinstance(bin, list):
                         bin = bin[0 if menus.val('s') < 1.0 else 1]
                     kbin = T_Pump.inTotal(bin)
                     if kbin == 0.0:
                         kbin = None
-                    bout = T_Pump.currOperation.bout
+                    bout = T_Pump.bout
                     if isinstance(bout, list):
                         bout = bout[0 if menus.val('s') < 1.0 else 1]
                     kbout = T_Pump.outTotal(bout)
@@ -2655,7 +2661,7 @@ class WebApiLog:
                             #'opt_T': temper if temper <  99.0 else '', \
                             'opt_M': menus.val('M'), \
                             'opt_temp': opt_temp, \
-                            'added': (2 if T_Pump.added else 1) if T_Pump.currAction in DILUTION_ACTIONS else 0,
+                            'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
                             'bucket': (2 if menus.val('s') >= 1.0 else 1) if T_Pump.currAction in CITY_WATER_ACTIONS else 0,
                             'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['M','E','P','H','I'] else 1), \
                             'pause': 1 if T_Pump.paused else 0, \
