@@ -850,7 +850,7 @@ class ThreadDAC(threading.Thread):
                             prec_heating = heating
                             some_heating = False
                         else:
-                            if heating > prec_heating + 0.2:
+                            if heating > (prec_heating + 0.1):
                                 some_heating = True
                             if (now - lastWatt) > TANK_EMPTY_LIMIT:
                                 if not some_heating:
