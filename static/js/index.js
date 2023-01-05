@@ -148,6 +148,8 @@ function LitersOnLiters(q,k,input) {
     return result;
 }
 
+var t = null;
+
 function fillDisplay(data,logging) {
             if (data && 'date' in data) {
                 var date = data['date'].substring(0,10);
@@ -401,7 +403,7 @@ function fillDisplay(data,logging) {
 $(document).ready(function() {
     var logging = ($("#tableau").length > 0);
     if (logging) {
-        var t = $('#tableau').DataTable( {
+        t = $('#tableau').DataTable( {
             "ajax": "/api/log",
             "order": [[ 0, "desc" ]],
             "ordering":       true,
