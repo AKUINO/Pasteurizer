@@ -171,7 +171,7 @@ FLOOD_PER_MINUTE = 4.0 # liters in a one minute flood from the tap (also used wi
 
 TANK_NOT_FILLED = 1.5 # If heating time remaining is decreasing more than expected (ratio above 1.3 and not 3), the tank may not be filled correctly...
 
-TANK_EMPTY_LIMIT = 60 # If heating time has not diminished in the last 60 seconds, the heating tank may be empty...
+TANK_EMPTY_LIMIT = 45 # If heating time has not diminished in the last 60 seconds, the heating tank may be empty...
 
 menus = Menus.singleton
 menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
@@ -651,7 +651,7 @@ State('s',ml.T('Sale','Dirty','Vies'),'brown', \
       [ ('C',['s','s',['c',None,False]]), ('R',''),('F',''),('V',''),('w','') ] )
 
 State('?','...','black', \
-      [ ('A',['a']),('C',['c']),('D',['d']), ('H','o'),('R','o'),('F','o'),('V','v'),('w','v'),('M','p'),('E','e'),('P','p'),('I','p') ] )
+      [ ('A',['a']),('C',['c']),('D',['d']), ('H','o'),('R','o'),('F','o'),('V','v'),('w','v'),('M','p'),('E','e'),('P','p'),('I','p'),['Z',''] ] )
 
 
 def menu_confirm(choice,delay=None):
@@ -852,10 +852,15 @@ class ThreadDAC(threading.Thread):
                         else:
                             if heating > prec_heating + 0.1:
                                 some_heating = True
-                            if (now - lastWatt) > TANK_EMPTY_LIMIT and not some_heating:
-                                self.empty_tank = True
-                                print("EMPTY TANK, stop heating!")
-                                self.dacSetting.set(0)
+                            if (now - lastWatt) > TANK_EMPTY_LIMIT:
+                                if not some_heating:
+                                    self.empty_tank = True
+                                    print("EMPTY TANK, stop heating!")
+                                    self.dacSetting.set(0)
+                                else:
+                                    lastWatt = now
+                                    prec_heating = heating
+                                    some_heating = False
                     else:
                         self.dacSetting.set(0)
                         lastWatt = 0
