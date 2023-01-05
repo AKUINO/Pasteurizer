@@ -113,8 +113,16 @@ $if not paving:
                 </tr>
         </table>
     $if connected and letter:
-            <hr/>
-            <a name="doc"></a>
+            <div class="modal fade" id="modalDocumentation" tabindex="-1" role="dialog" aria-labelledby="modalDocumentationTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalDocumentationTitle">$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
             <ul id="documentation">
             $if letter == 'F':
               $if ml.lang == 'f':
@@ -140,12 +148,12 @@ $if not paving:
                 §Het spoelwater kan worden opgevangen voor een andere keer: het wordt dan gebruikt voor de eerste twee van de 4 spoelingen.
             $if letter == 'P':
               $if ml.lang == 'f':
-                <li>La pasteurisation prend le lait crû (ou autre boisson) et le chauffe le temps requis (configurable entre 15 et 30 secondes) à la température requise (configurable entre 60 et 89°C).
+                <li>La pasteurisation prend le lait crû (ou autre boisson), chauffe le temps requis (configurable entre 15 et 30 secondes) à la température requise (configurable entre 60 et 89°C).
                 <li>Nettoyer l'extérieur du tuyau d’entrée puis le mettre dans le bidon de lait crû (ou autre boisson).
                 <li>Le tuyau de sortie fournira d'abord l'eau contenue dans le pasteurisateur (5 litres). Il y aura ensuite une pause pour que vous puissiez le brancher à la cuve de sortie lorsque le lait arrive.
                 <li>Cette cuve devra être impeccablement vide, propre et désinfectée.
                 <li>Le bouton vert permet de reprendre. Le bouton jaune permet de faire une pause (par exemple, pour passer d'un bidon de lait crû au suivant).
-                <li>Lorsque tous les bidons d'entrée ont été aspirés, la commande "E"(Pousse-à-l'eau) prendra 5L d’eau propre d'un bidon d’entrée pour pousser le lait qui reste vers la sortie du circuit.
+                <li>Lorsque tous les bidons d'entrée ont été vidés, la commande "E"(Pousse-à-l'eau) prendra 5L d’eau propre d'un seau en entrée pour pousser le lait qui reste vers la sortie du circuit.
               $if ml.lang == 'e':
                 <li>&nbsp;</li>
             $if letter == "I":
@@ -154,83 +162,77 @@ $if not paving:
                 <li>Garder le tuyau d’entrée dans le bidon de lait crû (ou autre boisson) et le tuyau de sortie branché à la cuve de sortie.
                 <li>La pasteurisation reprend alors directement.
                 <li>Le bouton vert permet de reprendre. Le bouton jaune permet de faire une pause (par exemple, pour passer d'un bidon de lait crû au suivant).
-                <li>Lorsque tous les bidons d'entrée ont été aspirés, la commande "E"(Pousse-à-l'eau) prendra 5L d’eau propre d'un bidon d’entrée pour pousser le lait qui reste vers la sortie du circuit.
+                <li>Lorsque tous les bidons d'entrée ont été vidés, la commande "E"(Pousse-à-l'eau) prendra 5L d’eau propre d'un seau en entrée pour pousser le lait qui reste vers la sortie du circuit.
               $if ml.lang == 'e':
                 <li>&nbsp;</li>
             $if letter == 'E':
               $if ml.lang == 'f':
-                <li>Quand il n’y a plus de lait crû dans le bidon d’entrée, il faut encore chasser le lait qui reste dans la machine. De l’eau est nécessaire et la machine arrête juste à temps pour ne pas la mettre dans le tampon de sortie...</li>
-                <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
-                <li>Mettre le tuyau d’entrée dans le bidon de lait crû et utiliser le tuyau de sortie avec la pince de Mohr pour embouteiller.
-                <li>Mettez au préalable 4L d’eau propre dans le bidon d’entrée.
-                <li>La pompe sera automatiquement arrêtée quand assez d’eau aura été pompée pour chasser tout le lait restant dans la machine.
-                <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
+                <li>Quand il n’y a plus de lait crû (ou autre boisson) à traiter, il faut encore chasser ce qui reste dans la machine.
+                <li>De l’eau est nécessaire et le pasteurisateur arrête juste à temps pour ne pas en mettre dans la cuve de sortie...
+                <li>Cette commande prendra 5L d’eau propre d'un seau en entrée pour pousser le lait qui reste vers la sortie du circuit.
+                <li>Le bouton jaune permet de faire une pause (par exemple, pour passer d'un bidon de lait crû au suivant). Le bouton vert permet de reprendre.
               $if ml.lang == 'e':
                 <li>&nbsp;</li>
             $if letter == 'M':
               $if ml.lang == 'f':
                 <li>Quand on change les paramètres de chauffe (par exemple, passer du Yaourt au Lait à embouteiller), il faut en terminer avec le lait qui a été traité selon un premier jeu de consignes
                     (temps configurable entre 15 et 30 secondes; température configurable entre 60 et 89°C).).
-                    On met déjà le nouvau lait (ou mélange) en entrée et la machine arrête juste à temps pour d'abord changer la consigne de pasteurisation si désiré
+                    On met déjà le nouvau lait (ou mélange) en entrée et la machine arrête juste à temps pour changer la consigne de pasteurisation si désiré
                     et, une deuxième fois, pour changer le récipient de sortie...</li>
-                <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
-                <li>Mettre le tuyau d’entrée dans le bidon de lait crû et utiliser le tuyau de sortie avec la pince de Mohr pour embouteiller.
-                <li>Mettez au préalable le nouveau lait/mélange en entrée.
-                <li>La pompe sera automatiquement arrêtée une première fois quand assez aura été pompé pour amener le nouveau lait/mélange à la pasteurisation: vous pourrez alors changer la consigne de température si désiré.
-                <li>La pompe sera automatiquement arrêtée une seconde fois quand assez aura été pompé pour chasser tout le lait restant dans la machine (et que le lait/mélange suivant commence à arriver).
-                <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
+                <li>Mettre le tuyau d’entrée dans le bidon de lait crû (ou autre boisson) à traiter selon la nouvelle consigne. Ne pas changer tout de suite le tuyau de sortie.
+                <li>La pompe sera automatiquement arrêtée une première fois quand elle aura pompé assez pour amener le nouveau lait/boisson à la pasteurisation: vous pourrez alors changer la consigne de temps et/ou de température si désiré.
+                <li>La pompe sera automatiquement arrêtée une seconde fois quand assez aura pompé assez pour chasser tout le lait de la première consigne restant dans la machine (et que le lait/mélange suivant commence à arriver en sortie).
+                <li>Le bouton vert permet de reprendre. Le bouton jaune permet de faire une pause (par exemple, pour passer d'un bidon de lait crû au suivant).
               $if ml.lang == 'e':
                 <li>&nbsp;</li>
             $if letter == 'R':
               $if ml.lang == 'f':
-                <li>Votre pasteurisateur a été utilisé et il est sale...
-                <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
-                <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
-                <li>Un « Flush » d’eau chaude sanitaire (45°C) est effectué au préalable.
-                <li>L’eau de rinçage est cyclée 3 minutes à 45°C.
-                <li>V : l’eau est vidée vers l’égout en fin de cycle (environ 5L).
+                <li>Votre pasteurisateur a été utilisé et il est sale... Ou des produits chimiques ont été utilisés et il faut en enlever toute trace.
+                <li>4 cycles de rinçage sont effectués. Les deux premiers peuvent utiliser de l'eau recyclée (provenant de rinçages précédents). Les deux derniers doivent se faire avec de l'eau fraîche et potable.</li>
+                <li>On utilise soit l’eau potable du réseau ou celle d'un seau.
+                <li>Pour l'eau du réseau: mettez le tuyau d’entrée et le tuyau de sortie dans un même seau ou au dessus d'un égout.
+                <li>Pour l'eau d'un seau, mettez le tuyau d’entrée dans celui-ci et le tuyau de sortie dans un autre.
+                <li>Faîtes attention à ce que les seaux fassent au moins 20L si vous faites 4 rinçages.
               $if ml.lang == 'e':
                 <li>&nbsp;</li>
             $if letter == 'C':
               $if ml.lang == 'f':
-                <li>Votre pasteurisateur a été rincé sommairement mais il faut le nettoyer en profondeur.
-                <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
-                <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
-                <li>Un remplissage d’eau chaude sanitaire (45°C) est effectué au préalable.
-                <li>Vous pourrez y mettre un détergent (caustique) pour NEP (CIP) dilué dans le tampon de sortie selon les instructions du fabricant du détergent.
-                <li>Tenez compte du niveau d’eau (graduations en Litres sur le tampon) et de l’eau dans le pasteurisateur (3.5L) pour calculer les quantités nécessaires.
-                <li>Le détergent ainsi dilué est circulé 15 minutes à 45°C.
-                <li>Il est vidé vers l’égout en fin de cycle (environ 5L).
+                <li>Votre pasteurisateur a été rincé mais il faut le nettoyer en profondeur.
+                <li>Le tuyau d'entrée et celui de sortie sont mis ensemble dans un seau d’au moins 10L.
+                <li>On peut réutiliser un seau de produit de nettoyage une ou deux fois dans la même semaine. Il faut indiquer que le seau est déjà rempli.
+                <li>Sinon, un remplissage d’eau potable est effectué au préalable et une confirmation (bouton vert) est demandée pour confirmer que le produit de nettoyage a été ajoutée selon la quantité requise par son fabricant.
+                    La quantité totale d'eau est de 5L dans le pasteurisateur + 2L = 7 litres.
+                <li>Le détergent ainsi dilué est circulé 30 minutes à 70°C maximum, 57°C minimum (consignes modifiables).
               $if ml.lang == 'e':
                 <li>&nbsp;</li>
             $if letter == 'A':
               $if ml.lang == 'f':
-                <li>Votre pasteurisateur a été nettoyé mais il faut encore le désinfecter.
-                <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
-                <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
-                <li>Un remplissage d’eau chaude sanitaire (45°C) est effectué au préalable pour obtenir l’eau nécessaire.
-                <li>Vous pourrez y mettre un désinfectant (acide ou caustique) pour NEP (CIP) dilué dans le tampon de sortie selon les instructions du fabricant du désinfectant.
-                <li>Tenez compte du niveau d’eau (graduations en Litres sur le tampon) et de l’eau dans le pasteurisateur (3.5L) pour calculer les quantités nécessaires.
-                <li>Le désinfectant ainsi dilué est circulé 5 minutes à 55°C.
-                <li>Il est vidé vers l’égout en fin de cycle (environ 5L).
+                <li>Votre pasteurisateur a été rincé et nettoyé mais il faut enlever les dépots minéraux à la fin d'une grosse semaine. Un produit acide spécialement formulé fait ce travail.
+                <li>Le tuyau d'entrée et celui de sortie sont mis ensemble dans un seau d’au moins 10L.
+                <li>Un remplissage d’eau potable est effectué au préalable et une confirmation (bouton vert) est demandée pour confirmer que le produit de nettoyage a été ajouté selon la quantité requise par son fabricant.
+                    La quantité totale d'eau est de 5L dans le pasteurisateur + 2L = 7 litres.
+                <li>Le détergent ainsi dilué est circulé 10 minutes à 50°C maximum, 37°C minimum (consignes modifiables).
               $if ml.lang == 'e':
                 <li>&nbsp;</li>
             $if letter == 'D':
               $if ml.lang == 'f':
-                <li>Votre pasteurisateur a été nettoyé mais il faut encore le désinfecter.
-                <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
-                <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
-                <li>Un remplissage d’eau chaude sanitaire (45°C) est effectué au préalable pour obtenir l’eau nécessaire.
-                <li>Vous pourrez y mettre un désinfectant (acide ou caustique) pour NEP (CIP) dilué dans le tampon de sortie selon les instructions du fabricant du désinfectant.
-                <li>Tenez compte du niveau d’eau (graduations en Litres sur le tampon) et de l’eau dans le pasteurisateur (3.5L) pour calculer les quantités nécessaires.
-                <li>Le désinfectant ainsi dilué est circulé 5 minutes à 55°C.
-                <li>Il est vidé vers l’égout en fin de cycle (environ 5L).
+                <li>Votre pasteurisateur a été nettoyé mais il faut toujours le désinfecter juste avant utilisation.
+                <li>Le tuyau d'entrée et celui de sortie sont mis ensemble dans un seau d’au moins 10L.
+                <li>Un remplissage d’eau potable est effectué au préalable et une confirmation (bouton vert) est demandée pour confirmer que le produit de désinfection a été ajouté selon la quantité requise par son fabricant.
+                    La quantité totale d'eau est de 5L dans le pasteurisateur + 2L = 7 litres.
+                <li>Le désinfectant ainsi dilué est circulé une fois et le pasteurisateur se met en pause. Le bouton vert permet de redémarrer après avoir laissé le désinfectant agir 15 minutes (concentration normale) ou plusieurs jours (concentration réduite au quart).
               $if ml.lang == 'e':
                 <li>&nbsp;</li>
             </ul>
             <p class="alert alert-warning">$(menus.actionName[letter][2])</p>
-            <a class="btn btn-success" href="#" onclick="action('$letter')" id="confirm">$(ml.T("Confirmer","Confirm","Bevestigen")) $letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
-            <a class="btn btn-warning" href="/" id="cancel">$(ml.T("Annuler","Cancel","Annuleer"))</a>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" href="/" id="cancel">$(ml.T("Annuler","Cancel","Annuleer"))</button>
+                            <button type="button" class="btn btn-primary" onclick="action('$letter')" id="confirm">$(ml.T("Confirmer","Confirm","Bevestigen")) $letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
     $if not connected :
         <div>
             <h4>$(ml.T("Cette application gère votre pasteurisateur accessible","This app manages your affordable flow pasteuriser","Deze app beheert uw betaalbare continu pasteurisator")).</h4>

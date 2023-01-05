@@ -498,7 +498,7 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                        # ,ml.T("Entrée à la soupape, Sortie à la vanne bleue.","Inlet at the valve, Outlet at the blue valve.","Inlaat bij de klep, uitlaat bij de blauwe klep.") \
                        # ,ml.T("Cycle complet de nettoyage","Complete cleaning cycle","Volledige reinigingscyclus")],
                'F':['F',ml.T("Flush","Flush","Flush") \
-                       ,ml.T("Entrée et Sortie connectés, Vidange...","Inlet and Outlet connected, Drain ...","Inlaat bij de klep, Uitlaat bij de blauwe klep, Afvoer ...") \
+                       ,ml.T("Entrée et Sortie dans un seau. Récupération?","Inlet and Outlet in the same bucket. Recycling?","Inlaat en uitlaat in dezelfde emmer. Recyclen?") \
                        ,ml.T("Rinçage à l'eau de ville","Rinse with city water","Spoelen met stadswater")], \
                'H':['H',ml.T("Eau pasteurisée","Pasteurized Water","Flush") \
                        ,ml.T("Sortie là où rincer","Outlet where to rince","Uitlaat waar spoelen") \
@@ -525,23 +525,23 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                        ,ml.T("Nouveau lait entrée et un récipient pasteurisé en sortie","New milk inlet and a pasteurized container outlet","Nieuwe melk bij de inlaat en een gepasteuriseerde container bij de uitlaat") \
                        ,ml.T("Passer à un autre lait","Switch to another milk","Overschakelen naar een andere melk")],
                'R':['R',ml.T("Rinçage (4 Flush)","Rinse (4 Flush)","Spoelen (4 Flush)") \
-                       ,ml.T("Entrée et Sortie connectés, Vidange...","Inlet and Outlet connected, Drain ...","Inlaat bij de klep, Uitlaat bij de blauwe klep, Afvoer ...") \
+                       ,ml.T("Entrée et Sortie dans un seau. Récupération?","Inlet and Outlet in the same bucket. Recycling?","Inlaat en uitlaat in dezelfde emmer. Recyclen?") \
                        ,ml.T("Rincer à fond les tuyaux","Rinse the pipes thoroughly","Spoel de leidingen grondig af")],
                'C':['C',ml.T("net.Caustique","Caustic clean","Bijtend Schoon") \
-                       ,ml.T("Entrée et Sortie dans un seau, Ajouter le Détergent...","Inlet and Outlet connected and in a bucket, Add Detergent ...","Input en output aangesloten en in een emmer, Wasmiddel toevoegen ...") \
+                       ,ml.T("Entrée et Sortie dans un même seau, Ajouter le Détergent...","Inlet and Outlet in a bucket, Add Detergent ...","Inlaat en uitlaat in dezelfde emmer. Wasmiddel toevoegen ...") \
                        ,ml.T("Nettoyer avec un détergent (caustique)","Clean with detergent (caustic)","Reinig met afwasmiddel (bijtend)")],
                'D':['D',ml.T("Désinfection","Disinfct","Desinfect.") \
-                       ,ml.T("Entrée et Sortie connectés et dans un seau","Inlet and Outlet connected and in a bucket","Input en output aangesloten en in een emmer") \
+                       ,ml.T("Entrée et Sortie dans un même seau","Inlet and Outlet in a bucket","Inlaat en uitlaat in dezelfde emmer.") \
                        ,ml.T("Désinfecter avec le produit approprié","Disinfect with sanitizer","Desinfecteren met ontsmettingsmiddel")], \
                'A':['A',ml.T("net.Acide","Acidic clean","Zuur") \
-                       ,ml.T("Entrée et Sortie connectés et dans un seau, Ajouter le Désinfectant...","Inlet and Outlet connected and in a bucket, Add Disinfectant ...","Input en output aangesloten en in een emmer, Desinfectiemiddel toevoegen ...") \
+                       ,ml.T("Entrée et Sortie dans un même seau, Ajouter le nettoyant acide...","Inlet and Outlet in the same bucket, Add Acidic cleaner...","Inlaat en uitlaat in dezelfde emmer. Zuur wasmiddel toevoegen ...") \
                        ,ml.T("Désinfecter les tuyaux (acide)","Disinfect pipes (acid)","Desinfecteer leidingen (zuur)")], \
                'S':['S',ml.T("pauSe","pauSe","pause") \
-                       ,ml.T("s=arrêter / S=redémarrer / V=vidanger / Z=arrêter l'opération en cours","s = stop / S = restart / V = drain / Z = stop the operation in progress","s = stop / S = herstart / V = afvoer / Z = stop de lopende operatie") \
+                       ,ml.T("Pause: bouton vert pour redémarrer","Pause: Green button to restart","Groene knop om opnieuw te starten") \
                        ,ml.T("Suspendre ou arrêter l'opération en cours","Suspend or stop the current operation","Onderbreek of stop de huidige bewerking")],
                'O':['O',ml.T("Option","Option","Opties") \
-                       ,ml.T("Paramètres TEMPORAIRES de fonctionnement","TEMPORARY operating parameters","TIJDELIJKE bedrijfsparameters") \
-                       ,ml.T("Changement temporaire de paramètres","Temporary change of parameters","Tijdelijke wijziging van parameters")],
+                       ,ml.T("Paramètres de fonctionnement","Operating parameters","Bedrijfsparameters") \
+                       ,ml.T("Changement de paramètres","Change of parameters","Wijziging van parameters")],
                'Y':['Y',ml.T("Yaourt","Yogurt","Yoghurt") \
                        ,ml.T("Pasteuriser pour Yaourt","Pasteurize for Yogurt","Pasteuriseren voor yoghurt") \
                        ,ml.T("Température pour Yaourt","Temperature for Yogurt","Temperatuur voor yoghurt")],

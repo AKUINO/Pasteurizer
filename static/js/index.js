@@ -420,6 +420,8 @@ $(document).ready(function() {
                 }
             ]
         } ).draw();
+    } else {
+       $('#modalDocumentation').modal({});
     }
 
     setInterval ( function() {
@@ -445,6 +447,7 @@ function action(letter) {
         timeout: 3000, // sets timeout to 3 seconds
         success: function(data) { fillDisplay(data,false); }
   });
+  $('#modalDocumentation').modal('hide');
   $('#confirm').hide();
   $('#cancel').hide();
   if (letter == 'Z') {
