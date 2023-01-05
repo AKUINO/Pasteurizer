@@ -2616,11 +2616,11 @@ class WebApiLog:
             if intake < 1.0 or input < 1.0 or warranty < 1.0 or heating < 1.0:
                 danger = str(ml.T('Capteur déconnecté?',"Sensor disconnected?","Sensor losgekoppeld?"))
             elif intake > 99.0 or input > 99.0 or warranty > 99.0 or heating > 99.0:
-                danger = ml.T('Capteur cassé?',"Sensor broken?","Sensor kapot?")
+                danger = str(ml.T('Capteur cassé?',"Sensor broken?","Sensor kapot?"))
             elif T_DAC.empty_tank:
-                danger = str(ml.T('Cuve de chauffe VIDE?','Heating tank EMPTY?','Verwarmingstank LEEG?'))
+                danger = str(ml.T('Cuve de chauffe VIDE ou déconnectée?','Heating tank EMPTY or disconnected?','Verwarmingstank LEEG of losgemaakte?'))
             elif warning:
-                danger = ml.T('Cuve de chauffe mal remplie?','Heating tank not correctly filled?','Verwarmingstank niet correct gevuld?')
+                danger = str(ml.T('Cuve de chauffe mal remplie?','Heating tank not correctly filled?','Verwarmingstank niet correct gevuld?'))
             currLog = {     'date': str(datetime.fromtimestamp(int(nowT))), \
                             'actif': 1 if actif else 0, \
                             'actionletter': T_Pump.currAction, \
@@ -2632,11 +2632,11 @@ class WebApiLog:
                             'danger': danger,
                             'bin' : bin.name if bin else None,
                             'bout' : bout.name if bout else None,
-                            'tbin' : str(ml.T(in_FR[bin],in_EN[bin],in_NL[bin])) if bin != bout else None,
-                            'tbout' : str(ml.T(in_FR[bout],in_EN[bout],in_NL[bout])),
-                            'qbin' : T_Pump.inCurrent(bin) if bin != bout else None,
-                            'kbin' : kbin if bin != bout else None,
-                            'qbout' : T_Pump.outCurrent(bout),
+                            'tbin' : str(ml.T(in_FR[bin],in_EN[bin],in_NL[bin])) if bin and bin != bout else None,
+                            'tbout' : str(ml.T(in_FR[bout],in_EN[bout],in_NL[bout])) if bout else None,
+                            'qbin' : T_Pump.inCurrent(bin) if bin and bin != bout else None,
+                            'kbin' : kbin if bin and bin != bout else None,
+                            'qbout' : T_Pump.outCurrent(bout) if bout else None,
                             'kbout' : kbout,
                             #'greasy': ('G' if State.greasy else 'J'),
                             'state': (str(State.current.labels) if State.current else ''),
