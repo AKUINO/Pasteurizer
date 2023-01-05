@@ -924,7 +924,7 @@ class ThreadDAC(threading.Thread):
                 quantityRemaining = self.T_Pump.quantityRemaining()
                 try:
                     data_file = open(DIR_DATA_CSV + fileName+".csv", "a")
-                    data_file.write("%d\t%s%s%s\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
+                    data_file.write("%d\t%s%s%s\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
                                     % (int(nowT), \
                                        State.current.letter if State.current else '', \
                                        'V' if State.empty else 'W', \
