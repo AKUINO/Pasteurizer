@@ -61,7 +61,7 @@ $if not paving:
                 <tr>
                     <td id="OUTbucket" rowspan="2"><span id="tbout"></span><br/><span id="qbout"></span></td>
                     <td colspan="5">&nbsp;</td>
-                    <td class="Ushape" rowspan="4"><div class="Oshape"><div class="Drotate"><span class="glyphicon glyphicon-random show-flow"></span></div><span id="Dwarranty">&nbsp;<b id="warranty"></b>°&nbsp;</span></div><span id="Dheating">&nbsp;<b id="heating"></b>°&nbsp;</span></td>
+                    <td class="Ushape" rowspan="4" id="Dheating"><div class="Oshape" id="Dwarranty"><div class="Drotate"><span class="glyphicon glyphicon-random show-flow"></span></div><span>&nbsp;<b id="warranty"></b>°&nbsp;</span></div><span>&nbsp;<b id="heating"></b>°&nbsp;</span></td>
                 </tr>
                 <tr>
                     <td class="Lshape" colspan="2"><span id="level2"><big><b style="color:red">X</b></big></span><small>&lt;$(ml.T("Sortie","Output","Uitvoer"))</small>&nbsp;<span class="glyphicon show-flow show-empty backward"></span></td>
@@ -140,35 +140,23 @@ $if not paving:
                 §Het spoelwater kan worden opgevangen voor een andere keer: het wordt dan gebruikt voor de eerste twee van de 4 spoelingen.
             $if letter == 'P':
               $if ml.lang == 'f':
-                <li>La pasteurisation prend le lait crû et le chauffe le temps requis (configurable entre 15 et 30 secondes) à la température requise (configurable choix entre 60 et 89°C).
+                <li>La pasteurisation prend le lait crû (ou autre boisson) et le chauffe le temps requis (configurable entre 15 et 30 secondes) à la température requise (configurable entre 60 et 89°C).
                 <li>Nettoyer l'extérieur du tuyau d’entrée puis le mettre dans le bidon de lait crû (ou autre boisson).
-                <li>Brancher le tuyau de sortie à la cuve de sortie.
-                <li>Un premier remplissage s’effectue et la pompe s’arrête ensuite : vous devez alors vous assurer que la cuve de sortie est vidée pour ne pas avoir du lait pasteurisé dilué avec de l’eau. Une confirmation permet de reprendre ensuite.
-                <li>Le bouton vert permet de reprendre. Le bouton jaune permet de faire une pause. Le bouton rouge permet d’arrêter totalement.
-                <li>Pour l’arrêt (E), mettre 4L d’eau dans le bidon d’entrée pour chasser le lait qui reste dans le circuit.
+                <li>Le tuyau de sortie fournira d'abord l'eau contenue dans le pasteurisateur (5 litres). Il y aura ensuite une pause pour que vous puissiez le brancher à la cuve de sortie lorsque le lait arrive.
+                <li>Cette cuve devra être impeccablement vide, propre et désinfectée.
+                <li>Le bouton vert permet de reprendre. Le bouton jaune permet de faire une pause (par exemple, pour passer d'un bidon de lait crû au suivant).
+                <li>Lorsque tous les bidons d'entrée ont été aspirés, la commande "E"(Pousse-à-l'eau) prendra 5L d’eau propre d'un bidon d’entrée pour pousser le lait qui reste vers la sortie du circuit.
               $if ml.lang == 'e':
-                <li> Pasteurization takes the raw milk and heats it for the required time (between 15 and 30 seconds) to the required temperature (your choice between 60 and 85 ° C).
-                <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece that was inserted there)
-                <li> Clean the outside of the inlet pipe and then put it in the container of raw milk (or juice).
-                <li> Connect the outlet hose to the outlet tank.
-                <li> A first filling takes place and the pump then stops: you must then make sure that the outlet tank is emptied so as not to have pasteurized milk diluted with water. A confirmation allows you to resume then.
-                <li> The green button allows you to resume. The yellow button allows you to pause. The red button allows you to stop completely.
-                <li> For shutdown (E), put 4L of water in the inlet container to flush out the milk that remains in the circuit.
+                <li>&nbsp;</li>
             $if letter == "I":
               $if ml.lang == 'f':
-                <li>Si vous produisez du Lait puis du Yaourt, vous devrez interrompre pour changer la température de pasteurisation. Et il faut ensuite reprendre le traitement...
-                <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
-                <li>Mettre le tuyau d’entrée dans le bidon de lait crû et utiliser le tuyau de sortie avec la pince de Mohr pour embouteiller.
-                <li>Pour l’arrêt (E), mettre 4L d’eau dans le bidon d’entrée pour chasser le lait qui reste dans le circuit.
-                <li>La pasteurisation reprend directement avec les paramètres éventuellement modifiés.
-                <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
+                <li>Si une panne électrique ou une autre cause interrompt la pasteurisation, il faut reprendre le traitement dès que possible...
+                <li>Garder le tuyau d’entrée dans le bidon de lait crû (ou autre boisson) et le tuyau de sortie branché à la cuve de sortie.
+                <li>La pasteurisation reprend alors directement.
+                <li>Le bouton vert permet de reprendre. Le bouton jaune permet de faire une pause (par exemple, pour passer d'un bidon de lait crû au suivant).
+                <li>Lorsque tous les bidons d'entrée ont été aspirés, la commande "E"(Pousse-à-l'eau) prendra 5L d’eau propre d'un bidon d’entrée pour pousser le lait qui reste vers la sortie du circuit.
               $if ml.lang == 'e':
-                <li> If you produce Milk and then Yogurt, you will need to interrupt to change the pasteurization temperature. And then you have to resume treatment ...
-                <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece that was inserted there)
-                <li> Put the inlet hose into the raw milk container and use the outlet hose with Mohr's clamp to bottle.
-                <li> For shutdown (E), put 4L of water in the inlet container to flush out the milk that remains in the circuit.
-                <li> Pasteurization resumes directly with any modified parameters.
-                <li> A yellow button allows you to pause (then resume). A red button allows you to stop completely.
+                <li>&nbsp;</li>
             $if letter == 'E':
               $if ml.lang == 'f':
                 <li>Quand il n’y a plus de lait crû dans le bidon d’entrée, il faut encore chasser le lait qui reste dans la machine. De l’eau est nécessaire et la machine arrête juste à temps pour ne pas la mettre dans le tampon de sortie...</li>
@@ -178,15 +166,11 @@ $if not paving:
                 <li>La pompe sera automatiquement arrêtée quand assez d’eau aura été pompée pour chasser tout le lait restant dans la machine.
                 <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
               $if ml.lang == 'e':
-                <li> When there is no more raw milk in the input canister, you still have to flush out the milk that remains in the machine. Water is needed and the machine stops just in time so as not to put it in the outlet buffer ... </li>
-                <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece that was inserted there)
-                <li> Put the inlet hose into the raw milk container and use the outlet hose with Mohr's clamp to bottle.
-                <li> First put 4L of clean water in the inlet container.
-                <li> The pump will automatically stop when enough water has been pumped to flush all the milk remaining in the machine.
-                <li> A yellow button allows you to pause (then resume). A red button allows you to stop completely.
+                <li>&nbsp;</li>
             $if letter == 'M':
               $if ml.lang == 'f':
-                <li>Quand on change de lait crû (autre exploitant, autre composition...), il faut en terminer avec le lait qui reste dans la machine.
+                <li>Quand on change les paramètres de chauffe (par exemple, passer du Yaourt au Lait à embouteiller), il faut en terminer avec le lait qui a été traité selon un premier jeu de consignes
+                    (temps configurable entre 15 et 30 secondes; température configurable entre 60 et 89°C).).
                     On met déjà le nouvau lait (ou mélange) en entrée et la machine arrête juste à temps pour d'abord changer la consigne de pasteurisation si désiré
                     et, une deuxième fois, pour changer le récipient de sortie...</li>
                 <li>Détacher les tuyaux d’entrée et de sortie (bien enfoncer la bague du « push-in » et retirer l’embout qui y était inséré)
@@ -196,32 +180,7 @@ $if not paving:
                 <li>La pompe sera automatiquement arrêtée une seconde fois quand assez aura été pompé pour chasser tout le lait restant dans la machine (et que le lait/mélange suivant commence à arriver).
                 <li>Un bouton jaune permet de faire une pause (puis de reprendre). Un bouton rouge permet d’arrêter totalement.
               $if ml.lang == 'e':
-                <li> When you change raw milk (other producer, other composition ...), you have to finish with the milk that remains in the machine.
-                We already put the new milk (or mixture) in and the machine stops just in time to first change the pasteurization setpoint if desired.
-                and, a second time, to change the outlet container ... </li>
-                <li> Detach the inlet and outlet pipes (press the "push-in" ring firmly and remove the end piece inserted there)
-                <li> Put the inlet hose into the raw milk container and use the outlet hose with Mohr's clamp to bottle.
-                <li> Put the new milk / mixture as a starter first.
-                <li> The pump will be automatically stopped for the first time when enough has been pumped to bring the new milk / mixture to pasteurization: you can then change the temperature set point if desired.
-                <li> The pump will automatically be stopped a second time when enough has been pumped to drive out any milk remaining in the machine (and the next milk / mixture begins to flow).
-                <li> A yellow button allows you to pause (then resume). A red button allows you to stop completely.
-            $if letter == 'y':
-              $if ml.lang == 'f':
-                <li>Votre pasteurisateur a été utilisé et il est sale : il se nettoie presque tout seul...
-                <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
-                <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
-                <li>TOUTES les opérations suivantes seront enchaînées automatiquement jusqu’à la désinfection incluse.
-                <li>Des pauses sont insérées au moment où il faut mettre le détergent ou le désinfectant.
-                <li>Il n’y a pas de rinçage final pour conserver l’acide dans les tuyaux.
-                <li>Si vous faites une désinfection caustique (percarbonate de soude), il vaut sans doute mieux rincer sommairement à la fin (F).
-              $if ml.lang == 'e':
-                <li> Your pasteurizer has been used and it is dirty: it almost cleans itself ...
-                <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
-                <li> Make sure the sewer pipe goes into a bucket of at least 20L.
-                <li> ALL the following operations will be chained automatically up to the included disinfection.
-                <li> Pauses are inserted when the detergent or disinfectant needs to be put on.
-                <li> There is no final rinse to keep the acid in the pipes.
-                <li> If you are doing a caustic disinfection (sodium percarbonate), it is probably best to rinse briefly at the end (F).
+                <li>&nbsp;</li>
             $if letter == 'R':
               $if ml.lang == 'f':
                 <li>Votre pasteurisateur a été utilisé et il est sale...
@@ -231,12 +190,7 @@ $if not paving:
                 <li>L’eau de rinçage est cyclée 3 minutes à 45°C.
                 <li>V : l’eau est vidée vers l’égout en fin de cycle (environ 5L).
               $if ml.lang == 'e':
-                <li> Your pasteurizer has been used and it is dirty ...
-                <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
-                <li> Make sure the sewer pipe goes into a bucket of at least 20L.
-                <li> A domestic hot water "flush" (45 ° C) is carried out beforehand.
-                <li> The rinsing water is cycled for 3 minutes at 45 ° C.
-                <li> V: the water is emptied to the sewer at the end of the cycle (about 5L).
+                <li>&nbsp;</li>
             $if letter == 'C':
               $if ml.lang == 'f':
                 <li>Votre pasteurisateur a été rincé sommairement mais il faut le nettoyer en profondeur.
@@ -248,14 +202,7 @@ $if not paving:
                 <li>Le détergent ainsi dilué est circulé 15 minutes à 45°C.
                 <li>Il est vidé vers l’égout en fin de cycle (environ 5L).
               $if ml.lang == 'e':
-                <li> Your pasteurizer has been briefly rinsed, but it needs to be cleaned thoroughly.
-                <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
-                <li> Make sure the sewer pipe goes into a bucket of at least 20L.
-                <li> A filling of domestic hot water (45 ° C) is carried out beforehand.
-                <li> You can add CIP (caustic) detergent diluted in outlet buffer according to the detergent manufacturer's instructions.
-                <li> Take into account the water level (liter graduations on the pad) and the water in the pasteurizer (3.5L) to calculate the quantities needed.
-                <li> The detergent thus diluted is circulated for 15 minutes at 45 ° C.
-                <li> It is emptied to the sewer at the end of the cycle (about 5L).
+                <li>&nbsp;</li>
             $if letter == 'A':
               $if ml.lang == 'f':
                 <li>Votre pasteurisateur a été nettoyé mais il faut encore le désinfecter.
@@ -267,14 +214,19 @@ $if not paving:
                 <li>Le désinfectant ainsi dilué est circulé 5 minutes à 55°C.
                 <li>Il est vidé vers l’égout en fin de cycle (environ 5L).
               $if ml.lang == 'e':
-                <li> Your pasteurizer has been cleaned but it still needs to be disinfected.
-                <li> Push in the inlet pipe at the height of the air inlet valve and the outlet pipe at the height of the sewer valve.
-                <li> Make sure the sewer pipe goes into a bucket of at least 20L.
-                <li> A filling of domestic hot water (45 ° C) is carried out beforehand to obtain the necessary water.
-                <li> You can put a disinfectant (acid or caustic) for CIP (CIP) diluted in the outlet buffer according to the instructions of the disinfectant manufacturer.
-                <li> Take into account the water level (liter graduations on the pad) and the water in the pasteurizer (3.5L) to calculate the quantities needed.
-                <li> The disinfectant thus diluted is circulated for 5 minutes at 55 ° C.
-                <li> It is emptied to the sewer at the end of the cycle (about 5L).
+                <li>&nbsp;</li>
+            $if letter == 'D':
+              $if ml.lang == 'f':
+                <li>Votre pasteurisateur a été nettoyé mais il faut encore le désinfecter.
+                <li>Branchez (« push-in ») le tuyau d’entrée à la hauteur de la soupape d’entrée d’air et le tuyau de sortie à la hauteur de la vanne d’égout.
+                <li>Faîtes attention que le tuyau d’égout arrive dans un seau d’au moins 20L.
+                <li>Un remplissage d’eau chaude sanitaire (45°C) est effectué au préalable pour obtenir l’eau nécessaire.
+                <li>Vous pourrez y mettre un désinfectant (acide ou caustique) pour NEP (CIP) dilué dans le tampon de sortie selon les instructions du fabricant du désinfectant.
+                <li>Tenez compte du niveau d’eau (graduations en Litres sur le tampon) et de l’eau dans le pasteurisateur (3.5L) pour calculer les quantités nécessaires.
+                <li>Le désinfectant ainsi dilué est circulé 5 minutes à 55°C.
+                <li>Il est vidé vers l’égout en fin de cycle (environ 5L).
+              $if ml.lang == 'e':
+                <li>&nbsp;</li>
             </ul>
             <p class="alert alert-warning">$(menus.actionName[letter][2])</p>
             <a class="btn btn-success" href="#" onclick="action('$letter')" id="confirm">$(ml.T("Confirmer","Confirm","Bevestigen")) $letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>

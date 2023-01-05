@@ -2361,10 +2361,10 @@ class WebApiAction:
                     menus.store('s',0.0)
                 message = str(ml.T("Seau","Bucket","Emmer"))+'='+str(menus.val('s'))
                 time.sleep(0.01)
-            elif letter == 'U':  # Dump output tank
-                   dumpValve.setWait(1.0)
-                   message = str(ml.T("Purge en cours","Purge bagan","Zuivering..."))
-                   time.sleep(0.01)
+            # elif letter == 'U':  # Dump output tank
+            #        dumpValve.setWait(1.0)
+            #        message = str(ml.T("Purge en cours","Purge bagan","Zuivering..."))
+            #        time.sleep(0.01)
             elif letter in ['X','Z']:
                 T_Pump.stopAction()
                 if letter == 'X':
