@@ -379,6 +379,7 @@ function fillDisplay(data,logging) {
                     $('#eff').hide();
                 }
                 if (logging) {
+                    var t = $('#tableau');
                     tableRow = [time+' '+data['accro'].substring(3,4),
                                 //floorCenti2(data['totalwatts'],data['totalwatts2']), floorCenti2(data['watts'],data['watts2']),
                                 floorCenti(data['totalwatts']), floorCenti(data['watts']),
