@@ -245,7 +245,7 @@ function fillDisplay(data,logging) {
                 $('#press').text(data['press'] > 0.0 ? floorCenti(data['press']) : "?");
                 $('#pressMin').text(data['pressMin'] > 0.0 ? floorCenti(data['pressMin']) : "?");
                 $('#pressMax').text(data['pressMax'] > 0.0 ? floorCenti(data['pressMax']) : "?");
-                $('#extra').text(data['extra'] != 0.0 ? (floorDeci(data['extra'])+'°'):"");
+                // $('#extra').text(data['extra'] != 0.0 ? (floorDeci(data['extra'])+'°'):"");
                 $('#pumpeff').text(floorUni(data['pumpeff']));
                 $('#heateff').text(floorDeci(data['heateff']));
                 $('#message').text(data['message']);
@@ -386,9 +386,9 @@ function fillDisplay(data,logging) {
                                 floorCenti(data['totalwatts']), floorCenti(data['watts']),
                                 floorCenti(data['volume']), floorCenti(data['speed']),
                                 floorCenti(data['input']), floorCenti(data['heating']),
-                                floorCenti(data['warranty']), floorCenti(data['intake']),
+                                floorCenti(data['warranty']), floorCenti(data['intake'])
                                 //floorCenti(data['temper']),
-                                floorCenti(data['extra'])
+                                //floorCenti(data['extra'])
                     ]
                     t.row.add( tableRow );
                     tableData = t.data();

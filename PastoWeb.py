@@ -937,7 +937,7 @@ class ThreadDAC(threading.Thread):
                                        self.T_Pump.pump.volume(), \
                                        self.T_Pump.pump.liters(), \
                                        1 if self.T_Pump.paused else 0, \
-                                       cohorts.val('extra'), \
+                                       #cohorts.val('extra'), \
                                        cohorts.val('input'), \
                                        cohorts.val('warranty'), \
                                        cohorts.val('intake'), \
@@ -965,7 +965,7 @@ class ThreadDAC(threading.Thread):
                     term.write("%2d" % (int(nowT)%60), term.white, term.bold, term.bgwhite)
                     term.write(self.T_Pump.currOperation.acronym[3:4] if self.T_Pump.currOperation else " ",term.blue,term.bgwhite)
                     cohorts.catalog[self.T_Pump.pump.address].display() # Pompe
-                    cohorts.display(term,'extra',format=" %5.1f° ") #Echgeur
+                    #cohorts.display(term,'extra',format=" %5.1f° ") #Echgeur
                     cohorts.display(term,'input',format=" %5.1f° ") # Entrée de la Chauffe
                     cohorts.display(term,'warranty',format=" %5.1f° ") # Garant
                     cohorts.display(term,'intake',format=" %5.1f° ") # Garant
@@ -981,7 +981,7 @@ class ThreadDAC(threading.Thread):
 
                     term.pos(lines-3,1)
                     term.clearLineFromPos()
-                    term.writeLine("     Pompe   Extra   Entrée  Garant. FinCh. Chau Bassin  Encore ",term.blue,term.bgwhite) # scroll the whole display by one line
+                    term.writeLine("     Pompe   Entrée  Garant. FinCh. Chau Bassin  Encore ",term.blue,term.bgwhite) # scroll the whole display by one line
 
                     term.pos(1,1) # rewrite the top line (which changes all the time anyway)
                     term.write(menus.actionName[self.T_Pump.currAction][1],term.blue,term.bgwhite)
@@ -2127,7 +2127,7 @@ defFile = datetime.now().strftime("%Y_%m%d_%H%M")
 #if not fileName:
 fileName = defFile
 data_file = open(DIR_DATA_CSV + fileName+".csv", "w")
-data_file.write("epoch_sec\tstate\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\textra\tinput\twarant\tintake\theat\theatbath\t"
+data_file.write("epoch_sec\tstate\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\tinput\twarant\tintake\theat\theatbath\t"
                 +("press" if hardConf.inputPressure else "rmeter")
                 +"\tlinput\tloutput\n") #\twatt2\ttemper\theat
 term.write("Données stockées dans ",term.blue, term.bgwhite)
@@ -2527,8 +2527,9 @@ class WebApiPut:
                     cohorts.reft.set(ref_val)
                     if calibrating:
                         now = time.time()
-                        temp_ref_calib.append({'time':now,'reft':ref_val, \
-                                    'extra': cohorts.catalog['extra'].value, \
+                        temp_ref_calib.append({'time':now, \
+                                    'reft':ref_val, \
+                                    #'extra': cohorts.catalog['extra'].value, \
                                     'input': cohorts.catalog['input'].value, \
                                     'intake': cohorts.catalog['intake'].value, \
                                     'warranty': cohorts.catalog['warranty'].value, \
@@ -2649,7 +2650,7 @@ class WebApiLog:
                             #'totalwatts2': T_DAC.totalWatts2, \
                             'volume': T_Pump.pump.volume(), \
                             'speed': T_Pump.pump.liters() if not T_Pump.paused else 0, \
-                            'extra': isnull(cohorts.getCalibratedValue('extra'), ''), \
+                            #'extra': isnull(cohorts.getCalibratedValue('extra'), ''), \
                             'input': isnull(input, ''), \
                             'intake': isnull(intake, ''), \
                             'watts': isnull(cohorts.catalog['DAC1'].value*HEAT_POWER, ''), \
