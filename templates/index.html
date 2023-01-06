@@ -301,6 +301,20 @@ $if not paving:
                 <li> De in- en uitlaatpijpen worden samengebracht in een emmer van minstens 10L.
                 <li> Een vulling van drinkwater wordt vooraf gedaan en een bevestiging (groene knop) wordt gevraagd om te bevestigen dat het ontsmettingsmiddel is toegevoegd in de door de fabrikant voorgeschreven hoeveelheid. De totale hoeveelheid water is 5L in de pasteur + 2L = 7 liter.
                 <li> Het verdunde ontsmettingsmiddel wordt eenmaal gecirculeerd en de pasteur wordt gepauzeerd. Met de groene knop wordt de pasteur opnieuw gestart nadat het ontsmettingsmiddel 15 minuten (normale concentratie) of enkele dagen (tot een kwart gereduceerde concentratie) heeft gewerkt.
+            $if letter == 'X':
+              $if ml.lang == 'f':
+                <li>Vous désirez mettre votre pasteurisateur hors tension. Cette commande va arrêter le contrôle électronique.
+                <li>Tous les boutons vont s'éteindre sauf le voyant blanc. Une dizaine de secondes plus tard, vous pourrez tourner le sectionneur en position OFF (horizontale) et tout sera hors tension.
+              $if ml.lang == 'e':
+                <li> You wish to switch off your pasteuriser.
+                This command will stop the electronic control.
+                <li> All the buttons will go out except the white light.
+                About ten seconds later, you can turn the main switch to the OFF position (horizontal) and everything will be off.
+              $if ml.lang == 'n':
+                <li> U wilt uw pasteur uitzetten.
+                Dit commando stopt de elektronische besturing.
+                <li> Alle knoppen gaan uit, behalve het witte licht.
+                Ongeveer tien seconden later kunt u de schakelaar in de stand OFF (horizontaal) zetten en is alles uit.
             </ul>
             <p class="alert alert-warning">$(menus.actionName[letter][2])</p>
                         </div>
