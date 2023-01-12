@@ -334,6 +334,15 @@ function fillDisplay(data,logging) {
                     $('#addbutton').hide();
                     $('#buckbutton').hide();
                 }
+                if ('bucket' in data) {
+                    if (data['bucket'] >= 2) {
+                        $('#bucket2').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
+                    } else if (data['bucket'] >= 1) {
+                        $('#bucket2').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
+                    } else {
+                        $('#bucket2').removeClass("glyphicon-check").addClass("glyphicon-unchecked");
+                    }
+                }
                 /*
                  if (data['purge'] == 1) {
                     //$('#dumpbutton').show();
