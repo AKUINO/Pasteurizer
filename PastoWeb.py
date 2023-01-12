@@ -1285,13 +1285,17 @@ class Operation(object):
             if typeOpToDo == 'REVR':
                 speed = -speed
         elif typeOpToDo == 'FILL' :
-            if State.empty :
+            if T_Pump.paused:
+                hotTapSolenoid.set(0)
+            elif State.empty:
                 if menus.val('s') < 1.0:
                     hotTapSolenoid.set(1)
                 else: # Water by bucket, what  must be done
                     speed = self.desired_speed()
         elif typeOpToDo in ['FLOO', 'RFLO', 'HOTW']:
-            if menus.val('s') < 1.0:
+            if T_Pump.paused:
+                hotTapSolenoid.set(0)
+            elif menus.val('s') < 1.0:
                 if typeOpToDo == 'RFLO':
                     speed = -self.desired_speed()
                     hotTapSolenoid.set(1)
