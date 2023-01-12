@@ -1667,6 +1667,7 @@ class ThreadPump(threading.Thread):
         self.lastStop = 0
         self.lastDurationEval = None
         self.lastDurationEvalTime = None
+        self.lastQuantityEval = None
         self.level1 = 1
         self.level2 = 0
         self.waitingAdd = False
@@ -2032,14 +2033,19 @@ class ThreadPump(threading.Thread):
         if self.currAction  != 'V':
             currV = 0.0
             if menus.val('s') < 1.0 and self.currOpContext and self.currOperation and self.currOperation.typeOp in ['FLOO','FILL','HOTW']:
-                currV = self.currOpContext.duration()
+                if self.paused:
+                    currV = self.lastQuantityEval
+                else:
+                    currV = self.currOpContext.duration()
                 vol = menus.val('u')
                 tim = menus.val('r')
                 if vol <= 0.1 or tim < 20: # invalid parameters, return a default value
                     currV *= (FLOOD_PER_MINUTE/60.0)
                 else:
                     currV *= (vol/tim)
+            self.lastQuantityEval = currV
             return (self.pump.volume() - (self.qbout if self.qbout is not None else 0.0)) + self.fbout + currV
+        self.lastQuantityEval = None
         return None # remaining water in pipe is unknown
 
     def outTotal (self,bin):
