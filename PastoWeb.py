@@ -806,6 +806,7 @@ class ThreadDAC(threading.Thread):
         lastWatt = 0
         prec_heating = None
         some_heating = False
+        has_heated = False
         # TODO: allow to balance both heating tanks to reduce power demand
         while self.running:
             time.sleep(0.01)
@@ -850,10 +851,12 @@ class ThreadDAC(threading.Thread):
                             prec_heating = heating
                             some_heating = False
                         else:
+                            if heating > (prec_heating + 0.5):
+                                has_heated = True
                             if heating > (prec_heating + 0.1):
                                 some_heating = True
                             if (now - lastWatt) > TANK_EMPTY_LIMIT:
-                                if not some_heating:
+                                if not has_heated and some_heating:
                                     self.empty_tank = True
                                     print("EMPTY TANK, stop heating!")
                                     self.dacSetting.set(0)
@@ -1298,7 +1301,8 @@ class Operation(object):
             if menus.val('s') < 1.0:
                 if typeOpToDo == 'RFLO':
                     speed = -self.desired_speed()
-                if typeOpToDo == 'HOTW':
+                    taps[self.tap].set(1)
+                elif typeOpToDo == 'HOTW':
                     valSensor1 = cohorts.getCalibratedValue(self.sensor1)
                     if float(valSensor1) < float(self.tempRef()): # Shake
                         taps[self.tap].set(0)
@@ -1501,10 +1505,10 @@ opSequences = {
     #       ],
 
     'F': # Pré-rinçage (Flush)
-        [ Operation('PreT','HEAT',ref='R', dump=True,programmable=True,bin=[buck.RECUP,buck.WPOT],bout=buck.RECUP,kbin=TOTAL_VOL),
-          Operation('PreS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('PreI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
-          Operation('PreR','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+        [ Operation('PreT','HEAT',ref='D', dump=True,programmable=True,bin=[buck.RECUP,buck.WPOT],bout=buck.RECUP,kbin=TOTAL_VOL),
+          Operation('PreS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='D', dump=True),
+          Operation('PreI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=True),  #
+          Operation('PreR','RFLO',duration=lambda:KICKBACK,ref='D',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('CLOS','MESS',message=ml.T("Recommencer au besoin!","Repeat if needed!","Herhaal indien nodig!"),dump=True)
           ],
     'H': # Distribution d'eau pasteurisée: GROSSIERE ERREUR: ne fonctionne que sur un circuit vide !!!
