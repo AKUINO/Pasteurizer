@@ -1505,10 +1505,12 @@ opSequences = {
           Operation('CLOS','MESS',message=ml.T("Recommencer au besoin!","Repeat if needed!","Herhaal indien nodig!"),dump=True)
           ],
     'H': # Distribution d'eau pasteurisée: GROSSIERE ERREUR: ne fonctionne que sur un circuit vide !!!
-        [ Operation('HotT','HEAT',ref='P', dump=True,programmable=True,bin=buck.WPOT,bout=buck.PAST,kbin=lambda:(START_VOL if State.empty else 0.0)+TOTAL_VOL,kbout=START_VOL),
-          Operation('HotS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('HotF','FILL',duration=lambda:flood_liters_to_seconds(START_VOL),base_speed=OPT_SPEED,qty=START_VOL, ref='P',dump=True),
-          Operation('HotW','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=TOTAL_VOL,shake_qty=SHAKE_QTY,dump=True)
+        [ Operation('HotT','HEAT',ref='P', dump=True,programmable=True,bin=buck.WPOT,bout=buck.SEWR,kbin=TOTAL_VOL,kbout=START_VOL),
+          Operation('HotS','SEAU',message=ml.T("Eau propre en entrée!","Clean water as input!","Schoon water als input!"),dump=True),
+          Operation('HotI','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds(START_VOL), base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',qty=START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Hoti','HOTW','warranty','input',duration=lambda:flood_liters_to_seconds((TOTAL_VOL*0.96)-START_VOL), base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref='P',qty=(TOTAL_VOL*0.96)-START_VOL,shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('HotE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',dump=True,bin=buck.RAW,bout=buck.PAST,kbin=0.0,qbout=True),
+          Operation('HotW','HOTW','warranty','input',base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref='P',shake_qty=SHAKE_QTY,dump=True)
           ],
     'R': # Pré-rinçage 4 fois
         [ Operation('Pr1T','HEAT',ref='R', dump=True,programmable=True,bin=buck.RECUP,bout=[buck.RECUP,buck.SEWR], kbin=lambda:(TOTAL_VOL if State.empty else 0.0)+(4*TOTAL_VOL),kbout=4*TOTAL_VOL),
@@ -1842,9 +1844,10 @@ class ThreadPump(threading.Thread):
                 if subr and subr.operation and subr.operation.duration:
                     return subr.operation.duration()- subr.duration(), warning
                 return 0, warning
-        else:
-            self.lastDurationEval = None
-            return self.currOperation.duration() - self.currOpContext.duration(), warning
+        else: # Timed operation
+            if not self.paused:
+                self.lastDurationEval = self.currOperation.duration() - self.currOpContext.duration()
+            return int(self.lastDurationEval), warning
 
     def quantityRemaining(self):
         if not self.currOperation:

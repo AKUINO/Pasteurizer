@@ -168,6 +168,22 @@ $if not paving:
                 <li>Deze tank moet onberispelijk leeg, schoon en ontsmet zijn.
                 <li>Met de groene knop kunt u hervatten. Met de gele knop kunt u pauzeren (bijvoorbeeld om van de ene naar de andere bus rauwe melk te gaan).
                 <li>Wanneer alle invoerblikken zijn geleegd, neemt de "E"-regeling (Duwen naar water) 5L schoon water uit een invoeremmer om de resterende melk uit het systeem te duwen.
+            $if letter == 'H':
+              $if ml.lang == 'f':
+                <li>La production d'eau pasteurisée chauffe l'eau propre le temps requis (configurable entre 15 et 30 secondes) à la température requise (configurable entre 60 et 89°C).
+                <li>Le tuyau de sortie fournira d'abord l'eau contenue dans le pasteurisateur (5 litres non pasteurisé). Il y aura ensuite une pause pour que vous puissiez le brancher à la cuve de sortie lorsque l'eau pasteurisée arrive.
+                <li>Cette cuve devra être impeccablement vide, propre et désinfectée.
+                <li>Le bouton vert permet de reprendre. Le bouton jaune permet de faire une pause.
+              $if ml.lang == 'e':
+                <li>The production of pasteurised water heats clean water for the required time (configurable between 15 and 30 seconds) to the required temperature (configurable between 60 and 89°C).
+                <li>The outlet pipe will first supply the water contained in the pasteuriser (5 litres). There will then be a pause so that you can connect it to the outlet tank when the pasteurized water arrives.
+                <li>This tank must be impeccably empty, clean and disinfected.
+                <li>The green button allows you to resume. The yellow button allows you to pause.
+              $if ml.lang == 'n':
+                <li>De pasteur neemt de schoon water, verhit deze gedurende de vereiste tijd (instelbaar tussen 15 en 30 seconden) tot de vereiste temperatuur (instelbaar tussen 60 en 89°C).
+                <li>De afvoerleiding voert eerst het water in de pasteur aan (5 liter). Er is dan een pauze zodat u hem kunt aansluiten op de uitlaattank wanneer de gepasteuriseerde water arriveert.
+                <li>Deze tank moet onberispelijk leeg, schoon en ontsmet zijn.
+                <li>Met de groene knop kunt u hervatten. Met de gele knop kunt u pauzeren.
             $if letter == "I":
               $if ml.lang == 'f':
                 <li>Si une panne électrique ou une autre cause interrompt la pasteurisation, il faut reprendre le traitement dès que possible...
