@@ -146,7 +146,7 @@ class Cohort(object):
                 self.calibration[address] = means
                 #print(means)
         except FileNotFoundError:
-            print ("Calibration not found for sensor "+address+" in directory "+directory)
+            print ('No calibration found for sensor "'+address+'" in directory '+directory)
         except:
             traceback.print_exc()
             pass
