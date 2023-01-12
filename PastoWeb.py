@@ -2222,12 +2222,15 @@ class WebOption:
         data, connected, mail, password = init_access()
         if not connected:
             raise web.seeother('/')
-        next_page = 'option'+page
-        if data: # Process saved options from options editing forms
+
+        if data and len(data) > 1: # Process saved options from options editing forms
+            #print(data.__repr__())
             if ('reset' in data and data['reset'].lower() == 'on'):
                 for choice in (menus.cleanOptions if page == '1' else menus.dirtyOptions):
                     if len(menus.options[choice]) > Menus.INI:
                         menus.options[choice][Menus.VAL] = menus.options[choice][Menus.INI]
+                reloadPasteurizationSpeed()
+                menus.save()
             else:
                 for keys in menus.options.keys():
                   if 'opt_'+keys in data:
@@ -2236,10 +2239,11 @@ class WebOption:
                         menus.options[keys][Menus.VAL] = menus.options[keys][Menus.INI]
                     else:
                         menus.store(keys, val)
-                next_page = 'index'
-            reloadPasteurizationSpeed()
-            menus.save()
-        render_page = getattr(render, next_page)
+                reloadPasteurizationSpeed()
+                menus.save()
+                raise web.seeother('/')
+
+        render_page = getattr(render, 'option'+page)
         return render_page(connected, mail)
 
     def POST(self,page):
