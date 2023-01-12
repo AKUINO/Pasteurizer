@@ -695,6 +695,7 @@ def menu_confirm(choice,delay=None):
     return ' '
 
 menu_choice = "?"
+hotTapSolenoid = None # initialized further below
 
 def option_confirm(delay=8.0):
     global display_pause,lines
@@ -745,10 +746,6 @@ def option_confirm(delay=8.0):
             break
     reloadPasteurizationSpeed()
     display_pause = prec_disp
-
-hotTapSolenoid = None # initialized further below
-#coldTapSolenoid = None # initialized further below
-taps = {}
 
 # returns clock time formatted as a floating number h.m
 def floating_time(some_time):
@@ -1040,10 +1037,10 @@ MAX_SPEED = -3
 
 class Operation(object):
 
-    global menus,lines,columns, taps, optimal_speed
+    global menus,lines,columns, hotTapSolenoid, optimal_speed
 
     def __init__(self, acronym, typeOp, sensor1=None, sensor2=None, ref=None, ref2=None, base_speed=None, min_speed=None, qty=None, shake_qty=None, \
-                 duration=None, subSequence = None, dump=False, inject=None, message=None, tap=None, cooling=False, programmable=False, waitAdd=False, \
+                 duration=None, subSequence = None, dump=False, inject=None, message=None, cooling=False, programmable=False, waitAdd=False, \
                  bin = None, bout = None, kbin = None, kbout = None, qbin=None, qbout=None):
         self.acronym = acronym
         self.typeOp = typeOp
@@ -1063,10 +1060,6 @@ class Operation(object):
         self.inject = inject
         self.message = message
         self.waitAdd = waitAdd
-        if not tap:
-            self.tap = 'H'
-        else:
-            self.tap = tap
         self.cooling = cooling # if cooling of output is permitted. Auto-Pause (option Q) is then also taken into account
         self.programmable = programmable
         self.bin = bin
@@ -1105,7 +1098,7 @@ class Operation(object):
     # Initialize current operation and starts it if it is not the pump...
     def start(self,T_Pump):
 
-        global menus, taps
+        global menus, hotTapSolenoid
 
         time.sleep(0.01)
         dumpValve.set(1.0 if self.dump else 0.0)
@@ -1126,19 +1119,19 @@ class Operation(object):
             if State.empty :
                 State.popDelayed()
                 if menus.val('s') < 1.0:
-                    taps[self.tap].set(1)
+                    hotTapSolenoid.set(1)
                 else: # Eau dans un seau..
                     pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
         elif self.typeOp == 'RFLO':
             State.popDelayed()
             if menus.val('s') < 1.0:
-                taps[self.tap].set(1)
+                hotTapSolenoid.set(1)
             else: # Eau dans un seau..
                 pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
         elif self.typeOp == 'FLOO':
             State.popDelayed()
             if menus.val('s') < 1.0:
-                taps[self.tap].set(1)
+                hotTapSolenoid.set(1)
                 menus.options['u'][Menus.REF] = float(int((self.qty*10.0)+0.5))/10.0
                 menus.options['r'][Menus.REF] = int(self.duration())
                 #print("Set REF u="+str(self.duration)+", r="+str(self.qty))
@@ -1149,9 +1142,9 @@ class Operation(object):
             if menus.val('s') < 1.0:
                 valSensor1 = cohorts.getCalibratedValue(self.sensor1)
                 if float(valSensor1) < float(self.tempRef()): # Shake
-                    taps[self.tap].set(0)
+                    hotTapSolenoid.set(0)
                 else:
-                    taps[self.tap].set(1)
+                    hotTapSolenoid.set(1)
             else: # Eau dans un seau..
                 pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
         elif self.typeOp == 'REVR':
@@ -1263,7 +1256,7 @@ class Operation(object):
     # Keep going in the current operation
     def execute(self,now,T_Pump):
 
-        global menus, taps
+        global menus, hotTapSolenoid
 
         time.sleep(0.01)
         dumpValve.set(1.0 if self.dump else 0.0) # Will stop command if open/close duration is done
@@ -1294,22 +1287,22 @@ class Operation(object):
         elif typeOpToDo == 'FILL' :
             if State.empty :
                 if menus.val('s') < 1.0:
-                    taps[self.tap].set(1)
+                    hotTapSolenoid.set(1)
                 else: # Water by bucket, what  must be done
                     speed = self.desired_speed()
         elif typeOpToDo in ['FLOO', 'RFLO', 'HOTW']:
             if menus.val('s') < 1.0:
                 if typeOpToDo == 'RFLO':
                     speed = -self.desired_speed()
-                    taps[self.tap].set(1)
+                    hotTapSolenoid.set(1)
                 elif typeOpToDo == 'HOTW':
                     valSensor1 = cohorts.getCalibratedValue(self.sensor1)
                     if float(valSensor1) < float(self.tempRef()): # Shake
-                        taps[self.tap].set(0)
+                        hotTapSolenoid.set(0)
                     else:
-                        taps[self.tap].set(1)
+                        hotTapSolenoid.set(1)
                 else:
-                    taps[self.tap].set(1)
+                    hotTapSolenoid.set(1)
             else: # Water by bucket, what  must be done
                 speed = self.desired_speed()
         elif typeOpToDo == 'SHAK':
@@ -1396,7 +1389,7 @@ class Operation(object):
     # Close anything needed with current operation to end gracefully
     def close(self,T_Pump):
         
-        global menus, taps
+        global menus, hotTapSolenoid
 
         if self.programmable and menus.val('H') and menus.val('H') != 0.0 and (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
             menus.store('H', 0.0)
@@ -1404,7 +1397,7 @@ class Operation(object):
         if self.typeOp in ['FILL','FLOO','RFLO','HOTW']:
             T_Pump.pump.stop()
             if menus.val('s') < 1.0:
-                taps[self.tap].set(0)
+                hotTapSolenoid.set(0)
                 if (self.typeOp != 'RFLO') and (self.typeOp != 'FILL' or State.empty):
                     T_Pump.fbout += self.qty # add the quantity equivalent to the fill duration
             State.empty = False
@@ -1752,13 +1745,13 @@ class ThreadPump(threading.Thread):
 
     def stopAction(self):
 
-        global taps
+        global hotTapSolenoid
 
         # do whatever is needed
         self.closeSequence()
         time.sleep(0.01)
         self.pump.reset_pump() # to be sure that no situation ends with a running pump...
-        taps['H'].set(0) # and tap are closed !
+        hotTapSolenoid.set(0) # and tap are closed !
         time.sleep(0.01)
         self.manAction('Z') # Should stop operations...
         self.setPause(False)
@@ -1799,7 +1792,7 @@ class ThreadPump(threading.Thread):
 
     def setPause(self,paused):
 
-        global taps
+        global hotTapSolenoid
 
         if self.paused and not paused:
             if self.currOpContext:
@@ -1811,7 +1804,7 @@ class ThreadPump(threading.Thread):
             self.startPause = self.pumpLastChange
         if paused:
             T_Pump.pump.reset_pump()
-            taps['H'].set(0)
+            hotTapSolenoid.set(0)
         self.paused = paused
 
     def durationRemaining(self,now):
@@ -2058,9 +2051,6 @@ for i in range(1,lines):
 
 # Solenoids:
 hotTapSolenoid = Solenoid('TAP',hardConf.TAP)
-#coldTapSolenoid = Solenoid('CLD',hardConf.CLD)
-taps['H'] = hotTapSolenoid
-#taps['C'] = coldTapSolenoid
 
 reloadPasteurizationSpeed()
 
@@ -2560,7 +2550,7 @@ class WebApiLog:
 
     def GET(self):
 
-        global T_DAC, T_Pump, menus, optimal_speed, cohorts, taps
+        global T_DAC, T_Pump, menus, optimal_speed, cohorts, hotTapSolenoid
 
         data, connected, mail, password = init_access()
         web.header('Content-type', 'application/json; charset=utf-8')
@@ -2675,7 +2665,7 @@ class WebApiLog:
                             'bucket': (2 if menus.val('s') >= 1.0 else 1) if T_Pump.currAction in CITY_WATER_ACTIONS else 0,
                             'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['M','E','P','H','I'] else 1), \
                             'pause': 1 if T_Pump.paused else 0, \
-                            'fill': taps['H'].get()[0], \
+                            'fill': hotTapSolenoid.get()[0], \
                             'pumpopt': optimal_speed, \
                             'pumpeff': (pumping_volume/(pumping_time/3600)) if pumping_time else 0, \
                             'heateff': (100.0*heating_volume/(pumping_time/3600))/HEAT_POWER if pumping_time else 0, \
