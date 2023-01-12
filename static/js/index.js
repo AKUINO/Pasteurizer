@@ -150,6 +150,18 @@ function LitersOnLiters(q,k,input) {
 
 var t = null;
 
+function toRepeat(data,logging) {
+        $.ajax({
+        url: "/api/log",
+        cache: false,
+        error: function (jqXHR, textStatus, errorThrown ) {
+            $('#message').text('Application '+(textStatus?textStatus:'')+(errorThrown?(' '+errorThrown):''));
+        },
+        timeout: 3000, // sets timeout to 3 seconds
+        success: function(data) { fillDisplay(data,logging); }
+        });
+    };
+
 function fillDisplay(data,logging) {
             if (data && 'date' in data) {
                 var date = data['date'].substring(0,10);
@@ -335,6 +347,7 @@ function fillDisplay(data,logging) {
                     $('#buckbutton').hide();
                 }
                 if ('bucket' in data) {
+                    $('#buckbutton2').css("visibility", "visible");
                     if (data['bucket'] >= 2) {
                         $('#bucket2').removeClass("glyphicon-unchecked").addClass("glyphicon-check");
                     } else if (data['bucket'] >= 1) {
@@ -433,20 +446,11 @@ $(document).ready(function() {
        $('#modalDocumentation').modal({});
     }
 
-    setInterval ( function() {
-        $.ajax({
-        url: "/api/log",
-        cache: false,
-        error: function (jqXHR, textStatus, errorThrown ) {
-            $('#message').text('Application '+(textStatus?textStatus:'')+(errorThrown?(' '+errorThrown):''));
-        },
-        timeout: 3000, // sets timeout to 3 seconds
-        success: function(data) { fillDisplay(data,logging); }
-        });
-    }, 3000);   //number of mili seconds between each call
+    toRepeat(logging);
+    setInterval ( function() { toRepeat(logging) }, 3000);   //number of mili seconds between each call
 } );
 
-function action(letter) {
+function action(letter, keep = false) {
    $.ajax({
         url: "/action/"+letter,
         cache: false,
@@ -456,11 +460,12 @@ function action(letter) {
         timeout: 3000, // sets timeout to 3 seconds
         success: function(data) { fillDisplay(data,false); }
   });
-  $('#modalDocumentation').modal('hide');
-  $('#confirm').hide();
-  $('#cancel').hide();
-  if (letter == 'Z') {
-    $('#documentation').hide();
+  if ( ! keep) {
+      $('#modalDocumentation').modal('hide');
+      $('#confirm').hide();
+      $('#cancel').hide();
+      if (letter == 'Z') {
+        $('#documentation').hide();
+      }
   }
 }
-
