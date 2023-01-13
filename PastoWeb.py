@@ -1985,7 +1985,7 @@ class ThreadPump(threading.Thread):
                 if YellowLED:
                     if RedPendingConfirmation != 0.0 and self.currAction in [None,'X','Z',' ']:
                         YellowLED.blink(2)
-                    elif speed == 0.0 and int(hotTapSolenoid.get()) == 0:
+                    elif speed == 0.0 and int(hotTapSolenoid.value) == 0:
                         YellowLED.off()
                     else:
                         YellowLED.on()
