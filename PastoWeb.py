@@ -1453,7 +1453,7 @@ def flood_liters_to_seconds(liters):
         return liters * 60 / FLOOD_PER_MINUTE
     return liters/vol*tim
 
-CITY_WATER_ACTIONS = "FRACDH"
+menus.CITY_WATER_ACTIONS = "FRACDH"
 DILUTION_ACTIONS = "ACD"
 
 from enum import Enum
@@ -2398,7 +2398,7 @@ class WebApiAction:
                         'statecolor': (str(State.current.color) if State.current else 'black'),
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
-                        'bucket': 2 if menus.val('s') >= 1.0 else (1 if letter in CITY_WATER_ACTIONS else 0),
+                        'bucket': 2 if menus.val('s') >= 1.0 else (1 if letter in menus.CITY_WATER_ACTIONS else 0),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[letter][2])+': '+message,
                         'dumping': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if letter in ['M','E','P','H','I'] else 1),
@@ -2442,7 +2442,7 @@ class WebApiState:
                         'statecolor': (str(State.current.color) if State.current else 'black'),
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
-                        'bucket': 2 if menus.val('s') >= 1.0 else (1 if letter in CITY_WATER_ACTIONS else 0),
+                        'bucket': 2 if menus.val('s') >= 1.0 else (1 if letter in menus.CITY_WATER_ACTIONS else 0),
                         'forcing': 2 if T_Pump.forcing else (1 if T_Pump.forcible else 0),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[T_Pump.currAction][2]),
@@ -2680,7 +2680,7 @@ class WebApiLog:
                             'opt_M': menus.val('M'), \
                             'opt_temp': opt_temp, \
                             'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
-                            'bucket': (1 if T_Pump.currAction in CITY_WATER_ACTIONS else 0) if menus.val('s') < 1.0 else 2,
+                            'bucket': (1 if T_Pump.currAction in menus.CITY_WATER_ACTIONS else 0) if menus.val('s') < 1.0 else 2,
                             'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['M','E','P','H','I'] else 1), \
                             'pause': 1 if T_Pump.paused else 0, \
                             'fill': hotTapSolenoid.get()[0], \

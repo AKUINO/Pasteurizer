@@ -336,7 +336,8 @@ $if not paving:
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal" href="/" id="cancel">$(ml.T("Annuler","Cancel","Annuleer"))</button>
-                            <button onclick="action('!',true)" id="buckbutton2" class="btn btn-info buckbutton" style="visibility:hidden">$(ml.T("Seau fourni","Bucket provided","Emmer voorzien"))&nbsp;<span id="bucket2" class="glyphicon"></span></button>
+                            $if letter in menus.CITY_WATER_ACTIONS:
+                                <button onclick="action('!',true)" id="buckbutton2" class="btn btn-info buckbutton" style="visibility:hidden">$(ml.T("Seau fourni","Bucket provided","Emmer voorzien"))&nbsp;<span id="bucket2" class="glyphicon"></span></button>
                             <button type="button" class="btn btn-primary" onclick="action('$letter')" id="confirm">$(ml.T("Confirmer","Confirm","Bevestigen")) $letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</button>
                         </div>
                     </div>

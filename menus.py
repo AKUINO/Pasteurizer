@@ -36,6 +36,7 @@ class Menus(object):
         self.cleanOptions = None
         self.dirtyOptions = None
         self.currAction = None
+        self.CITY_WATER_ACTIONS = None
 
     def nam(self,letter):
         return self.options[letter][Menus.NAM]
