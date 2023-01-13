@@ -1985,7 +1985,7 @@ class ThreadPump(threading.Thread):
                 if YellowLED:
                     if RedPendingConfirmation != 0.0 and self.currAction in [None,'X','Z',' ']:
                         YellowLED.blink(2)
-                    elif speed == 0.0 and hotTapSolenoid.get() == 0:
+                    elif speed == 0.0 and int(hotTapSolenoid.get()) == 0:
                         YellowLED.off()
                     else:
                         YellowLED.on()
@@ -2625,7 +2625,7 @@ class WebApiLog:
             intake = cohorts.getCalibratedValue('intake')
             input = cohorts.getCalibratedValue('input')
             warranty = cohorts.getCalibratedValue('warranty')
-            heating = cohorts.getCalibratedValue('warranty')
+            heating = cohorts.getCalibratedValue('heating')
             if intake < 1.0 or input < 1.0 or warranty < 1.0 or heating < 1.0:
                 danger = str(ml.T('Capteur déconnecté?',"Sensor disconnected?","Sensor losgekoppeld?"))
             elif intake > 99.0 or input > 99.0 or warranty > 99.0 or heating > 99.0:
