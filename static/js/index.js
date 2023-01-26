@@ -176,10 +176,10 @@ function fillDisplay(data,logging) {
                 $('#state').text(data['state']);
                 $('#danger').text(data['danger']);
                 $('#INbucket').attr( "class", "bucketIN"+(data['bin']==data['bout']? '1' : '2')+" in"+data['bin'] );
-                $('#tbin').text(data['tbin']);
+                $('#tbin').text(data['tbin'] if 'tbin' in data and data['tbin'] else ' &nbsp; &nbsp; ');
                 $('#qbin').html(LitersOnLiters(data['qbin'],data['kbin'], true));
                 $('#OUTbucket').attr( "class", "bucketOUT"+(data['bin']==data['bout']? '1' : '2')+" in"+data['bout'] );
-                $('#tbout').text(data['tbout'])
+                $('#tbout').text(data['tbout'] if 'tbout' in data and data['tbout'] else ' &nbsp; &nbsp; ')
                 $('#qbout').html(LitersOnLiters(data['qbout'],data['kbout'], false));
 
                 $('.show-flow').css('color',data['statecolor']);
