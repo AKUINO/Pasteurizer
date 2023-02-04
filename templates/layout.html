@@ -52,16 +52,16 @@ $ currentLetter = menus.currAction
 	    <span class="navbar-toggler-icon"></span>
 	</button>
 	<div class="collapse navbar-collapse" id="navbarCollapse">
-	    <ul class="navbar-nav mr-auto">
+	    <ul class="navbar-nav mr-auto" role="menu">
 		<li class="nav-item dropdown">
 		  <a class="nav-link dropdown-toggle" href="#" id="clean" data-toggle="dropdown">
 		    $(ml.T("Propre","Cleaned","Schoon"))
 		  </a>
 		  <div class="dropdown-menu">
 		  $for letter in menus.cleanActions:
-		    <a id="drop$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
+		    <a id="drop$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1])<small> - $(menus.actionName[letter][3])</small></a>
 		  <div class="dropdown-divider"></div>
-		  <a class="dropdown-item" href="/option1" onclick="closeMenu()">$(ml.T("Paramètres de Pasteurisation et Refroidissement","Pasteurisation and Cooling Parameters","Pasteurisatie- en koelparameters"))</a>
+		  <a class="dropdown-item" href="/option1" onclick="closeMenu()">$(ml.T("Paramètres de Pasteurisation","Pasteurisation Parameters","Pasteurisatie parameters"))</a>
 		  </div>
 		</li>
 		<li class="nav-item dropdown">
@@ -70,7 +70,7 @@ $ currentLetter = menus.currAction
 		  </a>
 		  <div class="dropdown-menu">
 		  $for letter in menus.dirtyActions:
-		    <a id="drop$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
+		    <a id="drop$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1])<small> - $(menus.actionName[letter][3])</small></a>
 		  <div class="dropdown-divider"></div>
 		  <a class="dropdown-item" href="/option2" onclick="closeMenu()">$(ml.T("Paramètres de Nettoyage","Cleansing Parameters","Reiniging parameters"))</a>
 		  </div>
@@ -81,7 +81,7 @@ $ currentLetter = menus.currAction
 		  </a>
 		  <div class="dropdown-menu">
 		  $for letter in menus.sysActions:
-		    <a id="drop$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</a>
+		    <a id="drop$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1])<small> - $(menus.actionName[letter][3])</small></a>
 		  <div class="dropdown-divider"></div>
 		  <a class="dropdown-item" href="/csv" onclick="closeMenu()">$(ml.T("Données brutes","Raw Data","Ruwe Data"))</a>
 		  <div class="dropdown-divider"></div>
@@ -146,8 +146,8 @@ $:content
 
 <footer class="footer">
     <div class="container">
-	<span class="text-muted">$(ml.T("Un pasteurisateur développé par le projet","A pasteurizer developed by project","Een pasteur ontwikkeld door project")) <a href="http://akuino.net"><img
-		src="/static/favicon.png" alt="AKUINO.net" style="height:1em;"/> AKUINO.net</a>.</span>
+	<span class="text-muted">$(ml.T("Un pasteurisateur développé par le projet","A pasteurizer developed by project","Een pasteur ontwikkeld door project"))
+	    <a href="http://akuino.net" style="white-space:nowrap"><img src="/static/favicon.png" alt="AKUINO.net" style="height:1em;"/>AKUINO.net</a>.</span>
     </div>
 </footer>
 

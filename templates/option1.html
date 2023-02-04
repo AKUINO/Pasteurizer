@@ -2,10 +2,11 @@ $def with (connected,mail)
 $var title : Pasteurization and Cooling Parameters
 <main role="main" class="container">
   <div class="jumbotron" onclick="void(0);">
-    <h3><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; (<span id="emptied">$(ml.T("Circuit vidé","Emptied circuit","Leeg circuit")), </span><b id="stateletter" class="show-flow"></b>:<b id="state"></b>)<br/><span id="danger" class="danger"></span></h3>
+    <!--
+    <h4><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b> &nbsp; (<span id="emptied">$(ml.T("Circuit vidé","Emptied circuit","Leeg circuit")), </span><b id="stateletter" class="show-flow"></b>:<b id="state"></b>)<br/><span id="danger" class="danger"></span></h4>
     <p style="margin:auto"><span id="actiontitle"></span></p>
     <p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
-    <hr/>
+    <hr/> -->
 <h2>$(ml.T("Paramètres de Pasteurisation et Refroidissement","Pasteurisation and Cooling Parameters","Pasteurisatie- en koelparameters"))</h2>
 <form method="post" action="/option1">
 $for letter in menus.cleanOptions:

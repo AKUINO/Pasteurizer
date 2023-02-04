@@ -3,7 +3,7 @@
 /* Not required for template or sticky footer method. */
 
 main > .container {
-  padding: 60px 15px 0;
+  padding: 0.4rem 0.2rem 0;
 }
 
 .footer {
@@ -11,8 +11,9 @@ main > .container {
 }
 
 .footer > .container {
-  padding-right: 15px;
-  padding-left: 15px;
+  padding-right: 0.2rem;
+  padding-left: 0.2rem;
+  text-align: center;
 }
 
 code {

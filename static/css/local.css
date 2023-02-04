@@ -7,12 +7,16 @@
         user-select: none;
       }
 
+     .jumbotron { padding: 0.4rem; margin-bottom: 0.2rem; line-height:normal }
+     .container { padding: 0.4rem; }
+
      .Pshape { width: 100%;
 		  border-collapse: separate;
 		  border-spacing: 0px;
 	    }
 
       @media (min-width: 768px) {
+        .container { padding: 0.4rem; width:512px }
         .bd-placeholder-img-lg {
           font-size: 3.5rem;
         }
@@ -25,22 +29,41 @@
      .Oshape { border:solid;
             border-color: black;
 		    border-width: 2px;
-		    border-radius: 20px;
+		    border-radius: 30px;
 		    text-align: center;
+		    aspect-ratio: 1 / 1;
+		    display: table-cell;
+		    vertical-align: middle;
+		    padding: 5px;
+	    }
+
+     .OWshape { border:solid;
+            border-color: black;
+		    border-width: 2px;
+		    border-radius: 30px;
+		    text-align: center;
+		    aspect-ratio: 1 / 1;
+		    padding: 5px;
 	    }
 
      .OTshape { border:solid;
             border-color: black;
 		    border-width: 2px;
 		    border-radius: 20px 20px 6px 6px;
+		    aspect-ratio: 1 / 1;
+		    padding: 5px;
 		    text-align: center;
+		    height: 35px;
 	    }
 
      .OBshape { border:solid;
             border-color: black;
 		    border-width: 2px;
 		    border-radius: 6px 6px 20px 20px;
+		    aspect-ratio: 1 / 1;
+		    padding: 5px;
 		    text-align: center;
+		    height: 35px;
 	    }
 
      .Xshape { border:solid;
@@ -83,7 +106,7 @@
 
     .empty_pipe { opacity:0.3; text-shadow: 2px 4px #666666; }
 
-    .danger { color: #FFFFFF; background-color: red; }
+    .danger { color: #FFFFFF; background-color: red; text-align:center; margin:2px }
 
     .greenToRed { background: linear-gradient(.25turn, #00AAFF, #FF0000); color:white; }
 
@@ -167,30 +190,31 @@
 	.st28{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}
 	.st29{fill:none;stroke:#FFFFFF;stroke-width:0.25;stroke-miterlimit:10;}
 
-    .bucketIN2  { padding: 3px;
+    .bucketIN2  { padding: 3px; width:7rem;
                   border-style: solid solid solid solid;
                   border-color: #e9ecef black black black;
                   border-width: 10px 3px 3px 3px;
                   border-radius: 0px 0px 10px 10px;
                   text-align: center; }
-    .bucketOUT2  { padding: 3px;
+    .bucketOUT2  { padding: 3px; width:7rem;
                   border-style: solid solid solid solid;
                   border-color: #e9ecef black black black;
                   border-width: 10px 3px 3px 3px;
                   border-radius: 0px 0px 10px 10px;
                   text-align: center; }
-    .bucketIN1  { padding: 3px;
+    .bucketIN1  { padding: 3px; width:7rem;
                   border-style: none solid solid solid;
                   border-color: #e9ecef black black black;
                   border-width: 10px 3px 3px 3px;
                   border-radius: 0px 0px 10px 10px;
                   text-align: center; }
-    .bucketOUT1  { padding: 3px;
+    .bucketOUT1  { padding: 3px; width:7rem;
                   border-style: solid solid none solid;
                   border-color: #e9ecef black black black;
                   border-width: 10px 3px 3px 3px;
                   text-align: center; }
 	.in      { color: black; background-color : #e9ecef }
+	.innull  { color: black; background-color : #e9ecef }
     .inWPOT  { color: black; background-color : white }
     .inDESI  { color: white; background-color : black }
     .inRECUP { color: black; background-color : yellow }
