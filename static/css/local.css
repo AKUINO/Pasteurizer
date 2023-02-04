@@ -190,25 +190,25 @@
 	.st28{fill:none;stroke:#FFFFFF;stroke-miterlimit:10;}
 	.st29{fill:none;stroke:#FFFFFF;stroke-width:0.25;stroke-miterlimit:10;}
 
-    .bucketIN2  { padding: 3px; width:7rem;
+    .bucketIN2  { padding: 3px; width:5rem;
                   border-style: solid solid solid solid;
                   border-color: #e9ecef black black black;
                   border-width: 10px 3px 3px 3px;
                   border-radius: 0px 0px 10px 10px;
                   text-align: center; }
-    .bucketOUT2  { padding: 3px; width:7rem;
+    .bucketOUT2  { padding: 3px; width:5rem;
                   border-style: solid solid solid solid;
                   border-color: #e9ecef black black black;
                   border-width: 10px 3px 3px 3px;
                   border-radius: 0px 0px 10px 10px;
                   text-align: center; }
-    .bucketIN1  { padding: 3px; width:7rem;
+    .bucketIN1  { padding: 3px; width:5rem;
                   border-style: none solid solid solid;
                   border-color: #e9ecef black black black;
                   border-width: 10px 3px 3px 3px;
                   border-radius: 0px 0px 10px 10px;
                   text-align: center; }
-    .bucketOUT1  { padding: 3px; width:7rem;
+    .bucketOUT1  { padding: 3px; width:5rem;
                   border-style: solid solid none solid;
                   border-color: #e9ecef black black black;
                   border-width: 10px 3px 3px 3px;
