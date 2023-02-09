@@ -1,5 +1,6 @@
 $def with (content)
 $ ip = web.ctx['ip']
+$ now = int(datetime.now().timestamp())
 $ currentLetter = menus.currAction
 <!doctype html>
 <html lang="fr">
@@ -45,8 +46,9 @@ $ currentLetter = menus.currAction
     <script type="text/javascript" src="/js/index.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" onclick="void(0);">
-	<a class="navbar-brand" href="/#"><img src="/static/akuino_black.png" alt="AKUINO" style="height:1.5em;" align="bottom"> $(ml.T("Pasteurisateur","Pasterizer","Pasteur"))</a>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" onclick="void(0);" style="text-align:center">
+	<a href="/?$now#"><img src="/static/akuino_black.png" alt="AKUINO" style="height:2em;" align="bottom"></a>
+	<button class="btn btn-warning" onclick="showCommands()"><img src="/static/touch.svg" style="height:1.5em;" alt="Buttons" align="bottom"> $(ml.T("Pasteurisateur","Pasterizer","Pasteur"))</button>
 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
 		aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
 	    <span class="navbar-toggler-icon"></span>
@@ -138,6 +140,45 @@ $ currentLetter = menus.currAction
 		<div class="modal-footer">
 		    <button type="button" class="btn btn-primary" data-dismiss="modal">$(ml.T("Annuler","Cancel","Annuleren"))</button>
 		    <button id="ModalConfirmContinue" type="button" class="btn btn-secondary">$(ml.T("Continuer quand même","Continue anyway","Ga toch door"))</button>
+		</div>
+	    </div>
+	</div>
+    </div>
+    <div class="modal fade" id="modalCommands" tabindex="-1" role="dialog" aria-labelledby="modalCommandsTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+	    <div class="modal-content">
+		<div class="modal-header"><img id="actionModalIcon" src="" style="height:2.8em; display:float" align="left"/>
+		    <h5 class="modal-title" id="modalCommandsTitle"><span id="timeModal"></span>: <span id="actionModal"></span> / <span id="stateModal"></span></h5>
+		    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		    </button>
+		</div>
+		<div class="modal-body">
+		    <table class="commandKeyboard" cellspacing="0" cellpadding="0" border="1" width="100%">
+			<tr id="comR1">
+			    <td id="comR1C1" class="commandButtonCell"><img id="comP" class="commandButton" src="/static/action/P.svg" onclick="fromHereTo(currentLetter,'P')"><img id="comI" class="commandButton" src="/static/action/I.svg" onclick="fromHereTo(currentLetter,'I')"></td>
+			    <td id="comR1C2" class="commandButtonCell"><img id="comE" class="commandButton" src="/static/action/E.svg" onclick="fromHereTo(currentLetter,'E')"></td>
+			    <td id="comR1C3" class="commandButtonCell"><a href="/option1"><img id="comO" class="commandButton" src="/static/action/O.svg"/></a></td>
+			</tr>
+			<tr id="comR2">
+			    <td id="comR2C1" class="commandButtonCell"><img id="comC" class="commandButton" src="/static/action/C.svg" onclick="fromHereTo(currentLetter,'C')"/></td>
+			    <td id="comR2C2" class="commandButtonCell"><img id="comA" class="commandButton" src="/static/action/A.svg" onclick="fromHereTo(currentLetter,'A')"/></td>
+			    <td id="comR2C3" class="commandButtonCell"><img id="comD" class="commandButton" src="/static/action/D.svg" onclick="fromHereTo(currentLetter,'D')"/></td>
+			</tr>
+			<tr id="comR3">
+			    <td id="comR3C1" class="commandButtonCell"><img id="comF" class="commandButton" src="/static/action/F.svg" onclick="fromHereTo(currentLetter,'F')"/></td>
+			    <td id="comR3C2" class="commandButtonCell"><img id="comR" class="commandButton" src="/static/action/R.svg" onclick="fromHereTo(currentLetter,'R')"/></td>
+			    <td id="comR3C3" class="commandButtonCell"><a href="/option2"><img id="comN" class="commandButton" src="/static/action/O.svg"/></a></td>
+			</tr>
+			<tr id="comR4">
+			    <td id="comR4C1" class="commandButtonCell"><img id="com_" class="commandButton" src="/static/action/_.svg" onclick="action('_')"/><img id="comS" class="commandButton" src="/static/action/S.svg" onclick="action('S')"/></td>
+			    <td id="comR4C2" class="commandButtonCell"><img id="comZ" class="commandButton" src="/static/action/Z.svg" onclick="action('Z')"/></td>
+			    <td id="comR4C3" class="commandButtonCell"><img id="comV" class="commandButton" src="/static/action/V.svg" onclick="fromHereTo(currentLetter,'V')"/></td>
+			</tr>
+		    </table>
+		</div>
+		<div class="modal-footer">
+		    <span id="dangerModal" class="danger"></span>
 		</div>
 	    </div>
 	</div>

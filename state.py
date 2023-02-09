@@ -136,6 +136,8 @@ class State(object):
         result = ""
         for (actDone,nextState) in self.transitions:
             result += actDone
+        if 'O' in result:
+            result += 'N' # Cleaning parameters and Pasteurisation parameters are both allowed most of the time.
         return result
 
     def save(self, empty, greasy=False, now=int(time.time()) ):

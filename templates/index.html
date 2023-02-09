@@ -1,5 +1,8 @@
-$def with (connected, mail, logtable, letter, paving)
+$def with (connected, mail, logtable, letter, paving, commands)
 $var title : Affordable Pasteurizer
+<script type="text/javascript">
+   var commands = ${str(commands).lower()};
+</script>
 $if paving:
     <div id="paving" class="jumbotron" onclick="void(0);"></div>
     <script type="text/javascript">
@@ -119,6 +122,12 @@ $if not paving:
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
+                        </div>
+                        <div class="modal-footer">
+                            $if letter in menus.CITY_WATER_ACTIONS:
+                                <button onclick="action('!',true)" id="buckbutton2" class="btn btn-info buckbutton" style="visibility:hidden">$(ml.T("Seau fourni","Bucket provided","Emmer voorzien"))&nbsp;<span id="bucket2" class="glyphicon"></span></button>
+                            <button type="button" class="btn btn-primary" onclick="action('$letter')" id="confirm">$(ml.T("Confirmer","Confirm","Bevestigen")) $letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" href="/" id="cancel">$(ml.T("Annuler","Cancel","Annuleer"))</button>
                         </div>
                         <div class="modal-body">
             <ul id="documentation">
@@ -331,12 +340,6 @@ $if not paving:
                 Ongeveer tien seconden later kunt u de schakelaar in de stand OFF (horizontaal) zetten en is alles uit.
             </ul>
             <p class="alert alert-warning">$(menus.actionName[letter][2])</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" href="/" id="cancel">$(ml.T("Annuler","Cancel","Annuleer"))</button>
-                            $if letter in menus.CITY_WATER_ACTIONS:
-                                <button onclick="action('!',true)" id="buckbutton2" class="btn btn-info buckbutton" style="visibility:hidden">$(ml.T("Seau fourni","Bucket provided","Emmer voorzien"))&nbsp;<span id="bucket2" class="glyphicon"></span></button>
-                            <button type="button" class="btn btn-primary" onclick="action('$letter')" id="confirm">$(ml.T("Confirmer","Confirm","Bevestigen")) $letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</button>
                         </div>
                     </div>
                 </div>

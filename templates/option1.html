@@ -1,5 +1,8 @@
 $def with (connected,mail)
 $var title : Pasteurization and Cooling Parameters
+<script type="text/javascript">
+   var commands = false;
+</script>
 <main role="main" class="container">
   <div class="jumbotron" onclick="void(0);">
     <!--
@@ -8,6 +11,9 @@ $var title : Pasteurization and Cooling Parameters
     <p class="alert alert-warning" style="display:inline-block"><b id="accro"></b> <span id="message"></span><span id="delay"></span></p>
     <hr/> -->
 <h2>$(ml.T("Paramètres de Pasteurisation et Refroidissement","Pasteurisation and Cooling Parameters","Pasteurisatie- en koelparameters"))</h2>
+    <button class="btn btn-info" onclick="goToLetter('P','L',false)"><img src="/static/touch.svg" style="height:1.5em;" alt="$(menus.actionName['L'][2])" align="bottom"> $(menus.actionName['L'][1])</button>
+    <button class="btn btn-info" onclick="goToLetter('P','Y',false)"><img src="/static/touch.svg" style="height:1.5em;" alt="$(menus.actionName['Y'][2])" align="bottom"> $(menus.actionName['Y'][1])</button>
+    <button class="btn btn-info" onclick="goToLetter('P','J',false)"><img src="/static/touch.svg" style="height:1.5em;" alt="$(menus.actionName['J'][2])" align="bottom"> $(menus.actionName['J'][1])</button>
 <form method="post" action="/option1">
 $for letter in menus.cleanOptions:
   <div class="form-group">

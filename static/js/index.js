@@ -79,12 +79,28 @@ function goToLetter(pageLetter,letter,PleaseClick) {
         $('#confirm').hide();
         $('#cancel').hide();
         console.log("/explain/"+letter+"#doc");
-        window.location.href = "/explain/"+letter+"?x="+Math.random().toString()+"#doc";
+        window.location.href = "/explain/"+letter+"?"+Math.random().toString()+"#doc";
     }
     currentLetter = letter;
 }
 
+function showCommands() {
+        $('#modalCommands').modal({keyboard: false, focus: true});
+        /*
+        var myModal = new bootstrap.Modal(document.getElementById('modalCommands'), {
+          keyboard: false, focus: true
+        });
+        $('#ModalConfirmContinue').click ( function() {
+          console.log(letter+" confirmed.");
+          myModal.hide();
+          goToLetter(pageLetter,letter,true);
+        } ); */
+        //myModal.show();
+        //console.log(myModal);
+}
+
 function fromHereTo(pageLetter,letter) {
+    $('#modalCommands').modal('hide');
     if (allowedActions.indexOf(letter) >= 0) {
         goToLetter(pageLetter,letter,false);
         return true;
@@ -100,7 +116,7 @@ function fromHereTo(pageLetter,letter) {
           goToLetter(pageLetter,letter,true);
         } );
         myModal.show();
-        console.log(myModal);
+        //console.log(myModal);
         return false;
     }
 }
@@ -167,14 +183,18 @@ function fillDisplay(data,logging) {
                 var date = data['date'].substring(0,10);
                 $('[name=date]').text(date);
                 var time = data['date'].substring(11,999);
-                $('#time').text(time);
+                $('#time').text(time); $('#timeModal').text(time);
                 $('#actionletter').text(data['actionletter']);
+                $('#actionModalIcon').attr("src",'/static/action/'+data['actionletter']+'.svg');
                 //currentLetter = data['actionletter'];
                 $('#preconfigletter').text(data['preconfigletter']);
-                $('#action').text(data['action']);
+                var cellContent = data['action'];
+                $('#action').text(cellContent); $('#actionModal').text(cellContent);
                 $('#stateletter').text(data['stateletter']);
-                $('#state').text(data['state']);
-                $('#danger').text(data['danger']);
+                cellContent = data['state'];
+                $('#state').text(cellContent); $('#stateModal').text(cellContent);
+                cellContent = data['danger'];
+                $('#danger').text(cellContent); $('#dangerModal').text(cellContent? (' '+cellContent+' ') : '');
                 $('#INbucket').attr( "class", "bucketIN"+(data['bin']==data['bout']? '1' : '2')+" in"+data['bin'] );
                 if ('tbin' in data && data['tbin']) {
                     $('#tbin').text(data['tbin']);
@@ -271,7 +291,7 @@ function fillDisplay(data,logging) {
                 $('#message').text(data['message']);
                 if (data['allowedActions'] != '') {
                     //console.log('AA='+data['allowedActions']);
-                    allowedActions = data['allowedActions']+'JYLTOXZ';
+                    allowedActions = data['allowedActions']+'JYLTONXZ';
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
                         if (ml == data['actionletter']) {
@@ -292,7 +312,7 @@ function fillDisplay(data,logging) {
                     }
                 } else {
                     //console.log('no AA');
-                    allowedActions = 'JYLTOXZ';
+                    allowedActions = 'JYLTONXZ';
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
                         $('#drop'+ml).removeClass('dropdown-grayed').removeClass('current').addClass('enabled');
@@ -300,20 +320,20 @@ function fillDisplay(data,logging) {
                     }
                 }
                 if ('actif' in data && data['actif'] > 0) {
-                    $('#STOP').show();
+                    $('#STOP').show(); $('#comZ').css('visibility','visible');
                     if (data['pause'] > 0) {
-                        $('#pause').hide();
-                        $('#restart').show();
+                        $('#pause').hide(); $('#comS').hide();
+                        $('#restart').show(); $('#com_').show();
                         $('#buckbutton').hide()
                         $('#forcing').hide()
                     } else {
-                        $('#pause').show();
+                        $('#pause').show(); $('#comS').show();
                         if (data['purge'] > 2) {
-                            $('#restart').show();
+                            $('#restart').show(); $('#com_').hide();
                             $('#forcing').hide()
                         }
                         else {
-                            $('#restart').hide();
+                            $('#restart').hide(); $('#com_').hide();
                             if (data['actif'] > 0 && data['forcing'] == 1) {
                                 $('#forcing').show().addClass("btn-success").removeClass("btn-light").removeClass("disabled");
                             } else if (data['forcing'] >= 2) {
@@ -347,13 +367,20 @@ function fillDisplay(data,logging) {
                         }
                     }
                 } else {
-                    $('#STOP').hide();
-                    $('#pause').hide();
-                    $('#restart').hide();
+                    $('#STOP').hide(); $('#comZ').hide();
+                    $('#pause').hide(); $('#comS').hide();
+                    $('#restart').hide(); $('#com_').hide();
                     $('#forcing').hide()
                     $('#addbutton').hide();
                     $('#buckbutton').hide();
                 }
+                for (let letter of 'MEPHIOCADFRNV')
+                    if (allowedActions.indexOf(letter) >= 0) {
+                        $('#com'+letter).show();
+                    } else {
+                        $('#com'+letter).hide()
+                    };
+
                 if ('bucket' in data) {
                     $('#buckbutton2').css("visibility", "visible");
                     if (data['bucket'] >= 2) {
@@ -451,7 +478,10 @@ $(document).ready(function() {
             ]
         } ).draw();
     } else {
-       $('#modalDocumentation').modal({});
+        if (commands) {
+           $('#modalCommands').modal({});
+        } else
+           $('#modalDocumentation').modal({});
     }
 
     toRepeat(logging);
@@ -468,8 +498,10 @@ function action(letter, keep = false) {
         timeout: 3000, // sets timeout to 3 seconds
         success: function(data) { fillDisplay(data,false); }
   });
+  console.log (letter,', keep=',keep);
   if ( ! keep) {
       $('#modalDocumentation').modal('hide');
+      $('#modalCommands').modal('hide');
       $('#confirm').hide();
       $('#cancel').hide();
       if (letter == 'Z') {

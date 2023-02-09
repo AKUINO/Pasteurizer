@@ -2219,7 +2219,11 @@ class WebIndex:
         data, connected, mail, password = init_access()
         if 'paving' in data and len(data['paving']) > 0:
             paving = data['paving'][0].lower() in ['o','y','d','s']
-        return render.index(connected, mail, False, None, paving) #True if Paving...
+        commands = 'false'
+        if 'commands' in data and len(data['commands']) > 0:
+            if data['commands'][0].lower() in ['o','y','d','s']:
+                commands = 'true'
+        return render.index(connected, mail, False, None, paving, commands) #True if Paving...
 
     def POST(self):
         return self.GET()
@@ -2265,7 +2269,7 @@ class WebLogTable:
 
     def GET(self):
         data, connected, mail, password = init_access()
-        return render.index(connected,mail, True, None, False)
+        return render.index(connected,mail, True, None, False, False)
 
     def POST(self):
         return self.GET()
@@ -2278,7 +2282,7 @@ class WebExplain:
     def GET(self, letter):
 
         data, connected, mail, password = init_access()
-        return render.index(connected,mail, False, letter, False)
+        return render.index(connected,mail, False, letter, False, False)
 
 class WebApiAction:
 

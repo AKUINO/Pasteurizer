@@ -106,7 +106,7 @@
 
     .empty_pipe { opacity:0.3; text-shadow: 2px 4px #666666; }
 
-    .danger { color: #FFFFFF; background-color: red; text-align:center; margin:2px }
+    .danger { color: #FFFFFF; background-color: red; text-align:center; margin:2px; padding-left:1rem; padding-right:1rem; }
 
     .greenToRed { background: linear-gradient(.25turn, #00AAFF, #FF0000); color:white; }
 
@@ -226,3 +226,7 @@
     .inSEWR  { color: white; background-color : brown }
     .inPAST2 { color: black; background-color : white }
     .inRAW2  { color: black; background-color : #fff3cd }
+
+    .commandKeyboard { border-color:white; width="100%" }
+    .commandButtonCell { border-color:white; }
+    .commandButton { display:block; height:100%; width: 100% }
