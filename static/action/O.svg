@@ -6,8 +6,8 @@
    id="Calque_1"
    x="0px"
    y="0px"
-   viewBox="0 0 68.208 68.208"
-   style="enable-background:new 0 0 68.208 68.208;"
+   viewBox="0 0 68.208 50.208"
+   style="enable-background:new 0 0 68.208 50.208;fill-opacity:0;"
    xml:space="preserve"
    sodipodi:docname="nextBtn.svg"
    inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
@@ -36,15 +36,13 @@
 <style
    type="text/css"
    id="style269">
-	.st0{fill:#F7941D;}
-	.st1{fill:#FFFFFF;}
+	.st1{fill:#FFFFFF;fill-opacity:1;}
 </style>
-<rect
+<rect id="bckO"
    y="0"
    class="st0"
    width="68.208"
    height="68.208"
-   id="rect271"
    x="0" />
 
 <g

@@ -13,8 +13,8 @@
    id="Calque_1"
    x="0px"
    y="0px"
-   viewBox="0 0 68.208 68.208"
-   style="enable-background:new 0 0 68.208 68.208;"
+   viewBox="0 0 68.208 50.208"
+   style="fill-opacity:0;enable-background:new 0 0 68.208 68.208;"
    xml:space="preserve"
    sodipodi:docname="E.svg"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"><metadata
@@ -44,19 +44,18 @@
 <style
    type="text/css"
    id="style2">
-	.st0{fill:#00A651;}
-	.st1{fill:none;stroke:#FFFFFF;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st2{fill:none;stroke:#FFFFFF;stroke-linecap:round;stroke-linejoin:round;}
-	.st3{fill:#FFFFFF;}
-	.st4{fill:none;stroke:#FFFFFF;stroke-width:0.5;stroke-linecap:round;stroke-miterlimit:10;}
+	.st0{fill:#00A651;fill-opacity:1;}
+	.st1{fill:none;fill-opacity:1;stroke:#FFFFFF;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st2{fill:none;fill-opacity:1;stroke:#FFFFFF;stroke-linecap:round;stroke-linejoin:round;}
+	.st3{fill:#FFFFFF;fill-opacity:1;}
+	.st4{fill:none;stroke:#FFFFFF;fill-opacity:1;stroke-width:0.5;stroke-linecap:round;stroke-miterlimit:10;}
 </style>
-<rect
+<rect  id="bckE"
    y="0"
    transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 68.2083 9.166001e-13)"
-   class="st0"
+   fill-opacity="0.0"
    width="68.208"
-   height="68.208"
-   id="rect4" />
+   height="68.208" />
 <g
    id="Pasteursiation_21_">
 	<g

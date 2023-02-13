@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  #F7941D -->
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 68.208 68.208" style="enable-background:new 0 0 68.208 68.208;" xml:space="preserve">
+	 viewBox="0 0 68.208 50.208" style="fill-opacity:0" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#F7941D;}
-	.st1{fill:none;stroke:#FFFFFF;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
-	.st2{fill:#FFFFFF;}
-	.st3{fill:none;stroke:#FFFFFF;stroke-width:0.75;stroke-miterlimit:10;}
+	.st1{fill:none;fill-opacity:1;stroke:#FFFFFF;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+	.st2{fill:#FFFFFF;fill-opacity:1;}
+	.st3{fill:none;fill-opacity:1;stroke:#FFFFFF;stroke-width:0.75;stroke-miterlimit:10;}
 </style>
-<rect x="0" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 68.2083 7.105427e-15)" class="st0" width="68.208" height="68.208"/>
+<!--rect id="bckA" x="0" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 68.2083 7.105427e-15)" width="68.208" height="68.208" /-->
 <g id="Désinfection_12_">
 	<g>
 		<g id="process_93_">
@@ -54,7 +53,7 @@
 			</g>
 		</g>
 	</g>
-	<g>
+	<!--g>
 		<g>
 			<path class="st2" d="M19.831,50.445h-1.431l-3.511-5.688h-0.039l0.024,0.317c0.045,0.605,0.068,1.159,0.068,1.66v3.711h-1.06
 				v-7.139H15.3l3.501,5.659h0.029c-0.006-0.074-0.02-0.348-0.039-0.817c-0.02-0.471-0.029-0.838-0.029-1.102v-3.74h1.069V50.445z"
@@ -130,6 +129,6 @@
 				 M50.972,57.816c-0.365,0-0.657,0.115-0.877,0.347s-0.351,0.568-0.393,1.011h2.451c-0.007-0.446-0.114-0.783-0.322-1.014
 				C51.622,57.931,51.336,57.816,50.972,57.816z"/>
 		</g>
-	</g>
+	</g-->
 </g>
 </svg>

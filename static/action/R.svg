@@ -13,8 +13,8 @@
    id="Calque_1"
    x="0px"
    y="0px"
-   viewBox="0 0 68.208 68.208"
-   style="enable-background:new 0 0 68.208 68.208;"
+   viewBox="0 0 68.208 50.208"
+   style="enable-background:new 0 0 68.208 50.208;fill-opacity:1;"
    xml:space="preserve"
    sodipodi:docname="R.svg"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"><metadata
@@ -44,10 +44,9 @@
 <style
    type="text/css"
    id="style2">
-	.st0{fill:#F7941D;}
-	.st1{fill:none;stroke:#FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st2{fill:#FFFFFF;}
-	.st3{fill:none;stroke:#FFFFFF;stroke-width:0.75;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st1{fill:none;fill-opacity:1;stroke:#FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st2{fill:#FFFFFF;fill-opacity:1;}
+	.st3{fill:none;fill-opacity:1;stroke:#FFFFFF;stroke-width:0.75;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
 </style>
 <rect
    x="0"

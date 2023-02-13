@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  #F7941D-->
 <svg version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 68.208 68.208" style="enable-background:new 0 0 68.208 68.208;" xml:space="preserve">
+	 viewBox="0 0 68.208 50.208" style="fill-opacity:0;enable-background:new 0 0 68.208 50.208;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#F7941D;}
-	.st1{fill:none;stroke:#FFFFFF;stroke-width:0.75;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st2{fill:none;stroke:#FFFFFF;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
-	.st3{fill:#FFFFFF;}
+	.st0{fill:darkcyan;fill-opacity:1;}
+	.st1{fill:none;stroke:#FFFFFF;fill-opacity:1;stroke-width:0.75;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st2{fill:none;fill-opacity:1;stroke:#FFFFFF;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+	.st3{fill:#FFFFFF;fill-opacity:1;}
 </style>
-<rect x="0" y="0" class="st0" width="68.208" height="68.208"/>
+<rect id="bckV" x="0" y="0" class="st0" width="68.208" height="68.208"/>
 <g id="Purge_31_">
 	<g id="bac_vidange_31_">
 		<path class="st1" d="M11.742,16.082c0.982-0.66,3.683-0.751,4.941-0.587c1.73,0.226,5.539,1.084,7.409,1.1
@@ -64,7 +64,7 @@
 				C47.582,21.949,47.456,21.625,47.093,21.437z"/>
 		</g>
 	</g>
-	<g>
+	<!--g>
 		<g>
 			<path class="st3" d="M23.585,52.641c0,0.745-0.244,1.316-0.732,1.714c-0.488,0.396-1.184,0.596-2.085,0.596h-0.742v2.671h-1.167
 				v-7.139h2.056c0.892,0,1.561,0.182,2.004,0.547C23.363,51.394,23.585,51.931,23.585,52.641z M20.025,53.97h0.62
@@ -101,6 +101,6 @@
 				c-0.459,0-0.831,0.149-1.116,0.449c-0.284,0.299-0.427,0.688-0.427,1.167v2.822H46.87v-5.4h0.898l0.151,0.952h0.059
 				c0.179-0.322,0.413-0.578,0.7-0.767C48.968,52.218,49.278,52.124,49.61,52.124z"/>
 		</g>
-	</g>
+	</g-->
 </g>
 </svg>

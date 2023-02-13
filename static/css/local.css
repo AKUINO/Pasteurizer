@@ -227,6 +227,24 @@
     .inPAST2 { color: black; background-color : white }
     .inRAW2  { color: black; background-color : #fff3cd }
 
-    .commandKeyboard { border-color:white; width="100%" }
-    .commandButtonCell { border-color:white; }
+    .commandKeyboard { border-color:white; width="100%"; table-layout:fixed }
+    .commandButtonCell { border-color:white; text-align: center; width="30%" max-width="30%"}
     .commandButton { display:block; height:100%; width: 100% }
+
+    #com_  {background-color:#00A651}
+    #comA  {background-color:red}
+    #comC  {background-color:blue}
+    #comD  {background-color:black}
+    #comE  {background-color:#F7941D}
+    #comF  {background-color:navy}
+    #comI  {background-color:#F7941D}
+    #comN  {background-color:blue}
+    #comO  {background-color:#F7941D}
+    #comP  {background-color:#F7941D}
+    #comR  {background-color:#F7941D}
+    #comS  {background-color:#F7941D}
+    #comV  {background-color:darkcyan}
+    #comZ  {background-color:#F7941D}
+    .comDisable  {background-color:gray ! important}
+
+    .letAction {color:white; text-align: center; vertical-align: bottom; font-size:1.2rem; overflow-wrap: break-word; }

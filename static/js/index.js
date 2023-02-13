@@ -374,11 +374,24 @@ function fillDisplay(data,logging) {
                     $('#addbutton').hide();
                     $('#buckbutton').hide();
                 }
+                if (allowedActions.indexOf('I') >= 0) {
+                    $('#comP').hide();
+                    $('#comI').show();
+                    $('#letP').hide();
+                    $('#letI').show();
+                } else {
+                    $('#comI').hide();
+                    $('#comP').show();
+                    $('#letI').hide();
+                    $('#letP').show();
+                 }
                 for (let letter of 'MEPHIOCADFRNV')
                     if (allowedActions.indexOf(letter) >= 0) {
-                        $('#com'+letter).show();
+                        $('#com'+letter).removeClass('comDisable');
+                        $('#let'+letter).removeClass('comDisable');
                     } else {
-                        $('#com'+letter).hide()
+                        $('#com'+letter).addClass('comDisable');
+                        $('#let'+letter).addClass('comDisable');
                     };
 
                 if ('bucket' in data) {
