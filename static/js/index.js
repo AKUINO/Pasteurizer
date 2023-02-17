@@ -233,7 +233,7 @@ function fillDisplay(data,logging) {
                 if ('forcing' in data && data['forcing'] > 0) {
                     $('#forcing').show()
                 } else {
-                    $('#forcing').hide()
+                    $('#forcing').show() //hide()
                 }
                 // $('#greasy').text(data['greasy']);
                 $('#actiontitle').text(data['actiontitle']);
@@ -339,7 +339,7 @@ function fillDisplay(data,logging) {
                             } else if (data['forcing'] >= 2) {
                                 $('#forcing').show().removeClass("btn-success").addClass("btn-light").addClass("disabled");
                             } else {
-                                $('#forcing').hide();
+                                $('#forcing').show() //hide();
                             }
                         }
                     }

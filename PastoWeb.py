@@ -2695,7 +2695,8 @@ class WebApiLog:
                             'pumpeff': (pumping_volume/(pumping_time/3600)) if pumping_time else 0, \
                             'heateff': (100.0*heating_volume/(pumping_time/3600))/HEAT_POWER if pumping_time else 0, \
                             'level1': T_Pump.level1, \
-                            'level2': T_Pump.level2 \
+                            'level2': T_Pump.level2, \
+                            'forcing': 2 if T_Pump.forcing else (1 if T_Pump.forcible else 0) \
                             }
         return json.dumps(currLog)
 
