@@ -184,9 +184,9 @@ function fillDisplay(data,logging) {
                 $('[name=date]').text(date);
                 var time = data['date'].substring(11,999);
                 $('#time').text(time); $('#timeModal').text(time);
-                $('#actionletter').text(data['actionletter']);
-                $('#actionModalIcon').attr("src",'/static/action/'+data['actionletter']+'.svg');
-                //currentLetter = data['actionletter'];
+                var actionletter = data['actionletter'];
+                $('#actionletter').text(actionletter);
+                //$('#actionModalIcon').attr("src",'/static/action/'+actionletter+'.svg');
                 $('#preconfigletter').text(data['preconfigletter']);
                 var cellContent = data['action'];
                 $('#action').text(cellContent); $('#actionModal').text(cellContent);
@@ -294,7 +294,7 @@ function fillDisplay(data,logging) {
                     allowedActions = data['allowedActions']+'JYLTONXZ';
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
-                        if (ml == data['actionletter']) {
+                        if (ml == actionletter) {
                             //console.log('current='+
                             $('#drop'+ml).removeClass('dropdown-grayed').addClass('current').removeClass('enabled');
                             //$('#menu'+ml).removeClass('disabled').addClass('current').removeClass('enabled');
@@ -386,6 +386,11 @@ function fillDisplay(data,logging) {
                     $('#letP').show();
                  }
                 for (let letter of 'MEPHIOCADFRNV') {
+                    if (letter == actionletter) {
+                        $('#com'+letter).addClass('commandButtonCurrent');
+                    } else {
+                        $('#com'+letter).removeClass('commandButtonCurrent');
+                    }
                     if (allowedActions.indexOf(letter) >= 0) {
                         $('#com'+letter).removeClass('comDisable');
                         $('#let'+letter).removeClass('comDisable icoDisable');
@@ -399,6 +404,9 @@ function fillDisplay(data,logging) {
                 if ( (allowedActions.indexOf('P') >= 0) || (allowedActions.indexOf('I') >= 0) ) {
                         $('#comP').removeClass('comDisable');
                 };
+                if (actionletter == 'I') {
+                    $('#comP').addClass('commandButtonCurrent');
+                }
 
                 if ('bucket' in data) {
                     $('#buckbutton2').css("visibility", "visible");
@@ -451,7 +459,7 @@ function fillDisplay(data,logging) {
                 if ('pumpopt' in data && data['pumpopt']) {
                     $('#pumpopt').text(floorDeci(data['pumpopt']));
                 }
-                if (data['actionletter'] in ['M','E','P','I'] && data['pumpeff'] > 0 && speed != 0 ) {
+                if (actionletter in ['M','E','P','I'] && data['pumpeff'] > 0 && speed != 0 ) {
                     $('#eff').show();
                 } else {
                     $('#eff').hide();
