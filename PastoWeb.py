@@ -2289,6 +2289,131 @@ class WebExplain:
         data, connected, mail, password = init_access()
         return render.index(connected,mail, False, letter, False, False)
 
+def LogData(letter):
+    global T_DAC, T_Pump, menus, optimal_speed, cohorts, hotTapSolenoid
+
+    data, connected, mail, password = init_access()
+    web.header('Content-type', 'application/json; charset=utf-8')
+    if False: #not connected and not guest:
+        currLog = {'message':str(ml.T('RECHARGER CETTE PAGE',"RELOAD THIS PAGE","HERLAAD DEZE PAGINA"))}
+    else:
+        nowT = time.time()
+        (durationRemaining, warning) = T_Pump.durationRemaining(nowT)
+        if durationRemaining:
+            durationRemaining = format_time(durationRemaining)
+        else:
+            durationRemaining = ''
+        quantityRemaining = T_Pump.quantityRemaining()
+        #temper = menus.options['T'][3]
+        opt_temp = menus.val('P')
+        bin = None
+        bout = None
+        kbin = None
+        kbout = None
+        actif = False
+        if T_Pump.currAction and T_Pump.currAction != 'Z':
+            message = str(menus.actionName[T_Pump.currAction][2])
+            if T_Pump.currOperation:
+                actif = True
+                opt_temp = T_Pump.currOperation.tempRef()
+                if opt_temp == 0.0:
+                    opt_temp = menus.val('P')
+                if T_Pump.message:
+                    message = str(T_Pump.message)
+                elif T_Pump.currOperation.message:
+                    message = str(T_Pump.currOperation.message)
+                else:
+                    message = str(menus.operName[T_Pump.currOperation.typeOp])
+                bin = T_Pump.bin
+                if isinstance(bin, list):
+                    bin = bin[0 if menus.val('s') < 1.0 else 1]
+                kbin = T_Pump.inTotal(bin)
+                if kbin == 0.0:
+                    kbin = None
+                bout = T_Pump.bout
+                if isinstance(bout, list):
+                    bout = bout[0 if menus.val('s') < 1.0 else 1]
+                kbout = T_Pump.outTotal(bout)
+                if kbout == 0.0:
+                    kbout = None
+            else:
+                message = str(ml.T("Opération terminée.","Operation completed.","Operatie voltooid."))
+        else:
+            message = str(ml.T("Choisir une action dans le menu...","Choose an action in the menu ...","Kies een actie in het menu ..."))
+        pumping_time = time.perf_counter() - T_Pump.pumpLastChange
+        pumping_volume = T_Pump.pump.volume() - T_Pump.pumpLastVolume
+        heating_volume = T_DAC.totalWatts - T_Pump.pumpLastHeating
+        danger = ''
+        intake = cohorts.getCalibratedValue('intake')
+        input = cohorts.getCalibratedValue('input')
+        warranty = cohorts.getCalibratedValue('warranty')
+        heating = cohorts.getCalibratedValue('heating')
+        if intake < 1.0 or input < 1.0 or warranty < 1.0 or heating < 1.0:
+            danger = str(ml.T('Capteur déconnecté?',"Sensor disconnected?","Sensor losgekoppeld?"))
+        elif intake > 99.0 or input > 99.0 or warranty > 99.0 or heating > 99.0:
+            danger = str(ml.T('Capteur cassé?',"Sensor broken?","Sensor kapot?"))
+        elif T_DAC.empty_tank:
+            danger = str(ml.T('Cuve de chauffe VIDE ou déconnectée?','Heating tank EMPTY or disconnected?','Verwarmingstank LEEG of losgemaakte?'))
+        elif warning:
+            danger = str(ml.T('Cuve de chauffe mal remplie?','Heating tank not correctly filled?','Verwarmingstank niet correct gevuld?'))
+    return {    'date': str(datetime.fromtimestamp(int(nowT))), \
+                'actif': 1 if actif else 0, \
+                'actionletter': T_Pump.currAction, \
+                'preconfigletter':menus.val('z'), \
+                'action': str(menus.actionName[T_Pump.currAction][1]), \
+                'actiontitle': str(menus.actionName[T_Pump.currAction][3]), \
+                'stateletter': (State.current.letter if State.current else ''),
+                'empty': ('V' if State.empty else 'W'),
+                'danger': danger,
+                'bin' : bin.name if bin else None,
+                'bout' : bout.name if bout else None,
+                'tbin' : str(ml.T(in_FR[bin],in_EN[bin],in_NL[bin])) if bin and bin != bout else None,
+                'tbout' : str(ml.T(in_FR[bout],in_EN[bout],in_NL[bout])) if bout else None,
+                'qbin' : T_Pump.inCurrent(bin) if bin and bin != bout else None,
+                'kbin' : kbin if bin and bin != bout else None,
+                'qbout' : T_Pump.outCurrent(bout) if bout else None,
+                'kbout' : kbout,
+                #'greasy': ('G' if State.greasy else 'J'),
+                'state': (str(State.current.labels) if State.current else ''),
+                'statecolor': (str(State.current.color) if State.current else 'black'),
+                'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
+                'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "", \
+                'delay': durationRemaining, \
+                'remain': quantityRemaining, \
+                'totalwatts': T_DAC.totalWatts, \
+                #'totalwatts2': T_DAC.totalWatts2, \
+                'volume': T_Pump.pump.volume(), \
+                'speed': T_Pump.pump.liters() if not T_Pump.paused else 0, \
+                #'extra': isnull(cohorts.getCalibratedValue('extra'), ''), \
+                'input': isnull(input, ''), \
+                'intake': isnull(intake, ''), \
+                'watts': isnull(cohorts.catalog['DAC1'].value*HEAT_POWER, ''), \
+                #'watts2': isnull(cohorts.catalog['DAC2'].value*MITIG_POWER, ''), \
+                'warranty': isnull(warranty, ''), \
+                'heating': isnull(heating, ''), \
+                #'temper': isnull(cohorts.getCalibratedValue('temper'), ''), \
+                'rmeter': isnull(cohorts.val('rmeter'), ''), \
+                'press': isnull(cohorts.val('press',peak=0), ''), \
+                'pressMin': isnull(cohorts.val('press',peak=-1), ''), \
+                'pressMax': isnull(cohorts.val('press',peak=1), ''), \
+                'reft': isnull(cohorts.reft.value, ''), \
+                'message': message + (str(ml.T(' - Cuve mal remplie?',' - Tank not filled?',' - Tank niet gevuld?')) if warning else ''), \
+                #'opt_T': temper if temper <  99.0 else '', \
+                'opt_M': menus.val('M'), \
+                'opt_temp': opt_temp, \
+                'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
+                'bucket': (1 if T_Pump.currAction in menus.CITY_WATER_ACTIONS else 0) if menus.val('s') < 1.0 else 2,
+                'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['M','E','P','H','I'] else 1), \
+                'pause': 1 if T_Pump.paused else 0, \
+                'fill': hotTapSolenoid.get()[0], \
+                'pumpopt': optimal_speed, \
+                'pumpeff': (pumping_volume/(pumping_time/3600)) if pumping_time else 0, \
+                'heateff': (100.0*heating_volume/(pumping_time/3600))/HEAT_POWER if pumping_time else 0, \
+                'level1': T_Pump.level1, \
+                'level2': T_Pump.level2, \
+                'forcing': 2 if T_Pump.forcing > 0 else (1 if T_Pump.forcible else 0) \
+                }
+
 class WebApiAction:
 
     def __init(self):
@@ -2360,10 +2485,8 @@ class WebApiAction:
                        dumpValve.setWait(0.0)
                    time.sleep(0.01)
             elif letter == '>':  # Forcer
-                if T_Pump.forcing > 0:
-                    T_Pump.forcing = 0
-                else:
-                    T_Pump.forcing = int(time.time()) + DEFAULT_FORCING_TIME
+                #if T_Pump.forcing > 0: T_Pump.forcing = 0 else:
+                T_Pump.forcing = int(time.time()) + DEFAULT_FORCING_TIME
                 time.sleep(0.01)
             elif letter == '+':  # Product added
                 if T_Pump.added:
@@ -2395,23 +2518,7 @@ class WebApiAction:
             else: # State dependent Actions
                 if not T_Pump.setAction(letter):
                     message = str(ml.T("Invalide","Invalid","Ongeldig"))
-            result = {  'date':str(datetime.fromtimestamp(int(time.time()))),
-                        'actionletter':letter,
-                        'preconfigletter':menus.val('z'),
-                        'action':str(menus.actionName[letter][1]),
-                        'actiontitle':str(menus.actionName[letter][3]),
-                        'stateletter': (State.current.letter if State.current else ''),
-                        'empty': ('V' if State.empty else 'W'),
-                        #'greasy': ('G' if State.greasy else 'J'),
-                        'state': (str(State.current.labels) if State.current else ''),
-                        'statecolor': (str(State.current.color) if State.current else 'black'),
-                        'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
-                        'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
-                        'bucket': 2 if menus.val('s') >= 1.0 else (1 if letter in menus.CITY_WATER_ACTIONS else 0),
-                        'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
-                        'message':str(menus.actionName[letter][2])+': '+message,
-                        'dumping': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if letter in ['M','E','P','H','I'] else 1),
-                        'pause': 1 if T_Pump.paused else 0 }
+            result = LogData(letter)
         return json.dumps(result)
 
     def POST(self,letter):
@@ -2439,24 +2546,7 @@ class WebApiState:
                 #if ('greasy' in data and data['greasy'].lower() == 'on'):
                     #greasy = True
             State.setCurrent(letter,empty,False) #greasy
-            result = {  'date':str(datetime.fromtimestamp(int(time.time()))),
-                        'actionletter':T_Pump.currAction,
-                        'preconfigletter':menus.val('z'),
-                        'action':str(menus.actionName[T_Pump.currAction][1]),
-                        'actiontitle':str(menus.actionName[T_Pump.currAction][3]),
-                        'stateletter': (State.current.letter if State.current else ''),
-                        'empty': ('V' if State.empty else 'W'),
-                        #'greasy': ('G' if State.greasy else 'J'),
-                        'state': (str(State.current.labels) if State.current else ''),
-                        'statecolor': (str(State.current.color) if State.current else 'black'),
-                        'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
-                        'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
-                        'bucket': 2 if menus.val('s') >= 1.0 else (1 if letter in menus.CITY_WATER_ACTIONS else 0),
-                        'forcing': 2 if T_Pump.forcing > 0 else (1 if T_Pump.forcible else 0),
-                        'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
-                        'message':str(menus.actionName[T_Pump.currAction][2]),
-                        'dumping': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['M','E','P','H','I'] else 1),
-                        'pause': 1 if T_Pump.paused else 0 }
+            result = LogData(T_Pump.currAction)
         return json.dumps(result)
 
     def POST(self,letter):
@@ -2576,131 +2666,7 @@ class WebApiLog:
         self.name = u"WebApiLog"
 
     def GET(self):
-
-        global T_DAC, T_Pump, menus, optimal_speed, cohorts, hotTapSolenoid
-
-        data, connected, mail, password = init_access()
-        web.header('Content-type', 'application/json; charset=utf-8')
-        if False: #not connected and not guest:
-            currLog = {'message':str(ml.T('RECHARGER CETTE PAGE',"RELOAD THIS PAGE","HERLAAD DEZE PAGINA"))}
-        else:
-            nowT = time.time()
-            (durationRemaining, warning) = T_Pump.durationRemaining(nowT)
-            if durationRemaining:
-                durationRemaining = format_time(durationRemaining)
-            else:
-                durationRemaining = ''
-            quantityRemaining = T_Pump.quantityRemaining()
-            #temper = menus.options['T'][3]
-            opt_temp = menus.val('P')
-            bin = None
-            bout = None
-            kbin = None
-            kbout = None
-            actif = False
-            if T_Pump.currAction and T_Pump.currAction != 'Z':
-                message = str(menus.actionName[T_Pump.currAction][2])
-                if T_Pump.currOperation:
-                    actif = True
-                    opt_temp = T_Pump.currOperation.tempRef()
-                    if opt_temp == 0.0:
-                        opt_temp = menus.val('P')
-                    if T_Pump.message:
-                        message = str(T_Pump.message)
-                    elif T_Pump.currOperation.message:
-                        message = str(T_Pump.currOperation.message)
-                    else:
-                        message = str(menus.operName[T_Pump.currOperation.typeOp])
-                    bin = T_Pump.bin
-                    if isinstance(bin, list):
-                        bin = bin[0 if menus.val('s') < 1.0 else 1]
-                    kbin = T_Pump.inTotal(bin)
-                    if kbin == 0.0:
-                        kbin = None
-                    bout = T_Pump.bout
-                    if isinstance(bout, list):
-                        bout = bout[0 if menus.val('s') < 1.0 else 1]
-                    kbout = T_Pump.outTotal(bout)
-                    if kbout == 0.0:
-                        kbout = None
-                else:
-                    message = str(ml.T("Opération terminée.","Operation completed.","Operatie voltooid."))
-            else:
-                message = str(ml.T("Choisir une action dans le menu...","Choose an action in the menu ...","Kies een actie in het menu ..."))
-            pumping_time = time.perf_counter() - T_Pump.pumpLastChange
-            pumping_volume = T_Pump.pump.volume() - T_Pump.pumpLastVolume
-            heating_volume = T_DAC.totalWatts - T_Pump.pumpLastHeating
-            danger = ''
-            intake = cohorts.getCalibratedValue('intake')
-            input = cohorts.getCalibratedValue('input')
-            warranty = cohorts.getCalibratedValue('warranty')
-            heating = cohorts.getCalibratedValue('heating')
-            if intake < 1.0 or input < 1.0 or warranty < 1.0 or heating < 1.0:
-                danger = str(ml.T('Capteur déconnecté?',"Sensor disconnected?","Sensor losgekoppeld?"))
-            elif intake > 99.0 or input > 99.0 or warranty > 99.0 or heating > 99.0:
-                danger = str(ml.T('Capteur cassé?',"Sensor broken?","Sensor kapot?"))
-            elif T_DAC.empty_tank:
-                danger = str(ml.T('Cuve de chauffe VIDE ou déconnectée?','Heating tank EMPTY or disconnected?','Verwarmingstank LEEG of losgemaakte?'))
-            elif warning:
-                danger = str(ml.T('Cuve de chauffe mal remplie?','Heating tank not correctly filled?','Verwarmingstank niet correct gevuld?'))
-            currLog = {     'date': str(datetime.fromtimestamp(int(nowT))), \
-                            'actif': 1 if actif else 0, \
-                            'actionletter': T_Pump.currAction, \
-                            'preconfigletter':menus.val('z'), \
-                            'action': str(menus.actionName[T_Pump.currAction][1]), \
-                            'actiontitle': str(menus.actionName[T_Pump.currAction][3]), \
-                            'stateletter': (State.current.letter if State.current else ''),
-                            'empty': ('V' if State.empty else 'W'),
-                            'danger': danger,
-                            'bin' : bin.name if bin else None,
-                            'bout' : bout.name if bout else None,
-                            'tbin' : str(ml.T(in_FR[bin],in_EN[bin],in_NL[bin])) if bin and bin != bout else None,
-                            'tbout' : str(ml.T(in_FR[bout],in_EN[bout],in_NL[bout])) if bout else None,
-                            'qbin' : T_Pump.inCurrent(bin) if bin and bin != bout else None,
-                            'kbin' : kbin if bin and bin != bout else None,
-                            'qbout' : T_Pump.outCurrent(bout) if bout else None,
-                            'kbout' : kbout,
-                            #'greasy': ('G' if State.greasy else 'J'),
-                            'state': (str(State.current.labels) if State.current else ''),
-                            'statecolor': (str(State.current.color) if State.current else 'black'),
-                            'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
-                            'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "", \
-                            'delay': durationRemaining, \
-                            'remain': quantityRemaining, \
-                            'totalwatts': T_DAC.totalWatts, \
-                            #'totalwatts2': T_DAC.totalWatts2, \
-                            'volume': T_Pump.pump.volume(), \
-                            'speed': T_Pump.pump.liters() if not T_Pump.paused else 0, \
-                            #'extra': isnull(cohorts.getCalibratedValue('extra'), ''), \
-                            'input': isnull(input, ''), \
-                            'intake': isnull(intake, ''), \
-                            'watts': isnull(cohorts.catalog['DAC1'].value*HEAT_POWER, ''), \
-                            #'watts2': isnull(cohorts.catalog['DAC2'].value*MITIG_POWER, ''), \
-                            'warranty': isnull(warranty, ''), \
-                            'heating': isnull(heating, ''), \
-                            #'temper': isnull(cohorts.getCalibratedValue('temper'), ''), \
-                            'rmeter': isnull(cohorts.val('rmeter'), ''), \
-                            'press': isnull(cohorts.val('press',peak=0), ''), \
-                            'pressMin': isnull(cohorts.val('press',peak=-1), ''), \
-                            'pressMax': isnull(cohorts.val('press',peak=1), ''), \
-                            'reft': isnull(cohorts.reft.value, ''), \
-                            'message': message + (str(ml.T(' - Cuve mal remplie?',' - Tank not filled?',' - Tank niet gevuld?')) if warning else ''), \
-                            #'opt_T': temper if temper <  99.0 else '', \
-                            'opt_M': menus.val('M'), \
-                            'opt_temp': opt_temp, \
-                            'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
-                            'bucket': (1 if T_Pump.currAction in menus.CITY_WATER_ACTIONS else 0) if menus.val('s') < 1.0 else 2,
-                            'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['M','E','P','H','I'] else 1), \
-                            'pause': 1 if T_Pump.paused else 0, \
-                            'fill': hotTapSolenoid.get()[0], \
-                            'pumpopt': optimal_speed, \
-                            'pumpeff': (pumping_volume/(pumping_time/3600)) if pumping_time else 0, \
-                            'heateff': (100.0*heating_volume/(pumping_time/3600))/HEAT_POWER if pumping_time else 0, \
-                            'level1': T_Pump.level1, \
-                            'level2': T_Pump.level2, \
-                            'forcing': 2 if T_Pump.forcing > 0 else (1 if T_Pump.forcible else 0) \
-                            }
-        return json.dumps(currLog)
+        return json.dumps(LogData(T_Pump.currAction))
 
     def POST(self):
         return self.GET()
