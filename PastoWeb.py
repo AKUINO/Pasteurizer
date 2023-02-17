@@ -1889,14 +1889,6 @@ class ThreadPump(threading.Thread):
         RedPendingConfirmation = 0.0
         self.running = True
 
-        if self.forcing > 0:
-            now = int(time.time())
-            if now > self.forcing:
-                self.forcing = 0
-
-        if trigger_w.trigger():
-            State.transitCurrent(State.ACTION_RESUME, 'w')
-
         while self.running:
             try:
                 time.sleep(0.2)
@@ -1962,6 +1954,12 @@ class ThreadPump(threading.Thread):
                         self.setPause(True)
                 if Buzzer:
                     Buzzer.off()
+
+                if self.forcing > 0:
+                    now = int(time.time())
+                    if now > self.forcing:
+                        self.forcing = 0
+
                 if self.paused:
                     speed = 0.0
                     if GreenLED:
