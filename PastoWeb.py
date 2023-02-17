@@ -848,7 +848,7 @@ class ThreadDAC(threading.Thread):
                             prec_heating = heating
                             some_heating = False
                         else:
-                            if heating > (prec_heating + 0.5):
+                            if heating > (prec_heating + 0.3):
                                 has_heated = True
                             if heating > (prec_heating + 0.1):
                                 some_heating = True
