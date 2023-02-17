@@ -2486,8 +2486,10 @@ class WebApiAction:
                        dumpValve.setWait(0.0)
                    time.sleep(0.01)
             elif letter == '>':  # Forcer
-                #if T_Pump.forcing > 0: T_Pump.forcing = 0 else:
-                T_Pump.forcing = int(time.time()) + DEFAULT_FORCING_TIME
+                if T_Pump.forcing > 0:
+                    T_Pump.forcing = 0
+                else:
+                    T_Pump.forcing = int(time.time()) + DEFAULT_FORCING_TIME
                 time.sleep(0.01)
             elif letter == '+':  # Product added
                 if T_Pump.added:
