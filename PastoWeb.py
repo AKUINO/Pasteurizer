@@ -1333,7 +1333,7 @@ class Operation(object):
                 pressed = GreenButton.poll() if GreenButton else False # Pressing the GreenButton forces slow speed forward...
                 if (pressed and pressed > 0.0):
                     speed = self.min_speed
-                elif (T_Pump.forcing):
+                elif (T_Pump.forcing > 0):
                     speed = self.min_speed
                 elif self.min_speed >= 0.0:
                     speed = self.min_speed
@@ -1889,7 +1889,7 @@ class ThreadPump(threading.Thread):
         RedPendingConfirmation = 0.0
         self.running = True
 
-        if self.forcing:
+        if self.forcing > 0:
             now = int(time.time())
             if now > self.forcing:
                 self.forcing = 0
@@ -2358,7 +2358,7 @@ class WebApiAction:
                        dumpValve.setWait(0.0)
                    time.sleep(0.01)
             elif letter == '>':  # Forcer
-                if T_Pump.forcing:
+                if T_Pump.forcing > 0:
                     T_Pump.forcing = 0
                 else:
                     T_Pump.forcing = int(time.time()) + DEFAULT_FORCING_TIME
@@ -2450,7 +2450,7 @@ class WebApiState:
                         'allowedActions' : (str(State.current.allowedActions()) if State.current else ''),
                         'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
                         'bucket': 2 if menus.val('s') >= 1.0 else (1 if letter in menus.CITY_WATER_ACTIONS else 0),
-                        'forcing': 2 if T_Pump.forcing else (1 if T_Pump.forcible else 0),
+                        'forcing': 2 if T_Pump.forcing > 0 else (1 if T_Pump.forcible else 0),
                         'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "",
                         'message':str(menus.actionName[T_Pump.currAction][2]),
                         'dumping': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['M','E','P','H','I'] else 1),
@@ -2696,7 +2696,7 @@ class WebApiLog:
                             'heateff': (100.0*heating_volume/(pumping_time/3600))/HEAT_POWER if pumping_time else 0, \
                             'level1': T_Pump.level1, \
                             'level2': T_Pump.level2, \
-                            'forcing': 2 if T_Pump.forcing else (1 if T_Pump.forcible else 0) \
+                            'forcing': 2 if T_Pump.forcing > 0 else (1 if T_Pump.forcible else 0) \
                             }
         return json.dumps(currLog)
 
