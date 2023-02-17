@@ -385,7 +385,7 @@ function fillDisplay(data,logging) {
                     $('#letI').hide();
                     $('#letP').show();
                  }
-                for (let letter of 'MEPHIOCADFRNV')
+                for (let letter of 'MEPHIOCADFRNV') {
                     if (allowedActions.indexOf(letter) >= 0) {
                         $('#com'+letter).removeClass('comDisable');
                         $('#let'+letter).removeClass('comDisable icoDisable');
@@ -394,7 +394,11 @@ function fillDisplay(data,logging) {
                         $('#com'+letter).addClass('comDisable');
                         $('#let'+letter).addClass('comDisable icoDisable');
                         $('#ico'+letter).addClass('icoDisable');
-                    };
+                    }
+                };
+                if ( (allowedActions.indexOf('P') >= 0) || (allowedActions.indexOf('I') >= 0) ) {
+                        $('#comP').removeClass('comDisable');
+                };
 
                 if ('bucket' in data) {
                     $('#buckbutton2').css("visibility", "visible");
