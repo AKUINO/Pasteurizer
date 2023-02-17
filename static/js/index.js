@@ -237,6 +237,7 @@ function fillDisplay(data,logging) {
                         $('#forcing').show().removeClass("btn-success").addClass("btn-light").addClass("disabled");
                     } else {
                         $('#forcing').hide();
+                    }
                 } else {
                     $('#forcing').hide()
                 }
