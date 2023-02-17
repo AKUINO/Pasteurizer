@@ -567,8 +567,9 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                      ,ml.T("Produit chimique ajouté.","Chemical product added.","Chemisch product toegevoegd.") \
                      ,ml.T("L'opération en cours ne doit plus s'interrompre","Current operation does not have to stop.","Huidige bewerking hoeft niet te stoppen.")],
                '>':['>',ml.T("Forcer>","Force>","Kracht>") \
-                     ,ml.T("Avancer / Ajouter de l'eau.","Advance / Add water","Vooruit / Voeg water toe.") \
-                     ,ml.T("Surmonter une bulle d'air / Augmenter l'eau de lavage","Overcome an air bubble / Increase wash water","Overwin een luchtbel / verhoog het waswater")],
+                     ,ml.T("Avancer","Advance","Vooruit") \
+                     #,ml.T("Surmonter une bulle d'air / Augmenter l'eau de lavage","Overcome an air bubble / Increase wash water","Overwin een luchtbel / verhoog het waswater")],
+                     ,ml.T("Surmonter une bulle d'air","Overcome an air bubble","Overwin een luchtbel")],
                '_':['_',ml.T("Redémar.","Restart","Herstart") \
                        ,ml.T("Redémarrage de l'opération en cours.","Restart of the current operation.","Herstart van de huidige bewerking.") \
                        ,ml.T("Redémarrer l'opération en cours","Restart the current operation","Herstart de huidige bewerking")]}
@@ -1153,7 +1154,8 @@ class Operation(object):
         elif self.typeOp == 'REVR':
             T_Pump.pump.reset_pump()
         elif self.typeOp == 'TRAK':
-            T_Pump.forcible = True
+            #T_Pump.forcible = True
+            pass
         elif self.typeOp == 'PAUS':
             if not T_Pump.added:
                 if Buzzer:
@@ -1330,6 +1332,7 @@ class Operation(object):
         elif typeOpToDo == 'TRAK':
             valSensor1 = cohorts.getCalibratedValue(self.sensor1)
             if float(valSensor1) < float(self.tempRef()): # Shake
+                T_Pump.forcible = True
                 pressed = GreenButton.poll() if GreenButton else False # Pressing the GreenButton forces slow speed forward...
                 if (pressed and pressed > 0.0):
                     speed = self.min_speed
@@ -1351,6 +1354,7 @@ class Operation(object):
                         speed = self.min_speed
                 #print("SHAK="+str(speed)+"\r")
             else:
+                T_Pump.forcible = False
                 #if menus.val('g') and self.sensor1 == 'warranty':
                 #    State.greasy = True
                 totalVol,totalTime,beginTemp,endTemp = cohorts.evolution(self.sensor2,self.sensor1)
