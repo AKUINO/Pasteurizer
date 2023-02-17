@@ -375,15 +375,11 @@ function fillDisplay(data,logging) {
                     $('#buckbutton').hide();
                 }
                 if (allowedActions.indexOf('I') >= 0) {
-                    $('#comP').hide();
-                    $('#comI').show();
                     $('#icoP').hide();
                     $('#icoI').show();
                     $('#letP').hide();
                     $('#letI').show();
                 } else {
-                    $('#comI').hide();
-                    $('#comP').show();
                     $('#icoI').hide();
                     $('#icoP').show();
                     $('#letI').hide();
