@@ -539,9 +539,12 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                'S':['S',ml.T("pauSe","pauSe","pause") \
                        ,ml.T("Pause: bouton vert pour redémarrer","Pause: Green button to restart","Groene knop om opnieuw te starten") \
                        ,ml.T("Suspendre ou arrêter l'opération en cours","Suspend or stop the current operation","Onderbreek of stop de huidige bewerking")],
-               'O':['O',ml.T("Option","Option","Opties") \
+               'O':['O',ml.T("Options","Options","Opties") \
                        ,ml.T("Paramètres de fonctionnement","Operating parameters","Bedrijfsparameters") \
                        ,ml.T("Changement de paramètres","Change of parameters","Wijziging van parameters")],
+               'N':['N',ml.T("net.Options","Clng Options","Schoon.Opties") \
+                     ,ml.T("Paramètres de Nettoyage","Cleaning parameters","Schoon Bedrijfsparameters") \
+                     ,ml.T("Changement de paramètres","Change of parameters","Wijziging van parameters")],
                'Y':['Y',ml.T("Yaourt","Yogurt","Yoghurt") \
                        ,ml.T("Pasteuriser pour Yaourt","Pasteurize for Yogurt","Pasteuriseren voor yoghurt") \
                        ,ml.T("Température pour Yaourt","Temperature for Yogurt","Temperatuur voor yoghurt")],
