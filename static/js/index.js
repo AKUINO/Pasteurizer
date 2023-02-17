@@ -231,9 +231,14 @@ function fillDisplay(data,logging) {
                     $('#level2').hide()
                 }
                 if ('forcing' in data && data['forcing'] > 0) {
-                    $('#forcing').show()
+                    if (data['actif'] > 0 && data['forcing'] == 1) {
+                        $('#forcing').show().addClass("btn-success").removeClass("btn-light").removeClass("disabled");
+                    } else if (data['forcing'] >= 2) {
+                        $('#forcing').show().removeClass("btn-success").addClass("btn-light").addClass("disabled");
+                    } else {
+                        $('#forcing').hide();
                 } else {
-                    $('#forcing').show() //hide()
+                    $('#forcing').hide()
                 }
                 // $('#greasy').text(data['greasy']);
                 $('#actiontitle').text(data['actiontitle']);
@@ -330,17 +335,9 @@ function fillDisplay(data,logging) {
                         $('#pause').show(); $('#comS').show();
                         if (data['purge'] > 2) {
                             $('#restart').show(); $('#com_').hide();
-                            $('#forcing').hide()
                         }
                         else {
                             $('#restart').hide(); $('#com_').hide();
-                            if (data['actif'] > 0 && data['forcing'] == 1) {
-                                $('#forcing').show().addClass("btn-success").removeClass("btn-light").removeClass("disabled");
-                            } else if (data['forcing'] >= 2) {
-                                $('#forcing').show().removeClass("btn-success").addClass("btn-light").addClass("disabled");
-                            } else {
-                                $('#forcing').show() //hide();
-                            }
                         }
                     }
                     if ('added' in data) {
