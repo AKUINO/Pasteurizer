@@ -1335,23 +1335,24 @@ class Operation(object):
                 T_Pump.forcible = True
                 pressed = GreenButton.poll() if GreenButton else False # Pressing the GreenButton forces slow speed forward...
                 if (pressed and pressed > 0.0):
-                    speed = self.min_speed
+                    speed = abs(self.min_speed)
                 elif (T_Pump.forcing > 0):
-                    speed = self.min_speed
+                    speed = abs(self.min_speed)
                 elif self.min_speed >= 0.0:
                     speed = self.min_speed
+                # self.min_speed < 0
                 elif speed == 0.0:
                     speed = self.min_speed
                 elif speed > 0.0:
                     if self.shake_qty and T_Pump.pump.current_liters(now) >= self.shake_qty:
-                        speed = self.min_speed
+                        speed = self.min_speed # negative !
                     else:
-                        speed = -self.min_speed
+                        speed = -self.min_speed # positive !
                 else:
                     if self.shake_qty and T_Pump.pump.current_liters(now) <= (-self.shake_qty):
-                        speed = -self.min_speed
+                        speed = -self.min_speed # positive !
                     else:
-                        speed = self.min_speed
+                        speed = self.min_speed # negative !
                 #print("SHAK="+str(speed)+"\r")
             else:
                 T_Pump.forcible = False
