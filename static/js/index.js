@@ -401,6 +401,10 @@ function fillDisplay(data,logging) {
                 };
                 if ( (allowedActions.indexOf('P') >= 0) || (allowedActions.indexOf('I') >= 0) ) {
                         $('#comP').removeClass('comDisable');
+                    if ( (allowedActions.indexOf('P') >= 0) && (allowedActions.indexOf('I') >= 0) ) {
+                        $('#letP').addClass('comDisable icoDisable');
+                        $('#icoP').addClass('icoDisable');
+                    };
                 };
                 if (actionletter == 'I') {
                     $('#comP').addClass('commandButtonCurrent');

@@ -1,0 +1,96 @@
+$def with (report)
+$var title : ml.T("Rapport","Report","Rapport")
+<script type="text/javascript">
+   var commands = false ;
+</script>
+<main role="main" class="container">
+    $if report.state:
+        <table class="report-table">
+        <tr>
+            <th>$(ml.T('Produit par','Produced by','Geproduceerd door'))</th>
+            <td><big><b>$(report.owner.name)</b></big><br/>
+                $(report.owner.address)</br>
+                $(report.owner.city)
+            </td>
+        </tr>
+        <tr>
+            <th>Mail</th>
+            <td><a href="mailto:$(report.owner.mail)">$(report.owner.mail)</a></td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Lot','Batch','Partij'))</th>
+            <td>$(report.batch)</td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Origine du Lait (#Lot)','Milk Source (Batch#)','Melk bron (Partij#)'))</th>
+            <td>...</td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Client et référence','Customer and Reference','Klant en Referentie'))</th>
+            <td>...</td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Volume prévu','Planned volume','Gepland volume'))</th>
+            <td>L : ...</td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Volume mesuré','Measured Volume','Gemeten volume'))</th>
+            <td>$('%.3f' % report.volume) L</td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Température de Pasteurisation','Pasteurisation Temperature','Pasteurisatie temperatuur'))</th>
+            <td>$('%.1f' % report.temp) °C</td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Durée de Maintien','Holding Time','Tijd vasthouden'))</th>
+            <td>$('%.0f' % report.hold) sec.</td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Durée de traitement','Processing Time','Verwerkingstijd'))</th>
+            <td>$('%.0f' % report.duration) sec.</td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Pauses','Pauses','Pauzeert'))</th>
+            <td>
+                $ totalSec = 0
+                $ totalVol = 0.0
+                $for deviation in report.pauses:
+                    $ totalSec += deviation[0] #.duration
+                    $ totalVol += deviation[1] #.volume
+                    $('%.0f' % deviation[0]) sec. : $('%.3f' % deviation[1]) L<br/>
+                <b>Total</b> = $('%.0f' % totalSec) sec. :  $('%.3f' % totalVol) L
+            </td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Attentes de régulation','Waits for temperature control','Wachten of regulatie'))</th>
+            <td>
+                $ totalSec = 0
+                $ totalVol = 0.0
+                $for deviation in report.regulations:
+                    $ totalSec += deviation[0] #.duration
+                    $ totalVol += deviation[1] #.volume
+                    $('%.0f' % deviation[0]) sec. : $('%.3f' % deviation[1]) L<br/>
+                <b>Total</b> = $('%.0f' % totalSec) sec. :  $('%.3f' % totalVol) L
+            </td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Autres déviations','Other deviations','Andere afwijkingen'))</th>
+            <td>$(ml.T('(type + volume impliqué)','(type + volume involved)','(type + volume betrokken)'))<br/> &nbsp; </td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Germes totaux','Total Count','Totaal kiemen'))</th>
+            <td>$(ml.T('CFU','CTU','KVE')) : </td>
+        </tr>
+        <tr>
+            <th>Phosphatase (PAL)</th>
+            <td>OK=$(ml.T('détruite(brun)','destroyed(brown)','vernietigd(bruin)')) / Nok=$(ml.T('présente(bleu)','present(blue)','present(blauw)'))</td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Nom+Signature de l\'opératrice/teur','Operator Name+Signature','Operator Naam+Handtekening'))</th>
+            <td>...<br/> &nbsp; </td>
+        </tr>
+        </table>
+    $else:
+        <h1>$(ml.T('Pas de pasteurisation effectuée','No pasteurization done','Geen pasteurisatie uitgevoerd'))</h1>
+    <div class="d-print-none"><a href="/reports">$(ml.T("Autres rapports","Other reports","Andere verslagen"))</a></div>
+</main>

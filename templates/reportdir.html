@@ -1,0 +1,13 @@
+$def with (reports,reportPasteur)
+$var title : ml.T("Rapports","Reports","Rapporten")
+<script type="text/javascript">
+   var commands = false ;
+</script>
+<main role="main" class="container">
+    <ul>
+        $if reportPasteur and reportPasteur.state:
+            <li><a href="/report/current">$(ml.T("En cours","Current","Huidige"))</a></li>
+        $for reportpath in reversed(reports):
+            <li><a href="/report/$(reportpath)">$(reportpath[0:4])/$(reportpath[5:7])/$(reportpath[7:9]) $(reportpath[10:12]):$(reportpath[12:14])</a></li>
+    </ul>
+</main>

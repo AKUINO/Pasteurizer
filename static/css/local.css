@@ -136,6 +136,11 @@
         transform: scaleY(-1) rotate(270deg);
     }
 
+    .report-table { border-bottom: solid black 1px }
+    .report-table tr { border-top: solid black 1px }
+    .report-table tr th { background-color: #DDD; padding: 4px; border-left: solid black 1px }
+    .report-table tr td { padding: 4px; border-right: solid black 1px }
+
     g text {
         /* font-family:'OpenSans, Arial, Helvetica, sans-serif'; */
         font-size:10px;

@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 # This module helps keeping track of measurements of "cohorts" of events and to take decision upon them
 import time
+
+import datafiles
 import sensor
-import datetime
-import sched
 import traceback
-import math
 import csv
 
 class Cohort(object):
@@ -111,6 +110,8 @@ class Cohort(object):
     def evolution(self,begAddr,endAddr):
         begin = None
         end = None
+        begPer = None
+        endPer = None
         volTotal, tablo = self.last_travel(endAddr)
         for line in tablo:
             if line[1] == begAddr:
@@ -123,22 +124,21 @@ class Cohort(object):
             return None,None,None,None
         return volTotal,self.diff_time(begPer,endPer),begin,end
         
-    def saveCalibration(self,directory,address,means):
+    def saveCalibration(self,address,means):
         try:
-            data_file = open(directory + address+".csv", "w")
-            for tuples in means:
-                mean = tuples[1]
-                data_file.write("%.1f\t%d\t%.3f\t%.3f\n" \
-                            % (tuples[0],mean[0],mean[1],mean[2]) )
+            with open(datafiles.csvfile(address), "w") as data_file:
+                for tuples in means:
+                    mean = tuples[1]
+                    data_file.write("%.1f\t%d\t%.3f\t%.3f\n" \
+                                % (tuples[0],mean[0],mean[1],mean[2]) )
             self.calibration[address] = means
-            data_file.close()
         except:
             traceback.print_exc()
             pass
         
-    def readCalibration(self,directory,address):
+    def readCalibration(self,address):
         try:
-            with open(directory + address+".csv") as csvfile:
+            with open(datafiles.csvfile(address)) as csvfile:
                 reader = csv.DictReader(csvfile, fieldnames=['key','qty','app','tru'], delimiter="\t")
                 means = []
                 for row in reader:
@@ -146,7 +146,7 @@ class Cohort(object):
                 self.calibration[address] = means
                 #print(means)
         except FileNotFoundError:
-            print ('No calibration found for sensor "'+address+'" in directory '+directory)
+            print ('No calibration found for sensor "'+address+'" in directory '+datafiles.DIR_DATA_CSV)
         except:
             traceback.print_exc()
             pass

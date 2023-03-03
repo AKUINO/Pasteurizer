@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 import time
 import traceback
+
+import datafiles
 from TimeTrigger import TimeTrigger
 
 class State(object):
@@ -40,13 +42,9 @@ class State(object):
         (State.dstart,State.delayed, State.dempty, State.dgreasy) = State.current.transit(State.empty, State.greasy, step, action, State.start, toBeSaved=False, now=now)
         # print (State.delayed.letter)
 
-    data_dir = None
-
-    def loadCurrent(DIR_DATA_CSV): # returns timestamp and current state
-
-        State.data_dir = DIR_DATA_CSV
+    def loadCurrent(dummy = None): # returns timestamp and current state
         try:
-            with open(DIR_DATA_CSV + "state.csv") as f:
+            with open(datafiles.csvfile("state")) as f:
                 stateData = f.read()
                 # print (stateData)
                 data = stateData.split('\n')
@@ -142,7 +140,7 @@ class State(object):
 
     def save(self, empty, greasy=False, now=int(time.time()) ):
         try:
-            with open(State.data_dir + "state.csv", "w") as data_file:
+            with open(datafiles.csvfile("state"), "w") as data_file:
                 data_file.write("epoch_sec\tstate\tempty\tgreasy\n")
                 data_file.write("%d\t%s\t%d\t%d\n"%(now, self.letter, empty, greasy))
                 # print ("%d\t%s\t%d\t%d\n"%(now, self.letter, empty, greasy))

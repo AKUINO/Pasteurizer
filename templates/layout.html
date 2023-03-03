@@ -64,6 +64,8 @@ $ currentLetter = menus.currAction
 		    <a id="drop$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1])<small> - $(menus.actionName[letter][3])</small></a>
 		  <div class="dropdown-divider"></div>
 		  <a class="dropdown-item" href="/option1" onclick="closeMenu()">$(ml.T("Paramètres de Pasteurisation","Pasteurisation Parameters","Pasteurisatie parameters"))</a>
+		  <div class="dropdown-divider"></div>
+		  <a class="dropdown-item" href="/reports" onclick="closeMenu()">$(ml.T("Rapports","Reports","Rapporten"))</a>
 		  </div>
 		</li>
 		<li class="nav-item dropdown">
@@ -85,6 +87,7 @@ $ currentLetter = menus.currAction
 		  $for letter in menus.sysActions:
 		    <a id="drop$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1])<small> - $(menus.actionName[letter][3])</small></a>
 		  <div class="dropdown-divider"></div>
+		  <a class="dropdown-item" href="/report" onclick="closeMenu()">$(ml.T("Rapports","Reports","Rapporten"))</a>
 		  <a class="dropdown-item" href="/csv" onclick="closeMenu()">$(ml.T("Données brutes","Raw Data","Ruwe Data"))</a>
 		  <div class="dropdown-divider"></div>
 		  <a class="dropdown-item" href="/assignsensor" onclick="closeMenu()">$(ml.T("Config.Capteurs","Sensors Config.","Sensoren Config."))</a>
@@ -109,9 +112,9 @@ $ currentLetter = menus.currAction
 		      <a class="dropdown-item" href="/?lang=n" onclick="closeMenu()">Nederlands</a>
 		  </div>
 		</li>
-		<li class="nav-item">
+		<!--li class="nav-item">
 		  <a class="nav-link" href="/logtable" id="logtable">$(ml.T("Journal","Log","Logboek"))</a>
-		</li>
+		</li-->
 		<!--li class="nav-item">
 		  <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
 		</li-->

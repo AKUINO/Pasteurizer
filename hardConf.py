@@ -11,6 +11,7 @@ import platform
 import term
 import ml
 import MICHApast
+import owner
 
 processor = None # pc, rpi, odroid
 io = None
@@ -263,6 +264,14 @@ if configParsing:
         for anItem in configParsing.items('user'):
             if anItem[0].lower() == 'lang':
                 ml.setLang(anItem[1].lower())
+            elif anItem[0].lower() == 'name' and anItem[1]:
+                owner.owner.name = anItem[1]
+            elif anItem[0].lower() == 'address' and anItem[1]:
+                owner.owner.address = anItem[1]
+            elif anItem[0].lower() == 'city' and anItem[1]:
+                owner.owner.city = anItem[1]
+            elif anItem[0].lower() == 'email' and anItem[1]:
+                owner.owner.email = anItem[1]
             else:
                 print('[user] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: lang')
 

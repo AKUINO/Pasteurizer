@@ -17,12 +17,14 @@ import subprocess
 import traceback
 
 import ml # Not unused !!!
+import datafiles
 
 import pyownet
 import term
 import threading
 
 import hardConf
+import report
 import sensor
 #import pump
 import pump_pwm
@@ -37,23 +39,13 @@ from sensor import Sensor
 from valve import Valve
 from menus import Menus
 from state import State
+from report import Report
 
 from TimeTrigger import TimeTrigger
 
 global render, _lock_socket
 
 DEBUG = True
-
-DIR_BASE = os.path.dirname(os.path.abspath(__file__)) + '/'
-
-DIR_STATIC = os.path.join(DIR_BASE, 'static/')
-URL_STATIC = u'/static/'
-
-DIR_DATA_CSV = os.path.join(DIR_BASE, 'csv/')
-
-DIR_WEB_TEMP = os.path.join(DIR_STATIC, 'temp/')
-
-TEMPLATES_DIR = os.path.join(DIR_BASE, 'templates/')
 
 KEY_ADMIN = "user@akuino.net"  # Omnipotent user
 PWD = "past0.NET"
@@ -243,7 +235,9 @@ menus.sortedOptions = "PMGwQDdHRrusCcAaZ" #T
 menus.cleanOptions = "PMGQH" #TtK
 menus.dirtyOptions = "RrusCcAawDdH" #Cc
 
-menus.loadCurrent(DIR_DATA_CSV)
+menus.loadCurrent()
+
+reportPasteur = Report(menus) # Initialized when initializing the pump...
 
 trigger_w = TimeTrigger('w',menus)
 #(options['P'][3] + BATH_TUBE) = 75.0  # Température du Bassin de chauffe
@@ -286,8 +280,7 @@ except socket.error:
     print('AKUINOpast lock exists')
     sys.exit()
 
-if not os.path.samefile(os.getcwd(), DIR_BASE):
-    os.chdir(DIR_BASE)
+datafiles.goto_application_root()
 
 PI = 3.141592 # Yes, we run on a Raspberry !
 
@@ -383,7 +376,7 @@ class ThreadOneWire(threading.Thread):
         global cohorts
         if not address in cohorts.catalog:
             cohorts.addSensor(address,sensor.Sensor(typeOneWire,address,param))
-            cohorts.readCalibration(DIR_DATA_CSV,address)
+            cohorts.readCalibration(address)
         return cohorts.catalog[address]
 
     def run(self):
@@ -451,14 +444,14 @@ class ThreadThermistor(threading.Thread):
         global cohorts
         if param and not address in cohorts.catalog:
             cohorts.addSensor(address,Thermistor(address,param))
-            cohorts.readCalibration(DIR_DATA_CSV,address)
+            cohorts.readCalibration(address)
         return cohorts.catalog[address]
 
     def pressureSensorParam(self,address,param, flag):
         global cohorts
         if param and flag and not address in cohorts.catalog:
             cohorts.addSensor(address,Pressure(address,param,flag))
-            cohorts.readCalibration(DIR_DATA_CSV,address)
+            cohorts.readCalibration(address)
         return cohorts.catalog[address]
 
     def run(self):
@@ -799,7 +792,7 @@ class ThreadDAC(threading.Thread):
 
     def run(self):
         
-        global cohorts, fileName, DIR_DATA_CSV, display_pause,tank,HEAT_POWER,ROOM_TEMP, lines, columns
+        global cohorts, fileName, display_pause,tank,HEAT_POWER,ROOM_TEMP, lines, columns
         
         self.running = True
         lastLoop = time.perf_counter()
@@ -927,8 +920,8 @@ class ThreadDAC(threading.Thread):
                 (durationRemaining, warning) = self.T_Pump.durationRemaining(nowT)
                 quantityRemaining = self.T_Pump.quantityRemaining()
                 try:
-                    data_file = open(DIR_DATA_CSV + fileName+".csv", "a")
-                    data_file.write("%d\t%s%s%s\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
+                    with open(datafiles.csvfile(datafiles.logfile), "a") as data_file:
+                        data_file.write("%d\t%s%s%s\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
                                     % (int(nowT), \
                                        State.current.letter if State.current else '', \
                                        'V' if State.empty else 'W', \
@@ -955,7 +948,6 @@ class ThreadDAC(threading.Thread):
                                        #cohorts.catalog['DAC2'].val(), \
                                        #cohorts.catalog['sp9b'].value
                                        #cohorts.catalog['intake'].value, batt
-                    data_file.close()
                 except:
                     traceback.print_exc()
                     pass
@@ -1342,19 +1334,26 @@ class Operation(object):
                     speed = self.min_speed
                 # self.min_speed < 0
                 elif speed == 0.0:
-                    speed = self.min_speed
+                    speed = self.min_speed # negative !
                 elif speed > 0.0:
                     if self.shake_qty and T_Pump.pump.current_liters(now) >= self.shake_qty:
+                        # begin a regulation control cycle: start reversal
+                        if not reportPasteur.startRegulating:
+                            reportPasteur.startRegulating = time.perf_counter()
                         speed = self.min_speed # negative !
                     else:
                         speed = -self.min_speed # positive !
-                else:
+                else: # speed negative !
                     if self.shake_qty and T_Pump.pump.current_liters(now) <= (-self.shake_qty):
+                        # ends a regulation control cycle: resume forward
                         speed = -self.min_speed # positive !
                     else:
                         speed = self.min_speed # negative !
                 #print("SHAK="+str(speed)+"\r")
-            else:
+            else: # No more "shake"
+                if reportPasteur.startRegulating:
+                    reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, heating_tube / 1000.0))
+                    reportPasteur.startRegulating = None
                 T_Pump.forcible = False
                 #if menus.val('g') and self.sensor1 == 'warranty':
                 #    State.greasy = True
@@ -1665,7 +1664,12 @@ class ThreadPump(threading.Thread):
         self.pump = pumpy
         self.T_DAC = T_DAC
         self.manAction('Z')
-        since, current, empty, greasy = State.loadCurrent(DIR_DATA_CSV)
+        since, current, empty, greasy = State.loadCurrent()
+        if current and current.letter in ['p','e'] :
+            reportPasteur.state = current.letter
+            nowD = datetime.now()
+            reportPasteur.batch = nowD.strftime(datafiles.FILENAME_FORMAT)
+            reportPasteur.begin = time.perf_counter()
         trigger_w.base = since
         self.currSequence = None
         self.currOperation = None
@@ -1807,11 +1811,14 @@ class ThreadPump(threading.Thread):
 
     def setPause(self,paused):
 
-        global hotTapSolenoid
+        global hotTapSolenoid, reportPasteur
 
         if self.paused and not paused:
+            duration = time.perf_counter()-self.startPause
+            if reportPasteur.state:
+                reportPasteur.pauses.append((duration, heating_tube / 1000.0))
             if self.currOpContext:
-                self.currOpContext.extend_duration(time.perf_counter()-self.startPause)
+                self.currOpContext.extend_duration(duration)
         self.pumpLastChange = time.perf_counter()
         self.pumpLastVolume = self.pump.volume()
         self.pumpLastHeating = self.T_DAC.totalWatts
@@ -2016,12 +2023,25 @@ class ThreadPump(threading.Thread):
                         term.pos(1,cols-10)
                         term.write("%5.2d" % speed, term.bold, term.yellow if speed > 0.0 else term.red, term.bgwhite)
                         display_pause = prec_disp
+                if not reportPasteur.state:
+                    if State.current.letter in ['p','e'] :
+                        reportPasteur.state = State.current.letter
+                        nowD = datetime.now()
+                        reportPasteur.batch = nowD.strftime(datafiles.FILENAME_FORMAT)
+                        reportPasteur.begin = time.perf_counter()
+                else:
+                    reportPasteur.duration = time.perf_counter() - reportPasteur.begin
+                    if State.current.letter not in ['p','e'] :
+                        reportPasteur.save()
+                        reportPasteur.state = None
             except:
                 traceback.print_exc()
                 self.pump.stop()
                 prec_speed = 0.0
                 prec = time.perf_counter()
 
+        if State.current.letter in ['p','e'] : # Closing while pasteurizing: save the report !
+            reportPasteur.save()
         time.sleep(0.01)
         self.pump.stop()
 
@@ -2054,7 +2074,12 @@ class ThreadPump(threading.Thread):
                 else:
                     currV *= (vol/tim)
             self.lastQuantityEval = currV
-            return (self.pump.volume() - (self.qbout if self.qbout is not None else 0.0)) + self.fbout + currV
+
+            result = (self.pump.volume() - (self.qbout if self.qbout is not None else 0.0)) + self.fbout
+            if reportPasteur.state == 'p':
+                reportPasteur.volume = result
+                #report.duration =
+            return result + currV
         self.lastQuantityEval = None
         return None # remaining water in pipe is unknown
 
@@ -2129,23 +2154,12 @@ else:
     dumpValve = Sensor(Valve.typeNum,'DMP',hardConf.DMP_open) # Dummy Valve only to know if we are dumping or cycling...
 dumpValve.set(1.0) # Open by default
 
-
-defFile = datetime.now().strftime("%Y_%m%d_%H%M")
-# term.write("Code de production ["+defFile+"] :", term.bgwhite, term.blue)
-# term.write(" ",term.red, term.bold, term.bgwhite)
-# try:
-    # fileName = input("")
-# except:
-    # fileName = ""
-#if not fileName:
-fileName = defFile
-data_file = open(DIR_DATA_CSV + fileName+".csv", "w")
-data_file.write("epoch_sec\tstate\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\tinput\twarant\tintake\theat\theatbath\t"
-                +("press" if hardConf.inputPressure else "rmeter")
-                +"\tlinput\tloutput\n") #\twatt2\ttemper\theat
-term.write("Données stockées dans ",term.blue, term.bgwhite)
-term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
-data_file.close()
+with open(datafiles.csvfile(datafiles.logfile), "w") as data_file:
+    data_file.write("epoch_sec\tstate\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\tinput\twarant\tintake\theat\theatbath\t"
+                    +("press" if hardConf.inputPressure else "rmeter")
+                    +"\tlinput\tloutput\n") #\twatt2\ttemper\theat
+    term.write("Données stockées dans ",term.blue, term.bgwhite)
+    term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
 
 ##x=""
 ##T_DAC.set_temp((options['P'][3] + BATH_TUBE))
@@ -2239,6 +2253,9 @@ class WebOption:
         self.name = u"WebOption"
 
     def GET(self,page):
+
+        global reportPasteur
+
         data, connected, mail, password = init_access()
         if not connected:
             raise web.seeother('/')
@@ -2264,7 +2281,7 @@ class WebOption:
                 raise web.seeother('/')
 
         render_page = getattr(render, 'option'+page)
-        return render_page(connected, mail)
+        return render_page(connected, mail, reportPasteur)
 
     def POST(self,page):
         return self.GET(page)
@@ -2618,7 +2635,7 @@ class WebCalibrate:
                 means = calib_digest(sensor)
                 if to_be_saved:
                     meansort = sorted(means.items())
-                    cohorts.saveCalibration(DIR_DATA_CSV,sensor,meansort)
+                    cohorts.saveCalibration(sensor,meansort)
         return render.calibrate(sensor, calibrating, temp_ref_calib, means)
         
     def POST(self,sensor=None):
@@ -2677,7 +2694,7 @@ class WebApiLog:
 class getCSS:
     def GET(self, filename):
         web.header('Content-type', 'text/css')
-        with open( os.path.join(DIR_STATIC,'css/') + filename) as f:
+        with open( datafiles.static_filepath( 'css', filename) ) as f:
             try:
                 return f.read()
             except IOError:
@@ -2686,7 +2703,16 @@ class getCSS:
 class getJS:
     def GET(self, filename):
         web.header('Content-type', 'application/javascript')
-        with open( os.path.join(DIR_STATIC,'js/') + filename) as f:
+        with open( datafiles.static_filepath( 'js', filename) ) as f:
+            try:
+                return f.read()
+            except IOError:
+                web.notfound()
+
+class getFavicon:
+    def GET(self, extension):
+        web.header('Content-type', 'image/x-icon')
+        with open( datafiles.static_filepath( None, 'favicon.ico') ) as f:
             try:
                 return f.read()
             except IOError:
@@ -2704,7 +2730,7 @@ class getCSV:
             if not fileParam:
                 fileParam = fileName
             web.header('Content-type', 'text/csv')
-            with open(DIR_DATA_CSV + fileParam + ".csv") as f:
+            with open(datafiles.csvfile(fileParam),'r') as f:
                 try:
                     return f.read()
                 except IOError:
@@ -2715,9 +2741,9 @@ class getCSV:
             res = []
             gotSmall = False
             # Iterate directory
-            for path in sorted(os.listdir(DIR_DATA_CSV),reverse=True):
+            for path in sorted(os.listdir(datafiles.DIR_DATA_CSV),reverse=True):
                 # check if current path is a file
-                if os.path.isfile(os.path.join(DIR_DATA_CSV, path)) and len(path) == 18  and path.startswith("2") \
+                if os.path.isfile(os.path.join(datafiles.DIR_DATA_CSV, path)) and len(path) == 18  and path.startswith("2") \
                         and path.endswith(".csv") and path <= endParam:
                     if gotSmall:
                         break
@@ -2726,7 +2752,7 @@ class getCSV:
                         gotSmall = True
             result = ""
             for fileName in sorted(res):
-                with open(DIR_DATA_CSV + fileName ) as f:
+                with open(datafiles.DIR_DATA_CSV + fileName ) as f:
                     try:
                         if result:
                             f.readline() # skip header if result is not empty
@@ -2747,11 +2773,43 @@ class getCSVdir:
             res = []
 
             # Iterate directory
-            for path in os.listdir(DIR_DATA_CSV):
+            for path in os.listdir(datafiles.DIR_DATA_CSV):
                 # check if current path is a file
-                if os.path.isfile(os.path.join(DIR_DATA_CSV, path)) and len(path) == 18  and path.startswith("2") and path.endswith(".csv"):
+                if os.path.isfile(os.path.join(datafiles.DIR_DATA_CSV, path)) and len(path) == 18  and path.startswith("2") and path.endswith(".csv"):
                     res.append(path)
             return render.csvdir(sorted(res))
+
+class WebReport:
+    def GET(self, batchParam=None):
+
+        global reportPasteur
+
+        data, connected, mail, password = init_access()
+        if not connected:
+            raise web.seeother('/')
+        elif not batchParam or batchParam == "current":
+            return render.report(reportPasteur)
+        elif batchParam:
+            shownReport = report.load(batchParam)
+            if shownReport:
+                #print (json.dumps(shownReport.to_dict()))
+                return render.report(shownReport)
+            else:
+                raise web.seeother('/reports')
+        else:
+            raise web.seeother('/reports')
+
+class WebReports:
+    def GET(self):
+
+        global reportPasteur
+
+        data, connected, mail, password = init_access()
+        if not connected:
+            raise web.seeother('/')
+        else:
+            res = report.list_reports()
+            return render.reportdir(sorted(res), reportPasteur)
 
 def restart_program():
     """Restarts the current program, with file objects and descriptors
@@ -2760,7 +2818,7 @@ def restart_program():
     _lock_socket.close()
     python = sys.executable
     args = sys.argv
-    args[0] = os.path.join(DIR_BASE, os.path.basename(sys.argv[0]))
+    args[0] = os.path.join(datafiles.DIR_BASE, os.path.basename(sys.argv[0]))
     os.execl(python, python, *args)
 
 class WebLog(object):
@@ -2943,8 +3001,9 @@ try:
     web.template.Template.globals['isnull'] = isnull
     web.template.Template.globals['zeroIsNone'] = zeroIsNone
     web.template.Template.globals['datetime'] = datetime
-    layout = web.template.frender(TEMPLATES_DIR + '/layout.html')
-    render = web.template.render(TEMPLATES_DIR, base=layout)
+    web.template.Template.globals['datafiles'] = datafiles
+    layout = web.template.frender(datafiles.TEMPLATES_DIR + '/layout.html')
+    render = web.template.render(datafiles.TEMPLATES_DIR, base=layout)
     web.httpserver.sys.stderr = WebLog()
     urls = (
         '/', 'WebIndex',
@@ -2968,6 +3027,8 @@ try:
         '/csv/(.+)/(.+)', 'getCSV',
         '/csv/(.+)', 'getCSV',
         '/csv', 'getCSV',
+        '/report/(.+)', 'WebReport',
+        '/reports', 'WebReports',
         '/update', 'WebSoftwareUpdate',
         '/disconnect', 'WebDisconnect'
         #'/restarting', 'WebRestarting'
@@ -3057,7 +3118,7 @@ try:
 except:
     traceback.print_exc()
 
-with open(DIR_DATA_CSV + fileName+".csv", "r") as data_file:
+with open(datafiles.csvfile(datafiles.logfile), "r") as data_file:
     term.write("Données stockées dans ",term.blue, term.bgwhite)
     term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
     data_file.close()
