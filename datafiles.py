@@ -25,8 +25,10 @@ logfile = datetime.datetime.now().strftime(FILENAME_FORMAT)
 def csvfile(fileName):
     return DIR_DATA_CSV + fileName + ".csv"
 
-def reportfile(fileName):
+def reportfile(fileName): # always begin with 2 !
     return DIR_DATA_REPORT + fileName + ".json"
+
+ownerfile = DIR_DATA_REPORT + "owner.json" # do not begins with 2 !
 
 def static_filepath( subdir, filename):
     return (os.path.join(DIR_STATIC,subdir+'/') if subdir else DIR_STATIC) + filename

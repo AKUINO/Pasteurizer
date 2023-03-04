@@ -3,19 +3,19 @@
 import time
 import datetime
 import traceback
-import owner
 
 import datafiles
 import os
 import json
 
 import menus
+import owner
 
 # Fonction pour lister les fichiers d'un répertoire et retourner une liste de noms de fichiers
 def list_reports(dummy = None):
     filenames = []
     for filename in os.listdir(datafiles.DIR_DATA_REPORT):
-        if os.path.isfile(os.path.join(datafiles.DIR_DATA_REPORT, filename)):
+        if os.path.isfile(os.path.join(datafiles.DIR_DATA_REPORT, filename)) and filename.startswith("2") :
             pext = filename.index(".json")
             if pext > 0:
                 filenames.append(filename[:pext])
@@ -50,9 +50,9 @@ class Report(object): # Info about the Owner of the Pasteurizee
 
     def start(self, menuOptions:menus.Menus, state):
         self.state = state
+        self.owner = owner.Owner.load(None)
         nowD = datetime.datetime.now()
         self.batch = nowD.strftime(datafiles.FILENAME_FORMAT)
-        self.owner = owner.owner
         self.duration = 0
         self.volume = 0.0
         self.temp = menuOptions.val('P') if menuOptions else 0
