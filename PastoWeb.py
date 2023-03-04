@@ -1253,7 +1253,7 @@ class Operation(object):
     # Keep going in the current operation
     def execute(self,now,T_Pump):
 
-        global menus, hotTapSolenoid
+        global menus, hotTapSolenoid, reportPasteur
 
         time.sleep(0.01)
         dumpValve.set(1.0 if self.dump else 0.0) # Will stop command if open/close duration is done
@@ -1353,7 +1353,7 @@ class Operation(object):
             else: # No more "shake"
                 if reportPasteur.startRegulating:
                     reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, heating_tube / 1000.0))
-                    reportPasteur.startRegulating = None
+                    reportPasteur.startRegulating = 0
                 T_Pump.forcible = False
                 #if menus.val('g') and self.sensor1 == 'warranty':
                 #    State.greasy = True
@@ -1657,7 +1657,8 @@ def reloadPasteurizationSpeed():
 class ThreadPump(threading.Thread):
 
     def __init__(self, pumpy, T_DAC):
-        global trigger_w
+
+        global trigger_w, reportPasteur
 
         threading.Thread.__init__(self)
         self.running = False
@@ -1666,10 +1667,7 @@ class ThreadPump(threading.Thread):
         self.manAction('Z')
         since, current, empty, greasy = State.loadCurrent()
         if current and current.letter in ['p','e'] :
-            reportPasteur.state = current.letter
-            nowD = datetime.now()
-            reportPasteur.batch = nowD.strftime(datafiles.FILENAME_FORMAT)
-            reportPasteur.begin = time.perf_counter()
+            reportPasteur.start(menus,current.letter)
         trigger_w.base = since
         self.currSequence = None
         self.currOperation = None
@@ -1890,7 +1888,7 @@ class ThreadPump(threading.Thread):
 
     def run(self):
 
-        global display_pause, WebExit, RedConfirmationDelay, trigger_w
+        global display_pause, WebExit, RedConfirmationDelay, trigger_w, reportPasteur
 
         if GreenLED:
             GreenLED.off()
@@ -2025,22 +2023,22 @@ class ThreadPump(threading.Thread):
                         display_pause = prec_disp
                 if not reportPasteur.state:
                     if State.current.letter in ['p','e'] :
-                        reportPasteur.state = State.current.letter
-                        nowD = datetime.now()
-                        reportPasteur.batch = nowD.strftime(datafiles.FILENAME_FORMAT)
-                        reportPasteur.begin = time.perf_counter()
+                        reportPasteur.start(menus, State.current.letter)
                 else:
-                    reportPasteur.duration = time.perf_counter() - reportPasteur.begin
                     if State.current.letter not in ['p','e'] :
-                        reportPasteur.save()
+                        if reportPasteur.volume > 0.0 :
+                            reportPasteur.save()
                         reportPasteur.state = None
+                    elif State.current.letter == 'p':
+                        reportPasteur.volume = (self.pump.volume() - (self.qbout if self.qbout is not None else 0.0)) + self.fbout
+                        reportPasteur.duration = time.perf_counter() - reportPasteur.begin
             except:
                 traceback.print_exc()
                 self.pump.stop()
                 prec_speed = 0.0
                 prec = time.perf_counter()
 
-        if State.current.letter in ['p','e'] : # Closing while pasteurizing: save the report !
+        if State.current.letter in ['p','e'] and reportPasteur.volume > 0.0 : # Closing while pasteurizing: save the report !
             reportPasteur.save()
         time.sleep(0.01)
         self.pump.stop()
@@ -2060,6 +2058,9 @@ class ThreadPump(threading.Thread):
         return self.kbin
 
     def outCurrent (self,bin):
+
+        global reportPasteur
+
         if self.currAction  != 'V':
             currV = 0.0
             if menus.val('s') < 1.0 and self.currOpContext and self.currOperation and self.currOperation.typeOp in ['FLOO','FILL','HOTW']:
@@ -2076,9 +2077,6 @@ class ThreadPump(threading.Thread):
             self.lastQuantityEval = currV
 
             result = (self.pump.volume() - (self.qbout if self.qbout is not None else 0.0)) + self.fbout
-            if reportPasteur.state == 'p':
-                reportPasteur.volume = result
-                #report.duration =
             return result + currV
         self.lastQuantityEval = None
         return None # remaining water in pipe is unknown

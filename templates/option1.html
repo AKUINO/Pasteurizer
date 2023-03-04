@@ -15,7 +15,9 @@ $var title : Pasteurization and Cooling Parameters
     <button class="btn btn-info" onclick="goToLetter('P','Y',false)"><img src="/static/touch.svg" style="height:1.5em;" alt="$(menus.actionName['Y'][2])" align="bottom"> $(menus.actionName['Y'][1])</button>
     <button class="btn btn-info" onclick="goToLetter('P','J',false)"><img src="/static/touch.svg" style="height:1.5em;" alt="$(menus.actionName['J'][2])" align="bottom"> $(menus.actionName['J'][1])</button>
     $if reportPasteur.state:
-        <a role="button" class="btn btn-success" href="/report/current" style="float:right">$(ml.T("Rapport","Report","Verslag"))</a>
+      <a role="button" class="btn btn-success" href="/report/current" style="float:right">$(ml.T("Rapport","Report","Verslag"))</a>
+    $else:
+      <a role="button" class="btn btn-secondary" href="/reports" style="float:right">$(ml.T("Rapports","Reports","Verslagen"))</a>
 <form method="post" action="/option1">
 $for letter in menus.cleanOptions:
   <div class="form-group">

@@ -48,6 +48,21 @@ class Report(object): # Info about the Owner of the Pasteurizee
         self.state = ''
         self.begin = 0
 
+    def start(self, menuOptions:menus.Menus, state):
+        self.state = state
+        nowD = datetime.datetime.now()
+        self.batch = nowD.strftime(datafiles.FILENAME_FORMAT)
+        self.owner = owner.owner
+        self.duration = 0
+        self.volume = 0.0
+        self.temp = menuOptions.val('P') if menuOptions else 0
+        self.hold = menuOptions.val('M') if menuOptions else 0
+        self.pauses = []
+        self.startRegulating = 0
+        self.regulations = []
+        self.begin = time.perf_counter()
+        print ('report start at %d' % self.begin)
+
     def from_dict (self,reportDict: dict):
         self.batch = reportDict['batch']
         self.owner = owner.Owner(reportDict['owner'])
