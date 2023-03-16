@@ -1,10 +1,11 @@
 $def with (report)
-$var title : ml.T("Rapport","Report","Rapport")
+$var title : $(ml.T("Rapport","Report","Rapport"))
 <script type="text/javascript">
    var commands = false ;
 </script>
 <main role="main" class="container">
     $if report.state:
+        <form method="post" action="/report/$(report.batch)">
         <table class="report-table">
         <tr>
             <th>$(ml.T('Produit par','Produced by','Geproduceerd door'))</th>
@@ -22,16 +23,26 @@ $var title : ml.T("Rapport","Report","Rapport")
             <td>$(report.batch)</td>
         </tr>
         <tr>
-            <th>$(ml.T('Origine du Lait (#Lot)','Milk Source (Batch#)','Melk bron (Partij#)'))</th>
-            <td>...</td>
+            <th>
+                <label for="input_source">$(ml.T('Origine du Lait (#Lot)','Milk Source (Batch#)','Melk bron (Partij#)'))</label>
+            </th>
+            <td>
+                <input class="form-control" id="input_source" name="input_source" placeholder="..." type="text" value="$(report.input_source)">
+            </td>
         </tr>
         <tr>
-            <th>$(ml.T('Client et référence','Customer and Reference','Klant en Referentie'))</th>
-            <td>...</td>
+            <th>
+                <label for="customer">$(ml.T('Client et référence','Customer and Reference','Klant en Referentie'))</label>
+            </th>
+            <td>
+                <input class="form-control" id="customer" name="customer" placeholder="..." type="text" value="$(report.customer)">
+            </td>
         </tr>
         <tr>
-            <th>$(ml.T('Volume prévu','Planned volume','Gepland volume'))</th>
-            <td>L : ...</td>
+            <th>
+                <label for="planned_volume">$(ml.T('Volume prévu','Planned volume','Gepland volume'))</label>
+            </th>
+            <td><input id="planned_volume" name="planned_volume" placeholder="0" type="number" min="0" max="9999" size="4" step="1" value="$(report.planned_volume)">&nbsp;L</td>
         </tr>
         <tr>
             <th>$(ml.T('Volume mesuré','Measured Volume','Gemeten volume'))</th>
@@ -39,26 +50,39 @@ $var title : ml.T("Rapport","Report","Rapport")
         </tr>
         <tr>
             <th>$(ml.T('Température de pasteurisation','Pasteurisation Temperature','Pasteurisatie temperatuur'))</th>
-            <td>$('%.1f' % report.temp) °C</td>
+            <td>
+                $if report.duration > 0 and report.volume > 0:
+                    $('%.1f' % (report.total_temperature/(report.duration*report.volume)) )°C
+                $(ml.T('Demandé','Requested','Aangevraagd')):<b>$('%.1f' % report.temp)°C</b>
+            </td>
         </tr>
         <tr>
             <th>$(ml.T('Durée de maintien','Holding Time','Tijd vasthouden'))</th>
             <td>$('%.0f' % report.hold) sec.</td>
         </tr>
+        $ totalSec = 0
+        $ totalVol = 0.0
+        $for deviation in report.pauses:
+            $ totalSec += deviation[0] #.duration
+            $ totalVol += deviation[1] #.volume
         <tr>
             <th>$(ml.T('Durée de traitement','Processing Time','Verwerkingstijd'))</th>
-            <td>$('%.0f' % report.duration) sec.</td>
+            <td>
+                $(menus.showTime(report.duration))
+            </td>
+        </tr>
+        <tr>
+            <th>$(ml.T('Chauffe','Heating','Verwarming'))</th>
+            <td>$(menus.showTime(report.total_time_heating))
+                = $(2.5*report.total_time_heating/3600)kW
+            </td>
         </tr>
         <tr>
             <th>$(ml.T('Pauses','Pauses','Pauzeert'))</th>
             <td>
-                $ totalSec = 0
-                $ totalVol = 0.0
                 $for deviation in report.pauses:
-                    $ totalSec += deviation[0] #.duration
-                    $ totalVol += deviation[1] #.volume
-                    $('%.0f' % deviation[0]) sec. : $('%.3f' % deviation[1]) L<br/>
-                <b>Total</b> = $('%.0f' % totalSec) sec. :  $('%.3f' % totalVol) L
+                    $(menus.showTime(deviation[0])) = $('%.3f' % deviation[1]) L<br/>
+                <b>Total</b> = $(menus.showTime(totalSec)) = $('%.3f' % totalVol) L
             </td>
         </tr>
         <tr>
@@ -69,28 +93,78 @@ $var title : ml.T("Rapport","Report","Rapport")
                 $for deviation in report.regulations:
                     $ totalSec += deviation[0] #.duration
                     $ totalVol += deviation[1] #.volume
-                    $('%.0f' % deviation[0]) sec. : $('%.3f' % deviation[1]) L<br/>
-                <b>Total</b> = $('%.0f' % totalSec) sec. :  $('%.3f' % totalVol) L
+                    $(menus.showTime(deviation[0])) = $('%.3f' % deviation[1]) L<br/>
+                <b>Total</b> = $(menus.showTime(totalSec)) =  $('%.3f' % totalVol) L
             </td>
         </tr>
         <tr>
-            <th>$(ml.T('Autres déviations','Other deviations','Andere afwijkingen'))</th>
-            <td>$(ml.T('(type + volume impliqué)','(type + volume involved)','(type + volume betrokken)'))<br/> &nbsp; </td>
+            <th><label for="deviations">$(ml.T('Autres déviations','Other deviations','Andere afwijkingen'))</label></th>
+            <td>$(ml.T('(type + volume impliqué)','(type + volume involved)','(type + volume betrokken)')) <br/>
+                <input class="form-control" id="deviations" name="deviations" placeholder="..." type="text" value="$(report.deviations)">
+            </td>
         </tr>
         <tr>
-            <th>$(ml.T('Germes totaux','Total Count','Totaal kiemen'))</th>
-            <td>$(ml.T('CFU','CTU','KVE')) : </td>
+            <th><label for="total_count">$(ml.T('Germes totaux','Total Count','Totaal kiemen'))</label></th>
+            <td><input id="total_count" name="total_count" placeholder="0" type="number" min="0" max="999999" size="6" step="1" value="$(report.total_count)">&nbsp;$(ml.T('CFU','CTU','KVE'))</td>
         </tr>
         <tr>
             <th>Phosphatase (PAL)</th>
-            <td>OK=$(ml.T('détruite(brun)','destroyed(brown)','vernietigd(bruin)')) / Nok=$(ml.T('présente(bleu)','present(blue)','present(blauw)'))</td>
+            <td><div class="custom-control custom-radio">
+                <input id="pd_none" name="phosphatase_destroyed" type="radio" value="0" class="custom-control-input"$(' checked' if report.phosphatase_destroyed=='0' else '')/>
+                <label class="custom-control-label" for="pd_none">$(ml.T('pas testé','not tested','getest'))</label>
+            </div><div class="custom-control custom-radio">
+                <input id="pd_OK" name="phosphatase_destroyed" type="radio" value="1" class="custom-control-input"$(' checked' if report.phosphatase_destroyed=='1' else '')/>
+                <label class="custom-control-label" for="pd_OK">OK=$(ml.T('détruite(brun)','destroyed(brown)','vernietigd(bruin)'))</label>
+            </div><div class="custom-control custom-radio">
+                <input id="pd_NOK" name="phosphatase_destroyed" type="radio" value="2" class="custom-control-input"$(' checked' if report.phosphatase_destroyed=='2' else '')/>
+                <label class="custom-control-label" for="pd_NOK">Nok=$(ml.T('présente(bleu)','present(blue)','present(blauw)'))</label>
+            </div>
+            </td>
         </tr>
         <tr>
-            <th>$(ml.T('Nom+Signature de l\'opératrice/teur','Operator Name+Signature','Operator Naam+Handtekening'))</th>
-            <td>...<br/> &nbsp; </td>
+            <th><label for="signature">$(ml.T('Nom+Signature de l\'opératrice/teur','Operator Name+Signature','Operator Naam+Handtekening'))</label></th>
+            <td>
+                <input class="form-control" id="signature" name="signature" placeholder="..." type="text" value="$(report.signature)">
+            </td>
+        </tr>
+        <tr class="d-print-none">
+            <td colspan="2" style="text-align:center">
+                <button type="submit" class="btn btn-primary">$(ml.T("Enregistrer","Save","Opslaan"))</button>
+            </td>
+        </tr>
+        <tr class="d-print-none">
+            <td>
+                <a href="/reports">$(ml.T("Autres rapports","Other reports","Andere verslagen"))</a>
+            </td>
+            <td>
+                <a onclick='deletePath("$(report.batch)")' href="#"><span class="glyphicon glyphicon-trash"></span>$(ml.T("Détruire ce rapport","Delete this report","Vernietiging van dit rapport"))</a>
+            </td>
         </tr>
         </table>
+        </form>
     $else:
         <h1>$(ml.T('Pas de pasteurisation effectuée','No pasteurization done','Geen pasteurisatie uitgevoerd'))</h1>
-    <div class="d-print-none"><a href="/reports">$(ml.T("Autres rapports","Other reports","Andere verslagen"))</a></div>
+        <div class="d-print-none"><a href="/reports">$(ml.T("Autres rapports","Other reports","Andere verslagen"))</a></div>
 </main>
+<!-- Modal -->
+<div class="modal fade" id="ModalConfirmR" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalTitleR">
+                    $(ml.T("Détruire le rapport","Delete the report","Vernietiging van het rapport"))
+                    <span id="pathToDelete"></span>
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">$(ml.T("Annuler","Cancel","Annuleren"))</button>
+                <button id="ModalConfirmContinueR" type="button" class="btn btn-secondary">$(ml.T("Confirmer","Confirm","Bevestig"))</button>
+            </div>
+        </div>
+    </div>
+</div>

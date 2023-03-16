@@ -70,6 +70,9 @@ class Menus(object):
         else:
             return None
 
+    def showTime(self,val):
+        return '%02d:%02d:%02d' % (val // 3600, (val % 3600) // 60, val // 60)
+
     def display(self,letter, field, value = None):
         fieldType = self.type(letter)
         if value is None and field:

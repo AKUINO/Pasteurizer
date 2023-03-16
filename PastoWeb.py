@@ -165,6 +165,8 @@ TANK_NOT_FILLED = 1.5 # If heating time remaining is decreasing more than expect
 
 TANK_EMPTY_LIMIT = 60 # If heating time has not diminished in the last 60 seconds, the heating tank may be empty...
 
+PUMP_LOOP_DELAY = 0.2
+
 menus = Menus.singleton
 menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,ml.T("Gradient de température","Temperature Gradient","Gradient van Temperatuur") \
@@ -1897,14 +1899,16 @@ class ThreadPump(threading.Thread):
         if RedLED:
             RedLED.on()
         RedPendingConfirmation = 0.0
+        prec_loop = time.perf_counter()
         self.running = True
 
         while self.running:
             try:
-                time.sleep(0.2)
+                time.sleep(PUMP_LOOP_DELAY)
+                now = time.perf_counter()
+
                 if trigger_w.trigger():
                     State.transitCurrent(State.ACTION_RESUME, 'w')
-                now = time.perf_counter()
                 if RedPendingConfirmation != 0.0:
                     if RedLED:
                         RedLED.blink(2)
@@ -2032,11 +2036,15 @@ class ThreadPump(threading.Thread):
                     elif State.current.letter == 'p':
                         reportPasteur.volume = (self.pump.volume() - (self.qbout if self.qbout is not None else 0.0)) + self.fbout
                         reportPasteur.duration = time.perf_counter() - reportPasteur.begin
+                        loop_delay = time.perf_counter()
+                        #TODO: Calculate and double check the performance indicators (also add them to report.html...
+                        reportPasteur.total_time_heating = reportPasteur.total_time_heating + ((loop_delay-prec_loop)*cohorts.catalog['DAC1'].value)
+                        reportPasteur.total_temperature = reportPasteur.total_temperature + (self.pump.speed*(loop_delay-prec_loop)*cohorts.catalog['heating'].value)
             except:
                 traceback.print_exc()
                 self.pump.stop()
                 prec_speed = 0.0
-                prec = time.perf_counter()
+            prec_loop = time.perf_counter()
 
         if State.current.letter in ['p','e'] and reportPasteur.volume > 0.0 : # Closing while pasteurizing: save the report !
             reportPasteur.save()
@@ -2797,6 +2805,27 @@ class WebReport:
         else:
             raise web.seeother('/reports')
 
+    def POST(self, batchParam=None):
+
+        global reportPasteur
+
+        data, connected, mail, password = init_access()
+        if not connected:
+            raise web.seeother('/')
+        else:
+            if not batchParam or batchParam == "current":
+                reportPasteur.record(data)
+                return render.report(reportPasteur)
+            elif batchParam:
+                shownReport = report.load(batchParam)
+                if shownReport:
+                    shownReport.record(data)
+                    return render.report(shownReport)
+                else:
+                    raise web.seeother('/reports')
+            else:
+                raise web.seeother('/reports')
+
 class WebReports:
     def GET(self):
 
@@ -2808,6 +2837,16 @@ class WebReports:
         else:
             res = report.list_reports()
             return render.reportdir(sorted(res), reportPasteur)
+
+class WebReportDelete:
+
+    def GET(self,path=None):
+        data, connected, mail, password = init_access()
+        if not connected:
+            raise web.seeother('/')
+        else:
+            success = report.delete(path)
+            raise web.seeother('/reports')
 
 def restart_program():
     """Restarts the current program, with file objects and descriptors
@@ -3025,7 +3064,9 @@ try:
         '/csv/(.+)/(.+)', 'getCSV',
         '/csv/(.+)', 'getCSV',
         '/csv', 'getCSV',
+        '/report', 'WebReport',
         '/report/(.+)', 'WebReport',
+        '/reportdel/(.+)', 'WebReportDelete',
         '/reports', 'WebReports',
         '/update', 'WebSoftwareUpdate',
         '/disconnect', 'WebDisconnect'

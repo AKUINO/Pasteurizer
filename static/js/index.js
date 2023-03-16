@@ -121,6 +121,29 @@ function fromHereTo(pageLetter,letter) {
     }
 }
 
+function deletePath(path) {
+    $('#modalCommands').modal('hide');
+    // (reportpath[0:4])/(reportpath[5:7])/(reportpath[7:9]) (reportpath[10:12]):(reportpath[12:14])
+    $('#pathToDelete').text(path);
+    var myModal = new bootstrap.Modal(document.getElementById('ModalConfirmR'), {
+      keyboard: false, focus: true
+    });
+    $('#ModalConfirmContinueR').click ( function() {
+      console.log(path+" deletion confirmed.");
+      myModal.hide();
+      doDeletePath(path);
+    } );
+    myModal.show();
+    //console.log(myModal);
+    return false;
+}
+
+function doDeletePath(path) {
+    $('.navbar-collapse').collapse('hide');
+    console.log("/reportdel/"+path);
+    window.location.href = "/reportdel/"+path+"?"+Math.random().toString();
+}
+
 var ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 function SVGready(elements) {

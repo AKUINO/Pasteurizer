@@ -138,8 +138,8 @@
 
     .report-table { border-bottom: solid black 1px }
     .report-table tr { border-top: solid black 1px }
-    .report-table tr th { background-color: #DDD; padding: 4px; border-left: solid black 1px }
-    .report-table tr td { padding: 4px; border-right: solid black 1px }
+    .report-table tr th { background-color: #DDD; padding: 4px; padding-right:8px; border-left: solid black 1px; text-align: right }
+    .report-table tr td { padding: 4px; border-right: solid black 1px; border-left: solid black 1px }
 
     g text {
         /* font-family:'OpenSans, Arial, Helvetica, sans-serif'; */
