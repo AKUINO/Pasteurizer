@@ -1946,34 +1946,32 @@ class ThreadPump(threading.Thread):
                             YellowLED.blink(2)
 
                 if RedButton and RedButton.acknowledge():
-                    if RedPendingConfirmation > 0.0:
+                    if not self.currAction in [None,'X','Z',' ']: # Immediate stop, no confirmation
+                        self.stopAction()
+                    elif RedPendingConfirmation > 0.0: # Red button already pressed, SHUTDOWN action can be taken
                         RedPendingConfirmation = 0.0
-                        if not self.currAction in [None,'X','Z',' ']:
-                            self.stopAction()
-                        else:
-                            if Buzzer:
-                                Buzzer.on()
-                            self.close()
-                            self.manAction('X')
-                            WebExit = True # SHUTDOWN requested
-                            if Buzzer:
-                                Buzzer.off()
-                            try:
-                                os.kill(os.getpid(),signal.SIGINT)
-                            except:
-                                traceback.print_exc()
+                        if Buzzer:
+                            Buzzer.on()
+                        self.close()
+                        self.manAction('X')
+                        WebExit = True # SHUTDOWN requested
+                        if Buzzer:
+                            Buzzer.off()
+                        try:
+                            os.kill(os.getpid(),signal.SIGINT)
+                        except:
+                            traceback.print_exc()
                     else:
                         if RedPendingConfirmation == 0.0: # Synchronize all LED !
                             if RedLED:
                                 RedLED.off()
                                 RedLED.blink(2)
-                            if self.currAction in [None,'X','Z',' ']:
-                                if YellowLED:
-                                    YellowLED.off()
-                                if GreenLED:
-                                    GreenLED.off()
+                            if YellowLED:
+                                YellowLED.off()
+                            if GreenLED:
+                                GreenLED.off()
                         RedPendingConfirmation = 0.0 - (now + RedConfirmationDelay) #Confirmation must occur within 3 seconds
-                else:
+                else: # RedButton not pressed
                     if RedPendingConfirmation != 0.0:
                         if RedPendingConfirmation < 0.0: # Button not released yet
                             RedPendingConfirmation = 0.0 - RedPendingConfirmation
