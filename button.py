@@ -13,7 +13,7 @@ class button(sensor.Sensor):
 
     typeNum = 13
 
-    def __init__(self,address,param):
+    def __init__(self,address,param,LED=None):
         try:
             if param < 0:
                 pass # MICHA...
@@ -26,6 +26,7 @@ class button(sensor.Sensor):
             print ("%s: init GPIO no.%d" % (address,param))
             traceback.print_exc()
         self.lastwrite = 0
+        self.LED = LED
         super().__init__(button.typeNum,address,param)
 
     def poll(self):
@@ -73,9 +74,15 @@ class ThreadButtons (threading.Thread):
 
     def run(self):
         self.running = True
+        i = 0
         while self.running:
             try:
                 time.sleep(0.1)
+                if button.LED:
+                    i += 1
+                    button.LED.phase = ( i <= 5 ) # Blink twice a second
+                    if i >= 10:
+                        i = 0
                 for button in self.buttons: #Take only the existing buttons
                     time.sleep(0.01)
                     if button.poll() > 0:

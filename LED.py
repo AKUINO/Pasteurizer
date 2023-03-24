@@ -21,6 +21,7 @@ class LED(sensor.Sensor):
             print ("%s: init GPIO no.%d" % (address,param))
             traceback.print_exc()
         self.lastwrite = 0
+        self.phase = False # more precise blinking twice a second...
         super().__init__(LED.typeNum,address,param)
 
     def write(self,value):
@@ -63,13 +64,14 @@ class LED(sensor.Sensor):
         self.set(0)
 
     def blink(self,flashPerSeconds=2):
-        if self.value == int(flashPerSeconds):
-            if self.lastwrite == 0:
-                self.write(1)
-            else:
-                self.write(0)
-        else:
-            self.set(flashPerSeconds)
+        # if self.value == int(flashPerSeconds):
+        #     if self.lastwrite == 0:
+        #         self.write(1)
+        #     else:
+        #         self.write(0)
+        # else:
+        #     self.set(flashPerSeconds)
+        self.write(1 if self.phase else 0)
 
     def on(self):
         self.set(1)

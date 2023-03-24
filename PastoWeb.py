@@ -163,11 +163,11 @@ if hardConf.Out_Green:
 
 #configuration of input pins
 if hardConf.In_Red:
-    RedButton = button('red',hardConf.In_Red)
+    RedButton = button('red',hardConf.In_Red, RedLED)
 if hardConf.In_Yellow:
-    YellowButton = button('yellow',hardConf.In_Yellow)
+    YellowButton = button('yellow',hardConf.In_Yellow, YellowLED)
 if hardConf.In_Green:
-    GreenButton = button('green',hardConf.In_Green)
+    GreenButton = button('green',hardConf.In_Green, GreenLED)
 if hardConf.In_Emergency:
     EmergencyButton = button('emergency',hardConf.In_Emergency)
 
