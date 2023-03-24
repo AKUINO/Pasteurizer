@@ -79,14 +79,14 @@ class ThreadButtons (threading.Thread):
             try:
                 time.sleep(0.1)
                 i = i + 1
-                if i > 10:
+                if i > 6:
                     i = 0
                 for button in self.buttons: #Take only the existing buttons
                     time.sleep(0.01)
                     if button.poll() > 0:
                         button.set(1.0)
                     if button.LED:
-                        button.LED.phase = ( i <= 5 ) # Blink twice a second
+                        button.LED.phase = ( i <= 3 ) # Blink twice a second
             except KeyboardInterrupt:
                 self.running = False
                 break

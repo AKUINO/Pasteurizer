@@ -1836,7 +1836,7 @@ class ThreadPump(threading.Thread):
 
     def setPause(self,paused):
 
-        global hotTapSolenoid, reportPasteur
+        global hotTapSolenoid, reportPasteur, YellowLED
 
         if self.paused and not paused:
             duration = time.perf_counter()-self.startPause
@@ -1850,6 +1850,7 @@ class ThreadPump(threading.Thread):
         if not self.paused and paused:
             self.startPause = self.pumpLastChange
         if paused:
+            YellowLED.set(0)
             T_Pump.pump.reset_pump()
             hotTapSolenoid.set(0)
         self.paused = paused
