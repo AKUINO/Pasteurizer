@@ -82,7 +82,7 @@ class ThreadButtons (threading.Thread):
                 if i > 4:
                     i = 0
                 for button in self.buttons: #Take only the existing buttons
-                    time.sleep(0.01)
+                    #time.sleep(0.01)
                     if button.poll() > 0:
                         button.set(1.0)
                     if button.LED:
