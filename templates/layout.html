@@ -61,7 +61,7 @@ $ currentLetter = menus.currAction
 		  </a>
 		  <div class="dropdown-menu">
 		  $for letter in menus.cleanActions:
-		    <a id="drop$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1])<small> - $(menus.actionName[letter][3])</small></a>
+		    <a id="menu$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1])<small> - $(menus.actionName[letter][3])</small></a>
 		  <div class="dropdown-divider"></div>
 		  <a class="dropdown-item" href="/option1" onclick="closeMenu()">$(ml.T("Paramètres de Pasteurisation","Pasteurisation Parameters","Pasteurisatie parameters"))</a>
 		  <div class="dropdown-divider"></div>
@@ -74,7 +74,7 @@ $ currentLetter = menus.currAction
 		  </a>
 		  <div class="dropdown-menu">
 		  $for letter in menus.dirtyActions:
-		    <a id="drop$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1])<small> - $(menus.actionName[letter][3])</small></a>
+		    <a id="menu$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1])<small> - $(menus.actionName[letter][3])</small></a>
 		  <div class="dropdown-divider"></div>
 		  <a class="dropdown-item" href="/option2" onclick="closeMenu()">$(ml.T("Paramètres de Nettoyage","Cleansing Parameters","Reiniging parameters"))</a>
 		  </div>
@@ -85,7 +85,7 @@ $ currentLetter = menus.currAction
 		  </a>
 		  <div class="dropdown-menu">
 		  $for letter in menus.sysActions:
-		    <a id="drop$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1])<small> - $(menus.actionName[letter][3])</small></a>
+		    <a id="menu$(letter)" class="dropdown-item" onclick='fromHereTo("$(currentLetter)","$(letter)")' href="#">$letter: $(menus.actionName[letter][1])<small> - $(menus.actionName[letter][3])</small></a>
 		  <div class="dropdown-divider"></div>
 		  <a class="dropdown-item" href="/report" onclick="closeMenu()">$(ml.T("Rapports","Reports","Rapporten"))</a>
 		  <a class="dropdown-item" href="/csv" onclick="closeMenu()">$(ml.T("Données brutes","Raw Data","Ruwe Data"))</a>

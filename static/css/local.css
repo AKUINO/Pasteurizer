@@ -87,12 +87,12 @@
      .Dshape { text-align: center;
 	    }
 
-     .Eshape { border-style: none none dashed none;
+     .Eshape { border-style: none none solid none;
 		    border-width: 1px;
 		    text-align: center;
 	    }
 
-     .Lshape { border-style: none none dashed none;
+     .Lshape { border-style: none none solid none;
 		    border-width: 1px;
 		    text-align: left;
 	    }
@@ -136,6 +136,10 @@
         transform: scaleY(-1) rotate(270deg);
     }
 
+    .vertical {
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+    }
     .report-table { border-bottom: solid black 1px }
     .report-table tr { border-top: solid black 1px }
     .report-table tr th { background-color: #DDD; padding: 4px; padding-right:8px; border-left: solid black 1px; text-align: right }

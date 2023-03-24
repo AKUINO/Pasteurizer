@@ -249,9 +249,11 @@ function fillDisplay(data,logging) {
                     $('#level1').hide()
                 }
                 if ('level2' in data && data['level2']=='1') {
-                    $('#level2').show()
+                    $('#level2').show();
+                    $('#NOTlevel2').hide();
                 } else {
-                    $('#level2').hide()
+                    $('#level2').hide();
+                    $('#NOTlevel2').show();
                 }
                 if ('forcing' in data && data['forcing'] > 0) {
                     if (data['actif'] > 0 && data['forcing'] == 1) {
@@ -326,17 +328,17 @@ function fillDisplay(data,logging) {
                         if (ml == actionletter) {
                             //console.log('current='+
                             $('#drop'+ml).removeClass('dropdown-grayed').addClass('current').removeClass('enabled');
-                            //$('#menu'+ml).removeClass('disabled').addClass('current').removeClass('enabled');
+                            $('#menu'+ml).removeClass('dropdown-grayed').addClass('current').removeClass('enabled');
                         }
                         else if (allowedActions.indexOf(ml) >= 0) {
                             //console.log('enable='+
                             $('#drop'+ml).removeClass('dropdown-grayed').removeClass('current').addClass('enabled');
-                            //$('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
+                            $('#menu'+ml).removeClass('dropdown-grayed').removeClass('current').addClass('enabled');
                         }
                         else {
                             //console.log('disable='+
                             $('#drop'+ml).addClass('dropdown-grayed').removeClass('current').removeClass('enabled');
-                            //$('#menu'+ml).addClass('disabled').removeClass('current').removeClass('enabled');
+                            $('#menu'+ml).addClass('dropdown-grayed').removeClass('current').removeClass('enabled');
                         }
                     }
                 } else {
@@ -345,7 +347,7 @@ function fillDisplay(data,logging) {
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
                         $('#drop'+ml).removeClass('dropdown-grayed').removeClass('current').addClass('enabled');
-                        //$('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
+                        $('#menu'+ml).removeClass('disabled').removeClass('current').addClass('enabled');
                     }
                 }
                 if ('actif' in data && data['actif'] > 0) {

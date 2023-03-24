@@ -61,14 +61,15 @@ $if not paving:
     $if not logtable:
         <table class="Pshape">
                 <tr>
+                    <td class="vertical Eshape" rowspan="2"><small style="color:red">$(ml.T("Sortie","Output","Uitvoer"))</small></td>
                     <td id="OUTbucket" class="bucketOUT1" rowspan="2"><span id="tbout"></span><br/><small id="qbout"></small></td>
                     <td colspan="5">&nbsp;</td>
                     <td class="Ushape" rowspan="4" id="Dheating"><div class="OWshape" id="Dwarranty"><div class="Drotate"><span class="glyphicon glyphicon-random show-flow"></span></div><span>&nbsp;<b id="warranty"></b>°&nbsp;</span></div><span>&nbsp;<b id="heating"></b>°&nbsp;</span></td>
                 </tr>
                 <tr>
-                    <td class="Lshape" colspan="2"><span id="level2"><big><b style="color:red">X</b></big></span><small>&lt;$(ml.T("Sortie","Output","Uitvoer"))</small>&nbsp;<span class="glyphicon show-flow show-empty backward"></span></td>
-                    <!--td class="Eshape"><b id="extra"></b></td-->
-                    <td class="Eshape"><div><span class="glyphicon show-flow show-empty backward"></span></div><span id="rmeter"></span></td>
+                    <td class="Lshape"><span id="level2"><big><b style="color:red">X</b></big></span><span id="NOTlevel2" class="glyphicon show-flow show-empty backward"></span></td>
+                    <td class="Eshape"><div><span class="glyphicon show-flow show-empty backward"></span></div></td>
+                    <td class="Eshape"><div><span class="glyphicon show-flow show-empty backward"></span></div><!--span id="rmeter"></span--></td>
                     <!--td class="Ushape" rowspan="2"><b id="temper"></b>°</td-->
                     <!--td class="Eshape"><span class="glyphicon glyphicon-arrow-left"/></td-->
                     <!--td class="Bshape" rowspan="2"><span class="glyphicon glyphicon-random Drotate show-flow"/></td-->
@@ -76,30 +77,32 @@ $if not paving:
                     <td class="Eshape"><div style="display:inline"><span class="glyphicon show-flow show-empty backward"></span></div></td>
                 </tr>
                 <tr>
-                    <td id="INbucket" class="bucketIN1" valign="top" rowspan="2"><span id="tbin"></span><br/><small id="qbin"></small></td>
-                    <td rowspan="2" valign="top"><span id="level1"><big><b style="color:blue">X</b></big></span><small>&gt;$(ml.T("Entrée","Input","Invoer"))</small>&nbsp;<span class="glyphicon show-flow show-empty forward"></span></td>
-                    <td rowspan="2" valign="top"><div class="Oshape"><b id="vitesse"></b><br/>L/h</div></td>
+                    <td rowspan="2" valign="top" class="vertical"><small style="color:blue">$(ml.T("Entrée","Input","Invoer"))</small></td>
+                    <td rowspan="2" id="INbucket" class="bucketIN1" valign="top"><span id="tbin"></span><br/><small id="qbin"></small></td>
+                    <td rowspan="2" valign="top"><span id="level1"><big><b style="color:blue">X</b></big></span> <span class="glyphicon show-flow show-empty forward"></span></td>
+                    <td valign="top"><div class="Oshape"><b id="vitesse"></b><br/>L/h</div></td>
                     <td class="Dshape" valign="top"><span class="glyphicon show-flow show-empty forward"></span></td>
                     <td valign="top"><div class="OBshape greenToRed">&nbsp;<span class="glyphicon forward"></span>&nbsp;</div></td>
                     <td class="Dshape" valign="top"><div style="display:inline"><span class="glyphicon show-flow show-empty forward"></span></div></td>
                 </tr>
                 <tr>
-                    <td class="Dshape"><span id="Dintake">&nbsp;<b id="intake"></b>°&nbsp;</span><br/><span class="glyphicon glyphicon-log-in" id="fill" style="color:blue"></span></td>
-                    <td>&nbsp;</td>
-                    <td class="Dshape"><span id="Dinput">&nbsp;<b id="input"></b>°&nbsp;</span></td>
+                    <td class="Dshape" colspan="2" align="right"><span id="Dintake"> <b id="intake"></b>° </span><br/><span class="glyphicon glyphicon-log-in" id="fill" style="color:blue"></span></td>
+                    <td class="Dshape" colspan="2"><span id="Dinput" style="float:right"> <b id="input"></b>° </span></td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
+                    <td>&nbsp;</td>
                     <td valign="top" colspan="2"><!--span id="pressMin" font-color="blue"></span>&nbsp;&lt;&nbsp;<b id="press"></b>&nbsp;&lt;&nbsp;<span id="pressMax" font-color="red"></span>bar<br/-->&sum;=<b id="volume"></b>L<br/><span id="remain"></span></td>
                     <!--td align="right" colspan="2"><span class="nobreak"><div style="display:inline;"><span class="glyphicon glyphicon-fire"/></div><b id="watts2"></b>W/h</span></td-->
-                    <td align="center" colspan="2">&sum;=<b id="totalwatt"></b>W</td>
+                    <td align="right" colspan="2">&sum;=<b id="totalwatt"></b>W</td>
                     <td align="right"><span class="nobreak"><div style="display:inline;"><span class="glyphicon glyphicon-fire"></span></div><b id="watts"></b>W/h</span></td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
-                    <td align="center"><i id="pumpopt"></i><i>L/h</i></td>
+                    <td>&nbsp;</td>
+                    <td colspan="2"><i id="pumpopt"></i><i>L/h</i></td>
                     <td>&nbsp;</td>
                     <!--td align="center"><span id="cooling"><i id="opt_T"></i><i>°</i></span> <span id="cleaning"><i id="opt_tempbis"></i><i>°</i></span></td-->
                     <td align="right" colspan="4"><i id="opt_temp"></i><i>°, </i><i id="opt_M"></i><i>"</i></td>
@@ -107,7 +110,8 @@ $if not paving:
                 <tr id="eff">
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
-                    <td align="center" style="text-decoration:overline"><i id="pumpeff"></i><i>L/h</i></td>
+                    <td>&nbsp;</td>
+                    <td colspan="2" style="text-decoration:overline"><i id="pumpeff"></i><i>L/h</i></td>
                     <td>&nbsp;</td>
                     <!--td align="center"><span id="cooling"><i id="opt_T"></i><i>°</i></span> <span id="cleaning"><i id="opt_tempbis"></i><i>°</i></span></td-->
                     <td align="right" colspan="4"><i id="heateff"></i><i>%</i></td>

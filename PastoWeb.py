@@ -1,6 +1,31 @@
 #!/usr/bin/python3
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
+#TODO:
+"""
+Dans le menu, Pasteurisation est permis. Dans le panneau de Boutons et dans les messages de confirmation, NON !?
+
+Refus de démarrage de l’application (blocage à l’envoi de l’e-mail?) sans être connecté au Wifi de l’entreprise (on a pu s’y connecter heureusement en le paramétrant par le Point d’Accès créé par le pasteurisateur).
+
+Lors de la désinfection, le produit a été aspiré mais avec un peu d’air. J’aurais voulu faire tourner la pompe un peu plus longtemps pour faire sortir cet air
+ mais la seule option qui m’était disponible était “redémarrer” (est-ce qu’il est indiqué l’action qu’il va se produire quand je clique dessus?).
+ Quoi qu’il en soit j’ai cliqué sur “redémarrer” pensant qu’il allait juste faire tourner la pompe mais à la place il a fait entrer de l’eau de conduite.
+ J’ai directement mis en pause: l’entrée d’eau s’est arrêtée mais le compteur correspondant, lui, a continué → enlever le compteur quand mise en pause d’entrée d’eau (fait: le compteur est arrêté) et donner la possibilité à l’utilisateur de faire tourner la pompe “manuellement” pour se dépanner de ce genre de situation
+proposition: actuellement on doit régler la température de flush. Il serait plus intéressant que le flush garde la température de l’action en cours (fait: Flush utilise maintenant la température de désinfection, soit 25 au lieu de 45°C sachant que la plupart des opérations ont une cuve déjà beaucoup plus chaude)
+
+le compteur de remplissage des seaux d’entrée/sortie n’est pas juste: lors d’un flush, le décompte du seau de sortie diminue lorsque la pompe tourne à l’envers hors il devrait continuer à augmenter car de l’eau arrive toujours en provenance de la conduite.
+
+lors du cyclage d’un nettoyage, le schéma montre comme si le seau se vidait et se remplissait alors que les tuyaux d’entrée/sortie sont dans le même seau
+dans le seau d’entrée, à la place d’indiquer la formule complète, par exemple 19,8-5,3=14,5L, indiquer juste ce qui est enlever du seau, -5,3L.
+
+le bouton physique “stop” n’a pas fonctionné lorsque, arriver à la fin du lait en entrée, on a voulu stopper la pasteurisation. Il a fallu utiliser le bouton, physique “pause”. Le bouton Stop n’a pas posé de problème ensuite…
+
+après fin de désinfection acide (ou autre action), lors de l’appui sur le bouton stop toutes les leds devraient clignoter mais ce n’est pas le cas, comme si il croyait encore devoir terminer une action (alors qu’il affiche bien que plus rien n’est en cours)
+
+si on lance par exemple un pasteurisation et qu’on l’arrête directement car fausse manipulation, le pasteurisateur croit quand même que l’action a été faite
+"""
+
 import socket
 import sys
 import os

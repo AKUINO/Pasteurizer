@@ -46,7 +46,7 @@ $var title : $(ml.T("Rapport","Report","Rapport"))
         </tr>
         <tr>
             <th>$(ml.T('Volume mesuré','Measured Volume','Gemeten volume'))</th>
-            <td>$('%.3f' % report.volume) L</td>
+            <td>&pm; $('%.3f' % report.volume) L</td>
         </tr>
         <tr>
             <th>$(ml.T('Température de pasteurisation','Pasteurisation Temperature','Pasteurisatie temperatuur'))</th>
@@ -86,7 +86,7 @@ $var title : $(ml.T("Rapport","Report","Rapport"))
             </td>
         </tr>
         <tr>
-            <th>$(ml.T('Attentes de régulation','Waits for temperature control','Wachten of regulatie'))</th>
+            <th>$(ml.T('Attentes de régulation','Waits for temp. control','Wachten of regulatie'))</th>
             <td>
                 $ totalSec = 0
                 $ totalVol = 0.0
