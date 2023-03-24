@@ -1937,15 +1937,25 @@ class ThreadPump(threading.Thread):
                 if RedPendingConfirmation != 0.0:
                     if RedLED:
                         RedLED.blink(2)
+                    if self.currAction in [None,'X','Z',' ']:
+                        if GreenLED:
+                            GreenLED.blink(2)
+                        if YellowLED:
+                            YellowLED.blink(2)
+
                 if RedButton and RedButton.acknowledge():
                     if RedPendingConfirmation > 0.0:
                         RedPendingConfirmation = 0.0
                         if not self.currAction in [None,'X','Z',' ']:
                             self.stopAction()
                         else:
+                            if Buzzer:
+                                Buzzer.on()
                             self.close()
                             self.manAction('X')
                             WebExit = True # SHUTDOWN requested
+                            if Buzzer:
+                                Buzzer.off()
                             try:
                                 os.kill(os.getpid(),signal.SIGINT)
                             except:
@@ -2006,7 +2016,7 @@ class ThreadPump(threading.Thread):
                 else:
                     if GreenLED:
                         if RedPendingConfirmation != 0.0 and self.currAction in [None,'X','Z',' ']:
-                            GreenLED.blink(2)
+                            pass
                         else:
                             GreenLED.off()
                     if not self.currOperation:
@@ -2024,7 +2034,7 @@ class ThreadPump(threading.Thread):
                         speed = 0.0
                 if YellowLED:
                     if RedPendingConfirmation != 0.0 and self.currAction in [None,'X','Z',' ']:
-                        YellowLED.blink(2)
+                        pass
                     elif speed == 0.0 and int(hotTapSolenoid.value) == 0:
                         YellowLED.off()
                     else:
