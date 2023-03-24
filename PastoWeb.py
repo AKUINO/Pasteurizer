@@ -819,7 +819,7 @@ class ThreadDAC(threading.Thread):
 
     def run(self):
         
-        global cohorts, fileName, display_pause,tank,HEAT_POWER,ROOM_TEMP, lines, columns
+        global cohorts, display_pause,tank,HEAT_POWER,ROOM_TEMP, lines, columns
         
         self.running = True
         lastLoop = time.perf_counter()
@@ -2752,14 +2752,12 @@ class getFavicon:
 class getCSV:
     def GET(self, fileParam=None, endParam=None):
 
-        global fileName
-
         data, connected, mail, password = init_access()
         if not connected:
             raise web.seeother('/')
         elif not endParam:
             if not fileParam:
-                fileParam = fileName
+                fileParam = datafiles.logfile
             web.header('Content-type', 'text/csv')
             with open(datafiles.csvfile(fileParam),'r') as f:
                 try:
