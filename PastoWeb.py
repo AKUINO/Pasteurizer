@@ -4,8 +4,6 @@
 
 #TODO:
 """
-Dans le menu, Pasteurisation est permis. Dans le panneau de Boutons et dans les messages de confirmation, NON !?
-
 Refus de démarrage de l’application (blocage à l’envoi de l’e-mail?) sans être connecté au Wifi de l’entreprise (on a pu s’y connecter heureusement en le paramétrant par le Point d’Accès créé par le pasteurisateur).
 
 Lors de la désinfection, le produit a été aspiré mais avec un peu d’air. J’aurais voulu faire tourner la pompe un peu plus longtemps pour faire sortir cet air
@@ -18,6 +16,8 @@ le compteur de remplissage des seaux d’entrée/sortie n’est pas juste: lors 
 
 lors du cyclage d’un nettoyage, le schéma montre comme si le seau se vidait et se remplissait alors que les tuyaux d’entrée/sortie sont dans le même seau
 dans le seau d’entrée, à la place d’indiquer la formule complète, par exemple 19,8-5,3=14,5L, indiquer juste ce qui est enlever du seau, -5,3L.
+
+Ce n'est pas clair quand le bouton "stop" va arrêter une opération et quand il va arrêter le pasteurisateur.
 
 le bouton physique “stop” n’a pas fonctionné lorsque, arriver à la fin du lait en entrée, on a voulu stopper la pasteurisation. Il a fallu utiliser le bouton, physique “pause”. Le bouton Stop n’a pas posé de problème ensuite…
 
@@ -207,7 +207,7 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                         ,STAY_CLEAN_TIME,STAY_CLEAN_TIME,"hh:mm",False,3600*2,600,"time"], # Durée où un tuyau propre le reste sans rinçage (le double avant de tout re-nettoyer)
                     'R':['R',ml.T("Rinçage°","Rinse°","Spoelen°") \
                             ,ml.T("Température de rinçage","Rinse Temperature","Spoelen Temperatuur") \
-                            ,45.0,45.0,"°C",False,90,0.1,"number"], # Température du Bassin pour le prélavage
+                            ,25.0,25.0,"°C",False,90,0.1,"number"], # Température du Bassin pour le prélavage
                     'r':['r',ml.T("Rinçage\"","Rinse\"","Spoelen\"") \
                             ,ml.T("Durée du dernier Rinçage","Last Rinse duration","Laatste spoelduur") \
                             ,0.0,60.0,'\"',False,300,1,"number",60], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
@@ -1536,10 +1536,10 @@ opSequences = {
     #       ],
 
     'F': # Pré-rinçage (Flush)
-        [ Operation('PreT','HEAT',ref='D', dump=True,programmable=True,bin=[buck.RECUP,buck.WPOT],bout=buck.RECUP,kbin=TOTAL_VOL),
-          Operation('PreS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='D', dump=True),
-          Operation('PreI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=True),  #
-          Operation('PreR','RFLO',duration=lambda:KICKBACK,ref='D',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+        [ Operation('PreT','HEAT',ref='R', dump=True,programmable=True,bin=[buck.RECUP,buck.WPOT],bout=buck.RECUP,kbin=TOTAL_VOL),
+          Operation('PreS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='R', dump=True),
+          Operation('PreI','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
+          Operation('PreR','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('CLOS','MESS',message=ml.T("Recommencer au besoin!","Repeat if needed!","Herhaal indien nodig!"),dump=True)
           ],
     'H': # Distribution d'eau pasteurisée: GROSSIERE ERREUR: ne fonctionne que sur un circuit vide !!!
