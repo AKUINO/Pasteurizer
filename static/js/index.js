@@ -69,13 +69,17 @@ function floorCenti2(tx,tx2) {
 var allowedActions = '';
 var currentLetter = '';
 
+function closeMenu() {
+        $('.navbar-collapse').collapse('hide');
+}
+
 function goToLetter(pageLetter,letter,PleaseClick) {
     /* if (pageLetter == letter) {
         location.reload();
         $('#drop'+letter).attr("href", "#doc");
         console.log("/explain/"+letter+"#doc (reload)")
     } else */ {
-        $('.navbar-collapse').collapse('hide');
+        closeMenu();
         $('#confirm').hide();
         $('#cancel').hide();
         console.log("/explain/"+letter+"#doc");
