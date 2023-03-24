@@ -1849,11 +1849,12 @@ class ThreadPump(threading.Thread):
         self.pumpLastHeating = self.T_DAC.totalWatts
         if not self.paused and paused:
             self.startPause = self.pumpLastChange
+
+        self.paused = paused
         if paused:
             YellowLED.set(0)
             T_Pump.pump.reset_pump()
             hotTapSolenoid.set(0)
-        self.paused = paused
 
     def durationRemaining(self,now):
 
