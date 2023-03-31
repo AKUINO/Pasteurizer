@@ -31,7 +31,7 @@ else:
     REAL_SPEED_INCREMENT = 20
 
 # speed change by second = speed change by twentieth of a second multiply by 20 !
-hardConf.MICHA_device.set_pump_speed_inc(REAL_SPEED_INCREMENT * 20)
+#hardConf.MICHA_device.set_pump_speed_inc(REAL_SPEED_INCREMENT * 20)
 
 class ReadPump_PWM(threading.Thread):
     
