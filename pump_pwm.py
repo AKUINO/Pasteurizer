@@ -30,6 +30,8 @@ else:
     SPEED_INCREMENT = 20 # When ramping up or down, speed change by twentieth of a second
     REAL_SPEED_INCREMENT = 20
 
+# speed change by second = speed change by twentieth of a second multiply by 20 !
+hardConf.MICHA_device.set_pump_speed_inc(REAL_SPEED_INCREMENT * 20)
 
 class ReadPump_PWM(threading.Thread):
     
@@ -254,9 +256,9 @@ class pump_PWM(sensor.Sensor):
         self.stop()
         if hardConf.MICHA_device:
             try:
-                time.sleep(2)
+                time.sleep(1)
                 hardConf.io.set_pump_power(0) # Disable power. (pins are managed by MICHA board)
-                time.sleep(2)
+                time.sleep(1.8)
                 hardConf.io.set_pump_power(1) # Enable power. (pins are managed by MICHA board)
             except:
                 traceback.print_exc()

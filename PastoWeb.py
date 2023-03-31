@@ -1787,10 +1787,8 @@ class ThreadPump(threading.Thread):
 
         # do whatever is needed
         self.closeSequence()
-        time.sleep(0.01)
         self.pump.reset_pump() # to be sure that no situation ends with a running pump...
         hotTapSolenoid.set(0) # and tap are closed !
-        time.sleep(0.01)
         self.manAction('Z') # Should stop operations...
         self.setPause(False)
         self.lastStop = time.perf_counter()
@@ -3014,8 +3012,7 @@ class ThreadInputProcessor(threading.Thread):
                         T_Pump.setPause(False)
                         T_Pump.setAction(menu_choice)
                     elif menu_choice == 'Z':
-                        T_Pump.setPause(False)
-                        T_Pump.stopAction()
+                        T_Pump.stopAction() # Already set pause
                 elif menu_choice == 'O': # Options...
                     option_confirm()
                 elif menu_choice:
