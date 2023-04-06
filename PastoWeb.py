@@ -4,8 +4,6 @@
 
 #TODO:
 """
-Refus de démarrage de l’application (blocage à l’envoi de l’e-mail?) sans être connecté au Wifi de l’entreprise (on a pu s’y connecter heureusement en le paramétrant par le Point d’Accès créé par le pasteurisateur).
-
 Lors de la désinfection, le produit a été aspiré mais avec un peu d’air. J’aurais voulu faire tourner la pompe un peu plus longtemps pour faire sortir cet air
  mais la seule option qui m’était disponible était “redémarrer” (est-ce qu’il est indiqué l’action qu’il va se produire quand je clique dessus?).
  Quoi qu’il en soit j’ai cliqué sur “redémarrer” pensant qu’il allait juste faire tourner la pompe mais à la place il a fait entrer de l’eau de conduite.

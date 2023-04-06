@@ -256,7 +256,7 @@ class pump_PWM(sensor.Sensor):
         self.stop()
         if hardConf.MICHA_device:
             try:
-                time.sleep(1)
+                time.sleep(1.2)
                 hardConf.io.set_pump_power(0) # Disable power. (pins are managed by MICHA board)
                 time.sleep(1.8)
                 hardConf.io.set_pump_power(1) # Enable power. (pins are managed by MICHA board)
