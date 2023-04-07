@@ -44,7 +44,7 @@ class State(object):
 
     def loadCurrent(dummy = None): # returns timestamp and current state
         try:
-            with open(datafiles.csvfile("state")) as f:
+            with open(datafiles.paramfile("state.csv")) as f:
                 stateData = f.read()
                 # print (stateData)
                 data = stateData.split('\n')
@@ -140,7 +140,7 @@ class State(object):
 
     def save(self, empty, greasy=False, now=int(time.time()) ):
         try:
-            with open(datafiles.csvfile("state"), "w") as data_file:
+            with open(datafiles.paramfile("state.csv"), "w") as data_file:
                 data_file.write("epoch_sec\tstate\tempty\tgreasy\n")
                 data_file.write("%d\t%s\t%d\t%d\n"%(now, self.letter, empty, greasy))
                 # print ("%d\t%s\t%d\t%d\n"%(now, self.letter, empty, greasy))

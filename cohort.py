@@ -126,7 +126,7 @@ class Cohort(object):
         
     def saveCalibration(self,address,means):
         try:
-            with open(datafiles.csvfile(address), "w") as data_file:
+            with open(datafiles.calibfile(address), "w") as data_file:
                 for tuples in means:
                     mean = tuples[1]
                     data_file.write("%.1f\t%d\t%.3f\t%.3f\n" \
@@ -138,7 +138,7 @@ class Cohort(object):
         
     def readCalibration(self,address):
         try:
-            with open(datafiles.csvfile(address)) as csvfile:
+            with open(datafiles.calibfile(address)) as csvfile:
                 reader = csv.DictReader(csvfile, fieldnames=['key','qty','app','tru'], delimiter="\t")
                 means = []
                 for row in reader:
@@ -146,7 +146,7 @@ class Cohort(object):
                 self.calibration[address] = means
                 #print(means)
         except FileNotFoundError:
-            print ('No calibration found for sensor "'+address+'" in directory '+datafiles.DIR_DATA_CSV)
+            print ('No calibration found for sensor "'+address+'" in directory '+datafiles.DIR_DATA_CALIB)
         except:
             traceback.print_exc()
             pass

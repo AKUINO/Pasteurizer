@@ -117,7 +117,7 @@ class Menus(object):
 
     def loadCurrent(self): # returns timestamp and current state
 
-        Menus.option_file = datafiles.DIR_DATA_CSV + "options.ini"
+        Menus.option_file = datafiles.paramfile("options.ini")
         configParsing = configparser.RawConfigParser()
         try:
             with codecs.open(Menus.option_file, 'r', 'utf8' ) as f:
