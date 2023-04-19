@@ -59,13 +59,18 @@ class State(object):
                         if stateLetter and stateLetter[0] and stateLetter in State.knownStates:
                             State.current = State.knownStates[stateLetter[0]][State.empty][State.greasy]
                             return int(since), State.current, State.empty, State.greasy
+                State.setCurrent('s',False,False)
+                State.saveCurrent()
         except IOError: # unknown previous state
-            traceback.print_exc()
-        State.setCurrent('s',False,False)
+            State.setCurrent('s',False,False)
+            State.saveCurrent()
         return 0,State.current,False,False # If state unknown, it is dirty !
 
     def saveCurrent(now=int(time.time())):
-        State.current.save(State.empty,State.greasy,State.start)
+        try:
+            State.current.save(State.empty,State.greasy,State.start)
+        except IOError: # no place to save current state ?
+            traceback.print_exc()
 
     def popDelayed(now=int(time.time())):
         if State.delayed:
