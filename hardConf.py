@@ -87,7 +87,7 @@ MICHA_version = None
 reversedPump = False
 tubing=None
 
-if hostname.startswith(prefixHostname):
+if hostname and hostname.startswith(prefixHostname):
     i = hostname.index('-',len(prefixHostname))
     if i < len(prefixHostname):
         print ("A '-'(dash) must precede the pasteurizer serial number in the hostname")
@@ -141,20 +141,25 @@ if configParsing:
             In_Red =  13
             Out_Red = None # TXD, SYS_LED for Odroid?
             Out_Buzzer = 26
-        elif localGPIOtype == "gpio":
+        elif localGPIOtype and localGPIOtype.startswith("gpio"):
             try:
                 if processor == "odroid":
                     import Odroid.GPIO as GPIO
+                    #import odroid_wiringpi as GPIO
+                    #GPIO.wiringPiSetupGpio()
                 else:
                     import RPi.GPIO as GPIO
             except RuntimeError:
                 print("Error importing RPi or Odroid.GPIO.")
                 traceback.print_exc()
+            #print("GPIO BCM")
             GPIO.setmode(GPIO.BCM)
             localGPIO = GPIO # Uses BOARD numbering for pins...
             gpio_PUD_UP = GPIO.PUD_UP
             gpio_INPUT = GPIO.IN
+            #gpio_INPUT = GPIO.INPUT
             gpio_OUTPUT = GPIO.OUT
+            #gpio_OUTPUT = GPIO.OUTPUT
             if processor == "odroid":
                 In_Green = 483 # board 15 # BCM 22
                 Out_Green = 476 # board 16 # BCM 23
@@ -405,7 +410,7 @@ if MICHA_device:
         inputPressure = MICHApast.PRESS_SENSOR_REG
         inputPressureFlag = MICHApast.PRESS_FLAG_REG
 
-elif localGPIOtype == "gpio":
+elif localGPIOtype and localGPIOtype.startswith("gpio"):
     from ExpanderPi import IO
     from ExpanderPi import ADC
 

@@ -1,5 +1,5 @@
 #!/bin/sh
-setcap 'cap_net_bind_service=+ep cap_sys_boot+ep' /usr/bin/python3.8
+#setcap 'cap_net_bind_service=+ep cap_sys_boot+ep' /usr/bin/python3.8
 cd /home/odroid
 sleep 2
 ./OpenVPN/disconnect.sh
@@ -28,4 +28,3 @@ cd /etc/xrdp
 setxkbmap -layout be
 cd /home/odroid/Pasteurizer
 /usr/bin/python3.8 PastoWeb.py 80
-sleep 20

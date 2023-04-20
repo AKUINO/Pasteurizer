@@ -113,7 +113,7 @@ def termSize():
         return (25,80)
 
 def tell_message(message):
-    
+ 
     global display_pause,lines,columns
 
     prec_disp = display_pause
@@ -128,7 +128,7 @@ def tell_message(message):
     term.pos(lines-3,1)
     term.clearLineFromPos()
     display_pause = prec_disp
-        
+ 
 typeOneWire = 1
 typeRMeter = 11
 
@@ -146,6 +146,7 @@ EmergencyButton = None
 #configuration of output pins
 if hardConf.Out_Buzzer:
     Buzzer = LED('buzzer',hardConf.Out_Buzzer)
+    Buzzer.on()
 if hardConf.Out_Red:
     RedLED = LED('red',hardConf.Out_Red) #BCM=24
 if hardConf.Out_Yellow:

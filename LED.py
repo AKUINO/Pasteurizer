@@ -13,8 +13,11 @@ class LED(sensor.Sensor):
 
     def __init__(self,address,param):
         try:
-            if hardConf.localGPIOtype == 'gpio':
-                hardConf.localGPIO.setup(param, hardConf.gpio_OUTPUT)
+            if hardConf.localGPIOtype and hardConf.localGPIOtype.startswith('gpio'):
+                #print("GPIO %s"%hardConf.localGPIO)
+                if hardConf.localGPIOtype == 'gpio':
+                    hardConf.localGPIO.setup(param, hardConf.gpio_OUTPUT)
+                    #hardConf.localGPIO.pinMode(param, hardConf.gpio_OUTPUT)
             elif hardConf.localGPIOtype == 'pigpio':
                 hardConf.localGPIO.set_mode(param, hardConf.gpio_OUTPUT)
         except:
@@ -27,7 +30,7 @@ class LED(sensor.Sensor):
     def write(self,value):
         self.lastwrite = value
         try:
-            if hardConf.localGPIOtype == 'gpio':
+            if hardConf.localGPIOtype and hardConf.localGPIOtype.startswith('gpio'):
                 hardConf.localGPIO.output(self.param,1 if value > 0 else 0)
             elif hardConf.localGPIOtype == 'pigpio':
                 hardConf.localGPIO.write(self.param,1 if value > 0 else 0)
