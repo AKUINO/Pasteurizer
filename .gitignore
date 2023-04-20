@@ -127,7 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Data directories
 /csv/
 /report/
 /param/
 /calib/
+
+
