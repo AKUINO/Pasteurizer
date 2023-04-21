@@ -346,7 +346,7 @@ class pump_PWM(sensor.Sensor):
                     if hardConf.io:
                         hardConf.io.write_pin( -self.pinDirection, 1 if speed > 0 else 0)
             time.sleep(0.01)
-            print ( "Pump dir=%d, speed=%d" % S((0 if speed > 0 else 1) if hardConf.reversedPump else (1 if speed > 0 else 0),speed))
+            print ( "Pump dir=%d, speed=%d" % ((0 if speed > 0 else 1) if hardConf.reversedPump else (1 if speed > 0 else 0),speed))
             
         if hardConf.MICHA_device:
             hardConf.io.write_holding(self.pinPWM, self.speed_freq(speed if speed >= 0 else -speed) ) #, 500000 if duty else 0)
