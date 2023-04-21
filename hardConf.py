@@ -294,7 +294,7 @@ if configParsing:
         if MICHA_version >= 40:
             import MICHA40past
             io = MICHA40past.Micha4(MICHA_device)
-            #reversedPump = (MICHA_version >= 50)
+            reversedPump = (MICHA_version >= 50)
         else:
             io = MICHApast.Micha(MICHA_device)
             reversedPump = True
