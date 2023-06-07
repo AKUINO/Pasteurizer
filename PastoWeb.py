@@ -359,6 +359,7 @@ cohorts.sequence = [ # Tubing and Sensor Sequence of the Pasteurizer
                     [up_to_thermistor - up_to_heating_tank, 'warranty'], # Garantie
                     [total_tubing - up_to_thermistor, 'extra'] ] # Sortie
 tell_message("Entrée=%dmL, avant Cuve=%dmL, Garantie=%dmL, Sortie=%dmL" %(cohorts.sequence[0][0],cohorts.sequence[1][0],cohorts.sequence[2][0],cohorts.sequence[3][0]))
+
 tell_message("Amorçage=%dmL, Pasteurisation=%dmL : %.1fL/h, Total=%dmL" % (int(up_to_thermistor), int(pasteurization_tube), (mL_L(pasteurization_tube) / 15.0) * 3600.0, int(total_tubing)))
 
 #Amorçage=1941mL, Pasteurisation=538mL, Total=3477mL
