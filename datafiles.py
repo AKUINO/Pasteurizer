@@ -12,16 +12,28 @@ def goto_application_root():
 DIR_STATIC = os.path.join(DIR_BASE, 'static/')
 URL_STATIC = u'/static/'
 
-DIR_DATA_CALIB = os.path.join(DIR_BASE, 'calib/')
+DIR_BASE_DATA = os.path.join(DIR_BASE, '../PasteurizerData');
+if not os.path.exists(DIR_BASE_DATA):
+    os.mkdir(DIR_BASE_DATA)
+DIR_BASE_DATA = DIR_BASE_DATA + '/'
 
-DIR_DATA_CSV = os.path.join(DIR_BASE, 'csv/')
+if (os.path.exists(os.path.join(DIR_BASE, 'calib'))):
+    os.rename(os.path.join(DIR_BASE, 'calib'),os.path.join(DIR_BASE_DATA, 'calib'))
+DIR_DATA_CALIB = os.path.join(DIR_BASE_DATA, 'calib/')
 
-DIR_DATA_REPORT = os.path.join(DIR_BASE, 'report/')
+if (os.path.exists(os.path.join(DIR_BASE, 'csv'))):
+    os.rename(os.path.join(DIR_BASE, 'csv'),os.path.join(DIR_BASE_DATA, 'csv'))
+DIR_DATA_CSV = os.path.join(DIR_BASE_DATA, 'csv/')
 
-DIR_DATA_PARAM = os.path.join(DIR_BASE, 'param/')
+if (os.path.exists(os.path.join(DIR_BASE, 'report'))):
+    os.rename(os.path.join(DIR_BASE, 'report'),os.path.join(DIR_BASE_DATA, 'report'))
+DIR_DATA_REPORT = os.path.join(DIR_BASE_DATA, 'report/')
+
+if (os.path.exists(os.path.join(DIR_BASE, 'param'))):
+    os.rename(os.path.join(DIR_BASE, 'param'),os.path.join(DIR_BASE_DATA, 'param'))
+DIR_DATA_PARAM = os.path.join(DIR_BASE_DATA, 'param/')
 
 DIR_WEB_TEMP = os.path.join(DIR_STATIC, 'temp/')
-
 TEMPLATES_DIR = os.path.join(DIR_BASE, 'templates/')
 
 FILENAME_FORMAT = "%Y_%m%d_%H%M"

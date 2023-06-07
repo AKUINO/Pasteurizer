@@ -68,6 +68,14 @@ OW_warranty = None # Garantie sortie serpentin long
 OW_heating = None # If no OneWire, this will be T_sp9b
 OW_extra = None
 
+vol_intake = None
+vol_input = None
+vol_warranty = None
+vol_heating = None
+vol_total = None
+
+vol_pasteurization = None
+
 MICHA_device = None
 thermistors_voltage = 4.087 # Surprisingly not 4.095
 thermistors_Rtop = 2000.0 # Divider bridge to measure temperature (top resistor). Should include 2 ohms for the transistor of stimulation power
@@ -86,6 +94,19 @@ configParsing = None
 MICHA_version = None
 reversedPump = False
 tubing=None
+
+def string_mL(anItem):
+    if not anItem[1]:
+        return None
+    try:
+        fd = float(anItem[1])
+        if (fd < 100.0): # Liters and not milliters
+            return fd * 1000.0
+        else:
+            return fd
+    except:
+        print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+        return None
 
 if hostname and hostname.startswith(prefixHostname):
     i = hostname.index('-',len(prefixHostname))
@@ -125,8 +146,12 @@ if configParsing:
                 localGPIOtype = anItem[1].lower()
             elif anItem[0].lower() == 'tubing':
                 tubing = anItem[1].lower()
+            elif anItem[0].lower == 'volume':
+                vol_total = string_mL(anItem)
+            elif anItem[0].lower == 'pasteurization':
+                vol_pasteurization = string_mL(anItem)
             else:
-                print('[system] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: type, pigpio, gpio, tubing')
+                print('[system] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: type, pigpio, gpio, tubing, volume, pasteurization')
 
         if localGPIOtype == "pigpio":
             import pigpio
@@ -308,8 +333,10 @@ if configParsing:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
             elif anItem[0].lower == 'onewire':
                 OW_heating = anItem[1]
+            elif anItem[0].lower == 'volume':
+                vol_heating = string_mL(anItem)
             else:
-                print('[heating] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
+                print('[heating] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
     if 'extra' in configParsing.sections():
         for anItem in configParsing.items('extra'):
@@ -320,8 +347,10 @@ if configParsing:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
             elif anItem[0].lower == 'onewire':
                 OW_extra = anItem[1]
+            elif anItem[0].lower == 'volume':
+                vol_total = string_mL(anItem)
             else:
-                print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
+                print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
     if 'input' in configParsing.sections():
         for anItem in configParsing.items('input'):
@@ -332,8 +361,10 @@ if configParsing:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
             elif anItem[0].lower == 'onewire':
                 OW_input = anItem[1]
+            elif anItem[0].lower == 'volume':
+                vol_input = string_mL(anItem)
             else:
-                print('[input] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
+                print('[input] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
     if 'intake' in configParsing.sections():
         for anItem in configParsing.items('intake'):
@@ -344,8 +375,10 @@ if configParsing:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
             elif anItem[0].lower == 'onewire':
                 OW_output = anItem[1]
+            elif anItem[0].lower == 'volume':
+                vol_intake = string_mL(anItem)
             else:
-                print('[intake] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
+                print('[intake] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
     if 'warranty' in configParsing.sections():
         for anItem in configParsing.items('warranty'):
@@ -356,8 +389,10 @@ if configParsing:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
             elif anItem[0].lower == 'onewire':
                 OW_warranty = anItem[1]
+            elif anItem[0].lower == 'volume':
+                vol_warranty = string_mL(anItem)
             else:
-                print('[warranty] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire')
+                print('[warranty] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
     if 'Rmeter' in configParsing.sections():
         import RMETERpast
