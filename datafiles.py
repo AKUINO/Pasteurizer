@@ -41,6 +41,8 @@ logfile = datetime.datetime.now().strftime(FILENAME_FORMAT)
 
 def calibfile(fileName):
     return DIR_DATA_CALIB + fileName + ".csv"
+def linearfile(fileName):
+    return DIR_DATA_CALIB + fileName + ".json"
 
 def csvfile(fileName):
     return DIR_DATA_CSV + fileName + ".csv"

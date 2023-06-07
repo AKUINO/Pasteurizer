@@ -2580,6 +2580,28 @@ class WebApiAction:
     def POST(self,letter):
         return self.GET(letter)
 
+class WebApiLinear:
+
+    def __init(self):
+        self.name = u"WebApiLinear"
+
+    def GET(self, address, a=None, b=None):
+
+        data, connected, mail, password = init_access()
+        web.header('Content-type', 'application/json; charset=utf-8')
+        if not connected:
+            result = {'message':'RECHARGER CETTE PAGE'}
+        else:
+            factors = {}
+            if data and 'a' in data and 'b' in data: # Process saved options from options editing forms
+                cohorts.saveLinear(address, data['a'],data['b'])
+            elif a and b:
+                cohorts.saveLinear(address, a, b)
+        return json.dumps(cohorts.getLinear(address))
+
+    def POST(self,address):
+        return self.GET(address)
+
 class WebApiState:
 
     def __init(self):
@@ -3080,6 +3102,8 @@ try:
         '/option(.)', 'WebOption',
         '/calibrate/(.+)', 'WebCalibrate',
         '/calibrate', 'WebCalibrate',
+        '/linear/(.+)/(.+)/(.+)', 'WebApiLinear',
+        '/linear/(.+)', 'WebApiLinear',
         '/api/log', 'WebApiLog',
         '/api/put/(.+)', 'WebApiPut',
         '/favicon(.+)', 'getFavicon',

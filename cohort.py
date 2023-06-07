@@ -7,6 +7,7 @@ import datafiles
 import sensor
 import traceback
 import csv
+import json
 
 class Cohort(object):
 
@@ -17,6 +18,7 @@ class Cohort(object):
         self.history = {} # Data from sensors
         self.history_base = time.perf_counter() # To synchronize all data series
         self.calibration = {} # Calibrations of sensors
+        self.linear = {} # linear regression is prefered now
         self.old_base = None # To synchronize all data series
         self.period = 0
         self.sequence = [] # sequence of sensors with their distance in L
@@ -135,18 +137,34 @@ class Cohort(object):
         except:
             traceback.print_exc()
             pass
-        
+
+    def saveLinear(self,address,a,b):
+        try:
+            with open(datafiles.linearfile(address), "w") as data_file:
+                obj = { 'a':a, 'b': b }
+                json.dump(obj,data_file)
+        except:
+                traceback.print_exc()
+                pass
+
     def readCalibration(self,address):
         try:
-            with open(datafiles.calibfile(address)) as csvfile:
-                reader = csv.DictReader(csvfile, fieldnames=['key','qty','app','tru'], delimiter="\t")
-                means = []
-                for row in reader:
-                    means.append([float(row['key']),[int(row['qty']),float(row['app']),float(row['tru'])]])
-                self.calibration[address] = means
-                #print(means)
+            with open(datafiles.linearfile(address), 'r') as jsonfile:
+                self.linear[address] = json.load(jsonfile)
         except FileNotFoundError:
-            print ('No calibration found for sensor "'+address+'" in directory '+datafiles.DIR_DATA_CALIB)
+            try:
+                with open(datafiles.calibfile(address), 'r') as csvfile:
+                    reader = csv.DictReader(csvfile, fieldnames=['key','qty','app','tru'], delimiter="\t")
+                    means = []
+                    for row in reader:
+                        means.append([float(row['key']),[int(row['qty']),float(row['app']),float(row['tru'])]])
+                    self.calibration[address] = means
+                    #print(means)
+            except FileNotFoundError:
+                print ('No calibration found for sensor "'+address+'" in directory '+datafiles.DIR_DATA_CALIB)
+            except:
+                traceback.print_exc()
+                pass
         except:
             traceback.print_exc()
             pass
@@ -154,7 +172,13 @@ class Cohort(object):
         # TODO: merge current calibration in future calibration: for one sensor only?
         #<a href="/calibrate/merge"><button class="btn btn-danger">$(ml.T("Fusionner Actuel","Merge Current","Huidige Samenvoegen"))</button></a> 
         return current_observ
-        
+
+    def getLinear(self,address):
+        if address in self.linear:
+            return self.linear[address]
+        else:
+            return None
+
     def getCalibratedValue(self,address,apparentValue=None):
         if not address in self.catalog:
             return None
@@ -163,27 +187,31 @@ class Cohort(object):
             if apparentValue is None:
                 return None
         #print("**A="+address)
-        trueValue = apparentValue
-        siz = len(self.calibration[address])
-        if siz > 0:
-            for i in range(siz):
-                if apparentValue <= self.calibration[address][i][1][1]:
-                    if i > 0:
-                        p = self.calibration[address][i][1][1] - apparentValue
-                        comp_p = apparentValue - self.calibration[address][i-1][1][1]
-                        offset_bottom = self.calibration[address][i-1][1][2] - self.calibration[address][i-1][1][1]
-                        offset_top = self.calibration[address][i][1][2] - self.calibration[address][i][1][1]
-                        trueValue = apparentValue + ( ((offset_bottom*comp_p) + (offset_top*p)) / (self.calibration[address][i][1][1] - self.calibration[address][i-1][1][1]) )
-                        #print("**%s=%.3f,p=%.3f,1-p=%.3f,ob=%.3f,ot=%.3f,adj=%.3f" % (address,apparentValue,p,comp_p,offset_bottom,offset_top,trueValue))
-                        break
-                    else:
+        if address in self.linear: # linear interpolation calibration
+            interpol = self.linear[address]
+            trueValue = (float(interpol['a']) * apparentValue) + float(interpol['b'])
+        else:
+            trueValue = apparentValue
+            siz = len(self.calibration[address])
+            if siz > 0:
+                for i in range(siz):
+                    if apparentValue <= self.calibration[address][i][1][1]:
+                        if i > 0:
+                            p = self.calibration[address][i][1][1] - apparentValue
+                            comp_p = apparentValue - self.calibration[address][i-1][1][1]
+                            offset_bottom = self.calibration[address][i-1][1][2] - self.calibration[address][i-1][1][1]
+                            offset_top = self.calibration[address][i][1][2] - self.calibration[address][i][1][1]
+                            trueValue = apparentValue + ( ((offset_bottom*comp_p) + (offset_top*p)) / (self.calibration[address][i][1][1] - self.calibration[address][i-1][1][1]) )
+                            #print("**%s=%.3f,p=%.3f,1-p=%.3f,ob=%.3f,ot=%.3f,adj=%.3f" % (address,apparentValue,p,comp_p,offset_bottom,offset_top,trueValue))
+                            break
+                        else:
+                            trueValue = apparentValue - self.calibration[address][i][1][1] + self.calibration[address][i][1][2]
+                            #print("**2="+str(trueValue))
+                            break
+                    elif i == siz-1:
                         trueValue = apparentValue - self.calibration[address][i][1][1] + self.calibration[address][i][1][2]
-                        #print("**2="+str(trueValue))
+                        #print("**3="+str(trueValue))
                         break
-                elif i == siz-1:
-                    trueValue = apparentValue - self.calibration[address][i][1][1] + self.calibration[address][i][1][2]
-                    #print("**3="+str(trueValue))
-                    break
         #print("**4="+str(trueValue))
         return trueValue
 
