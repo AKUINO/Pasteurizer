@@ -22,7 +22,7 @@ $if not paving:
         <h4><b id="time"></b> &nbsp; <b id="actionletter"></b>:<b id="action"></b><br/><small id="actiontitle"></small></h4>
         <button onclick="action('\x3E')" class="btn btn-success" id="forcing" style="float:right")>&gt;&gt;</button>
         <button onclick="action('S')" class="btn btn-warning" id="pause" style="float:right">$(ml.T("Pause","Pause","Pauze"))</button>
-        <button onclick="action('!')" class="btn btn-info buckbutton" id="buckbutton" style="float:right">$(ml.T("Seau fourni","Bucket provided","Emmer voorzien"))&nbsp;<span id="bucket" class="glyphicon"></span></button>
+        <button onclick="action('!')" class="btn btn-info buckbutton" id="buckbutton" style="float:right">$(ml.T("Seau à fournir","Bucket to be provided","Emmer te voorzien"))&nbsp;<span id="bucket" class="glyphicon"></span></button>
         <button onclick="action('+')" class="btn btn-info" id="addbutton" style="float:right">$(ml.T("Produit ajouté","Product added","Product toegevoegd"))&nbsp;<span id="added" class="glyphicon"></span></button>
         <!--button onclick="action('&gt;')" class="btn btn-info" id="force" style="float:right">$(ml.T("Forcer>","Force>","Kracht>"))</button-->
         <button onclick="action('_')" class="btn btn-success" id="restart" style="float:right">$(ml.T("Redémarrer","Restart","Herstart"))</button>
@@ -130,7 +130,7 @@ $if not paving:
                         </div>
                         <div class="modal-footer">
                             $if letter in menus.CITY_WATER_ACTIONS:
-                                <button onclick="action('!',true)" id="buckbutton2" class="btn btn-info buckbutton" style="visibility:hidden">$(ml.T("Seau fourni","Bucket provided","Emmer voorzien"))&nbsp;<span id="bucket2" class="glyphicon"></span></button>
+                                <button onclick="action('!',true)" id="buckbutton2" class="btn btn-info buckbutton" style="visibility:hidden">$(ml.T("Seau à fournir","Bucket to be provided","Emmer te voorzien"))&nbsp;<span id="bucket2" class="glyphicon"></span></button>
                             $if letter == 'F':
                                 <button type="button" class="btn btn-primary" onclick="action('R')" id="confirm4">$(menus.actionName['R'][1]) - $(menus.actionName['R'][3])</button>
                             <button type="button" class="btn btn-primary" onclick="action('$letter')" id="confirm">$(ml.T("Confirmer","Confirm","Bevestigen")) $letter: $(menus.actionName[letter][1]) - $(menus.actionName[letter][3])</button>
@@ -277,6 +277,22 @@ $if not paving:
                 <li> Voor leidingwater: plaats de inlaatleiding en de uitlaatleiding in dezelfde emmer of over een riool.
                 <li> Voor emmer water, plaats de inlaatbuis in de emmer en de uitlaatbuis in een andere emmer.
                 <li> Zorg ervoor dat de emmers minstens 20L zijn als u 4 spoelingen doet.
+            $if letter == 'V':
+              $if ml.lang == 'f':
+                <li>Votre pasteurisateur va rester inutilisé ou être déplacé. Vous voulez vider ses tuyaux autant que possible...</li>
+                <li>Mettre en l'air le tuyau d'entrée.</li>
+                <li>Mettre le tuyau de sortie dans un seau de 10L minimum.</li>
+                <li>ATTENTION: de l'air sous pression sort vers la fin du pompage et l'eau qui l'accompagne est souvent très chaude: fixez bien le tuyau de sortie!</li>
+              $if ml.lang == 'e':
+                <li>Your pasteuriser is going to remain unused or be moved. You want to empty its pipes as much as possible...
+                <li>Put the inlet pipe in the air.
+                <li>Place the outlet pipe in a minimum 10L bucket.
+                <li>CAUTION: air under pressure comes out towards the end of the pumping process and the water that accompanies it is often very hot: secure the outlet hose!
+              $if ml.lang == 'n':
+                <li>Je pasteur blijft ongebruikt of wordt verplaatst. Je wilt de leidingen zoveel mogelijk leegmaken...
+                <li>Zet de inlaatpijp in de lucht.
+                <li>Plaats de afvoerleiding in een emmer van minimaal 10 liter.
+                <li>LET OP: tegen het einde van het pompproces komt er lucht onder druk uit en het water dat daarbij komt is vaak erg heet: zet de uitlaatslang goed vast!
             $if letter == 'C':
               $if ml.lang == 'f':
                 <li>Votre pasteurisateur a été rincé mais il faut le nettoyer en profondeur.
