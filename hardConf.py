@@ -136,19 +136,20 @@ if configFile:
 if configParsing:
     if 'system' in configParsing.sections():
         for anItem in configParsing.items('system'):
-            if anItem[0].lower() == 'type':
+            opt = anItem[0].lower()
+            if opt == 'type':
                 processor = anItem[1].lower()
                 if processor == "rpi" and not localGPIOtype:
                     localGPIOtype = 'pigpio'
                 elif processor == "odroid" and not localGPIOtype:
                     localGPIOtype = "gpio"
-            elif anItem[0].lower() == 'gpio':
+            elif opt == 'gpio':
                 localGPIOtype = anItem[1].lower()
-            elif anItem[0].lower() == 'tubing':
+            elif opt == 'tubing':
                 tubing = anItem[1].lower()
-            elif anItem[0].lower == 'volume':
+            elif opt == 'volume':
                 vol_total = string_mL(anItem)
-            elif anItem[0].lower == 'pasteurization':
+            elif opt == 'pasteurization':
                 vol_pasteurization = string_mL(anItem)
             else:
                 print('[system] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: type, pigpio, gpio, tubing, volume, pasteurization')
@@ -207,27 +208,29 @@ if configParsing:
 
     if 'emergency' in configParsing.sections():
         for anItem in configParsing.items('emergency'):
-            if anItem[0].lower() == 'input':
+            opt = anItem[0].lower()
+            if opt == 'input':
                 try:
                     In_Emergency = int(anItem[1])
                 except:
                     print(anItem[0] + ': ' + anItem[1] + ' is not decimal.')
-            elif anItem[0].lower() == 'output':
+            elif opt == 'output':
                 try:
                     Out_Emergency = int(anItem[1])
                 except:
                     print(anItem[0] + ': ' + anItem[1] + ' is not decimal.')
             else:
-                print('[emergency] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: input, output')
+                print('[emergency] '+opt + ': ' + anItem[1] + ' unknown option. Valid: input, output')
 
     if 'level' in configParsing.sections():
         for anItem in configParsing.items('level'):
-            if anItem[0].lower() == '1':
+            opt = anItem[0].lower()
+            if opt == '1':
                 try:
                     In_Level1 = int(anItem[1])
                 except:
                     print(anItem[0] + ': ' + anItem[1] + ' is not decimal.')
-            elif anItem[0].lower() == '2':
+            elif opt == '2':
                 try:
                     In_Level2 = int(anItem[1])
                 except:
@@ -237,12 +240,13 @@ if configParsing:
 
     if 'green' in configParsing.sections():
         for anItem in configParsing.items('green'):
-            if anItem[0].lower() == 'input':
+            opt = anItem[0].lower()
+            if opt == 'input':
                 try:
                     In_Green = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif anItem[0].lower() == 'output':
+            elif opt == 'output':
                 try:
                     Out_Green = int(anItem[1])
                 except:
@@ -252,12 +256,13 @@ if configParsing:
 
     if 'yellow' in configParsing.sections():
         for anItem in configParsing.items('yellow'):
-            if anItem[0].lower() == 'input':
+            opt = anItem[0].lower()
+            if opt == 'input':
                 try:
                     In_Yellow = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif anItem[0].lower() == 'output':
+            elif opt == 'output':
                 try:
                     Out_Yellow = int(anItem[1])
                 except:
@@ -267,12 +272,13 @@ if configParsing:
 
     if 'red' in configParsing.sections():
         for anItem in configParsing.items('red'):
-            if anItem[0].lower() == 'input':
+            opt = anItem[0].lower()
+            if opt == 'input':
                 try:
                     In_Red = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif anItem[0].lower() == 'output':
+            elif opt == 'output':
                 try:
                     Out_Red = int(anItem[1])
                 except:
@@ -282,7 +288,8 @@ if configParsing:
 
     if 'buzzer' in configParsing.sections():
         for anItem in configParsing.items('buzzer'):
-            if anItem[0].lower() == 'output':
+            opt = anItem[0].lower()
+            if opt == 'output':
                 try:
                     Out_Buzzer = int(anItem[1])
                 except:
@@ -292,24 +299,26 @@ if configParsing:
 
     if 'user' in configParsing.sections():
         for anItem in configParsing.items('user'):
-            if anItem[0].lower() == 'lang':
+            opt = anItem[0].lower()
+            if opt == 'lang':
                 ml.setLang(anItem[1].lower())
-            elif anItem[0].lower() == 'name' and anItem[1]:
+            elif opt == 'name' and anItem[1]:
                 owner.owner.name = anItem[1]
-            elif anItem[0].lower() == 'address' and anItem[1]:
+            elif opt == 'address' and anItem[1]:
                 owner.owner.address = anItem[1]
-            elif anItem[0].lower() == 'city' and anItem[1]:
+            elif opt == 'city' and anItem[1]:
                 owner.owner.city = anItem[1]
-            elif anItem[0].lower() == 'email' and anItem[1]:
+            elif opt == 'email' and anItem[1]:
                 owner.owner.email = anItem[1]
             else:
                 print('[user] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: lang')
 
     if 'MICHA' in configParsing.sections():
         for anItem in configParsing.items('MICHA'):
-            if anItem[0].lower() == 'device':
+            opt = anItem[0].lower()
+            if opt == 'device':
                 MICHA_device = anItem[1]
-            elif anItem[0].lower() == 'version':
+            elif opt == 'version':
                 try:
                     MICHA_version = int(anItem[1])
                 except:
@@ -326,70 +335,75 @@ if configParsing:
 
     if 'heating' in configParsing.sections():
         for anItem in configParsing.items('heating'):
-            if anItem[0].lower() == 'port':
+            opt = anItem[0].lower()
+            if opt == 'port':
                 try:
                     T_heating = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif anItem[0].lower == 'onewire':
+            elif opt == 'onewire':
                 OW_heating = anItem[1]
-            elif anItem[0].lower == 'volume':
+            elif opt == 'volume':
                 vol_heating = string_mL(anItem)
             else:
                 print('[heating] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
     if 'extra' in configParsing.sections():
         for anItem in configParsing.items('extra'):
-            if anItem[0].lower() == 'port':
+            opt = anItem[0].lower()
+            if opt == 'port':
                 try:
                     T_extra = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif anItem[0].lower == 'onewire':
+            elif opt == 'onewire':
                 OW_extra = anItem[1]
-            elif anItem[0].lower == 'volume':
+            elif opt == 'volume':
                 vol_total = string_mL(anItem)
             else:
                 print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
     if 'input' in configParsing.sections():
         for anItem in configParsing.items('input'):
-            if anItem[0].lower() == 'port':
+            opt = anItem[0].lower()
+            if opt == 'port':
                 try:
                     T_input = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif anItem[0].lower == 'onewire':
+            elif opt == 'onewire':
                 OW_input = anItem[1]
-            elif anItem[0].lower == 'volume':
+            elif opt == 'volume':
                 vol_input = string_mL(anItem)
             else:
                 print('[input] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
     if 'intake' in configParsing.sections():
         for anItem in configParsing.items('intake'):
-            if anItem[0].lower() == 'port':
+            opt = anItem[0].lower()
+            if opt == 'port':
                 try:
                     T_intake = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif anItem[0].lower == 'onewire':
+            elif opt == 'onewire':
                 OW_output = anItem[1]
-            elif anItem[0].lower == 'volume':
+            elif opt == 'volume':
                 vol_intake = string_mL(anItem)
             else:
                 print('[intake] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
     if 'warranty' in configParsing.sections():
         for anItem in configParsing.items('warranty'):
-            if anItem[0].lower() == 'port':
+            opt = anItem[0].lower()
+            if opt == 'port':
                 try:
                     T_warranty = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif anItem[0].lower == 'onewire':
+            elif opt == 'onewire':
                 OW_warranty = anItem[1]
-            elif anItem[0].lower == 'volume':
+            elif opt == 'volume':
                 vol_warranty = string_mL(anItem)
             else:
                 print('[warranty] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
@@ -402,22 +416,23 @@ if configParsing:
         R_S3=5
         R_polarity=16
         for anItem in configParsing.items('Rmeter'):
-            if anItem[0].lower() == 's1':
+            opt = anItem[0].lower()
+            if opt == 's1':
                 try:
                     R_S1 = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif anItem[0].lower() == 's2':
+            elif opt == 's2':
                 try:
                     R_S2 = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif anItem[0].lower() == 's3':
+            elif opt == 's3':
                 try:
                     R_S2 = int(anItem[1])
                 except:
                     print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif anItem[0].lower() == 'polarity':
+            elif opt == 'polarity':
                 try:
                     R_polarity = int(anItem[1])
                 except:

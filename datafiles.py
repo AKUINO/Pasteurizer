@@ -12,7 +12,7 @@ def goto_application_root():
 DIR_STATIC = os.path.join(DIR_BASE, 'static/')
 URL_STATIC = u'/static/'
 
-DIR_BASE_DATA = os.path.join(DIR_BASE, '../PasteurizerData');
+DIR_BASE_DATA = os.path.join(DIR_BASE, '../PasteurizerData')
 if not os.path.exists(DIR_BASE_DATA):
     os.mkdir(DIR_BASE_DATA)
 DIR_BASE_DATA = DIR_BASE_DATA + '/'
@@ -41,6 +41,7 @@ logfile = datetime.datetime.now().strftime(FILENAME_FORMAT)
 
 def calibfile(fileName):
     return DIR_DATA_CALIB + fileName + ".csv"
+
 def linearfile(fileName):
     return DIR_DATA_CALIB + fileName + ".json"
 

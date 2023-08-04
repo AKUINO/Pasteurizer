@@ -3084,6 +3084,7 @@ try:
     web.template.Template.globals['Menus'] = Menus
     web.template.Template.globals['ml'] = ml
     web.template.Template.globals['web'] = web
+    web.template.Template.globals['hardConf'] = hardConf
     web.template.Template.globals['isnull'] = isnull
     web.template.Template.globals['zeroIsNone'] = zeroIsNone
     web.template.Template.globals['datetime'] = datetime
