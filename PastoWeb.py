@@ -529,6 +529,9 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                #'A':['A',ml.T("Amorc.","initiAte","Aanzet.") \
                #        ,ml.T("Entrée et Sortie connectés et dans un seau, Pré-chauffage...","Inlet and Outlet connected and in a bucket, Pre-heating ...","Input en output aangesloten en in een emmer, Voorverwarmen ...") \
                #        ,ml.T("Amorçage de la Pasteurisation","Initiating Pasteurization","Pasteurisatie initiëren")],
+               'B':['B',ml.T("caliB.","caliB.","caliB.") \
+                       ,ml.T("Seau d'eau en entrée+sortie","Water Bucket","Water Emmer") \
+                       ,ml.T("Calibration","Calibration","Calibratie")],
                'P':['P',ml.T("Pasteur.","Pasteur.","Pasteur.") \
                        ,ml.T("Lait de la traite en entrée; Récipient pasteurisé en sortie. Jeter l'eau","Milking milk at inlet; Pasteurized container at the outlet. Discard water","Melk melken als voorgerecht; Gepasteuriseerde container bij de uitlaat. Gooi water") \
                        ,ml.T("Pasteurisation","Pasteurization","Pasteurisatie")],
@@ -591,7 +594,7 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                        ,ml.T("Redémarrage de l'opération en cours.","Restart of the current operation.","Herstart van de huidige bewerking.") \
                        ,ml.T("Redémarrer l'opération en cours","Restart the current operation","Herstart de huidige bewerking")]}
 menus.sortedActions1 = "PIMERDCAH"
-menus.sortedActions2 = "FVOYLTZSX" #K
+menus.sortedActions2 = "FVOYLTZSXB" #K
 
 menus.cleanActions = "LYJTPIMEHV" #K
 menus.dirtyActions = "RFDCAV"
@@ -672,7 +675,7 @@ State('s',ml.T('Sale','Dirty','Vies'),'brown', \
       [ ('C',['s','s',['c',None,False]]), ('R',''),('F',''),('V',''),('w','') ] )
 
 State('?','...','black', \
-      [ ('A',['a']),('C',['c']),('D',['d']), ('H','o'),('R','o'),('F','o'),('V','v'),('w','v'),('M','p'),('E','e'),('P','p'),('I','p'),['Z',''] ] )
+      [ ('A',['a']),('C',['c']),('D',['d']), ('H','o'),('R','o'),('F','o'),('V','v'),('w','v'),('M','p'),('E','e'),('P','p'),('I','p'),['Z',''],('B','p'), ] )
 
 
 def menu_confirm(choice,delay=None):
@@ -1092,12 +1095,18 @@ class Operation(object):
     def tempRef(self): # Current heating temperature along what is set in options
         if not self.ref: # do not heat !
             return 0.0
-        return (menus.val(self.ref) - GRADIENT_FOR_INPUT) if self.sensor1 == 'intake' else menus.val(self.ref)
+        if isinstance(self.ref,str):
+            return (menus.val(self.ref) - GRADIENT_FOR_INPUT) if self.sensor1 == 'intake' else menus.val(self.ref)
+        else:
+            return self.ref
 
     def tempWithGradient(self): # Current heating temperature along what is set in options
         if not self.ref: # do not heat !
             return 0.0
-        return menus.val(self.ref) + ( menus.val('G') if self.sensor1 == 'warranty' else 0.0 )
+        if isinstance(self.ref,str):
+            return menus.val(self.ref) + ( menus.val('G') if self.sensor1 == 'warranty' else 0.0 )
+        else:
+            return self.ref
 
     # def tempRef2(self): # Current heating temperature along what is set in options
         # if not self.ref2: # do not heat !
@@ -1630,6 +1639,22 @@ opSequences = {
     'c': # Étape répétée du nettoyage
         [ Operation('NetC','PUMP',ref='C',base_speed=MAX_SPEED, qty=4.0,dump=False,bin=buck.CAUS,bout=buck.CAUS),
           Operation('NetP','REVR',ref='C',base_speed=MAX_SPEED, qty=-2.0,dump=False)
+          ],
+    'B': # Calibrsation
+        [ Operation('Cali','HEAT', ref=60, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
+          Operation('CalI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=60, qty=TOTAL_VOL, shake_qty=SHAKE_QTY, dump=True, cooling=True),
+          Operation('Cl60','HEAT', ref=60, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
+          Operation('CL60','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Cl65','HEAT', ref=65, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
+          Operation('CL65','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=65,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Cl70','HEAT', ref=70, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
+          Operation('CL70','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=70,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Cl75','HEAT', ref=75, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
+          Operation('CL75','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=75,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Cl80','HEAT', ref=80, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
+          Operation('CL80','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=80,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
+          Operation('Cl85','HEAT', ref=85, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
+          Operation('CL85','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=85,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True)
           ],
     'P': # Pasteurisation
         [ Operation('PasT','HEAT', ref='P', dump=True, programmable=True, bin=buck.RAW, bout=buck.SEWR, kbin=TOTAL_VOL),
@@ -3000,14 +3025,14 @@ class ThreadInputProcessor(threading.Thread):
                 menu_choice = str(getch()).upper() # BLOCKING I-O !
                 if menu_choice == ' ':
                     display_pause = False
-                elif menu_choice in ['M','E','P','H','I','R','V','F','A','C','D','X','Z']: # 'C','K'
+                elif menu_choice in ['M','E','P','H','I','R','V','F','A','C','D','X','Z','B']: # 'C','K'
                     menu_choice = menu_confirm(menu_choice,8.0)
                     if menu_choice == 'X':
                         T_Pump.stopAction()
                         break
                     if menu_choice == 'Z':
                         T_Pump.stopAction()
-                    elif menu_choice in ['M','E','P','H','I','R','V','F','A','C','D']: # 'C','K'
+                    elif menu_choice in ['M','E','P','H','I','R','V','F','A','C','D','B']: # 'C','K'
                         T_Pump.setAction(menu_choice)
                 elif menu_choice == 'Y': # Yaourt
                     menus.store('P', 82.0)
