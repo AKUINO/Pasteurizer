@@ -642,7 +642,7 @@ State('r',ml.T('Propre','Clean','Schoon'),'aqua', \
     [ ('A',['r',['a',None,False]]),('P','p'),('D',['','d','d']),('H',''),('F',''),('V',''),('w','o') ] )
 
 State('o',ml.T('Eau','Water','Waser'),'navy', \
-    [ ('A',['o',['a',None,False]]),('F',''),('V',''),('D',['','d','d']),('H',['','r']),('w','v') ] )
+    [ ('A',['o',['a',None,False]]),('F',''),('V',''),('B',''),('D',['','d','d']),('H',['','r']),('w','v') ] )
 
 State('v',ml.T('Eau vieille','Old Water','Oude Waser'),'darkcyan', \
       [ ('A',['v',['a',None,False]]),('C',['v',['c',None,False]]),('F',''),('V',''),('D',['','d','d']),('w','') ] )
@@ -675,7 +675,7 @@ State('s',ml.T('Sale','Dirty','Vies'),'brown', \
       [ ('C',['s','s',['c',None,False]]), ('R',''),('F',''),('V',''),('w','') ] )
 
 State('?','...','black', \
-      [ ('A',['a']),('C',['c']),('D',['d']), ('H','o'),('R','o'),('F','o'),('V','v'),('w','v'),('M','p'),('E','e'),('P','p'),('I','p'),['Z',''],('B','p'), ] )
+      [ ('A',['a']),('C',['c']),('D',['d']), ('H','o'),('R','o'),('F','o'),('V','v'),('w','v'),('M','p'),('E','e'),('P','p'),('I','p'),['Z',''],('B','o'), ] )
 
 
 def menu_confirm(choice,delay=None):
@@ -1641,19 +1641,11 @@ opSequences = {
           Operation('NetP','REVR',ref='C',base_speed=MAX_SPEED, qty=-2.0,dump=False)
           ],
     'B': # Calibrsation
-        [ Operation('Cali','HEAT', ref=60, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
-          Operation('CalI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=60, qty=TOTAL_VOL, shake_qty=SHAKE_QTY, dump=True, cooling=True),
-          Operation('Cl60','HEAT', ref=60, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
-          Operation('CL60','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('Cl65','HEAT', ref=65, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
+        [ Operation('CL60','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('CL65','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=65,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('Cl70','HEAT', ref=70, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
           Operation('CL70','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=70,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('Cl75','HEAT', ref=75, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
           Operation('CL75','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=75,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('Cl80','HEAT', ref=80, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
           Operation('CL80','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=80,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('Cl85','HEAT', ref=85, bin=buck.SEWR, bout=buck.SEWR, kbin=TOTAL_VOL),
           Operation('CL85','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=85,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True)
           ],
     'P': # Pasteurisation
