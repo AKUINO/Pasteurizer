@@ -115,13 +115,14 @@ class Cohort(object):
         begPer = None
         endPer = None
         volTotal, tablo = self.last_travel(endAddr)
-        for line in tablo:
-            if line[1] == begAddr:
-                begin = line[2]
-                begPer = line[0]
-            if line[1] == endAddr:
-                end = line[2]
-                endPer = line[0]
+        if tablo:
+            for line in tablo:
+                if line[1] == begAddr:
+                    begin = line[2]
+                    begPer = line[0]
+                if line[1] == endAddr:
+                    end = line[2]
+                    endPer = line[0]
         if not begin or not end:
             return None,None,None,None
         return volTotal,self.diff_time(begPer,endPer),begin,end
