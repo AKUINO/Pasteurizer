@@ -639,13 +639,13 @@ StateLessActions = "JYLT" # TO BE DUPLICATED in index.js !
 # Empty sub state is managed by underlying operations
 # Greasy sub state must be set
 State('r',ml.T('Propre','Clean','Schoon'),'aqua', \
-    [ ('A',['r',['a',None,False]]),('P','p'),('D',['','d','d']),('H',''),('F',''),('V',''),('w','o') ] )
+    [ ('A',['r',['a',None,False]]),('P','p'),('D',['','d','d']),('H',''),('F',''),('V',''),('B',''),('w','o') ] )
 
 State('o',ml.T('Eau','Water','Waser'),'navy', \
     [ ('A',['o',['a',None,False]]),('F',''),('V',''),('B',''),('D',['','d','d']),('H',['','r']),('w','v') ] )
 
 State('v',ml.T('Eau vieille','Old Water','Oude Waser'),'darkcyan', \
-      [ ('A',['v',['a',None,False]]),('C',['v',['c',None,False]]),('F',''),('V',''),('D',['','d','d']),('w','') ] )
+      [ ('A',['v',['a',None,False]]),('C',['v',['c',None,False]]),('F',''),('V',''),('B',''),('D',['','d','d']),('w','') ] )
 
 State('c',ml.T('Soude','Soda','Natrium'),'blue', \
     [ ('R',['','r']),('F',''),('V',''),('w','') ] )
@@ -666,13 +666,13 @@ State('p',ml.T('Produit','Product','Product'),'orange', \
 #      [                                 ('C',['e','e',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
 #      , [False,True],[True] )
 State('e',ml.T('Eau+Produit','Water+Product','Water+Product'),'darkorange', \
-      [ ('C',['e',['c',None,False]]),('P','p'),('R',''),('F',''),('V',''),('w','s') ] )
+      [ ('C',['e',['c',None,False]]),('P','p'),('R',''),('F',''),('V',''),('B',''),('w','s') ] )
 
 #State('s',ml.T('Sale+Gras','Dirty+Greasy','Vies+Vet'), \
 #    [ ('C',['s','s',['c',None,False]]), ('F',''),('V',''),('w','') ]
 #    , [False,True],[True])
 State('s',ml.T('Sale','Dirty','Vies'),'brown', \
-      [ ('C',['s','s',['c',None,False]]), ('R',''),('F',''),('V',''),('w','') ] )
+      [ ('C',['s','s',['c',None,False]]), ('R',''),('F',''),('V',''),('B',''),('w','') ] )
 
 State('?','...','black', \
       [ ('A',['a']),('C',['c']),('D',['d']), ('H','o'),('R','o'),('F','o'),('V','v'),('w','v'),('M','p'),('E','e'),('P','p'),('I','p'),['Z',''],('B','o'), ] )
@@ -1641,18 +1641,18 @@ opSequences = {
           Operation('NetP','REVR',ref='C',base_speed=MAX_SPEED, qty=-2.0,dump=False)
           ],
     'B': # Calibrsation
-        [ Operation('CL66','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('CL6A','PUMP','warranty','input', base_speed=OPT_SPEED, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('CL65','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=65,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('CL6B','PUMP','warranty','input', base_speed=OPT_SPEED, ref=65,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('CL77','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=70,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('CL7C','PUMP','warranty','input', base_speed=OPT_SPEED, ref=70,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('CL75','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=75,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('CL7D','PUMP','warranty','input', base_speed=OPT_SPEED, ref=75,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('CL88','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=80,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('CL8E','PUMP','warranty','input', base_speed=OPT_SPEED, ref=80,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('CL85','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=85,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
-          Operation('CL8F','PUMP','warranty','input', base_speed=OPT_SPEED, ref=85,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False)
+        [ Operation('CL66','TRAK','heating','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY*4,dump=False),
+          Operation('CL6A','PUMP','heating','input', base_speed=OPT_SPEED, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL65','TRAK','heating','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref=65,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL6B','PUMP','heating','input', base_speed=OPT_SPEED, ref=65,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL77','TRAK','heating','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref=70,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL7C','PUMP','heating','input', base_speed=OPT_SPEED, ref=70,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL75','TRAK','heating','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref=75,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL7D','PUMP','heating','input', base_speed=OPT_SPEED, ref=75,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL88','TRAK','heating','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref=80,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL8E','PUMP','heating','input', base_speed=OPT_SPEED, ref=80,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL85','TRAK','heating','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref=85,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL8F','PUMP','heating','input', base_speed=OPT_SPEED, ref=85,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False)
           ],
     'P': # Pasteurisation
         [ Operation('PasT','HEAT', ref='P', dump=True, programmable=True, bin=buck.RAW, bout=buck.SEWR, kbin=TOTAL_VOL),
