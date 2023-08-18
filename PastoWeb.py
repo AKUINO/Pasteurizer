@@ -1641,7 +1641,7 @@ opSequences = {
           Operation('NetP','REVR',ref='C',base_speed=MAX_SPEED, qty=-2.0,dump=False)
           ],
     'B': # Calibrsation
-        [ Operation('CL66','TRAK','heating','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY*4,dump=False),
+        [ Operation('CL66','TRAK','heating','input', base_speed=OPT_SPEED, bin=buck.WPOT, bout=buck.WPOT, min_speed=-pumpy.minimal_liters*1.5, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY*4,dump=False),
           Operation('CL6A','PUMP','heating','input', base_speed=OPT_SPEED, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
           Operation('CL65','TRAK','heating','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters*1.5, ref=65,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
           Operation('CL6B','PUMP','heating','input', base_speed=OPT_SPEED, ref=65,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
@@ -1813,6 +1813,8 @@ class ThreadPump(threading.Thread):
 
         # do whatever is needed
         self.closeSequence()
+        self.CurrOperation = None
+        self.CurrSequence = None
         self.pump.reset_pump() # to be sure that no situation ends with a running pump...
         hotTapSolenoid.set(0) # and tap are closed !
         self.manAction('Z') # Should stop operations...
