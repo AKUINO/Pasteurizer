@@ -73,7 +73,7 @@ class Cohort(object):
                 break
             pseq += 1
         if pseq >= len(self.sequence): # unknown address
-            return None
+            return None,None
         result = []
         volTotal = 0.0
         while True:
