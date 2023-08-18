@@ -1641,12 +1641,18 @@ opSequences = {
           Operation('NetP','REVR',ref='C',base_speed=MAX_SPEED, qty=-2.0,dump=False)
           ],
     'B': # Calibrsation
-        [ Operation('CL60','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('CL65','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=65,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('CL70','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=70,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('CL75','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=75,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('CL80','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=80,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True),
-          Operation('CL85','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=85,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=True,cooling=True)
+        [ Operation('CL66','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL6A','PUMP','warranty','input', base_speed=OPT_SPEED, ref=60,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL65','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=65,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL6B','PUMP','warranty','input', base_speed=OPT_SPEED, ref=65,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL77','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=70,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL7C','PUMP','warranty','input', base_speed=OPT_SPEED, ref=70,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL75','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=75,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL7D','PUMP','warranty','input', base_speed=OPT_SPEED, ref=75,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL88','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=80,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL8E','PUMP','warranty','input', base_speed=OPT_SPEED, ref=80,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL85','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters*1.5, ref=85,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False),
+          Operation('CL8F','PUMP','warranty','input', base_speed=OPT_SPEED, ref=85,qty=TOTAL_VOL, shake_qty=SHAKE_QTY,dump=False)
           ],
     'P': # Pasteurisation
         [ Operation('PasT','HEAT', ref='P', dump=True, programmable=True, bin=buck.RAW, bout=buck.SEWR, kbin=TOTAL_VOL),
