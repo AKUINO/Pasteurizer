@@ -464,10 +464,15 @@ class ThreadThermistor(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
 
-    def sensorParam(self,address,param):
+    def sensorParam(self,address,param,beta,ohm25):
         global cohorts
         if param and not address in cohorts.catalog:
-            cohorts.addSensor(address,Thermistor(address,param))
+            new_sensor = Thermistor(address,param)
+            if beta:
+                new_sensor.bResistance = beta
+            if ohm25:
+                new_sensor.t25Resistance = ohm25
+            cohorts.addSensor(address, new_sensor)
             cohorts.readCalibration(address)
         return cohorts.catalog[address]
 
@@ -1014,7 +1019,7 @@ class ThreadDAC(threading.Thread):
                     term.write(datetime.fromtimestamp(nowT).strftime("%Y-%m-%d %H:%M:%S"),term.black,term.bgwhite)
                     term.write(" %dWh" % (self.totalWatts+self.totalWatts2),term.red,term.bgwhite)
                     if self.setpoint:
-                        term.write(" %0.1f°C" % self.setpoint,term.black,term.bgwhite)
+                        term.write(f" {self.setpoint:0.1f}°C", term.black, term.bgwhite)
                     #if self.setpoint2:
                     #    term.write("*",term.red,term.bgwhite)
                         
@@ -2181,12 +2186,12 @@ else:
 
 T_Thermistor = ThreadThermistor()
 T_Thermistor.daemon = True
-T_Thermistor.sensorParam("input",hardConf.T_input) # Entrée
-T_Thermistor.sensorParam("intake",hardConf.T_intake) # Sortie
-T_Thermistor.sensorParam("warranty", hardConf.T_warranty) # Garantie sortie serpentin long
+T_Thermistor.sensorParam("input",hardConf.T_input, hardConf.beta_input, hardConf.ohm25_input) # Entrée
+T_Thermistor.sensorParam("intake",hardConf.T_intake, hardConf.beta_intake, hardConf.ohm25_intake) # Sortie
+T_Thermistor.sensorParam("warranty", hardConf.T_warranty, hardConf.beta_warranty, hardConf.ohm25_warranty) # Garantie sortie serpentin long
 #T_Thermistor.sensorParam("temper",hardConf.T_sp9b) # Garantie entrée serpentin court
 if hardConf.T_heating:
-    T_Thermistor.sensorParam("heating",hardConf.T_heating)
+    T_Thermistor.sensorParam("heating",hardConf.T_heating, hardConf.beta_heating, hardConf.ohm25_heating)
 if hardConf.inputPressure:
     T_Thermistor.pressureSensorParam("press", hardConf.inputPressure, hardConf.inputPressureFlag) # Garantie sortie serpentin long
 

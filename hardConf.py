@@ -68,6 +68,16 @@ OW_warranty = None # Garantie sortie serpentin long
 OW_heating = None # If no OneWire, this will be T_sp9b
 OW_extra = None
 
+beta_input = None # Entrée de la chauffe
+beta_intake= None # Entrée du pasteurisateur
+beta_warranty = None # Garantie sortie serpentin long
+beta_heating = None # If no OneWire, this will be T_sp9b
+
+ohm25_input = None # Entrée de la chauffe
+ohm25_intake= None # Entrée du pasteurisateur
+ohm25_warranty = None # Garantie sortie serpentin long
+ohm25_heating = None # If no OneWire, this will be T_sp9b
+
 vol_intake = None
 vol_input = None
 vol_warranty = None
@@ -345,6 +355,10 @@ if configParsing:
                 OW_heating = anItem[1]
             elif opt == 'volume':
                 vol_heating = string_mL(anItem)
+            elif opt == 'beta':
+                beta_heating = float(anItem[1])
+            elif opt == 'ohm25':
+                ohm25_heating = float(anItem[1])
             else:
                 print('[heating] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
@@ -360,6 +374,10 @@ if configParsing:
                 OW_extra = anItem[1]
             elif opt == 'volume':
                 vol_total = string_mL(anItem)
+            elif opt == 'beta':
+                beta_extra = float(anItem[1])
+            elif opt == 'ohm25':
+                ohm25_extra = float(anItem[1])
             else:
                 print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
@@ -375,6 +393,10 @@ if configParsing:
                 OW_input = anItem[1]
             elif opt == 'volume':
                 vol_input = string_mL(anItem)
+            elif opt == 'beta':
+                beta_input = float(anItem[1])
+            elif opt == 'ohm25':
+                ohm25_input = float(anItem[1])
             else:
                 print('[input] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
@@ -390,6 +412,10 @@ if configParsing:
                 OW_output = anItem[1]
             elif opt == 'volume':
                 vol_intake = string_mL(anItem)
+            elif opt == 'beta':
+                beta_intake = float(anItem[1])
+            elif opt == 'ohm25':
+                ohm25_intake = float(anItem[1])
             else:
                 print('[intake] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
@@ -405,6 +431,10 @@ if configParsing:
                 OW_warranty = anItem[1]
             elif opt == 'volume':
                 vol_warranty = string_mL(anItem)
+            elif opt == 'beta':
+                beta_warranty = float(anItem[1])
+            elif opt == 'ohm25':
+                ohm25_warranty = float(anItem[1])
             else:
                 print('[warranty] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 

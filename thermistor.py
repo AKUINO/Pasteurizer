@@ -30,8 +30,6 @@ import hardConf
 
 # Thermistor Resistance & Beta Parameter (from datasheet)
 #bResistance = 3969
-bResistance = 3694.0
-t25Resistance = 10000.0
 
 # Constants
 t0 = 273.15;  # °Kelvin
@@ -43,18 +41,14 @@ def calcResistance(voltage,top_resis):
     except:
         return 0.0
 
-def calcTemp(resistance):
-    try:
-        return 1 / ( (math.log(resistance / t25Resistance) / bResistance) + (1.0 / t25) ) - t0;
-    except:
-        return 0.0
-
 class Thermistor(sensor.Sensor):
 
     typeNum = 5
 
     def __init__(self,address,param):
         super().__init__(Thermistor.typeNum,address,param)
+        self.bResistance = 3694.0
+        self.t25Resistance = 10000.0
         if hardConf.io and not hardConf.MICHA_device: # LOCAL ADC (not MICHA)
             self.stim_pin = ((int(param)-1)*2)+1
             hardConf.io.set_pin_direction(self.stim_pin,0) #Output
@@ -69,6 +63,12 @@ class Thermistor(sensor.Sensor):
             attr = term.black
         term.write(format % (self.value if self.value else 0.0), attr, term.bgwhite)
 
+    def calcTemp(self, resistance):
+        try:
+            return 1 / ( (math.log(resistance / self.t25Resistance) / self.bResistance) + (1.0 / t25) ) - t0;
+        except:
+            return 0.0
+
     def getreading(self):
         if hardConf.io:
             if not hardConf.MICHA_device: # LOCAL ADC (not MICHA)
@@ -82,7 +82,7 @@ class Thermistor(sensor.Sensor):
                     volts *= hardConf.thermistors_voltage/4096.0
             if volts != None:
                 res = calcResistance(volts,hardConf.thermistors_Rtop)
-                temp = calcTemp(res)
+                temp = self.calcTemp(res)
                 #print ("%d(%f)=%f ohm; %f°C"%(self.param,volts,res,temp))
                 if (temp > 0.0) and (temp < 100.0):
                     return volts,res,temp
