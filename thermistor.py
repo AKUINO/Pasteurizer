@@ -32,7 +32,7 @@ import hardConf
 #bResistance = 3969
 
 # Constants
-t0 = 273.15;  # °Kelvin
+t0 = 273.15;  # 0°C in °Kelvin
 t25 = t0 + 25.0; # 25°C in Kelvin
 
 def calcResistance(voltage,top_resis):
@@ -65,6 +65,7 @@ class Thermistor(sensor.Sensor):
 
     def calcTemp(self, resistance):
         try:
+            # print ("%s: %dmV, b=%d, r25=%d" % (self.address,resistance,self.bResistance,self.t25Resistance))
             return 1 / ( (math.log(resistance / self.t25Resistance) / self.bResistance) + (1.0 / t25) ) - t0;
         except:
             return 0.0

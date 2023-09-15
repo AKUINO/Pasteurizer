@@ -1821,9 +1821,9 @@ class ThreadPump(threading.Thread):
         self.closeSequence()
         self.CurrOperation = None
         self.CurrSequence = None
+        self.manAction('Z') # Should stop operations...
         self.pump.reset_pump() # to be sure that no situation ends with a running pump...
         hotTapSolenoid.set(0) # and tap are closed !
-        self.manAction('Z') # Should stop operations...
         #self.setPause(False) COUNTER PRODUCTIVE?
         self.lastStop = time.perf_counter()
 
