@@ -35,6 +35,11 @@ import hardConf
 t0 = 273.15;  # 0°C in °Kelvin
 t25 = t0 + 25.0; # 25°C in Kelvin
 
+# Reinhart-hart contants (for the temperature range from 20°C to 100°C)
+A = 0.0010296697555538872
+B = 0.00023902485774993708
+C = 1.572127153105922e-07
+
 def calcResistance(voltage,top_resis):
     try:
         return (top_resis*voltage) / (hardConf.thermistors_voltage-voltage)
@@ -66,7 +71,8 @@ class Thermistor(sensor.Sensor):
     def calcTemp(self, resistance):
         try:
             # print ("%s: %dmV, b=%d, r25=%d" % (self.address,resistance,self.bResistance,self.t25Resistance))
-            return 1 / ( (math.log(resistance / self.t25Resistance) / self.bResistance) + (1.0 / t25) ) - t0;
+            # return 1 / ( (math.log(resistance / self.t25Resistance) / self.bResistance) + (1.0 / t25) ) - t0;
+            return 1/(A+B*math.log(resistance)+C*(math.log(resistance))**3)-t0   # Reinhart-hart formula
         except:
             return 0.0
 
@@ -102,6 +108,7 @@ class Thermistor(sensor.Sensor):
 
 def main(args):
     try:
+        # print(Thermistor("THE1",1).calcTemp(1868)) # test pour la resistance de 72°C
         therm=[Thermistor("THE1",1),Thermistor("THE2",2),Thermistor("THE3",3),Thermistor("THE4",4)]
         while True:
             for t in therm:
