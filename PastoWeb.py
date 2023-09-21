@@ -1978,7 +1978,7 @@ class ThreadPump(threading.Thread):
                         self.stopAction()
                     elif self.stopRequest:
                         pass # Do not allow shuting down the machine by the Web interface
-                    elif RedPendingConfirmation > c0.0: # Red button already pressed, SHUTDOWN action can be taken
+                    elif RedPendingConfirmation > 0.0: # Red button already pressed, SHUTDOWN action can be taken
                         RedPendingConfirmation = 0.0
                         if Buzzer:
                             Buzzer.on()
