@@ -1748,6 +1748,7 @@ class ThreadPump(threading.Thread):
         self.qbin = None
         self.qbout = None
         self.fbout = 0.0
+        self.stopRequest = False
 
     def pushContext(self,opContext):
         if opContext:
@@ -1954,6 +1955,7 @@ class ThreadPump(threading.Thread):
         RedPendingConfirmation = 0.0
         prec_loop = time.perf_counter()
         self.running = True
+        self.stopRequest = False
 
         while self.running:
             try:
@@ -1971,10 +1973,12 @@ class ThreadPump(threading.Thread):
                         if YellowLED:
                             YellowLED.blink(2)
 
-                if RedButton and RedButton.acknowledge():
+                if self.stopRequest or (RedButton and RedButton.acknowledge()):
                     if not self.currAction in [None,'X','Z',' ']: # Immediate stop, no confirmation
                         self.stopAction()
-                    elif RedPendingConfirmation > 0.0: # Red button already pressed, SHUTDOWN action can be taken
+                    elif self.stopRequest:
+                        pass # Do not allow shuting down the machine by the Web interface
+                    elif RedPendingConfirmation > c0.0: # Red button already pressed, SHUTDOWN action can be taken
                         RedPendingConfirmation = 0.0
                         if Buzzer:
                             Buzzer.on()
@@ -1997,6 +2001,7 @@ class ThreadPump(threading.Thread):
                             if GreenLED:
                                 GreenLED.off()
                         RedPendingConfirmation = 0.0 - (now + RedConfirmationDelay) #Confirmation must occur within 3 seconds
+                    self.stopRequest = False
                 else: # RedButton not pressed
                     if RedPendingConfirmation != 0.0:
                         if RedPendingConfirmation < 0.0: # Button not released yet
@@ -2597,7 +2602,8 @@ class WebApiAction:
             #        message = str(ml.T("Purge en cours","Purge bagan","Zuivering..."))
             #        time.sleep(0.01)
             elif letter in ['X','Z']:
-                T_Pump.stopAction()
+                #T_Pump.stopAction()
+                T_Pump.stopRequest = True
                 if letter == 'X':
                     T_Pump.manAction('X')
                     os.kill(os.getpid(),signal.SIGINT)
@@ -3034,10 +3040,12 @@ class ThreadInputProcessor(threading.Thread):
                 elif menu_choice in ['M','E','P','H','I','R','V','F','A','C','D','X','Z','B']: # 'C','K'
                     menu_choice = menu_confirm(menu_choice,8.0)
                     if menu_choice == 'X':
-                        T_Pump.stopAction()
+                        #T_Pump.stopAction()
+                        T_Pump.stopRequest = True
                         break
                     if menu_choice == 'Z':
-                        T_Pump.stopAction()
+                        #T_Pump.stopAction()
+                        T_Pump.stopRequest = True
                     elif menu_choice in ['M','E','P','H','I','R','V','F','A','C','D','B']: # 'C','K'
                         T_Pump.setAction(menu_choice)
                 elif menu_choice == 'Y': # Yaourt
@@ -3068,7 +3076,8 @@ class ThreadInputProcessor(threading.Thread):
                         T_Pump.setPause(False)
                         T_Pump.setAction(menu_choice)
                     elif menu_choice == 'Z':
-                        T_Pump.stopAction() # Already set pause
+                        #T_Pump.stopAction()
+                        T_Pump.stopRequest = True
                 elif menu_choice == 'O': # Options...
                     option_confirm()
                 elif menu_choice:
@@ -3090,7 +3099,8 @@ class ThreadInputProcessor(threading.Thread):
                     term.writeLine("", term.bgwhite, term.blue)
                     display_pause = prec_pause
             except KeyboardInterrupt:
-                T_Pump.stopAction()
+                #T_Pump.stopAction()
+                T_Pump.stopRequest = True
                 break
             except:
                 traceback.print_exc()
