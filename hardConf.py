@@ -358,9 +358,8 @@ if configParsing:
             io = MICHApast.Micha(MICHA_device)
             reversedPump = True
 
-    def parseThermistor (section):
+    def parseThermistor (section,T):
 
-        T = None
         OW = None
         vol = None
         beta  = None
@@ -394,7 +393,7 @@ if configParsing:
                     print('['+section+'] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume, beta, ohm25, a, b, c')
         return (T,OW,vol,beta,ohm25,A,B,C)
     
-    (T_heating, OW_heating, vol_heating, beta_heating, ohm25_heating, A_heating, B_heating, C_heating) = parseThermistor('heating')
+    (T_heating, OW_heating, vol_heating, beta_heating, ohm25_heating, A_heating, B_heating, C_heating) = parseThermistor('heating', T_heating)
 
     if 'extra' in configParsing.sections():
         for anItem in configParsing.items('extra'):
@@ -411,9 +410,9 @@ if configParsing:
             else:
                 print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume,beta,ohm25')
 
-    (T_input, OW_input, vol_input, beta_input, ohm25_input, A_input, B_input, C_input) = parseThermistor('input')
-    (T_intake, OW_intake, vol_intake, beta_intake, ohm25_intake, A_intake, B_intake, C_intake) = parseThermistor('intake')
-    (T_warranty, OW_warranty, vol_warranty, beta_warranty, ohm25_warranty, A_warranty, B_warranty, C_warranty) = parseThermistor('warranty')
+    (T_input, OW_input, vol_input, beta_input, ohm25_input, A_input, B_input, C_input) = parseThermistor('input', T_input)
+    (T_intake, OW_intake, vol_intake, beta_intake, ohm25_intake, A_intake, B_intake, C_intake) = parseThermistor('intake', T_intake)
+    (T_warranty, OW_warranty, vol_warranty, beta_warranty, ohm25_warranty, A_warranty, B_warranty, C_warranty) = parseThermistor('warranty', T_warranty)
 
     if 'Rmeter' in configParsing.sections():
         import RMETERpast
