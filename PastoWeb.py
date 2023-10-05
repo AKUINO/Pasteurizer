@@ -2197,14 +2197,17 @@ else:
 
 T_Thermistor = ThreadThermistor()
 T_Thermistor.daemon = True
-T_Thermistor.sensorParam("input",hardConf.T_input, hardConf.beta_input, hardConf.ohm25_input, hardConf.A_input, hardConf.B_input, hardConf.C_input) # Entrée
-T_Thermistor.sensorParam("intake",hardConf.T_intake, hardConf.beta_intake, hardConf.ohm25_intake, hardConf.A_intake, hardConf.B_intake, hardConf.C_intake) # Sortie
-T_Thermistor.sensorParam("warranty", hardConf.T_warranty, hardConf.beta_warranty, hardConf.ohm25_warranty, hardConf.A_warranty, hardConf.B_warranty, hardConf.C_warranty) # Garantie sortie serpentin long
-#T_Thermistor.sensorParam("temper",hardConf.T_sp9b) # Garantie entrée serpentin court
-if hardConf.T_heating:
-    T_Thermistor.sensorParam("heating",hardConf.T_heating, hardConf.beta_heating, hardConf.ohm25_heating, hardConf.A_heating, hardConf.B_heating, hardConf.C_heating)
-if hardConf.inputPressure:
-    T_Thermistor.pressureSensorParam("press", hardConf.inputPressure, hardConf.inputPressureFlag) # Garantie sortie serpentin long
+try:
+    T_Thermistor.sensorParam("input",hardConf.T_input, hardConf.beta_input, hardConf.ohm25_input, hardConf.A_input, hardConf.B_input, hardConf.C_input) # Entrée
+    T_Thermistor.sensorParam("intake",hardConf.T_intake, hardConf.beta_intake, hardConf.ohm25_intake, hardConf.A_intake, hardConf.B_intake, hardConf.C_intake) # Sortie
+    T_Thermistor.sensorParam("warranty", hardConf.T_warranty, hardConf.beta_warranty, hardConf.ohm25_warranty, hardConf.A_warranty, hardConf.B_warranty, hardConf.C_warranty) # Garantie sortie serpentin long
+    #T_Thermistor.sensorParam("temper",hardConf.T_sp9b) # Garantie entrée serpentin court
+    if hardConf.T_heating:
+        T_Thermistor.sensorParam("heating",hardConf.T_heating, hardConf.beta_heating, hardConf.ohm25_heating, hardConf.A_heating, hardConf.B_heating, hardConf.C_heating)
+    if hardConf.inputPressure:
+        T_Thermistor.pressureSensorParam("press", hardConf.inputPressure, hardConf.inputPressureFlag) # Garantie sortie serpentin long
+except:
+    pass
 
 
 if not pumpy.open():
