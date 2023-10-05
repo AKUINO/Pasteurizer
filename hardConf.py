@@ -68,6 +68,21 @@ OW_warranty = None # Garantie sortie serpentin long
 OW_heating = None # If no OneWire, this will be T_sp9b
 OW_extra = None
 
+A_input = None # Entrée de la chauffe
+A_intake= None # Entrée du pasteurisateur
+A_warranty = None # Garantie sortie serpentin long
+A_heating = None # If no OneWire, this will be T_sp9b
+
+B_input = None # Entrée de la chauffe
+B_intake= None # Entrée du pasteurisateur
+B_warranty = None # Garantie sortie serpentin long
+B_heating = None # If no OneWire, this will be T_sp9b
+
+C_input = None # Entrée de la chauffe
+C_intake= None # Entrée du pasteurisateur
+C_warranty = None # Garantie sortie serpentin long
+C_heating = None # If no OneWire, this will be T_sp9b
+
 beta_input = None # Entrée de la chauffe
 beta_intake= None # Entrée du pasteurisateur
 beta_warranty = None # Garantie sortie serpentin long
@@ -343,24 +358,43 @@ if configParsing:
             io = MICHApast.Micha(MICHA_device)
             reversedPump = True
 
-    if 'heating' in configParsing.sections():
-        for anItem in configParsing.items('heating'):
-            opt = anItem[0].lower()
-            if opt == 'port':
-                try:
-                    T_heating = int(anItem[1])
-                except:
-                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif opt == 'onewire':
-                OW_heating = anItem[1]
-            elif opt == 'volume':
-                vol_heating = string_mL(anItem)
-            elif opt == 'beta':
-                beta_heating = float(anItem[1])
-            elif opt == 'ohm25':
-                ohm25_heating = float(anItem[1])
-            else:
-                print('[heating] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
+    def parseThermistor (section):
+
+        T = None
+        OW = None
+        vol = None
+        beta  = None
+        ohm25 = None
+        A = None
+        B = None
+        C = None
+        if section in configParsing.sections():
+            for anItem in configParsing.items(section):
+                opt = anItem[0].lower()
+                if opt == 'port':
+                    try:
+                        T = int(anItem[1])
+                    except:
+                        print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+                elif opt == 'onewire':
+                    OW = anItem[1]
+                elif opt == 'volume':
+                    vol = string_mL(anItem)
+                elif opt == 'beta':
+                    beta = float(anItem[1])
+                elif opt == 'ohm25':
+                    ohm25 = float(anItem[1])
+                elif opt == 'a':
+                    A = float(anItem[1])
+                elif opt == 'b':
+                    B = float(anItem[1])
+                elif opt == 'c':
+                    C = float(anItem[1])
+                else:
+                    print('['+section+'] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume, beta, ohm25, a, b, c')
+        return (T,OW,vol,beta,ohm25,A,B,C)
+    
+    (T_heating, OW_heating, vol_heating, beta_heating, ohm25_heating, A_heating, B_heating, C_heating) = parseThermistor('heating')
 
     if 'extra' in configParsing.sections():
         for anItem in configParsing.items('extra'):
@@ -379,64 +413,11 @@ if configParsing:
             elif opt == 'ohm25':
                 ohm25_extra = float(anItem[1])
             else:
-                print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
+                print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume,beta,ohm25')
 
-    if 'input' in configParsing.sections():
-        for anItem in configParsing.items('input'):
-            opt = anItem[0].lower()
-            if opt == 'port':
-                try:
-                    T_input = int(anItem[1])
-                except:
-                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif opt == 'onewire':
-                OW_input = anItem[1]
-            elif opt == 'volume':
-                vol_input = string_mL(anItem)
-            elif opt == 'beta':
-                beta_input = float(anItem[1])
-            elif opt == 'ohm25':
-                ohm25_input = float(anItem[1])
-            else:
-                print('[input] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
-
-    if 'intake' in configParsing.sections():
-        for anItem in configParsing.items('intake'):
-            opt = anItem[0].lower()
-            if opt == 'port':
-                try:
-                    T_intake = int(anItem[1])
-                except:
-                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif opt == 'onewire':
-                OW_output = anItem[1]
-            elif opt == 'volume':
-                vol_intake = string_mL(anItem)
-            elif opt == 'beta':
-                beta_intake = float(anItem[1])
-            elif opt == 'ohm25':
-                ohm25_intake = float(anItem[1])
-            else:
-                print('[intake] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
-
-    if 'warranty' in configParsing.sections():
-        for anItem in configParsing.items('warranty'):
-            opt = anItem[0].lower()
-            if opt == 'port':
-                try:
-                    T_warranty = int(anItem[1])
-                except:
-                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif opt == 'onewire':
-                OW_warranty = anItem[1]
-            elif opt == 'volume':
-                vol_warranty = string_mL(anItem)
-            elif opt == 'beta':
-                beta_warranty = float(anItem[1])
-            elif opt == 'ohm25':
-                ohm25_warranty = float(anItem[1])
-            else:
-                print('[warranty] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
+    (T_input, OW_input, vol_input, beta_input, ohm25_input, A_input, B_input, C_input) = parseThermistor('input')
+    (T_intake, OW_intake, vol_intake, beta_intake, ohm25_intake, A_intake, B_intake, C_intake) = parseThermistor('intake')
+    (T_warranty, OW_warranty, vol_warranty, beta_warranty, ohm25_warranty, A_warranty, B_warranty, C_warranty) = parseThermistor('warranty')
 
     if 'Rmeter' in configParsing.sections():
         import RMETERpast

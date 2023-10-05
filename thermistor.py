@@ -35,11 +35,6 @@ import hardConf
 t0 = 273.15;  # 0°C in °Kelvin
 t25 = t0 + 25.0; # 25°C in Kelvin
 
-# Reinhart-hart contants (for the temperature range from 20°C to 100°C)
-A = 0.0010296697555538872
-B = 0.00023902485774993708
-C = 1.572127153105922e-07
-
 def calcResistance(voltage,top_resis):
     try:
         return (top_resis*voltage) / (hardConf.thermistors_voltage-voltage)
@@ -52,8 +47,12 @@ class Thermistor(sensor.Sensor):
 
     def __init__(self,address,param):
         super().__init__(Thermistor.typeNum,address,param)
-        self.bResistance = 3694.0
+        self.bResistance = None # A,B,C are prefered except if Beta is specified in config (old Beta is 3694.0)
         self.t25Resistance = 10000.0
+        # Reinhart-hart contants (for the temperature range from 20°C to 100°C)
+        self.A = 0.0010296697555538872
+        self.B = 0.00023902485774993708
+        self.C = 1.572127153105922e-07
         if hardConf.io and not hardConf.MICHA_device: # LOCAL ADC (not MICHA)
             self.stim_pin = ((int(param)-1)*2)+1
             hardConf.io.set_pin_direction(self.stim_pin,0) #Output
@@ -70,9 +69,11 @@ class Thermistor(sensor.Sensor):
 
     def calcTemp(self, resistance):
         try:
-            # print ("%s: %dmV, b=%d, r25=%d" % (self.address,resistance,self.bResistance,self.t25Resistance))
-            # return 1 / ( (math.log(resistance / self.t25Resistance) / self.bResistance) + (1.0 / t25) ) - t0;
-            return 1/(A+B*math.log(resistance)+C*(math.log(resistance))**3)-t0   # Reinhart-hart formula
+            if self.bResistance: # A,B,C are prefered except if Beta is specified in config (old Beta is 3694.0)
+                # print ("%s: %dmV, b=%d, r25=%d" % (self.address,resistance,self.bResistance,self.t25Resistance))
+                return 1 / ( (math.log(resistance / self.t25Resistance) / self.bResistance) + (1.0 / t25) ) - t0
+            else:
+                return 1/(self.A+self.B*math.log(resistance)+self.C*(math.log(resistance))**3) - t0   # Reinhart-hart formula
         except:
             return 0.0
 
