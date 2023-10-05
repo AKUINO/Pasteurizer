@@ -2446,9 +2446,9 @@ def LogData(letter):
         input = cohorts.getCalibratedValue('input')
         warranty = cohorts.getCalibratedValue('warranty')
         heating = cohorts.getCalibratedValue('heating')
-        if intake < 1.0 or input < 1.0 or warranty < 1.0 or heating < 1.0:
+        if float(intake) < 1.0 or float(input) < 1.0 or float(warranty) < 1.0 or float(heating) < 1.0:
             danger = str(ml.T('Capteur déconnecté?',"Sensor disconnected?","Sensor losgekoppeld?"))
-        elif intake > 99.0 or input > 99.0 or warranty > 99.0 or heating > 99.0:
+        elif float(intake) > 99.0 or float(input) > 99.0 or float(warranty) > 99.0 or float(heating) > 99.0:
             danger = str(ml.T('Capteur cassé?',"Sensor broken?","Sensor kapot?"))
         elif T_DAC.empty_tank:
             danger = str(ml.T('Cuve de chauffe VIDE ou déconnectée?','Heating tank EMPTY or disconnected?','Verwarmingstank LEEG of losgemaakte?'))
