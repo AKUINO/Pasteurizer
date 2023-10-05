@@ -408,10 +408,6 @@ if configParsing:
                 OW_extra = anItem[1]
             elif opt == 'volume':
                 vol_total = string_mL(anItem)
-            elif opt == 'beta':
-                beta_extra = float(anItem[1])
-            elif opt == 'ohm25':
-                ohm25_extra = float(anItem[1])
             else:
                 print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume,beta,ohm25')
 
