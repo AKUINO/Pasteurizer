@@ -19,6 +19,7 @@ si on lance par exemple un pasteurisation et qu’on l’arrête directement car
 """
 
 import socket
+import socklocks
 import sys
 import os
 import signal
@@ -289,10 +290,11 @@ def manage_cmdline_arguments():
 
 # restart_program()
 args = manage_cmdline_arguments()
-_lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+#_lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) # pour Linux
 
 try:
-    _lock_socket.bind('\0AKUINOpast')
+    _lock_socket = socklocks.SocketLock('AKUINOpast')
+    #_lock_socket.bind('\0AKUINOpast')
     print('Socket AKUINOpast now locked')
 except socket.error:
     print('AKUINOpast lock exists')
@@ -303,12 +305,12 @@ datafiles.goto_application_root()
 PI = 3.141592 # Yes, we run on a Raspberry !
 
 # mL Volume of a tube based on ID(mm) and length(mm)
-def vol_tube(ID,long):
+def vol_tube(ID,long): # retourne le volume d'un cylindre sur base de son diamètre et de sa longeur, en cm3 (=mL)
     rad = ID/2.0
     return PI*rad*rad*long/1000.0 # cubic mm to cubic cm (mL)
 
 # mL Volume of a tube based on ID(mm) of outer tube, OD of inner tube and length(mm)
-def vol_outer_tube(OD_inner,ID_outer,long):
+def vol_outer_tube(OD_inner,ID_outer,long): # retourne le volume d'un cylindre creux(pour volume du tube externe de l'échangeur)
     return vol_tube(ID_outer,long) - vol_tube(OD_inner,long)
 
 # mL Volume of a coil based on ID(mm) and coil middle diam(mm) and number of spires
@@ -322,9 +324,7 @@ def mL_L(mL): # milli Liters to Liters...
 def L_mL(L): #Liters to milli Liters...
     return L * 1000.0
 
-tank = 23.79 # litres dans le bassin de chauffe
-if hardConf.vol_heating:
-    tank = mL_L(hardConf.vol_heating)
+tank = mL_L(hardConf.vol_heating)
 
 # Volumes for the different parts of the pasteurizer circuit
 pasteurization_tube = vol_tube(9.5,8820) # = 625mL = 15 seconds for 150L / hour
