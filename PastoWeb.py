@@ -19,7 +19,6 @@ si on lance par exemple un pasteurisation et qu’on l’arrête directement car
 """
 
 import socket
-import socklocks
 import sys
 import os
 import signal
@@ -265,7 +264,7 @@ trigger_w = TimeTrigger('w',menus)
 ##reject = 71.7 # Température minimum de pasteurisation
 
 kCalWatt = 1.16 # watts per kilo calories
-HEAT_POWER = 2500.0 # watts per hour (puissance de la chauffe)
+
 WATT_LOSS = 10 # watts lost per 1°C difference with room temperature
 # MITIG_POWER = 1500.0 # watts per hour (puissance du bac de mitigation)
 ROOM_TEMP = 20.0 # degrees: should be measured...
@@ -290,15 +289,23 @@ def manage_cmdline_arguments():
 
 # restart_program()
 args = manage_cmdline_arguments()
-#_lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) # pour Linux
 
-try:
-    _lock_socket = socklocks.SocketLock('AKUINOpast')
-    #_lock_socket.bind('\0AKUINOpast')
-    print('Socket AKUINOpast now locked')
-except socket.error:
-    print('AKUINOpast lock exists')
-    sys.exit()
+if hardConf.operatingSystem == 'Linux':
+    _lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM) # pour Linux
+    try:
+        _lock_socket.bind('\0AKUINOpast')
+        print('Socket AKUINOpast now locked')
+    except socket.error:
+        print('AKUINOpast lock exists')
+        sys.exit()
+else: # Other operating systems like MAC
+    import socklocks
+    try:
+        _lock_socket = socklocks.SocketLock('AKUINOpast')
+        print('Socket AKUINOpast now locked for '+hardConf.operatingSystem)
+    except socket.error:
+        print('AKUINOpast lock exists for '+hardConf.operatingSystem)
+        sys.exit()
 
 datafiles.goto_application_root()
 
@@ -830,7 +837,7 @@ class ThreadDAC(threading.Thread):
 
     def run(self):
         
-        global cohorts, display_pause,tank,HEAT_POWER,ROOM_TEMP, lines, columns
+        global cohorts, display_pause,tank,ROOM_TEMP, lines, columns
         
         self.running = True
         lastLoop = time.perf_counter()
@@ -861,8 +868,8 @@ class ThreadDAC(threading.Thread):
                         # wattHour += (self.setpoint-cohorts.catalog['input'].value)*self.T_Pump.pump.liters()*kCalWatt
                     # if wattHour <= 1.0:
                         # wattHour = 0.0
-                    # elif wattHour >= HEAT_POWER:
-                        # wattHour = HEAT_POWER
+                    # elif wattHour >= hardConf.power_heating:
+                        # wattHour = hardConf.power_heating
 
                 if self.setpoint and cohorts.catalog['heating'].value:
                     currHeat = int(self.dacSetting.value)
@@ -877,7 +884,7 @@ class ThreadDAC(threading.Thread):
 
                     if wattHour and not self.empty_tank:
                         self.dacSetting.set(1)
-                        self.totalWatts += (HEAT_POWER/3600.0 * delay)
+                        self.totalWatts += (hardConf.power_heating/3600.0 * delay)
                         if not lastWatt or self.T_Pump.pump.speed != 0.0:
                             lastWatt = now
                             prec_heating = heating
@@ -1906,8 +1913,8 @@ class ThreadPump(threading.Thread):
                     self.lastDurationEval = None
                     newEval = 0
                 else:
-                    newEval =  diffTemp * tank * kCalWatt / ( (HEAT_POWER-((heating-ROOM_TEMP)*WATT_LOSS))) * 3600.0
-                    #print("Evaluation=%f tank=%f kCalW=%f HP=%f RT=%f WL=%f" % (newEval, tank, kCalWatt,HEAT_POWER,ROOM_TEMP,WATT_LOSS) )
+                    newEval =  diffTemp * tank * kCalWatt / ( (hardConf.power_heating-((heating-ROOM_TEMP)*WATT_LOSS))) * 3600.0
+                    #print("Evaluation=%f tank=%f kCalW=%f HP=%f RT=%f WL=%f" % (newEval, tank, kCalWatt,hardConf.power_heating,ROOM_TEMP,WATT_LOSS) )
                     if not self.lastDurationEval or not self.lastDurationEvalTime:
                         self.lastDurationEval = newEval
                         self.lastDurationEvalTime = now
@@ -2487,7 +2494,7 @@ def LogData(letter):
                 #'extra': isnull(cohorts.getCalibratedValue('extra'), ''), \
                 'input': isnull(input, ''), \
                 'intake': isnull(intake, ''), \
-                'watts': isnull(cohorts.catalog['DAC1'].value*HEAT_POWER, ''), \
+                'watts': isnull(cohorts.catalog['DAC1'].value*hardConf.power_heating, ''), \
                 #'watts2': isnull(cohorts.catalog['DAC2'].value*MITIG_POWER, ''), \
                 'warranty': isnull(warranty, ''), \
                 'heating': isnull(heating, ''), \
@@ -2508,7 +2515,7 @@ def LogData(letter):
                 'fill': hotTapSolenoid.get()[0], \
                 'pumpopt': optimal_speed, \
                 'pumpeff': (pumping_volume/(pumping_time/3600)) if pumping_time else 0, \
-                'heateff': (100.0*heating_volume/(pumping_time/3600))/HEAT_POWER if pumping_time else 0, \
+                'heateff': (100.0*heating_volume/(pumping_time/3600))/hardConf.power_heating if pumping_time else 0, \
                 'level1': T_Pump.level1, \
                 'level2': T_Pump.level2, \
                 'forcing': 2 if T_Pump.forcing > 0 else (1 if T_Pump.forcible else 0) \

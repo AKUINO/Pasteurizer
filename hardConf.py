@@ -96,8 +96,13 @@ ohm25_heating = None # If no OneWire, this will be T_sp9b
 vol_intake = None
 vol_input = None
 vol_warranty = None
-vol_heating = 23790 # en mL
+vol_heating = None
+vol_heating_DEFAULT = 23790 # en mL
 vol_total = None
+
+power_heating = None # Heating electricity power consumption (and energy released)
+power_heating_DEFAULT = 2500 # en mL
+power_dummy = None # do not use!
 
 vol_pasteurization = None
 
@@ -138,27 +143,31 @@ if hostname and hostname.startswith(prefixHostname):
     i = hostname.index('-',len(prefixHostname))
     if i < len(prefixHostname):
         print ("A '-'(dash) must precede the pasteurizer serial number in the hostname")
+        configCode = "DEV"
+        serialNumber = "0"
     else:
         configCode = hostname[len(prefixHostname):i]
         serialNumber = hostname[i:]
-        configFile = os.path.join(HARDdirectory,configCode+'.ini')
 else:
     print ("hostname must begin by pasto")
+    configCode = "DEV"
+    serialNumber = "0"
 
-if configFile:
-    configParsing = configparser.RawConfigParser()
+configFile = os.path.join(HARDdirectory,configCode+'.ini')
+configParsing = configparser.RawConfigParser()
+try:
+    with codecs.open(configFile, 'r', 'utf8' ) as f:
+        configParsing.read_file(f)
+except IOError:
+    new_path = os.path.join(HARDdirectory, 'DEFAULT.ini')
+    print((configFile+' not found. Using ' + new_path))
     try:
-        with codecs.open(configFile, 'r', 'utf8' ) as f:
+        with codecs.open(new_path, 'r', 'utf8' ) as f:
             configParsing.read_file(f)
     except IOError:
-        new_path = os.path.join(HARDdirectory, 'DEFAULT.ini')
-        print((configFile+' not found. Using ' + new_path))
-        try:
-            with codecs.open(new_path, 'r', 'utf8' ) as f:
-                configParsing.read_file(f)
-        except IOError:
-            print("No valid hardware configuration file found. \
-                   Using built-in defaults...")
+        print("No valid hardware configuration file found. \
+               Using built-in defaults...")
+
 if configParsing:
     if 'system' in configParsing.sections():
         for anItem in configParsing.items('system'):
@@ -368,12 +377,18 @@ if configParsing:
         A = None
         B = None
         C = None
+        POWER = None
         if section in configParsing.sections():
             for anItem in configParsing.items(section):
                 opt = anItem[0].lower()
                 if opt == 'port':
                     try:
                         T = int(anItem[1])
+                    except:
+                        print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+                elif opt == 'power':
+                    try:
+                        POWER = int(anItem[1])
                     except:
                         print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
                 elif opt == 'onewire':
@@ -391,12 +406,14 @@ if configParsing:
                 elif opt == 'c':
                     C = float(anItem[1])
                 else:
-                    print('['+section+'] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume, beta, ohm25, a, b, c')
-        return (T,OW,vol,beta,ohm25,A,B,C)
+                    print('['+section+'] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume, beta, ohm25, a, b, c, power')
+        return (T,OW,vol,beta,ohm25,A,B,C,POWER)
 
-    
-    (T_heating, OW_heating, vol_heating, beta_heating, ohm25_heating, A_heating, B_heating, C_heating) = parseThermistor('heating', T_heating)
-
+    (T_heating, OW_heating, vol_heating, beta_heating, ohm25_heating, A_heating, B_heating, C_heating, power_heating) = parseThermistor('heating', T_heating)
+    if not vol_heating:
+        vol_heating = vol_heating_DEFAULT # milliLitres dans le bassin de chauffe
+    if not power_heating:
+        power_heating = power_heating_DEFAULT # watts to heat the tank...
 
     if 'extra' in configParsing.sections():
         for anItem in configParsing.items('extra'):
@@ -411,11 +428,11 @@ if configParsing:
             elif opt == 'volume':
                 vol_total = string_mL(anItem)
             else:
-                print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume,beta,ohm25')
+                print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
 
-    (T_input, OW_input, vol_input, beta_input, ohm25_input, A_input, B_input, C_input) = parseThermistor('input', T_input)
-    (T_intake, OW_intake, vol_intake, beta_intake, ohm25_intake, A_intake, B_intake, C_intake) = parseThermistor('intake', T_intake)
-    (T_warranty, OW_warranty, vol_warranty, beta_warranty, ohm25_warranty, A_warranty, B_warranty, C_warranty) = parseThermistor('warranty', T_warranty)
+    (T_input, OW_input, vol_input, beta_input, ohm25_input, A_input, B_input, C_input, power_dummy) = parseThermistor('input', T_input)
+    (T_intake, OW_intake, vol_intake, beta_intake, ohm25_intake, A_intake, B_intake, C_intake, power_dummy) = parseThermistor('intake', T_intake)
+    (T_warranty, OW_warranty, vol_warranty, beta_warranty, ohm25_warranty, A_warranty, B_warranty, C_warranty, power_dummy) = parseThermistor('warranty', T_warranty)
 
     if 'Rmeter' in configParsing.sections():
         import RMETERpast
