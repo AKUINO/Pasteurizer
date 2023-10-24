@@ -1055,6 +1055,7 @@ class ThreadDAC(threading.Thread):
         self.running = False
         time.sleep(0.1)
         self.dacSetting.close()
+        time.sleep(0.1)
         #self.dacSetting2.close()
 
 def format_time(seconds):
@@ -2265,6 +2266,7 @@ with open(datafiles.csvfile(datafiles.logfile), "w") as data_file:
 
 T_Thermistor.start()
 T_DAC.T_Pump = T_Pump
+T_DAC.daemon = False # No KILL: wait for graceful close
 T_DAC.start()
 T_Pump.start()
 T_Buttons.start()
@@ -3240,6 +3242,7 @@ if T_PumpReading:
 
 try:
     T_Pump.close()
+    time.sleep(0.2)
     term.write ("Pompe ", term.blue, term.bgwhite)
     term.writeLine ("éteinte.", term.green, term.bold, term.bgwhite)
 except:
@@ -3257,6 +3260,10 @@ try:
     #coldTapSolenoid.close()
 except:
     traceback.print_exc()
+
+while T_DAC.is_alive():
+    T_DAC.running = False
+    time.sleep(0.2)
 
 with open(datafiles.csvfile(datafiles.logfile), "r") as data_file:
     term.write("Données stockées dans ",term.blue, term.bgwhite)
