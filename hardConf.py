@@ -96,7 +96,7 @@ ohm25_heating = None # If no OneWire, this will be T_sp9b
 vol_intake = None
 vol_input = None
 vol_warranty = None
-vol_heating = None
+vol_heating = 23790 # en mL
 vol_total = None
 
 vol_pasteurization = None
@@ -107,6 +107,7 @@ thermistors_Rtop = 2000.0 # Divider bridge to measure temperature (top resistor)
 
 hostname = socket.gethostname()
 machine = platform.machine()
+operatingSystem = platform.system()
 print (hostname+" / "+machine)
 
 HARDdirectory = os.path.join(os.path.dirname(os.path.abspath(__file__)),"configs")
@@ -392,8 +393,10 @@ if configParsing:
                 else:
                     print('['+section+'] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume, beta, ohm25, a, b, c')
         return (T,OW,vol,beta,ohm25,A,B,C)
+
     
     (T_heating, OW_heating, vol_heating, beta_heating, ohm25_heating, A_heating, B_heating, C_heating) = parseThermistor('heating', T_heating)
+
 
     if 'extra' in configParsing.sections():
         for anItem in configParsing.items('extra'):

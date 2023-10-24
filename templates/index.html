@@ -397,12 +397,14 @@ $if not paving:
                 </span>
             </form>
             $code:
-               result = subprocess.check_output(['ip','-4', '-o','addr'])
-               result = result.decode('utf-8').split('\n')
-               toDisplay = ""
-               for line in result:
-                   line = line.split('scope')[0].split('brd')[0].strip()
-                   toDisplay += line+'<br>'
+                toDisplay = ""
+                if hardConf.operatingSystem == 'Linux':
+                    result = subprocess.check_output(['ip','-4', '-o','addr'])
+                    if result:
+                       result = result.decode('utf-8').split('\n')
+                       for line in result:
+                           line = line.split('scope')[0].split('brd')[0].strip()
+                           toDisplay += line+'<br>'
             <pre>$:toDisplay</pre>
         </div>
     </div>
