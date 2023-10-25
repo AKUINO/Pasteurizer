@@ -105,6 +105,7 @@ power_heating_DEFAULT = 2500 # en mL
 power_dummy = None # do not use!
 
 vol_pasteurization = None
+dynamicRegulation = False
 
 MICHA_device = None
 thermistors_voltage = 4.087 # Surprisingly not 4.095
@@ -186,8 +187,10 @@ if configParsing:
                 vol_total = string_mL(anItem)
             elif opt == 'pasteurization':
                 vol_pasteurization = string_mL(anItem)
+            elif opt == 'regulation':
+                dynamicRegulation = anItem[1].lower() == "dynamic"
             else:
-                print('[system] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: type, pigpio, gpio, tubing, volume, pasteurization')
+                print('[system] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: type, pigpio, gpio, tubing, volume, pasteurization, regulation')
 
         if localGPIOtype == "pigpio":
             import pigpio

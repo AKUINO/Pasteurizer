@@ -17,7 +17,7 @@ dans le seau d’entrée, à la place d’indiquer la formule complète, par exe
 
 si on lance par exemple un pasteurisation et qu’on l’arrête directement car fausse manipulation, le pasteurisateur croit quand même que l’action a été faite
 """
-
+import queue
 import socket
 import sys
 import os
@@ -1375,60 +1375,72 @@ class Operation(object):
             #print ("s=%f\r" % speed)
         elif typeOpToDo == 'TRAK':
             valSensor1 = cohorts.getCalibratedValue(self.sensor1)
-            if float(valSensor1) < float(self.tempRef()): # Shake
-                T_Pump.forcible = True
-                pressed = GreenButton.poll() if GreenButton else False # Pressing the GreenButton forces slow speed forward...
-                if (pressed and pressed > 0.0):
-                    speed = abs(self.min_speed)
-                elif (T_Pump.forcing > 0):
-                    speed = abs(self.min_speed)
-                elif self.min_speed >= 0.0:
-                    speed = self.min_speed
-                # self.min_speed < 0
-                elif speed == 0.0:
-                    speed = self.min_speed # negative !
-                elif speed > 0.0:
-                    if self.shake_qty and T_Pump.pump.current_liters(now) >= self.shake_qty:
-                        # begin a regulation control cycle: start reversal
-                        if not reportPasteur.startRegulating:
-                            reportPasteur.startRegulating = time.perf_counter()
-                        speed = self.min_speed # negative !
-                    else:
-                        speed = -self.min_speed # positive !
-                else: # speed negative !
-                    if self.shake_qty and T_Pump.pump.current_liters(now) <= (-self.shake_qty):
-                        # ends a regulation control cycle: resume forward
-                        speed = -self.min_speed # positive !
-                    else:
-                        speed = self.min_speed # negative !
-                #print("SHAK="+str(speed)+"\r")
-            else: # No more "shake"
+            if hardConf.dynamicRegulation and self.sensor1 == 'warranty': # Pasteurizing and not cleaning
+                time_for_temp = safe_time_to_kill(valSensor1)
+            else:
+                time_for_temp = 999999.0 # no dynamic regulation
+
+            if time_for_temp <= 90.0: # More than 90 seconds to traverse pasteurization tube = too slow
+                speed = T_Pump.dynamicRegulation(time_for_temp)
                 if reportPasteur.startRegulating:
                     reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, (START_VOL - up_to_heating_tank) / 1000.0))
                     reportPasteur.startRegulating = 0
                 T_Pump.forcible = False
-                #if menus.val('g') and self.sensor1 == 'warranty':
-                #    State.greasy = True
-                totalVol,totalTime,beginTemp,endTemp = cohorts.evolution(self.sensor2,self.sensor1)
-                #print("EVOL="+str(totalVol)+"L/"+str(totalTime)+"s "+str(beginTemp)+"°C<"+str(endTemp)+"°C\r")
-                if not totalVol or (totalVol <= 0.0) or (endTemp <= beginTemp) or (self.tempRef() <= beginTemp): # no data
-                    speed = self.desired_speed()
-                    #print("NUL="+str(speed)+"\r")
-                else:
-                    speed0 = T_Pump.pump.liters()
-                    try:
-                        speed = ((endTemp-beginTemp) / (self.tempRef()-beginTemp)) * (totalVol/(PUMP_SLOWDOWN*totalTime/3600.0))
-                        if speed0 > 0.0:
-                            if speed > (speed0*1.5): # dampen accelerations
-                                speed = speed0*1.5
-                        #print("CAL="+str(speed)+"\r")
-                    except:
-                        #traceback.print_exc()
-                        if speed0 > 0.0:
-                            speed = speed0
+            else:
+                if float(valSensor1) < float(self.tempRef()): # Shake
+                    T_Pump.forcible = True
+                    pressed = GreenButton.poll() if GreenButton else False # Pressing the GreenButton forces slow speed forward...
+                    if (pressed and pressed > 0.0):
+                        speed = abs(self.min_speed)
+                    elif (T_Pump.forcing > 0):
+                        speed = abs(self.min_speed)
+                    elif self.min_speed >= 0.0:
+                        speed = self.min_speed
+                    # self.min_speed < 0
+                    elif speed == 0.0:
+                        speed = self.min_speed # negative !
+                    elif speed > 0.0:
+                        if self.shake_qty and T_Pump.pump.current_liters(now) >= self.shake_qty:
+                            # begin a regulation control cycle: start reversal
+                            if not reportPasteur.startRegulating:
+                                reportPasteur.startRegulating = time.perf_counter()
+                            speed = self.min_speed # negative !
                         else:
-                            speed = 0.0
-                        #print("BAD="+str(speed)+"\r")
+                            speed = -self.min_speed # positive !
+                    else: # speed negative !
+                        if self.shake_qty and T_Pump.pump.current_liters(now) <= (-self.shake_qty):
+                            # ends a regulation control cycle: resume forward
+                            speed = -self.min_speed # positive !
+                        else:
+                            speed = self.min_speed # negative !
+                    #print("SHAK="+str(speed)+"\r")
+                else: # No more "shake"
+                    if reportPasteur.startRegulating:
+                        reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, (START_VOL - up_to_heating_tank) / 1000.0))
+                        reportPasteur.startRegulating = 0
+                    T_Pump.forcible = False
+                    #if menus.val('g') and self.sensor1 == 'warranty':
+                    #    State.greasy = True
+                    totalVol,totalTime,beginTemp,endTemp = cohorts.evolution(self.sensor2,self.sensor1)
+                    #print("EVOL="+str(totalVol)+"L/"+str(totalTime)+"s "+str(beginTemp)+"°C<"+str(endTemp)+"°C\r")
+                    if not totalVol or (totalVol <= 0.0) or (endTemp <= beginTemp) or (self.tempRef() <= beginTemp): # no data
+                        speed = self.desired_speed()
+                        #print("NUL="+str(speed)+"\r")
+                    else:
+                        speed0 = T_Pump.pump.liters()
+                        try:
+                            speed = ((endTemp-beginTemp) / (self.tempRef()-beginTemp)) * (totalVol/(PUMP_SLOWDOWN*totalTime/3600.0))
+                            if speed0 > 0.0:
+                                if speed > (speed0*1.5): # dampen accelerations
+                                    speed = speed0*1.5
+                            #print("CAL="+str(speed)+"\r")
+                        except:
+                            #traceback.print_exc()
+                            if speed0 > 0.0:
+                                speed = speed0
+                            else:
+                                speed = 0.0
+                            #print("BAD="+str(speed)+"\r")
             if T_Pump.pump.speed > 0.0:
                 diff = speed - T_Pump.pump.liters()
                 if diff < 0.0:
@@ -1708,6 +1720,45 @@ opSequences = {
           ]
     }
 
+DESIRED_LOG_REDUCTION = 5.0 # 10^5 reduction of bacterias
+
+def time_to_kill(temp, D, T, z): # seconds to
+    return (D*DESIRED_LOG_REDUCTION) / ( 10.0 ** ((temp-T)/z) )
+
+Coxiella_burnetii_D = 36.00 # time (seconds) to kill 9/10 of the bacterias
+Coxiella_burnetii_T = 65.60 # temperature to kill with that time
+Coxiella_burnetii_z = 5.50  # temperature increase to kill 10 times more
+
+MAP_D = 2.03 # Mycobacterium avium paratuberculosis
+MAP_T = 72.00
+MAP_z = 8.60
+
+def max_time_to_kill(temp):
+    return max( (time_to_kill(temp, Coxiella_burnetii_D, Coxiella_burnetii_T, Coxiella_burnetii_z), \
+                time_to_kill(temp, MAP_D, MAP_T, MAP_z) ) )
+
+LEGAL_PAST = [63.0, 72.0, 89.0]
+LEGAL_TIME = [1800.0, 15.0, 1.0]
+
+safe_ratio = [LEGAL_TIME[0] / max_time_to_kill(LEGAL_PAST[0]), LEGAL_TIME[1] / max_time_to_kill(LEGAL_PAST[1]), LEGAL_TIME[2] / max_time_to_kill(LEGAL_PAST[2]) ]
+
+#for i in [0,1,2]:
+#    print (str(LEGAL_PAST[i])+"°C, "+str(LEGAL_TIME[i])+" sec., security ratio="+str(safe_ratio[i]) )
+
+def safe_time_to_kill(temp):
+    time_needed = max_time_to_kill(temp)
+    if temp <= LEGAL_PAST[0]:
+        return safe_ratio[0] * time_needed
+    elif temp <= LEGAL_PAST[1]:
+        return time_needed * ((safe_ratio[0]*(LEGAL_PAST[1]-temp))+(safe_ratio[1]*(temp-LEGAL_PAST[0])))/(LEGAL_PAST[1]-LEGAL_PAST[0])
+    elif temp < LEGAL_PAST[2]:
+        return time_needed * ((safe_ratio[1]*(LEGAL_PAST[2]-temp))+(safe_ratio[2]*(temp-LEGAL_PAST[1])))/(LEGAL_PAST[2]-LEGAL_PAST[1])
+    else:
+        return safe_ratio[2] * time_needed
+
+#for temp in [63,64,67,68,69,72,74,89]:
+#    print (str(temp)+": "+str(safe_time_to_kill(float(temp))))
+
 def reloadPasteurizationSpeed():
 
   global menus,pumpy,pasteurization_tube,optimal_speed
@@ -1715,6 +1766,7 @@ def reloadPasteurizationSpeed():
   if menus.val('M') < 15.0: # Minimum légal = 15 secondes de pasteurisation
       menus.store('M', 15.0)
   optimal_speed = (mL_L(pasteurization_tube) / menus.val('M')) * 3600.0 # duree minimale de pasteurisation (sec) --> vitesse de la pompe en L/heure
+
   if optimal_speed > pumpy.maximal_liters: # trop lent est sans doute dangereux
       optimal_speed = pumpy.maximal_liters
   elif optimal_speed < pumpy.minimal_liters: # trop lent est sans doute dangereux
@@ -1956,6 +2008,29 @@ class ThreadPump(threading.Thread):
             return vol - self.currOperation.qty
         return 0.0
 
+    def dynamicRegulation(self, pasteurization_holding_time):
+        curr_volume = self.pump.volume()
+        end_holding = curr_volume+pasteurization_tube
+        if end_holding in self.pasteurizationDurations:
+            prev =  self.pasteurizationDurations[end_holding]
+            if pasteurization_holding_time <= prev:
+                pasteurization_holding_time = prev
+            else:
+                self.pasteurizationDurations[end_holding] = pasteurization_holding_time
+        else:
+            self.pasteurizationDurations[end_holding] = pasteurization_holding_time
+
+        to_remove = []
+        max_time = pasteurization_holding_time
+        for (vol,time) in self.pasteurizationDurations.items():
+            if vol < curr_volume:
+                to_remove.append(vol)
+            elif time > max_time:
+                max_time = time
+        for vol in to_remove:
+            del(self.pasteurizationDurations[vol])
+        return (pasteurization_tube / max_time)*3600.0/1000.0 # to get liters per hour
+
     def run(self):
 
         global display_pause, WebExit, RedConfirmationDelay, trigger_w, reportPasteur
@@ -1970,6 +2045,7 @@ class ThreadPump(threading.Thread):
         prec_loop = time.perf_counter()
         self.running = True
         self.stopRequest = False
+        self.pasteurizationDurations = {}
 
         while self.running:
             try:
