@@ -1448,10 +1448,11 @@ class Operation(object):
                 #print("DIFF="+str(diff)+"\r")
                 if diff < (T_Pump.pump.liters() / 25.0):
                     speed = T_Pump.pump.liters()
-            if speed > self.desired_speed():
-                speed = self.desired_speed()
-            elif speed == 0.0:
-                speed = self.desired_speed()
+            if not hardConf.dynamicRegulation:
+                if speed > self.desired_speed():
+                    speed = self.desired_speed()
+                elif speed == 0.0:
+                    speed = self.desired_speed()
         if speed >= 0.0:
             if speed > T_Pump.pump.maximal_liters:
                 speed = T_Pump.pump.maximal_liters
