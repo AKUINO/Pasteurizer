@@ -71,9 +71,9 @@ class Sensor(object):
             return None
         return (self.value + self.prv1 + self.prv2) / 3.0
 
-    def val(self,format="%.2f"):
+    def val(self,format="%.2f",default=""):
         if not self.value:
-            return ""
+            return default
         else:
             return format % self.value
 

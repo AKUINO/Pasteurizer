@@ -983,7 +983,7 @@ class ThreadDAC(threading.Thread):
                                        cohorts.val('input'), \
                                        cohorts.val('warranty'), \
                                        cohorts.val('intake'), \
-                                       isnull(cohorts.catalog['DAC1'].val(), '0'), \
+                                       cohorts.catalog['DAC1'].val(default='0'), \
                                        cohorts.val('heating'), \
                                        cohorts.val('press' if hardConf.inputPressure else 'rmeter') , \
                                        self.T_Pump.level1, \
