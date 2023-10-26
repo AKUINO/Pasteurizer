@@ -983,7 +983,7 @@ class ThreadDAC(threading.Thread):
                                        cohorts.val('input'), \
                                        cohorts.val('warranty'), \
                                        cohorts.val('intake'), \
-                                       cohorts.catalog['DAC1'].val(), \
+                                       isnull(cohorts.catalog['DAC1'].val(), '0'), \
                                        cohorts.val('heating'), \
                                        cohorts.val('press' if hardConf.inputPressure else 'rmeter') , \
                                        self.T_Pump.level1, \
@@ -2194,7 +2194,7 @@ class ThreadPump(threading.Thread):
                         reportPasteur.duration = time.perf_counter() - reportPasteur.begin
                         loop_delay = time.perf_counter()
                         #TODO: Calculate and double check the performance indicators (also add them to report.html...
-                        reportPasteur.total_time_heating = reportPasteur.total_time_heating + ((loop_delay-prec_loop)*cohorts.catalog['DAC1'].value)
+                        reportPasteur.total_time_heating = reportPasteur.total_time_heating + ((loop_delay-prec_loop)*isnull(cohorts.catalog['DAC1'].value,0))
                         reportPasteur.total_temperature = reportPasteur.total_temperature + (self.pump.speed*(loop_delay-prec_loop)*cohorts.catalog['heating'].value)
             except:
                 traceback.print_exc()
@@ -2570,7 +2570,7 @@ def LogData(letter):
                 #'extra': isnull(cohorts.getCalibratedValue('extra'), ''), \
                 'input': isnull(input, ''), \
                 'intake': isnull(intake, ''), \
-                'watts': isnull(cohorts.catalog['DAC1'].value*hardConf.power_heating, ''), \
+                'watts': isnull(cohorts.catalog['DAC1'].value*hardConf.power_heating, '0'), \
                 #'watts2': isnull(cohorts.catalog['DAC2'].value*MITIG_POWER, ''), \
                 'warranty': isnull(warranty, ''), \
                 'heating': isnull(heating, ''), \
