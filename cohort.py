@@ -191,6 +191,7 @@ class Cohort(object):
         if address in self.linear: # linear interpolation calibration
             interpol = self.linear[address]
             trueValue = (float(interpol['a']) * apparentValue) + float(interpol['b'])
+            # print("%s: %.2f --> %.2f\r" % (address,apparentValue,trueValue))
         else:
             trueValue = apparentValue
             siz = len(self.calibration[address])
