@@ -2012,7 +2012,7 @@ class ThreadPump(threading.Thread):
 
         global pasteurization_tube
 
-        curr_volume = self.pump.volume()
+        curr_volume = self.pump.volume()*1000.0  # Liters to milliliters !
         end_holding = curr_volume+pasteurization_tube
         if end_holding in self.pasteurizationDurations:
             prev =  self.pasteurizationDurations[end_holding]
