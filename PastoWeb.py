@@ -2023,7 +2023,7 @@ class ThreadPump(threading.Thread):
                 self.pasteurizationDurations[end_holding] = pasteurization_holding_time
         else:
             self.pasteurizationDurations[end_holding] = pasteurization_holding_time
-        print ("Set "+str(curr_volume)+"+"+str(pasteurization_tube)+"="+str(end_holding)+"mL "+str(pasteurization_holding_time)+"sec.")
+        #print ("Set "+str(curr_volume)+"+"+str(pasteurization_tube)+"="+str(end_holding)+"mL "+str(pasteurization_holding_time)+"sec.")
 
         to_remove = []
         max_time = pasteurization_holding_time
@@ -2034,7 +2034,7 @@ class ThreadPump(threading.Thread):
                 max_time = time
         print (to_remove)
         for vol in to_remove:
-            print ("Remove "+str(vol)+"mL "+str(self.pasteurizationDurations[vol])+"sec.")
+            # print ("Remove "+str(vol)+"mL "+str(self.pasteurizationDurations[vol])+"sec.")
             del(self.pasteurizationDurations[vol])
         return (pasteurization_tube / max_time)*3600.0/1000.0 # to get liters per hour
 
