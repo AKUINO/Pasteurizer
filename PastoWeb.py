@@ -1380,13 +1380,13 @@ class Operation(object):
             else:
                 time_for_temp = 999999.0 # no dynamic regulation
 
-            if time_for_temp <= 90.0: # More than 90 seconds to traverse pasteurization tube = too slow
+            if time_for_temp <= 90.0:
                 speed = T_Pump.dynamicRegulation(time_for_temp)
                 if reportPasteur.startRegulating:
                     reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, (START_VOL - up_to_heating_tank) / 1000.0))
                     reportPasteur.startRegulating = 0
                 T_Pump.forcible = False
-            else:
+            else:  # More than 90 seconds to traverse pasteurization tube = too slow
                 if float(valSensor1) < float(self.tempRef()): # Shake
                     T_Pump.forcible = True
                     pressed = GreenButton.poll() if GreenButton else False # Pressing the GreenButton forces slow speed forward...
@@ -2019,6 +2019,7 @@ class ThreadPump(threading.Thread):
                 self.pasteurizationDurations[end_holding] = pasteurization_holding_time
         else:
             self.pasteurizationDurations[end_holding] = pasteurization_holding_time
+        print ("Set "+str(end_holding)+"mL "+str(pasteurization_holding_time)+"sec.")
 
         to_remove = []
         max_time = pasteurization_holding_time
@@ -2028,6 +2029,7 @@ class ThreadPump(threading.Thread):
             elif time > max_time:
                 max_time = time
         for vol in to_remove:
+            print ("Remove "+str(vol)+"mL "+str(self.pasteurizationDurations[vol])+"sec.")
             del(self.pasteurizationDurations[vol])
         return (pasteurization_tube / max_time)*3600.0/1000.0 # to get liters per hour
 
