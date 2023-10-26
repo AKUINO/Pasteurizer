@@ -2022,7 +2022,7 @@ class ThreadPump(threading.Thread):
                 self.pasteurizationDurations[end_holding] = pasteurization_holding_time
         else:
             self.pasteurizationDurations[end_holding] = pasteurization_holding_time
-        print ("Set "+curr_volume+"+"+str(pasteurization_tube)+"="+str(end_holding)+"mL "+str(pasteurization_holding_time)+"sec.")
+        print ("Set "+str(curr_volume)+"+"+str(pasteurization_tube)+"="+str(end_holding)+"mL "+str(pasteurization_holding_time)+"sec.")
 
         to_remove = []
         max_time = pasteurization_holding_time
