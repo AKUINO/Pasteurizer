@@ -2009,6 +2009,9 @@ class ThreadPump(threading.Thread):
         return 0.0
 
     def dynamicRegulation(self, pasteurization_holding_time):
+
+        global pasteurization_tube
+
         curr_volume = self.pump.volume()
         end_holding = curr_volume+pasteurization_tube
         if end_holding in self.pasteurizationDurations:
@@ -2019,7 +2022,7 @@ class ThreadPump(threading.Thread):
                 self.pasteurizationDurations[end_holding] = pasteurization_holding_time
         else:
             self.pasteurizationDurations[end_holding] = pasteurization_holding_time
-        print ("Set "+str(end_holding)+"mL "+str(pasteurization_holding_time)+"sec.")
+        print ("Set "+curr_volume+"+"+str(pasteurization_tube)+"="+str(end_holding)+"mL "+str(pasteurization_holding_time)+"sec.")
 
         to_remove = []
         max_time = pasteurization_holding_time
@@ -2028,6 +2031,7 @@ class ThreadPump(threading.Thread):
                 to_remove.append(vol)
             elif time > max_time:
                 max_time = time
+        print (to_remove)
         for vol in to_remove:
             print ("Remove "+str(vol)+"mL "+str(self.pasteurizationDurations[vol])+"sec.")
             del(self.pasteurizationDurations[vol])
