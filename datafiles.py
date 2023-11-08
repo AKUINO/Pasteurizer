@@ -20,14 +20,20 @@ DIR_BASE_DATA = DIR_BASE_DATA + '/'
 if (os.path.exists(os.path.join(DIR_BASE, 'calib'))):
     os.rename(os.path.join(DIR_BASE, 'calib'),os.path.join(DIR_BASE_DATA, 'calib'))
 DIR_DATA_CALIB = os.path.join(DIR_BASE_DATA, 'calib/')
+if not os.path.exists(DIR_DATA_CALIB):
+    os.mkdir(DIR_DATA_CALIB)
 
 if (os.path.exists(os.path.join(DIR_BASE, 'csv'))):
     os.rename(os.path.join(DIR_BASE, 'csv'),os.path.join(DIR_BASE_DATA, 'csv'))
 DIR_DATA_CSV = os.path.join(DIR_BASE_DATA, 'csv/')
+if not os.path.exists(DIR_DATA_CSV):
+    os.mkdir(DIR_DATA_CSV)
 
 if (os.path.exists(os.path.join(DIR_BASE, 'report'))):
     os.rename(os.path.join(DIR_BASE, 'report'),os.path.join(DIR_BASE_DATA, 'report'))
 DIR_DATA_REPORT = os.path.join(DIR_BASE_DATA, 'report/')
+if not os.path.exists(DIR_DATA_REPORT):
+    os.mkdir(DIR_DATA_REPORT)
 
 if (os.path.exists(os.path.join(DIR_BASE, 'param'))):
     os.rename(os.path.join(DIR_BASE, 'param'),os.path.join(DIR_BASE_DATA, 'param'))
@@ -35,6 +41,7 @@ DIR_DATA_PARAM = os.path.join(DIR_BASE_DATA, 'param/')
 
 DIR_WEB_TEMP = os.path.join(DIR_STATIC, 'temp/')
 TEMPLATES_DIR = os.path.join(DIR_BASE, 'templates/')
+DIR_BASE_DTZ = os.path.join(DIR_BASE, 'dtz/')
 
 FILENAME_FORMAT = "%Y_%m%d_%H%M"
 logfile = datetime.datetime.now().strftime(FILENAME_FORMAT)
@@ -44,6 +51,9 @@ def calibfile(fileName):
 
 def linearfile(fileName):
     return DIR_DATA_CALIB + fileName + ".json"
+
+def dtzfile(fileName):
+    return DIR_BASE_DTZ + fileName + ".json"
 
 def csvfile(fileName):
     return DIR_DATA_CSV + fileName + ".csv"

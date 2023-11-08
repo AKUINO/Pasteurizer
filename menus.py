@@ -95,6 +95,8 @@ class Menus(object):
         if fieldType == 'time':
             return '%02d:%02d' % (value // 3600, (value % 3600) // 60)
         scale = self.stp(letter)
+        if not scale:
+            return str(value)
         value = float(int(0.5+(value * (1.0 / scale )))) * scale
         return str(value)
 
@@ -136,11 +138,15 @@ class Menus(object):
                     else:
                         letter = anItem[0][0].lower()
                     if letter in self.options:
+                        fieldType = self.type(letter)
                         if anItem[1]:
-                            try:
-                                self.options[letter][Menus.VAL] = float(anItem[1])
-                            except:
-                                print ('In '+Menus.option_file+', option '+letter+'='+anItem[1]+' not a floating point number like 3.14')
+                            if fieldType == 'text':
+                                self.options[letter][Menus.VAL] = anItem[1]
+                            else:
+                                try:
+                                    self.options[letter][Menus.VAL] = float(anItem[1])
+                                except:
+                                    print ('In '+Menus.option_file+', option '+letter+'='+anItem[1]+' not a floating point number like 3.14')
 
     def save(self):
         try:

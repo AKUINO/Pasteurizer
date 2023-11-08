@@ -1,4 +1,4 @@
-$def with (connected,mail,reportPasteur)
+$def with (connected,mail,reportPasteur, tag_index)
 $var title : Pasteurization and Cooling Parameters
 <script type="text/javascript">
    var commands = false ;
@@ -13,6 +13,7 @@ $var title : Pasteurization and Cooling Parameters
 <h2>$(ml.T("Paramètres de Pasteurisation et Refroidissement","Pasteurisation and Cooling Parameters","Pasteurisatie- en koelparameters"))</h2>
     <button class="btn btn-info" onclick="goToLetter('P','L',false)"><img src="/static/touch.svg" style="height:1.5em;" alt="$(menus.actionName['L'][2])" align="bottom"> $(menus.actionName['L'][1])</button>
     <button class="btn btn-info" onclick="goToLetter('P','Y',false)"><img src="/static/touch.svg" style="height:1.5em;" alt="$(menus.actionName['Y'][2])" align="bottom"> $(menus.actionName['Y'][1])</button>
+    <button class="btn btn-info" onclick="goToLetter('P','T',false)"><img src="/static/touch.svg" style="height:1.5em;" alt="$(menus.actionName['T'][2])" align="bottom"> $(menus.actionName['T'][1])</button>
     <button class="btn btn-info" onclick="goToLetter('P','J',false)"><img src="/static/touch.svg" style="height:1.5em;" alt="$(menus.actionName['J'][2])" align="bottom"> $(menus.actionName['J'][1])</button>
     $if reportPasteur.state:
       <a role="button" class="btn btn-success" href="/report/current" style="float:right">$(ml.T("Rapport","Report","Verslag"))</a>
@@ -26,7 +27,20 @@ $for letter in menus.cleanOptions:
   </div>
 <button type="submit" class="btn btn-success">$(ml.T("Enregistrer","Save","Opslaan"))</button>
 </form>
-<hr/>
+<hr/><ul>
+      $for tag in tag_index.keys():
+        $ minTemp = 0.0
+        $ maxTemp = 0.0
+        <li>$(tag) :
+            $for bact in tag_index[tag]:
+                <div>$(bact.address)&nbsp;/&nbsp;10<sup><b>$("%0.1f"%bact.reduction)</b></sup>&nbsp;: D<sub>$("%0.1f"%bact.get_Dt())°</sub>&nbsp;=&nbsp;$("%0.2f"%bact.t)"&nbsp;,&nbsp;z=$("%0.2f"%bact.z)°C $(bact.source)
+                $ temp = bact.minTemp()
+                $ minTemp = minTemp if minTemp >= temp else temp
+                $ temp = bact.maxTemp()
+                $ maxTemp = maxTemp if maxTemp >= temp else temp
+                </div>
+        [ $("%0.1f"%minTemp)°C &lt; $("%0.1f"%maxTemp)°C ]<br/> &nbsp; </li>
+  </ul><hr/>
 <a href="/index"><button class="btn btn-info">$(ml.T("Quitter","Cancel","Annuleer"))</button></a> &nbsp;
 <a href="/option1?reset=on"><button class="btn btn-warning">$(ml.T("Valeurs par défaut","Reset to default","Reset"))</button></a>
 <script type="text/javascript" src="/static/js/index.js"></script>

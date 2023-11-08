@@ -33,6 +33,9 @@ pumpON = 0
 pumpOFF = 1
 pumpDirection = -14
 
+# Max allowed speed (RPM) allowed for the pump (theoretical: 600)
+pumpMaxRPM = 450 #Maximum pump speed without "rattrapage"
+
 # Solenoids to control water inputs
 TAP = 8 # Hot rinsing water
 CLD = 4 # Cooling water
@@ -72,39 +75,46 @@ A_input = None # Entrée de la chauffe
 A_intake= None # Entrée du pasteurisateur
 A_warranty = None # Garantie sortie serpentin long
 A_heating = None # If no OneWire, this will be T_sp9b
+A_extra = None
 
 B_input = None # Entrée de la chauffe
 B_intake= None # Entrée du pasteurisateur
 B_warranty = None # Garantie sortie serpentin long
 B_heating = None # If no OneWire, this will be T_sp9b
+B_extra = None
 
 C_input = None # Entrée de la chauffe
 C_intake= None # Entrée du pasteurisateur
 C_warranty = None # Garantie sortie serpentin long
 C_heating = None # If no OneWire, this will be T_sp9b
+C_extra = None
 
 beta_input = None # Entrée de la chauffe
 beta_intake= None # Entrée du pasteurisateur
 beta_warranty = None # Garantie sortie serpentin long
 beta_heating = None # If no OneWire, this will be T_sp9b
+beta_extra = None
 
 ohm25_input = None # Entrée de la chauffe
 ohm25_intake= None # Entrée du pasteurisateur
 ohm25_warranty = None # Garantie sortie serpentin long
 ohm25_heating = None # If no OneWire, this will be T_sp9b
+ohm25_extra = None
 
 vol_intake = None
 vol_input = None
 vol_warranty = None
 vol_heating = None
 vol_heating_DEFAULT = 23790 # en mL
+vol_extra = None
 vol_total = None
 
 power_heating = None # Heating electricity power consumption (and energy released)
 power_heating_DEFAULT = 2500 # en mL
 power_dummy = None # do not use!
 
-vol_pasteurization = None
+#holding_length = 8820 #mm for 150L/h, 11757 mm for 200L/h
+holding_volume = 625 #mL for 150L/h, 833mL for 200L/h
 dynamicRegulation = False
 
 MICHA_device = None
@@ -185,10 +195,17 @@ if configParsing:
                 tubing = anItem[1].lower()
             elif opt == 'volume':
                 vol_total = string_mL(anItem)
-            elif opt == 'pasteurization':
-                vol_pasteurization = string_mL(anItem)
+            #elif opt == 'pasteurization':
+            #    vol_pasteurization = string_mL(anItem)
+            elif opt == 'holding': #holding tube volume in mL
+                holding_volume = string_mL(anItem)
             elif opt == 'regulation':
                 dynamicRegulation = anItem[1].lower() == "dynamic"
+            elif opt == 'pump':
+                try:
+                    pumpMaxRPM = int(anItem[1])
+                except:
+                    print(anItem[0] + ': ' + anItem[1] + ' is not decimal.')
             else:
                 print('[system] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: type, pigpio, gpio, tubing, volume, pasteurization, regulation')
 
@@ -418,24 +435,10 @@ if configParsing:
     if not power_heating:
         power_heating = power_heating_DEFAULT # watts to heat the tank...
 
-    if 'extra' in configParsing.sections():
-        for anItem in configParsing.items('extra'):
-            opt = anItem[0].lower()
-            if opt == 'port':
-                try:
-                    T_extra = int(anItem[1])
-                except:
-                    print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
-            elif opt == 'onewire':
-                OW_extra = anItem[1]
-            elif opt == 'volume':
-                vol_total = string_mL(anItem)
-            else:
-                print('[extra] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume')
-
     (T_input, OW_input, vol_input, beta_input, ohm25_input, A_input, B_input, C_input, power_dummy) = parseThermistor('input', T_input)
     (T_intake, OW_intake, vol_intake, beta_intake, ohm25_intake, A_intake, B_intake, C_intake, power_dummy) = parseThermistor('intake', T_intake)
     (T_warranty, OW_warranty, vol_warranty, beta_warranty, ohm25_warranty, A_warranty, B_warranty, C_warranty, power_dummy) = parseThermistor('warranty', T_warranty)
+    (T_extra, OW_extra, vol_extra, beta_extra, ohm25_extra, A_extra, B_extra, C_extra, power_dummy) = parseThermistor('extra', T_extra)
 
     if 'Rmeter' in configParsing.sections():
         import RMETERpast

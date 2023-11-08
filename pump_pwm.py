@@ -20,9 +20,6 @@ TEST = False
 REVOLUTION_STEPS = 6400 #1000, 2000, 4000, 5000, 8000, 10000, 20000, 25000
                     #200, 400, 800, 1600, 3200, 6400, 12800, 25600
 
-# Max allowed speed (RPM) allowed for the pump (theoretical: 600)
-MAX_SPEED = 450 #350,#437, #600 in theory. 400 is possible when pumping air (previous value: 284)
-                    
 if hardConf.MICHA_device:
     SPEED_INCREMENT = None # Ramping is done by MICHA
     REAL_SPEED_INCREMENT = 20
@@ -179,7 +176,6 @@ class pump_PWM(sensor.Sensor):
                  pinPWM = 12, # 12(board=32) or 18(board=12) CustardPi Digital out #2, RPi PWM
                  pinDirection = -14, # 17(board=11) CustardPi Digital out #2
                  pinStatus = -15,  # 23(board=16) CustardPi Digital in #1. RPi pin must be in "Pull-up"...
-                 maxSpeed = MAX_SPEED,
                  maximal_liters = None,
                  minimal_liters = 15.0
                  ):
@@ -195,7 +191,7 @@ class pump_PWM(sensor.Sensor):
             self.pinStatus = pinStatus
         self.pumpSerial = None
         self.prec_entry = 0.0
-        self.maxSpeed = maxSpeed
+        self.maxRPM = hardConf.pumpMaxRPM
         self.minimal_liters = minimal_liters
         self.speed = 0.0
         self.speed_liters = 0.0
@@ -209,7 +205,7 @@ class pump_PWM(sensor.Sensor):
         self.running = False
         self.subdivision = 8
         if not maximal_liters:
-            self.maximal_liters = self.speedLitersHour(self.maxSpeed)
+            self.maximal_liters = self.speedLitersHour(self.maxRPM)
         else:
             self.maximal_liters = maximal_liters
 
@@ -296,8 +292,6 @@ class pump_PWM(sensor.Sensor):
             else:
                 self.lastError = ReadPump_PWM.errors[3]
                 OK = False
-            if not self.maxSpeed:
-                time.sleep(0.1)
             self.reset_volume()
             self.speed = 0.0
             self.speed_liters = 0.0
@@ -392,7 +386,7 @@ class pump_PWM(sensor.Sensor):
         prvSpeed = -self.speed if self.reverse else self.speed
         print(" %s=%d \r" % (self.address,speed) )
         if speed is None:
-            speed = self.maxSpeed
+            speed = self.maxRPM
         running = True
         if float(self.speed) == 0.0:
             running = False
@@ -412,8 +406,8 @@ class pump_PWM(sensor.Sensor):
                 inc = True
             self.speed = speed
             self.speed_liters = liters
-        if self.maxSpeed and self.speed > self.maxSpeed:
-            self.speed = self.maxSpeed
+        if self.maxRPM and self.speed > self.maxRPM:
+            self.speed = self.maxRPM
             self.speed_liters = self.maximal_liters
         elif not self.speed_liters:
             self.speed_liters = self.speedLitersHour(self.speed)
