@@ -1322,7 +1322,7 @@ class Operation(object):
         global menus, hotTapSolenoid, reportPasteur
 
         time.sleep(0.01)
-        Dt_line.set_ref_temp(self.tempRef(),menus.val('F'),menus.val('M'))
+        Dt_line.set_ref_temp(self.tempRef(),menus.val('F'))
         dumpValve.set(1.0 if self.dump else 0.0) # Will stop command if open/close duration is done
         #print("%d >= %d" % ( (int(datetime.now().timestamp()) % (24*60*60)), int(menus.val('H'))) )
         if not self.programmable or not menus.val('H') or (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
