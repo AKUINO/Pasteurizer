@@ -1322,7 +1322,7 @@ class Operation(object):
         global menus, hotTapSolenoid, reportPasteur
 
         time.sleep(0.01)
-        Dt_line.set_ref_temp(self.tempRef())
+        Dt_line.set_ref_temp(self.tempRef(),menus.val('F'),menus.val('M'))
         dumpValve.set(1.0 if self.dump else 0.0) # Will stop command if open/close duration is done
         #print("%d >= %d" % ( (int(datetime.now().timestamp()) % (24*60*60)), int(menus.val('H'))) )
         if not self.programmable or not menus.val('H') or (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
@@ -1392,7 +1392,7 @@ class Operation(object):
             valSensor1 = cohorts.getCalibratedValue(self.sensor1)
             if hardConf.dynamicRegulation and self.sensor1 == 'warranty': # Pasteurizing and not cleaning
                 #time_for_temp = Dt_line.legal_safe_time_to_kill(valSensor1)
-                time_for_temp = Dt_line.tagged_time_to_kill(valSensor1,menus.val('F'))[1]
+                time_for_temp = Dt_line.scaled_time_to_kill(valSensor1,menus.val('F'))[1]
                 if not time_for_temp:
                     time_for_temp = 9999.9 # no dynamic regulation
             else:
@@ -1652,6 +1652,7 @@ opSequences = {
         [ Operation('DesA','PUMP',ref='A', base_speed=MAX_SPEED, qty=4.0,dump=False,bin=buck.ACID,bout=buck.ACID),
           Operation('DesP','REVR',ref='A', base_speed=MAX_SPEED, qty=-2.0,dump=False)
         ],
+
     'D': # Désinfection (fut thermique)
         # [ Operation('Dett','HEAT','intake',ref='R',dump=False,programmable=True),
         #   Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
@@ -2432,12 +2433,14 @@ class WebOption:
                     if not val:
                         menus.options[keys][Menus.VAL] = menus.options[keys][Menus.INI]
                     else:
+                        if menus.options[keys][Menus.TYP] == "text" and keys == 'F':
+                            val = val.upper()
                         menus.store(keys, val)
                 reloadPasteurizationSpeed()
                 menus.save()
                 raise web.seeother('/')
 
-        Dt_line.set_ref_temp(menus.val('P'))
+        Dt_line.set_ref_temp(menus.val('P'),menus.val('F'))
         render_page = getattr(render, 'option'+page)
         return render_page(connected, mail, reportPasteur, Dt_line.tag_index() )
 

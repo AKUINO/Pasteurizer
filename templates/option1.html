@@ -31,15 +31,18 @@ $for letter in menus.cleanOptions:
       $for tag in tag_index.keys():
         $ minTemp = 0.0
         $ maxTemp = 0.0
+        $ min_reduction = 99.9
         <li>$(tag) :
-            $for bact in tag_index[tag]:
-                <div>$(bact.address)&nbsp;/&nbsp;10<sup><b>$("%0.1f"%bact.reduction)</b></sup>&nbsp;: D<sub>$("%0.1f"%bact.get_Dt())°</sub>&nbsp;=&nbsp;$("%0.2f"%bact.t)"&nbsp;,&nbsp;z=$("%0.2f"%bact.z)°C $(bact.source)
-                $ temp = bact.minTemp()
-                $ minTemp = minTemp if minTemp >= temp else temp
-                $ temp = bact.maxTemp()
-                $ maxTemp = maxTemp if maxTemp >= temp else temp
-                </div>
-        [ $("%0.1f"%minTemp)°C &lt; $("%0.1f"%maxTemp)°C ]<br/> &nbsp; </li>
+        $for bact in tag_index[tag]:
+            <div>$(bact.address)&nbsp;/&nbsp;10<sup><b>$("%0.1f"%bact.reduction)</b></sup>&nbsp;: D<sub>$("%0.1f"%bact.get_Dt())°</sub>&nbsp;=&nbsp;$("%0.2f"%bact.t)"&nbsp;,&nbsp;z=$("%0.2f"%bact.z)°C $(bact.source)
+            $ temp = bact.minTemp()
+            $ minTemp = minTemp if minTemp >= temp else temp
+            $ temp = bact.maxTemp()
+            $ maxTemp = maxTemp if maxTemp >= temp else temp
+            $ reduc = bact.real_reduction()
+            $ min_reduction = min_reduction if min_reduction <= reduc else reduc
+            </div>
+        [ $("%0.1f"%minTemp)°C &lt; $("%0.1f"%maxTemp)°C ] /&nbsp;10<sup><b>$("%0.1f"%min_reduction)</b></sup><br/> &nbsp; </li>
   </ul><hr/>
 <a href="/index"><button class="btn btn-info">$(ml.T("Quitter","Cancel","Annuleer"))</button></a> &nbsp;
 <a href="/option1?reset=on"><button class="btn btn-warning">$(ml.T("Valeurs par défaut","Reset to default","Reset"))</button></a>

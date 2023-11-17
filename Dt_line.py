@@ -15,6 +15,9 @@ minTime = 0.0
 maxTime = 9999.9
 ref_speed = 0.0
 ref_temp = 0.0
+ref_tag = 'L'
+ref_ratio = 1.0
+ref_duration = 15.0
 
 class Dt_line():
 
@@ -75,6 +78,9 @@ class Dt_line():
         #print ("min.sec="+str(minTime)+'", temp='+str(int(temp))+', '+addr+'='+str(dur)+'"')
         return temp
 
+    def real_reduction(self):
+        return self.reduction * ref_ratio
+
     # Fonction pour sauvegarder un objet de la classe courante en utilisant JSON : normalement on édite les JSON a la main !
     def save(self):
         with open(datafiles.dtzfile(self.address), 'w') as f:
@@ -100,12 +106,15 @@ class Dt_line():
 
     # Returns the time in seconds to get the desired log reduction at a given temperature
     def D_kill(self,temp):
-        return self.reduction * self.t * (10.0 ** ((self.get_Dt() - temp) / self.z) )
+        duration = self.reduction * self.t * (10.0 ** ((self.get_Dt() - temp) / self.z) )
+        print (self.address+": "+str(temp)+"°C = "+str(duration)+"sec.")
+        return duration
 
     def include(self, criteria):
         return eval(criteria)
 
-    def include_tag(self, tag):
+    def include_tag(self, tag: str):
+        tag = tag.upper()
         try:
             x = self.tags.index(tag) >= 0
             return x
@@ -142,15 +151,27 @@ def set_pump(pump):
 
 def set_ref_speed(speed):
 
-    global ref_speed
+    global ref_speed, ref_duration
 
     ref_speed = speed
+    ref_duration = hardConf.holding_volume / ( speed*1000.0/3600.0 )
+    print("ref_duration="+str(ref_duration))
 
-def set_ref_temp(temp):
+def set_ref_temp(temp,tag):
 
-    global ref_temp
+    global ref_temp, ref_ratio, ref_duration
 
+    if not temp:
+        return None
+    ref_tag = tag
     ref_temp = temp
+    address,base_duration = tagged_time_to_kill(temp,tag)
+    print(address+": duration="+str(base_duration))
+    if base_duration > 0.0:
+        ref_ratio = ref_duration / base_duration
+        print("ref_ratio="+str(ref_ratio))
+        return ref_ratio
+    return None
 
 load()
 
@@ -192,7 +213,7 @@ def max_time_to_kill(temp,criteria):
             if t2k > time_to_kill:
                 killingAddress = address
                 time_to_kill = t2k
-    return address,(time_to_kill if time_to_kill >= 0.0 else None)
+    return killingAddress,(time_to_kill if time_to_kill >= 0.0 else None)
 
 def tagged_time_to_kill(temp,tag):
     time_to_kill = -1.0
@@ -202,8 +223,15 @@ def tagged_time_to_kill(temp,tag):
             if t2k > time_to_kill:
                 killingAddress = address
                 time_to_kill = t2k
-    #print (killingAddress+"="+str(time_to_kill)+'"')
+    print (killingAddress+"="+str(time_to_kill)+'"')
     return killingAddress,(time_to_kill if time_to_kill >= 0.0 else None)
+
+def scaled_time_to_kill(temp,tag):
+
+    global ref_ratio
+
+    address,time_to_kill = tagged_time_to_kill(temp,tag)
+    return address,(time_to_kill*(ref_ratio if ref_ratio else 1.0) if time_to_kill >= 0.0 else None)
 
 def tag_index():
     tags = {}
