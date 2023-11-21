@@ -3,6 +3,8 @@
 
 import math
 import os
+
+import Heating_Profile
 import datafiles
 import json
 import traceback
@@ -57,7 +59,7 @@ class Dt_line():
 
         global lines
 
-        if not address in lines:
+        if not address in lines.keys():
             return None
         else:
             return lines[address]
@@ -87,6 +89,14 @@ class Dt_line():
             #print(json.dumps(self.to_dict()))
             json.dump(self.to_dict(),f)
 
+    def validate_tags(self):
+        OK = True
+        for tag in self.tags:
+            if not tag in Heating_Profile.profiles:
+                OK = False
+                print(self.address+': Tag '+tag+' is not an heating profile.')
+        return OK
+
     def set_address(self,address):
 
         global lines
@@ -94,10 +104,10 @@ class Dt_line():
         if self.address != address:
             if self.address:
                 del lines[self.address]
-                try:
-                    os.remove(datafiles.dtzfile(self.address))
-                except:
-                    pass
+                # try:
+                #     os.remove(datafiles.dtzfile(self.address))
+                # except:
+                #     pass
 
         if address is not None:
             self.address = address
@@ -129,7 +139,7 @@ def load():
             pext = filename.index(".json")
             if pext > 0:
                 fullpath = os.path.join(datafiles.DIR_BASE_DTZ, filename)
-                if os.path.isfile(fullpath) :
+                if os.path.isfile(fullpath) and not filename.startswith('profile_') :
                     with open(fullpath, 'r') as f:
                         objdict = json.load(f)
                         newDTZ = Dt_line(objdict['t'],objdict['Dt'],objdict['z'],objdict['reduction'] if 'reduction' in objdict else DEFAULT_REDUCTION)
@@ -137,10 +147,31 @@ def load():
                         newDTZ.tags = objdict['tags']
                         newDTZ.set_address(filename[:pext])
                         print("Load "+str(newDTZ))
+                        newDTZ.validate_tags()
     except:
         traceback.print_exc()
         print ('Error accessing '+datafiles.DIR_BASE_DTZ+' directory')
         pass
+
+    try:
+        for filename in os.listdir(datafiles.DIR_PRIV_DTZ):
+            pext = filename.index(".json")
+            if pext > 0:
+                fullpath = os.path.join(datafiles.DIR_PRIV_DTZ, filename)
+                if os.path.isfile(fullpath) and not filename.startswith('profile_') :
+                    with open(fullpath, 'r') as f:
+                        objdict = json.load(f)
+                        newDTZ = Dt_line(objdict['t'],objdict['Dt'],objdict['z'],objdict['reduction'] if 'reduction' in objdict else DEFAULT_REDUCTION)
+                        newDTZ.source = objdict['source']
+                        newDTZ.tags = objdict['tags']
+                        newDTZ.set_address(filename[:pext])
+                        print("Load private "+str(newDTZ))
+                        newDTZ.validate_tags()
+    except:
+        traceback.print_exc()
+        print ('Error accessing '+datafiles.DIR_PRIV_DTZ+' directory')
+        pass
+
 
 def set_pump(pump):
 

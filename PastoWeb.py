@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 #TODO:
@@ -16,8 +15,26 @@ lors du cyclage d’un nettoyage, le schéma montre comme si le seau se vidait e
 dans le seau d’entrée, à la place d’indiquer la formule complète, par exemple 19,8-5,3=14,5L, indiquer juste ce qui est enlever du seau, -5,3L.
 
 si on lance par exemple un pasteurisation et qu’on l’arrête directement car fausse manipulation, le pasteurisateur croit quand même que l’action a été faite
+
+* Corriger les RAPPORTS: marche mieux ???
+       S'inspirer des règles canadiennes pour compléter le rapport...
+- Prendre la durée de pasteurisation à la température de pasteurisation pour calculer un ratio supplémentaire de réduction de la souche bactérienne retenue à cette température là.
+    Utiliser ce ratio pour toutes les souches. A TESTER !
+- Rinçages: suivre le nombre et permettre de choisir une configuration de réutilisation de seaux
+- Ne jamais accélérer (décélérer) quand on n'est pas en pasteurisation (quand ce n'est pas une régulation sur la courbe de survie d'un microbe)
+- Arrêter de chauffer quand la pompe tourne déjà bien vite
+- Ne pas aller trop vite quand on pousse l'eau ou qu'on pousse à l'eau.
+- Intégrer les Produits à base de lait contenant 10 % de matières grasses ou plus, ou du sucre ajouté (par exemple, crème liquide, crème pour beurre, lait au chocolat, lait aromatisé) :
+    soumettre à une température de 75°C pendant 15 secondes.
+- Intégrer les Mélanges de produits laitiers congelés, lait de poule :
+    soumettre à une température de 80°C pendant 25 secondes ou à une température de 83°C pendant 15 secondes
+- Vider le tuyau avant ou après un rinçage pour rendre le suivant plus efficace
+- Démarrer lentement une pasteurisation.
+- Pousse-à-l'eau : vérifier le paramétrage en relation avec la nouvelle régulation
+- Lavage: assurer un minimum de 50 en entrée et non de "cuve - 13".   Pour celà, la chauffe de la cuve pourrait être OK pour "bouger" dès 50°C et pour arrêter de chauffer 20°C (paramétrable?) plus haut (gradient nettoyage).
+      Pour une pasteurisation, ce pourrait être idem avec un gradient de 3°C (paramétré)
+   ATTENTION: CHANGEMENT a moitié fait.
 """
-import queue
 import socket
 import sys
 import os
@@ -33,7 +50,6 @@ import termios
 import subprocess
 import traceback
 
-import Dt_line
 import ml # Not unused !!!
 import datafiles
 
@@ -47,6 +63,7 @@ import sensor
 #import pump
 import pump_pwm
 import cohort
+import Heating_Profile
 import Dt_line
 
 from thermistor import Thermistor
@@ -217,7 +234,7 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                         ,0,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
                     'C':['C',ml.T("net.Caustique°","Caustic cleaning°","Bijtende schoonmaak°") \
                             ,ml.T("Température de nettoyage","Cleaning Temperature","Schoonmaak Temperatuur") \
-                            ,70.0,70.0,"°C",False,77,0.1,"number"], # Température pour un passage au détergent
+                            ,50.0,50.0,"°C",False,60,0.1,"number"], # Température pour un passage au détergent
                     'c':['c',ml.T("net.Caustique\"","Caustic cleaning\"","Bijtende schoonmaak\"") \
                             ,ml.T("Durée de nettoyage","Cleaning Duration","Schoonmaak Tijd") \
                             ,CLEAN_TIME,CLEAN_TIME,"hh:mm",False,3600*2,60,"time"],
@@ -229,7 +246,7 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                          , TH_DISINF_TIME,TH_DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'A':['A',ml.T("net.Acide°""Acidic cleaning°","Zuur schoonmaak°") \
                             ,ml.T("Température de nettoyage acide","Acidic cleaning Temperature","Zuur schoomaak Temperatuur") \
-                            ,55.0,55.0,"°C",False,90,0.1,"number"], # Température pour un traitement à l'acide ou au percarbonate de soude
+                            ,45.0,45.0,"°C",False,60,0.1,"number"], # Température pour un traitement à l'acide ou au percarbonate de soude
                     'a':['a',ml.T("net.Acide\"","Acidic cleaning\"","Zuur schoonmaak\"") \
                             ,ml.T("Durée de nettoyage acide","Acidic cleaning Duration","Zuur schoomaak Tijd") \
                             ,DISINF_TIME,DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
@@ -403,7 +420,7 @@ DILUTE_VOL = 2.0 #L added in the bucket to dilute the cleaning products
 SHAKE_QTY = mL_L(hardConf.holding_volume) / 4 # liters
 SHAKE_TIME = 10.0 # seconds shaking while cleaning, rincing or disinfecting
 
-GRADIENT_FOR_INPUT = 13.0  # How many degrees do we heat the tank more than the desired temperature just after the pump
+GRADIENT_FOR_INTAKE = 20.0  # How many degrees do we heat the tank more than the desired temperature just after the pump
 
 class ThreadOneWire(threading.Thread):
 
@@ -1127,7 +1144,7 @@ class Operation(object):
         if not self.ref: # do not heat !
             return 0.0
         if isinstance(self.ref,str):
-            return (menus.val(self.ref) - GRADIENT_FOR_INPUT) if self.sensor1 == 'intake' else menus.val(self.ref)
+            return (menus.val(self.ref) - GRADIENT_FOR_INTAKE) if self.sensor1 == 'intake' else menus.val(self.ref)
         else:
             return self.ref
 
@@ -1392,7 +1409,7 @@ class Operation(object):
             valSensor1 = cohorts.getCalibratedValue(self.sensor1)
             if hardConf.dynamicRegulation and self.sensor1 == 'warranty': # Pasteurizing and not cleaning
                 #time_for_temp = Dt_line.legal_safe_time_to_kill(valSensor1)
-                time_for_temp = Dt_line.scaled_time_to_kill(valSensor1,menus.val('F'))[1]
+                bacteria_of_concern, time_for_temp = Dt_line.scaled_time_to_kill(valSensor1,menus.val('F'))[1]
                 if not time_for_temp:
                     time_for_temp = 9999.9 # no dynamic regulation
             else:
@@ -2609,46 +2626,9 @@ class WebApiAction:
         else:
             message = ""
             # StateLessActions
-            if letter == 'J':  # Juice
-                menus.store('z','J')
-                menus.store('P',75.0)
-                menus.store('M', 15.0)
-                menus.store('F', 'L')
-                #menus.store('g', False)
-                #menus.options['T'][3] = 45.0
-                message = "75°C"
+            if letter in ['T','L','J','Y']:
+                Heating_Profile.setProfile(letter)
                 reloadPasteurizationSpeed()
-                menus.save()
-            elif letter == 'Y':  # Yaourt
-                menus.store('z','Y')
-                menus.store('P', 85.0)
-                menus.store('M', 15.0)
-                menus.store('F', 'Y')
-                #menus.options['T'][3] = 45.0
-                #menus.store('g', True)
-                message = "85°C"
-                reloadPasteurizationSpeed()
-                menus.save()
-            elif letter == 'L':  # Lait
-                menus.store('z','L')
-                menus.store('P', 72.0)
-                menus.store('M', 15.0)
-                menus.store('F', 'L')
-                #menus.options['T'][3] = 22.0
-                #menus.store('g', True)
-                message = "72°C"
-                menus.save()
-                reloadPasteurizationSpeed()
-            elif letter == 'T':  # Thermiser
-                menus.store('z','T')
-                menus.store('P', 68.0)
-                menus.store('M', 15.0)
-                menus.store('F', 'T')
-                #menus.options['T'][3] = 35.0
-                #menus.store('g', True)
-                message = "68°C"
-                reloadPasteurizationSpeed()
-                menus.save()
             # end of StateLessActions
             elif letter == 'S':  # Pause
                 if not T_Pump.paused:
@@ -3141,26 +3121,8 @@ class ThreadInputProcessor(threading.Thread):
                         T_Pump.stopRequest = True
                     elif menu_choice in ['M','E','P','H','I','R','V','F','A','C','D','B']: # 'C','K'
                         T_Pump.setAction(menu_choice)
-                elif menu_choice == 'Y': # Yaourt
-                    menus.store('P', 85.0)
-                    menus.store('M', 30.0)
-                    menus.store('F', 'Y')
-                    #menus.options['T'][3] = 45.0
-                    menus.save()
-                    option_confirm(0.0)
-                elif menu_choice == 'L': # Lait
-                    menus.store('P', 72.0)
-                    menus.store('M', 15.0)
-                    menus.store('F', 'L')
-                    #menus.options['T'][3] = 22.0
-                    menus.save()
-                    option_confirm(0.0)
-                elif menu_choice == 'T': # Thermiser
-                    menus.store('P', 68.0)
-                    menus.store('M', 15.0)
-                    menus.store('F', 'T')
-                    #menus.options['T'][3] = 35.0
-                    menus.save()
+                elif menu_choice in  ['T','L','J','Y']:
+                    Heating_Profile.setProfile(menu_choice,menus)
                     option_confirm(0.0)
                 elif menu_choice == 'S': # Pause / Restart
                     if not T_Pump.paused:

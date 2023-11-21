@@ -42,6 +42,7 @@ DIR_DATA_PARAM = os.path.join(DIR_BASE_DATA, 'param/')
 DIR_WEB_TEMP = os.path.join(DIR_STATIC, 'temp/')
 TEMPLATES_DIR = os.path.join(DIR_BASE, 'templates/')
 DIR_BASE_DTZ = os.path.join(DIR_BASE, 'dtz/')
+DIR_PRIV_DTZ = os.path.join(DIR_BASE_DATA, 'dtz/')
 
 FILENAME_FORMAT = "%Y_%m%d_%H%M"
 logfile = datetime.datetime.now().strftime(FILENAME_FORMAT)
@@ -53,6 +54,9 @@ def linearfile(fileName):
     return DIR_DATA_CALIB + fileName + ".json"
 
 def dtzfile(fileName):
+    return DIR_PRIV_DTZ + fileName + ".json"
+
+def dtzSharedFile(fileName):
     return DIR_BASE_DTZ + fileName + ".json"
 
 def csvfile(fileName):
@@ -77,3 +81,4 @@ Path(static_dirpath(DIR_DATA_CALIB,"")).mkdir(parents=True, exist_ok=True)
 Path(static_dirpath(DIR_DATA_CSV,"")).mkdir(parents=True, exist_ok=True)
 Path(static_dirpath(DIR_DATA_REPORT,"")).mkdir(parents=True, exist_ok=True)
 Path(static_dirpath(DIR_DATA_PARAM,"")).mkdir(parents=True, exist_ok=True)
+Path(static_dirpath(DIR_PRIV_DTZ,"")).mkdir(parents=True, exist_ok=True)
