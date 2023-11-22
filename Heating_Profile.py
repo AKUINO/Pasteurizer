@@ -105,10 +105,11 @@ def setProfile(letter,menus):
     global profiles
 
     if letter in profiles.keys():
+        prof = profiles[letter]
         menus.store('z', letter)
         menus.store('P', prof.temp)
         menus.store('M', prof.duration)
-        menus.store('F', prof.letter)
+        #menus.store('F', prof.letter)
         menus.save()
 
 # Heating_Profile('T',68.0,15.0,"Thermiser","Thermize","Thermis.")

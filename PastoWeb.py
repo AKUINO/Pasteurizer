@@ -211,9 +211,9 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                     #'g':['g',ml.T("Produit Gras","Fatty Product","Vet Product") \
                     #    ,ml.T("Nécessite de la soude(1) Pas toujours(0)","Needs Soda Cleaning(1) Not always(0)","Soda-reiniging nodig(1) Niet altijd(0)") \
                     #    ,1,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
-                    'F':['F',ml.T("Profil Bact.","Profile Bact.","Profiel Bact.") \
-                        ,ml.T("Courbe de réduction des bactéries","Bacteria reduction curve","Bacterie reductiecurve") \
-                        ,'L','L',"",True,None,None,"text"], # Gradient de Température
+                    # 'F':['F',ml.T("Profil Bact.","Profile Bact.","Profiel Bact.") \
+                    #     ,ml.T("Courbe de réduction des bactéries","Bacteria reduction curve","Bacterie reductiecurve") \
+                    #     ,'L','L',"",True,None,None,"text"], # Gradient de Température
                     'P':['P',ml.T("Pasteurisation°","Pasteurization°","Pasteurisatie°") \
                             ,ml.T("Température de pasteurisation","Pasteurisation Temperature","Pasteurisatie Temperatuur") \
                             ,72.0,72.0,"°C",False,90,0.1,"number"], # Température normale de pasteurisation
@@ -274,7 +274,7 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                     # 'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
                     #         ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
 menus.sortedOptions = "FPMGwQDdHRrusCcAaZ" #T
-menus.cleanOptions = "FPMGQH" #TtK
+menus.cleanOptions = "PMGQH" #TtK
 menus.dirtyOptions = "RrusCcAawDdH" #Cc
 
 menus.loadCurrent()
@@ -1144,7 +1144,7 @@ class Operation(object):
         if not self.ref: # do not heat !
             return 0.0
         if isinstance(self.ref,str):
-            return (menus.val(self.ref) - GRADIENT_FOR_INTAKE) if self.sensor1 == 'intake' else menus.val(self.ref)
+            return menus.val(self.ref)
         else:
             return self.ref
 
@@ -1152,7 +1152,7 @@ class Operation(object):
         if not self.ref: # do not heat !
             return 0.0
         if isinstance(self.ref,str):
-            return menus.val(self.ref) + ( menus.val('G') if self.sensor1 == 'warranty' else 0.0 )
+            return menus.val(self.ref) + ( menus.val('G') if self.sensor1 == 'warranty' else GRADIENT_FOR_INTAKE if self.sensor1 == 'intake' else 0.0 )
         else:
             return self.ref
 
@@ -1284,7 +1284,8 @@ class Operation(object):
         if requiredTime and T_Pump.currOpContext and (T_Pump.currOpContext.duration() >= requiredTime):
             return True
         if self.typeOp == 'HEAT':
-            if float(cohorts.getCalibratedValue('heating')) >= float(self.tempWithGradient()-HYSTERESIS):
+            #if float(cohorts.getCalibratedValue('heating')) >= float(self.tempWithGradient()-HYSTERESIS):
+            if float(cohorts.getCalibratedValue('heating')) >= float(self.tempRef()):
                 return True
         elif self.typeOp == 'FILL' :
             if State.empty :
@@ -1339,7 +1340,7 @@ class Operation(object):
         global menus, hotTapSolenoid, reportPasteur
 
         time.sleep(0.01)
-        Dt_line.set_ref_temp(self.tempRef(),menus.val('F'))
+        Dt_line.set_ref_temp(self.tempRef(),menus.val('z'))
         dumpValve.set(1.0 if self.dump else 0.0) # Will stop command if open/close duration is done
         #print("%d >= %d" % ( (int(datetime.now().timestamp()) % (24*60*60)), int(menus.val('H'))) )
         if not self.programmable or not menus.val('H') or (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
@@ -1409,7 +1410,7 @@ class Operation(object):
             valSensor1 = cohorts.getCalibratedValue(self.sensor1)
             if hardConf.dynamicRegulation and self.sensor1 == 'warranty': # Pasteurizing and not cleaning
                 #time_for_temp = Dt_line.legal_safe_time_to_kill(valSensor1)
-                bacteria_of_concern, time_for_temp = Dt_line.scaled_time_to_kill(valSensor1,menus.val('F'))[1]
+                bacteria_of_concern, time_for_temp = Dt_line.scaled_time_to_kill(valSensor1,menus.val('z'))[1]
                 if not time_for_temp:
                     time_for_temp = 9999.9 # no dynamic regulation
             else:
@@ -1962,7 +1963,7 @@ class ThreadPump(threading.Thread):
             if self.currOperation.typeOp == 'HEAT':
                 heating = cohorts.getCalibratedValue('heating')
                 #print("heating=%d" % heating)
-                diffTemp = float(self.currOperation.tempWithGradient()-HYSTERESIS)-float(heating)
+                diffTemp = float(self.currOperation.tempRef())-float(heating)
                 #print("diffTemp=%f" % diffTemp)
                 if diffTemp <= 0.0:
                     self.lastDurationEval = None
@@ -2450,14 +2451,14 @@ class WebOption:
                     if not val:
                         menus.options[keys][Menus.VAL] = menus.options[keys][Menus.INI]
                     else:
-                        if menus.options[keys][Menus.TYP] == "text" and keys == 'F':
-                            val = val.upper()
+                        # if menus.options[keys][Menus.TYP] == "text" and keys == 'F':
+                        #     val = val.upper()
                         menus.store(keys, val)
                 reloadPasteurizationSpeed()
                 menus.save()
                 raise web.seeother('/')
 
-        Dt_line.set_ref_temp(menus.val('P'),menus.val('F'))
+        Dt_line.set_ref_temp(menus.val('P'),menus.val('z'))
         render_page = getattr(render, 'option'+page)
         return render_page(connected, mail, reportPasteur, Dt_line.tag_index() )
 
@@ -2627,7 +2628,7 @@ class WebApiAction:
             message = ""
             # StateLessActions
             if letter in ['T','L','J','Y']:
-                Heating_Profile.setProfile(letter)
+                Heating_Profile.setProfile(letter,menus)
                 reloadPasteurizationSpeed()
             # end of StateLessActions
             elif letter == 'S':  # Pause
@@ -3188,6 +3189,7 @@ try:
     web.template.Template.globals['zeroIsNone'] = zeroIsNone
     web.template.Template.globals['datetime'] = datetime
     web.template.Template.globals['datafiles'] = datafiles
+    web.template.Template.globals['profiles'] = Heating_Profile.profiles
     layout = web.template.frender(datafiles.TEMPLATES_DIR + '/layout.html')
     render = web.template.render(datafiles.TEMPLATES_DIR, base=layout)
     web.httpserver.sys.stderr = WebLog()
