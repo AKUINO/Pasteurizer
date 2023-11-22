@@ -1438,7 +1438,7 @@ class Operation(object):
                     elif speed > 0.0:
                         if self.shake_qty and T_Pump.pump.current_liters(now) >= self.shake_qty:
                             # begin a regulation control cycle: start reversal
-                            if not reportPasteur.startRegulating:
+                            if not reportPasteur.startRegulating and self.sensor1 == 'warranty':
                                 reportPasteur.startRegulating = time.perf_counter()
                             speed = self.min_speed # negative !
                         else:
