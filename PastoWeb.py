@@ -614,9 +614,12 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                'Y':['Y',ml.T("Yaourt","Yogurt","Yoghurt") \
                        ,ml.T("Pasteuriser pour Yaourt","Pasteurize for Yogurt","Pasteuriseren voor yoghurt") \
                        ,ml.T("Température pour Yaourt","Temperature for Yogurt","Temperatuur voor yoghurt")],
-               'J':['J',ml.T("Jus","Juics","Saap") \
-                        ,ml.T("Pasteuriser du Jus","Pasteurize for Juice","Pasteuriseren voor saap") \
-                        ,ml.T("Température pour Jus","Temperature for Juice","Temperatuur voor saap")],
+               'J':['J',ml.T("Jus/Crème","Juice/Cream","Saap/Room") \
+                       ,ml.T("Pasteuriser du Jus ou de la Crème","Pasteurize for Juice or cream","Pasteuriseren voor saap of room") \
+                       ,ml.T("Température pour Jus ou Crème","Temperature for Juice or cream","Temperatuur voor saap of room")],
+               'K':['K',ml.T("Décongelé","Thawed","Ontdooid") \
+                       ,ml.T("Pasteuriser prod.décongelés","Pasteurize thawed products","Pasteuriseren ontdooid produc.") \
+                       ,ml.T("Température pour décongelés","Temperature for Thawed prod.","Temperatuur voor ontdooid produc.")],
                'L':['L',ml.T("Lait","miLk","meLk") \
                        ,ml.T("Pasteuriser du Lait","Pasteurize for Milk","Pasteuriseren voor melk") \
                        ,ml.T("Température pour Lait","Temperature for Milk","Temperatuur voor melk")],
@@ -642,7 +645,7 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
 menus.sortedActions1 = "PIMERDCAH"
 menus.sortedActions2 = "FVOYLTZSXB" #K
 
-menus.cleanActions = "LYJTPIMEHV" #K
+menus.cleanActions = "LYJKTPIMEHV" #K
 menus.dirtyActions = "RFDCAV"
 menus.sysActions = "ZX"
 
@@ -2627,7 +2630,7 @@ class WebApiAction:
         else:
             message = ""
             # StateLessActions
-            if letter in ['T','L','J','Y']:
+            if letter in ['T','L','J','Y','K']:
                 Heating_Profile.setProfile(letter,menus)
                 reloadPasteurizationSpeed()
             # end of StateLessActions
@@ -3122,7 +3125,7 @@ class ThreadInputProcessor(threading.Thread):
                         T_Pump.stopRequest = True
                     elif menu_choice in ['M','E','P','H','I','R','V','F','A','C','D','B']: # 'C','K'
                         T_Pump.setAction(menu_choice)
-                elif menu_choice in  ['T','L','J','Y']:
+                elif menu_choice in  ['T','L','J','Y','K']:
                     Heating_Profile.setProfile(menu_choice,menus)
                     option_confirm(0.0)
                 elif menu_choice == 'S': # Pause / Restart

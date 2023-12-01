@@ -248,6 +248,7 @@ def max_time_to_kill(temp,criteria):
 
 def tagged_time_to_kill(temp,tag):
     time_to_kill = -1.0
+    killingAddress = None
     for (address, itemDt) in lines.items():
         if itemDt.include_tag(tag):
             t2k = itemDt.D_kill(temp)
