@@ -643,7 +643,7 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                        ,ml.T("Redémarrage de l'opération en cours.","Restart of the current operation.","Herstart van de huidige bewerking.") \
                        ,ml.T("Redémarrer l'opération en cours","Restart the current operation","Herstart de huidige bewerking")]}
 menus.sortedActions1 = "PIMERDCAH"
-menus.sortedActions2 = "FVOYLTZSXB" #K
+menus.sortedActions2 = "FVOLYJKTZSXB" #K
 
 menus.cleanActions = "LYJKTPIMEHV" #K
 menus.dirtyActions = "RFDCAV"
@@ -838,6 +838,7 @@ class ThreadDAC(threading.Thread):
         #cohorts.addSensor(self.dacSetting2.address,self.dacSetting2)
         self.running = False
         self.setpoint = None
+        self.refpoint = None
         #self.setpoint2 = None
         #self.coldpoint = None
         self.T_Pump = None
@@ -846,7 +847,11 @@ class ThreadDAC(threading.Thread):
         self.currLog = None
         self.empty_tank = False
 
-    def set_temp(self,setpoint=None, setpoint2=None):
+    def set_temp(self,setpoint=None, refpoint=None):
+        if refpoint:
+            self.refpoint = float(refpoint)
+        else:
+            self.refpoint = None
         if setpoint:
             self.setpoint = float(setpoint)
         else:
@@ -907,7 +912,9 @@ class ThreadDAC(threading.Thread):
                     #print("%d %f / %f" % (currHeat, cohorts.catalog['heating'].value , self.setpoint) )
                     heating = cohorts.getCalibratedValue('heating')
                     if currHeat > 0: # ON
-                        if heating < (self.setpoint+HYSTERESIS):
+                        if self.T_Pump.pasteurizationOverSpeed:
+                            wattHour = heating < (self.refpoint+HYSTERESIS)
+                        elif heating < (self.setpoint+HYSTERESIS):
                             wattHour = True
                     else: # Off
                         if heating < (self.setpoint-HYSTERESIS):
@@ -1188,9 +1195,9 @@ class Operation(object):
         T_Pump.forcible = False # unless TRAK...
         #print("%d >= %d" % ( (int(datetime.now().timestamp()) % (24*60*60)), int(menus.val('H'))) )
         if not self.programmable or not menus.val('H') or (int(time.time()) % (24*60*60)) >= int(menus.val('H')):
-            T_Pump.T_DAC.set_temp(self.tempWithGradient())
+            T_Pump.T_DAC.set_temp(self.tempWithGradient(), self.tempRef())
         else:
-            T_Pump.T_DAC.set_temp(None) #,None) # Delayed start
+            T_Pump.T_DAC.set_temp(None,None) # Delayed start
         # if self.cooling:
             # T_Pump.T_DAC.set_cold(menus.options['T'][3])
         # else:
@@ -1347,9 +1354,9 @@ class Operation(object):
         dumpValve.set(1.0 if self.dump else 0.0) # Will stop command if open/close duration is done
         #print("%d >= %d" % ( (int(datetime.now().timestamp()) % (24*60*60)), int(menus.val('H'))) )
         if not self.programmable or not menus.val('H') or (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
-            T_Pump.T_DAC.set_temp(self.tempWithGradient()) #,self.tempRef2()) # In case of a manual change
+            T_Pump.T_DAC.set_temp(self.tempWithGradient(),self.tempRef()) # In case of a manual change
         else:
-            T_Pump.T_DAC.set_temp(None) #, None) # Delayed start
+            T_Pump.T_DAC.set_temp(None,None) #, None) # Delayed start
         # if self.cooling:
             # T_Pump.T_DAC.set_cold(menus.options['T'][3])
             # if zeroIsNone(menus.options['Q'][3]):
@@ -1421,11 +1428,13 @@ class Operation(object):
 
             if T_Pump.time2speedL(time_for_temp) >= T_Pump.pump.minimal_liters:
                 speed = T_Pump.dynamicRegulation(time_for_temp)
+                self.T_Pump.pasteurizationOverSpeed = speed >= self.T_Pump.maximal_liters
                 if reportPasteur.startRegulating:
                     reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, (START_VOL - up_to_heating_tank) / 1000.0))
                     reportPasteur.startRegulating = 0
                 T_Pump.forcible = False
             else:  # More than 90 seconds to traverse pasteurization tube = too slow
+                self.T_Pump.pasteurizationOverSpeed = False
                 if float(valSensor1) < float(self.tempRef()): # Shake
                     T_Pump.forcible = True
                     pressed = GreenButton.poll() if GreenButton else False # Pressing the GreenButton forces slow speed forward...
@@ -1822,6 +1831,7 @@ class ThreadPump(threading.Thread):
         self.qbout = None
         self.fbout = 0.0
         self.stopRequest = False
+        self.pasteurizationSpeed = None
 
     def pushContext(self,opContext):
         if opContext:
@@ -2630,7 +2640,7 @@ class WebApiAction:
         else:
             message = ""
             # StateLessActions
-            if letter in ['T','L','J','Y','K']:
+            if letter in ['J','K','L','T','Y']:
                 Heating_Profile.setProfile(letter,menus)
                 reloadPasteurizationSpeed()
             # end of StateLessActions
@@ -3125,7 +3135,7 @@ class ThreadInputProcessor(threading.Thread):
                         T_Pump.stopRequest = True
                     elif menu_choice in ['M','E','P','H','I','R','V','F','A','C','D','B']: # 'C','K'
                         T_Pump.setAction(menu_choice)
-                elif menu_choice in  ['T','L','J','Y','K']:
+                elif menu_choice in  ['J','K','L','T','Y']:
                     Heating_Profile.setProfile(menu_choice,menus)
                     option_confirm(0.0)
                 elif menu_choice == 'S': # Pause / Restart

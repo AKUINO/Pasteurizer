@@ -197,10 +197,10 @@ def set_ref_temp(temp,tag):
     ref_tag = tag
     ref_temp = temp
     address,base_duration = tagged_time_to_kill(temp,tag)
-    print(address+": duration="+str(base_duration))
+    #print(address+": duration="+str(base_duration))
     if base_duration > 0.0:
         ref_ratio = ref_duration / base_duration
-        print("ref_ratio="+str(ref_ratio))
+        #print("ref_ratio="+str(ref_ratio))
         return ref_ratio
     return None
 

@@ -21,7 +21,6 @@ $for letter in menus.cleanOptions:
     <label for="opt_$(letter)">$(menus.tit(letter)) ( $(menus.uni(letter)) )</label>
     <input class="form-control" id="opt_$(letter)" name="opt_$(letter)" placeholder="$(menus.display(letter,Menus.INI))" min="$(menus.display(letter,Menus.MIN))" max="$(menus.display(letter,Menus.MAX))" step="$(menus.display(letter,Menus.STP))" type="$(menus.type(letter))" value="$(menus.display(letter,Menus.VAL))">
   </div>
-</form>
 <p><button type="submit" class="btn btn-success">$(ml.T("Enregistrer","Save","Opslaan"))</button></p>
       $for tag in tag_index.keys():
         $ minTemp = 0.0
@@ -41,5 +40,6 @@ $for letter in menus.cleanOptions:
         [ $("%0.1f"%minTemp)°C &lt; $("%0.1f"%prof.temp)°C x $("%0.1f"%prof.duration)&quot; &lt; $("%0.1f"%maxTemp)°C ] /&nbsp;10<sup><b>$("%0.1f"%min_reduction)</b></sup></p><hr/>
 <a href="/index"><button class="btn btn-info">$(ml.T("Quitter","Cancel","Annuleer"))</button></a> &nbsp;
 <a href="/option1?reset=on"><button class="btn btn-warning">$(ml.T("Valeurs par défaut","Reset to default","Reset"))</button></a>
+</form>
 <script type="text/javascript" src="/static/js/index.js"></script>
 </div></main>
