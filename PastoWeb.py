@@ -1428,7 +1428,7 @@ class Operation(object):
 
             if T_Pump.time2speedL(time_for_temp) >= T_Pump.pump.minimal_liters:
                 speed = T_Pump.dynamicRegulation(time_for_temp)
-                T_Pump.pasteurizationOverSpeed = speed >= T_Pump.maximal_liters
+                T_Pump.pasteurizationOverSpeed = speed >= T_Pump.pump.maximal_liters
                 if reportPasteur.startRegulating:
                     reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, (START_VOL - up_to_heating_tank) / 1000.0))
                     reportPasteur.startRegulating = 0
