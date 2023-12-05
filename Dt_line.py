@@ -117,7 +117,7 @@ class Dt_line():
     # Returns the time in seconds to get the desired log reduction at a given temperature
     def D_kill(self,temp):
         duration = self.reduction * self.t * (10.0 ** ((self.get_Dt() - temp) / self.z) )
-        print (self.address+": "+str(temp)+"°C = "+str(duration)+"sec.")
+        #print (self.address+": "+str(temp)+"°C = "+str(duration)+"sec.")
         return duration
 
     def include(self, criteria):
