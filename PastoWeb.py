@@ -1420,7 +1420,7 @@ class Operation(object):
             valSensor1 = cohorts.getCalibratedValue(self.sensor1)
             if hardConf.dynamicRegulation and self.sensor1 == 'warranty': # Pasteurizing and not cleaning
                 #time_for_temp = Dt_line.legal_safe_time_to_kill(valSensor1)
-                bacteria_of_concern, time_for_temp = Dt_line.scaled_time_to_kill(valSensor1,menus.val('z'))[1]
+                bacteria_of_concern, time_for_temp = Dt_line.scaled_time_to_kill(valSensor1,menus.val('z'))
                 if not time_for_temp:
                     time_for_temp = 9999.9 # no dynamic regulation
             else:
