@@ -1428,13 +1428,13 @@ class Operation(object):
 
             if T_Pump.time2speedL(time_for_temp) >= T_Pump.pump.minimal_liters:
                 speed = T_Pump.dynamicRegulation(time_for_temp)
-                self.T_Pump.pasteurizationOverSpeed = speed >= self.T_Pump.maximal_liters
+                T_Pump.pasteurizationOverSpeed = speed >= T_Pump.maximal_liters
                 if reportPasteur.startRegulating:
                     reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, (START_VOL - up_to_heating_tank) / 1000.0))
                     reportPasteur.startRegulating = 0
                 T_Pump.forcible = False
             else:  # More than 90 seconds to traverse pasteurization tube = too slow
-                self.T_Pump.pasteurizationOverSpeed = False
+                T_Pump.pasteurizationOverSpeed = False
                 if float(valSensor1) < float(self.tempRef()): # Shake
                     T_Pump.forcible = True
                     pressed = GreenButton.poll() if GreenButton else False # Pressing the GreenButton forces slow speed forward...
