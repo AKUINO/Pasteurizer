@@ -1831,7 +1831,7 @@ class ThreadPump(threading.Thread):
         self.qbout = None
         self.fbout = 0.0
         self.stopRequest = False
-        self.pasteurizationSpeed = None
+        self.pasteurizationOverSpeed = None
 
     def pushContext(self,opContext):
         if opContext:
