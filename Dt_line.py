@@ -255,7 +255,7 @@ def tagged_time_to_kill(temp,tag):
             if t2k > time_to_kill:
                 killingAddress = address
                 time_to_kill = t2k
-    print (killingAddress+"="+str(time_to_kill)+'"')
+    #print (killingAddress+"="+str(time_to_kill)+'"')
     return killingAddress,(time_to_kill if time_to_kill >= 0.0 else None)
 
 def scaled_time_to_kill(temp,tag):
