@@ -410,6 +410,7 @@ KICKBACK = 13 # Haw many seconds the pump turns toward input after a flush in or
 # Parameterized volumes are in Liters and not milliliters...
 START_VOL = mL_L(up_to_thermistor) # 1.9L
 TOTAL_VOL = mL_L(total_tubing) # 3.5L
+SAFE_TOTAL_VOL = TOTAL_VOL - 0.2 #200ml is about the content of the output pipe
 menus.options['u'][Menus.INI] = TOTAL_VOL # Flush quantity
 
 DRY_VOLUME = TOTAL_VOL * 1.5 # (air) liters to pump to empty the tubes...
@@ -917,7 +918,9 @@ class ThreadDAC(threading.Thread):
                         elif heating < (self.setpoint+HYSTERESIS):
                             wattHour = True
                     else: # Off
-                        if heating < (self.setpoint-HYSTERESIS):
+                        if self.T_Pump.pasteurizationOverSpeed:
+                            wattHour = heating < (self.refpoint-HYSTERESIS)
+                        elif heating < (self.setpoint-HYSTERESIS):
                             wattHour = True
 
                     if wattHour and not self.empty_tank:
@@ -1633,7 +1636,7 @@ opSequences = {
         [ Operation('HotT','HEAT', ref='P', dump=True, programmable=True, bin=buck.WPOT, bout=buck.SEWR, kbin=TOTAL_VOL, kbout=START_VOL),
           Operation('HotS','SEAU',message=ml.T("Eau propre en entrée!","Clean water as input!","Schoon water als input!"),dump=True),
           Operation('HotI','HOTW','warranty','input', duration=lambda:flood_liters_to_seconds(START_VOL), base_speed=OPT_SPEED, min_speed=pumpy.minimal_liters, ref='P', qty=START_VOL, shake_qty=SHAKE_QTY, dump=True, cooling=True),
-          Operation('Hoti','HOTW','warranty','input', duration=lambda:flood_liters_to_seconds((TOTAL_VOL * 0.96) - START_VOL), base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=(TOTAL_VOL * 0.96) - START_VOL, shake_qty=SHAKE_QTY, dump=True, cooling=True),
+          Operation('Hoti','HOTW','warranty','input', duration=lambda:flood_liters_to_seconds(SAFE_TOTAL_VOL - START_VOL), base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=SAFE_TOTAL_VOL - START_VOL, shake_qty=SHAKE_QTY, dump=True, cooling=True),
           Operation('HotE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',dump=True,bin=buck.RAW,bout=buck.PAST,kbin=0.0,qbout=True),
           Operation('HotW','HOTW','warranty','input',base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True)
           ],
@@ -1742,7 +1745,7 @@ opSequences = {
     'P': # Pasteurisation
         [ Operation('PasT','HEAT', ref='P', dump=True, programmable=True, bin=buck.RAW, bout=buck.SEWR, kbin=TOTAL_VOL),
           Operation('PasI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P', qty=START_VOL, shake_qty=SHAKE_QTY, dump=True, cooling=True),
-          Operation('Pasi','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=(TOTAL_VOL * 0.96) - START_VOL, shake_qty=SHAKE_QTY, dump=True, cooling=True),
+          Operation('Pasi','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=SAFE_TOTAL_VOL - START_VOL, shake_qty=SHAKE_QTY, dump=True, cooling=True),
           Operation('PasE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',dump=True,bin=buck.RAW,bout=buck.PAST,kbin=0.0,qbout=True),
           Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('Pasm','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
@@ -1753,19 +1756,19 @@ opSequences = {
           Operation('Pasm','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
     'E': # Eau pour finir une Pasteurisation en poussant juste ce qu'il faut le lait encore dans les tuyaux
-        [ Operation('EauT','HEAT', ref='P', dump=True, programmable=True, bin=buck.WPOT, bout=buck.PAST, kbin=TOTAL_VOL * 0.96),
+        [ Operation('EauT','HEAT', ref='P', dump=True, programmable=True, bin=buck.WPOT, bout=buck.PAST, kbin=SAFE_TOTAL_VOL),
           Operation('EauI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P',qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('EauP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=START_VOL - SHAKE_QTY, shake_qty=SHAKE_QTY, dump=True, cooling=True),
-          Operation('EauV','PUMP', base_speed=OPT_SPEED, ref='P', qty=(TOTAL_VOL * 0.96) - START_VOL, dump=True, cooling=True),
+          Operation('EauV','PUMP', base_speed=OPT_SPEED, ref='P', qty=SAFE_TOTAL_VOL - START_VOL, dump=True, cooling=True),
           Operation('Eaum','MESS',message=ml.T("Faites C quand vous voulez nettoyer!","Press C when you want to clean!","Druk op C als u wilt reinigen!"),dump=True)
           ],
     'M': # Passer à un lait d'un autre provenance en chassant celui de la pasteurisation précédente
-        [ Operation('Mult','HEAT', ref='P', dump=True, programmable=True, bin=buck.RAW2, bout=buck.PAST, kbin=0.0, kbout=TOTAL_VOL * 0.96),
+        [ Operation('Mult','HEAT', ref='P', dump=True, programmable=True, bin=buck.RAW2, bout=buck.PAST, kbin=0.0, kbout=SAFE_TOTAL_VOL),
           Operation('Muli','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P',qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=True),
           Operation('Mulp','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=START_VOL - SHAKE_QTY, shake_qty=SHAKE_QTY, dump=True, cooling=True),
           Operation('MulC','PAUS',message=ml.T("Consigne nouveau lait puis une touche pour finir de chasser le 1er lait","Setpoint for New milk then press a key to finish bottling 1st","Instelpunt voor nieuwe melk en druk vervolgens op een toets om het bottelen eerst te beëindigen"),ref='P',dump=True),
           Operation('MulT','HEAT',ref='P',dump=True),
-          Operation('MulP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=(TOTAL_VOL * 0.96) - START_VOL, shake_qty=SHAKE_QTY, dump=True, cooling=True),
+          Operation('MulP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=SAFE_TOTAL_VOL - START_VOL, shake_qty=SHAKE_QTY, dump=True, cooling=True),
           Operation('MulE','PAUS',message=ml.T("Contenant pour le nouveau lait!","New Milk container!","Houder voor nieuwe melk!"),ref='P',dump=True,bin=buck.RAW2,bout=buck.PAST2,kbin=0.0,kbout=0.0,qbout=True),
           Operation('MulH','HEAT',ref='P',dump=True),
           Operation('MulI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=True),

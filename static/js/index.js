@@ -326,7 +326,7 @@ function fillDisplay(data,logging) {
                 $('#message').text(data['message']);
                 if (data['allowedActions'] != '') {
                     //console.log('AA='+data['allowedActions']);
-                    allowedActions = data['allowedActions']+'JYLTONXZ';
+                    allowedActions = data['allowedActions']+'LYJKTONXZ';
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
                         if (ml == actionletter) {
@@ -347,7 +347,7 @@ function fillDisplay(data,logging) {
                     }
                 } else {
                     //console.log('no AA');
-                    allowedActions = 'JYLTONXZ';
+                    allowedActions = 'LYJKTONXZ';
                     for (var i=0; i < ALPHABET.length; i++) {
                         ml = ALPHABET.charAt(i);
                         $('#drop'+ml).removeClass('dropdown-grayed').removeClass('current').addClass('enabled');
