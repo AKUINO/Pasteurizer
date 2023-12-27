@@ -47,7 +47,7 @@ $ currentLetter = menus.currAction
 </head>
 <body>
     <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" onclick="void(0);" style="text-align:center">
-	<a href="/?$now#" style="color:white;"><img src="/static/akuino_black.png" alt="AKUINO $(ml.T("Pasteurisateur","Pasterizer","Pasteur"))" style="height:1.6em;" align="bottom"> $(hardConf.hostname) &nbsp; </a>
+	<a href="/?$now#" style="color:white;"><div style="display:run-in flow;width:200px"><img src="/static/akuino_black.png" alt="AKUINO $(ml.T("Pasteurisateur","Pasterizer","Pasteur"))" style="height:1.6em;" align="bottom"> $:(menus.wbr(hardConf.hostname,'-'))</div></a>
 	<button class="btn btn-warning" onclick="showCommands()" style="float:center"><img src="/static/touch.svg" style="height:1.5em;" alt="Buttons" align="bottom"></button>
 	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
 		aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
