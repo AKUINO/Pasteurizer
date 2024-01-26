@@ -1327,6 +1327,8 @@ class Operation(object):
             if self.qty and T_Pump.currOpContext:
                 if self.typeOp == 'TRAK' and self.sensor1 == 'warranty': # Pasteurizing and not cleaning
                     if zeroIsNone(menus.val('Q')):
+                        print("Q="+menus.display('Q'))
+                        print("vol="+str(T_Pump.currOpContext.volume() ))
                         if T_Pump.currOpContext.volume() > menus.val('Q'):
                             T_Pump.setPause(True)
                             menus.store('Q',None) # reset the option...
