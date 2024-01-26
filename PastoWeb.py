@@ -1422,10 +1422,10 @@ class Operation(object):
         elif typeOpToDo == 'TRAK':
             valSensor1 = cohorts.getCalibratedValue(self.sensor1)
             if hardConf.dynamicRegulation and self.sensor1 == 'warranty': # Pasteurizing and not cleaning
-                if zeroIsNone(menus.options['Q'][3]):
-                    if T_Pump.pump.volume() > menus.options['Q'][3]:
+                if zeroIsNone(menus.options.val('Q')):
+                    if T_Pump.pump.volume() > menus.options.val('Q'):
                         T_Pump.setPause(True)
-                        menus.options['Q'][3] = 0.0 # reset the option...
+                        menus.options.store('Q',None) # reset the option...
                 #time_for_temp = Dt_line.legal_safe_time_to_kill(valSensor1)
                 bacteria_of_concern, time_for_temp = Dt_line.scaled_time_to_kill(valSensor1,menus.val('z'))
                 if not time_for_temp:
