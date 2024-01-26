@@ -1325,6 +1325,11 @@ class Operation(object):
             return False # not finished
         elif self.typeOp in ['PUMP','TRAK','EMPT','REVR']:
             if self.qty and T_Pump.currOpContext:
+                if self.typeOp == 'TRAK' and self.sensor1 == 'warranty': # Pasteurizing and not cleaning
+                    if zeroIsNone(menus.val('Q')):
+                        if T_Pump.currOpContext.volume() > menus.val('Q'):
+                            T_Pump.setPause(True)
+                            menus.store('Q',None) # reset the option...
                 if self.qty > 0.0 and (T_Pump.currOpContext.volume() >= self.qty):
                     return True
                 if self.qty < 0.0:
@@ -1422,10 +1427,6 @@ class Operation(object):
         elif typeOpToDo == 'TRAK':
             valSensor1 = cohorts.getCalibratedValue(self.sensor1)
             if hardConf.dynamicRegulation and self.sensor1 == 'warranty': # Pasteurizing and not cleaning
-                if zeroIsNone(menus.val('Q')):
-                    if T_Pump.pump.volume() > menus.val('Q'):
-                        T_Pump.setPause(True)
-                        menus.store('Q',None) # reset the option...
                 #time_for_temp = Dt_line.legal_safe_time_to_kill(valSensor1)
                 bacteria_of_concern, time_for_temp = Dt_line.scaled_time_to_kill(valSensor1,menus.val('z'))
                 if not time_for_temp:
@@ -1820,6 +1821,7 @@ class ThreadPump(threading.Thread):
         self.pumpLastChange = 0 # Time of last change in pump running
         self.pumpLastVolume = 0
         self.pumpLastHeating = 0
+        self.pumpLimit = None
         self.lastStop = 0
         self.lastDurationEval = None
         self.lastDurationEvalTime = None
