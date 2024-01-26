@@ -1324,17 +1324,15 @@ class Operation(object):
                         return True
             return False # not finished
         elif self.typeOp in ['PUMP','TRAK','EMPT','REVR']:
-            print(self.typeOp+"/"+self.sensor1+"="+str(self.qty))
+            if self.typeOp == 'TRAK' and self.sensor1 == 'warranty' and T_Pump.currOpContext: # Pasteurizing and not cleaning
+                if zeroIsNone(menus.val('Q')):
+                    print("Q="+menus.display('Q'))
+                    print("vol="+str(T_Pump.currOpContext.volume() ))
+                    if T_Pump.currOpContext.volume() > menus.val('Q'):
+                        print("Stopping")
+                        menus.store('Q',None) # reset the option...
+                        return True
             if self.qty and T_Pump.currOpContext:
-                if self.qty > 0.0 and self.typeOp == 'TRAK' and self.sensor1 == 'warranty': # Pasteurizing and not cleaning
-                    print("Testing")
-                    if zeroIsNone(menus.val('Q')):
-                        print("Q="+menus.display('Q'))
-                        print("vol="+str(T_Pump.currOpContext.volume() ))
-                        if T_Pump.currOpContext.volume() > menus.val('Q'):
-                            print("Stopping")
-                            menus.store('Q',None) # reset the option...
-                            return True
                 if self.qty > 0.0 and (T_Pump.currOpContext.volume() >= self.qty):
                     return True
                 if self.qty < 0.0:
