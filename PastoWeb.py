@@ -1325,6 +1325,7 @@ class Operation(object):
             return False # not finished
         elif self.typeOp in ['PUMP','TRAK','EMPT','REVR']:
             if self.qty and T_Pump.currOpContext:
+                print(self.typeOp+"/"+self.sensor1+"="+str(self.qty))
                 if self.qty > 0.0 and self.typeOp == 'TRAK' and self.sensor1 == 'warranty': # Pasteurizing and not cleaning
                     print("Testing")
                     if zeroIsNone(menus.val('Q')):
