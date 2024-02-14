@@ -21,13 +21,16 @@ $for letter in menus.cleanOptions:
     <label for="opt_$(letter)">$(menus.tit(letter)) ( $(menus.uni(letter)) )</label>
     <input class="form-control" id="opt_$(letter)" name="opt_$(letter)" placeholder="$(menus.display(letter,Menus.INI))" min="$(menus.display(letter,Menus.MIN))" max="$(menus.display(letter,Menus.MAX))" step="$(menus.display(letter,Menus.STP))" type="$(menus.type(letter))" value="$(menus.display(letter,Menus.VAL))">
   </div>
-<p><button type="submit" class="btn btn-success">$(ml.T("Enregistrer","Save","Opslaan"))</button></p>
-      $for tag in tag_index.keys():
+<p><button type="submit" class="btn btn-success">$(ml.T("Enregistrer","Save","Opslaan"))</button>
+<a href="/index"><button class="btn btn-info">$(ml.T("Quitter","Cancel","Annuleer"))</button></a> &nbsp;
+<a href="/option1?reset=on"><button class="btn btn-warning">$(ml.T("Valeurs par défaut","Reset to default","Reset"))</button></a></p>
+</form>
+$for tag in tag_index.keys():
         $ minTemp = 0.0
         $ maxTemp = 0.0
         $ min_reduction = 99.9
         $ prof = profiles[tag]
-        <p><button class="btn $('btn-success' if menus.val('z')==tag else 'btn-info')" onclick="goToLetter('P','$(tag)',false)"><img src="/static/touch.svg" style="height:1.5em;" alt="$(menus.actionName[tag][2])" align="bottom"> $(prof.label)</button>
+        <p><a id="menu$(tag)" href="/explain/$(tag)"><button class="btn $('btn-success' if menus.val('z')==tag else 'btn-info')"><img src="/static/touch.svg" style="height:1.5em;" alt="$(menus.actionName[tag][2])" align="bottom"> $(prof.label)</button></a>
         $for bact in tag_index[tag]:
             <div>$(bact.address)&nbsp;/&nbsp;10<sup><b>$("%0.1f"%bact.reduction)</b></sup>&nbsp;: D<sub>$("%0.1f"%bact.get_Dt())°</sub>&nbsp;=&nbsp;$("%0.2f"%bact.t)"&nbsp;,&nbsp;z=$("%0.2f"%bact.z)°C $(bact.source)
             $ temp = bact.minTemp()
@@ -38,8 +41,5 @@ $for letter in menus.cleanOptions:
             $ min_reduction = min_reduction if min_reduction <= reduc else reduc
             </div>
         [ $("%0.1f"%minTemp)°C &lt; $("%0.1f"%prof.temp)°C x $("%0.1f"%prof.duration)&quot; &lt; $("%0.1f"%maxTemp)°C ] /&nbsp;10<sup><b>$("%0.1f"%min_reduction)</b></sup></p><hr/>
-<a href="/index"><button class="btn btn-info">$(ml.T("Quitter","Cancel","Annuleer"))</button></a> &nbsp;
-<a href="/option1?reset=on"><button class="btn btn-warning">$(ml.T("Valeurs par défaut","Reset to default","Reset"))</button></a>
-</form>
 <script type="text/javascript" src="/static/js/index.js"></script>
 </div></main>

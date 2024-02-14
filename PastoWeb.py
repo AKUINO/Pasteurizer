@@ -1337,7 +1337,7 @@ class Operation(object):
                     return True
                 if self.qty < 0.0:
                     volnow = T_Pump.currOpContext.volume()
-                    if (volnow <= self.qty):
+                    if volnow <= self.qty:
                         return True
                     elif volnow > 0.2: # on part dans le mauvais sens !
                         T_Pump.pump.reset_pump()
