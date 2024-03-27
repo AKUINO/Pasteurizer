@@ -476,14 +476,14 @@ class pump(sensor.Sensor):
         curr = self.current_liters(self.now)
         return self.previous_volume+curr, self.previous_change, curr
 
-    def display(self,format=" %6.0fmL"): # Over display in Sensor!
+    def display(self, format_param=" %6.0fmL"): # Over display in Sensor!
         if self.reverse:
             attr = term.blue
         elif self.speed > 0.0:
             attr = term.yellow
         else:
             attr = term.black
-        term.write(format % (self.volume()*1000.0), attr, term.bgwhite)
+        term.write(format_param % (self.volume() * 1000.0), attr, term.bgwhite)
 
     def reset_volume(self):
         self.previous_change = time.perf_counter()

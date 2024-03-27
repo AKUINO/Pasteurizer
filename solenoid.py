@@ -33,14 +33,14 @@ class Solenoid(sensor.Sensor):
             traceback.print_exc()
         return changed
 
-    def display(self,format=" %s"):
+    def display(self, format_param=" %s"):
         if self.changed < 0.0:
             attr = term.blue
         elif self.changed > 0.0:
             attr = term.red
         else:
             attr = term.black
-        term.write(format % Solenoid.onOff[self.value], attr, term.bgwhite)
+        term.write(format_param % Solenoid.onOff[self.value], attr, term.bgwhite)
 
     def close(self):
         self.set(0) # Or whatever the "non heating" solenoid value

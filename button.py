@@ -44,7 +44,7 @@ class button(sensor.Sensor):
             if value is not None:
                 value = 0 if value > 0 else 1 # REVERSE because pressing is grounding !!!
         except:
-            print ("%s: %d=%d" % (self.address, self.param, value if value != None else 9))
+            print ("%s: %d=%d" % (self.address, self.param, value if value is not None else 9))
             traceback.print_exc()
         return value
 
@@ -55,14 +55,14 @@ class button(sensor.Sensor):
             return True
         return False
 
-    def display(self,format=" %d"):
+    def display(self, format_param=" %d"):
         if self.changed < 0.0:
             attr = term.blue
         elif self.changed > 0.0:
             attr = term.red
         else:
             attr = term.black
-        term.write(format % self.value, attr, term.bgwhite)
+        term.write(format_param % self.value, attr, term.bgwhite)
 
 class ThreadButtons (threading.Thread):
 
@@ -70,9 +70,9 @@ class ThreadButtons (threading.Thread):
         threading.Thread.__init__(self)
         self.running = False
         self.buttons = []
-        for button in buttons: #Take only the existing buttons
-            if button:
-                self.buttons.append(button)
+        for currbutton in buttons: #Take only the existing buttons
+            if currbutton:
+                self.buttons.append(currbutton)
 
     def run(self):
         self.running = True
@@ -83,12 +83,12 @@ class ThreadButtons (threading.Thread):
                 i = i + 1
                 if i > 4:
                     i = 0
-                for button in self.buttons: #Take only the existing buttons
+                for currbutton in self.buttons: #Take only the existing buttons
                     #time.sleep(0.01)
-                    if button.poll() > 0:
-                        button.set(1.0)
-                    if button.LED:
-                        button.LED.phase = ( i <= 2 ) # Blink twice a second
+                    if currbutton.poll() > 0:
+                        currbutton.set(1.0)
+                    if currbutton.LED:
+                        currbutton.LED.phase = ( i <= 2 ) # Blink twice a second
             except KeyboardInterrupt:
                 self.running = False
                 break

@@ -160,9 +160,7 @@ class Menus(object):
         except: # unknown previous state
             traceback.print_exc()
 
-    def wbr(self,input,breaking):
-        return (input.replace(breaking,breaking+"<wbr/>"))
+    def wbr(self, input_to_break, breaking):
+        return input_to_break.replace(breaking, breaking + "<wbr/>")
 
 Menus.singleton = Menus()
-
-

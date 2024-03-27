@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# This code allows to communicate with the MICHA board in a pastorizator configuration. It can be use as:
+# This code allows to communicate with the MICHA board in a pasteurizer configuration. It can be use as:
 #     - a library to communicate with the MICHA board using another main code file
 #     - a standalone code to test the I/O of the MICHA board
 
@@ -228,7 +228,9 @@ class Micha:
         while i < MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()
-                
+
+                message = None
+                response = None
                 if self.thermi==0: # get the value of all the thermistors
                     message = rtu.read_input_registers(SLAVE_ID, THERMI1_REG, 4)
                 elif self.thermi==1: # get the thermistor 1 value
@@ -241,8 +243,8 @@ class Micha:
                     message = rtu.read_input_registers(SLAVE_ID, THERMI4_REG, 1)
                 else:
                     print("ERROR: no thermistor was found at this value")
-                
-                response = rtu.send_message(message, serial_port)
+                if message:
+                   response = rtu.send_message(message, serial_port)
                 
                 self.release_serial_port()
                 return response
@@ -263,9 +265,9 @@ class Micha:
         self.pump_speed = speed
         return self.write_holding(PUMP_SPEED_REG, speed)
     
-    def set_pump_dir(self,dir=0): # to set the direction of the pump
-        self.pump_dir = dir
-        response = self.write_pin(PUMP_DIR_REG, dir)
+    def set_pump_dir(self, direction=0): # to set the direction of the pump
+        self.pump_dir = direction
+        response = self.write_pin(PUMP_DIR_REG, direction)
         return response
     
     def get_pump_power(self): # to get the power state of the pump (stored in the register), returns the pump power state
@@ -363,14 +365,14 @@ class Micha:
         self.valve2_power = self.read_pin(VALVE2_POW_REG)
         return self.valve2_power
     
-    def set_valve1_dir(self,dir=0): # to set the direction of the valve 1
-        self.valve1_dir = dir
-        response = self.write_pin(VALVE1_DIR_REG, dir)
+    def set_valve1_dir(self, direction=0): # to set the direction of the valve 1
+        self.valve1_dir = direction
+        response = self.write_pin(VALVE1_DIR_REG, direction)
         return response
     
-    def set_valve2_dir(self,dir=0): # to set the direction of the valve 2
-        self.valve2_dir = dir
-        response = self.write_pin(VALVE2_DIR_REG, dir)
+    def set_valve2_dir(self, direction=0): # to set the direction of the valve 2
+        self.valve2_dir = direction
+        response = self.write_pin(VALVE2_DIR_REG, direction)
         return response
     
     def get_valve1_dir(self): # to get the direction of the valve 1 (stored in the register)
@@ -409,24 +411,24 @@ if __name__ == "__main__":
         return 0
     
     def menu_choice(mini,maxi):
-        choice = '-1'
+        choice_made = '-1'
         
-        while (int(choice)<mini or int(choice)>maxi):
-            choice = input("Choose an option: ")
+        while (int(choice_made)<mini or int(choice_made)>maxi):
+            choice_made = input("Choose an option: ")
             
             boot_monitoring()
                 
-            if (int(choice)<mini or int(choice)>maxi):
+            if (int(choice_made)<mini or int(choice_made)>maxi):
                 print("ERROR: incorrect choice. Your choice must be [{}:{}]".format(mini,maxi))
         
-        return choice
+        return choice_made
 
     # A sub-menu to manage the thermistors
     def subMenu_thermis():
         """Display a sub-menu to manage the thermistors."""
-        choice = '-1'
+        choice_made = '-1'
         
-        while choice!='0':
+        while choice_made!='0':
             print("########## THERMISTORS SUB-MENU ##########")
             print(" 1 - Get the thermistor 1 value\n",
                   "2 - Get the thermistor 2 value\n",
@@ -435,11 +437,11 @@ if __name__ == "__main__":
                   "5 - Get teh value of all the thermistors\n",
                   "0 - Back\n")
             
-            choice = menu_choice(0,5)
+            choice_made = menu_choice(0,5)
             print("\n")
             
             # If the choice is valid
-            if choice!='0':
+            if choice_made!='0':
                 thermi1 = pasto.get_thermi(1)[0]
                 thermi2 = pasto.get_thermi(2)[0]
                 thermi3 = pasto.get_thermi(3)[0]
@@ -450,15 +452,15 @@ if __name__ == "__main__":
                 thermi3_mV = (VOLTAGE_REF*thermi3/4096)*1000
                 thermi4_mV = (VOLTAGE_REF*thermi4/4096)*1000
                 
-                if choice=='1':
+                if choice_made=='1':
                     print("Thermistor 1 = {} ({:4.3f} mV)".format(thermi1,thermi1_mV))
-                elif choice=='2':
+                elif choice_made=='2':
                     print("Thermistor 2 = {} ({:4.3f} mV)".format(thermi2,thermi2_mV))
-                elif choice=='3':
+                elif choice_made=='3':
                     print("Thermistor 3 = {} ({:4.3f} mV)".format(thermi3,thermi3_mV))
-                elif choice=='4':
+                elif choice_made=='4':
                     print("Thermistor 4 = {} ({:4.3f} mV)".format(thermi4,thermi4_mV))
-                elif choice=='5':
+                elif choice_made=='5':
                     i = 1
                     for value in pasto.get_thermi():
                         print("Thermistor {} = {} ({:4.3f} mV)".format(i,value,(VOLTAGE_REF*value/4096)*1000))
@@ -466,16 +468,16 @@ if __name__ == "__main__":
                 
                 # input()
                 
-                choice = '-1'
+                choice_made = '-1'
         
         return 0
 
     # A sub-menu to manage the pump
     def subMenu_pump():
         """Display a sub-menu to manage the pump."""
-        choice = '-1'
+        choice_made = '-1'
         
-        while choice!='0':
+        while choice_made!='0':
             print("########## PUMP SUB-MENU ##########")
             print(" 1 - Power\n",
                   "2 - Speed\n",
@@ -484,12 +486,12 @@ if __name__ == "__main__":
                   "5 - Get the error code return by the regulator\n",
                   "0 - Back\n")
             
-            choice = menu_choice(0,5)
+            choice_made = menu_choice(0,5)
             print("\n")
             
             # If the choice is valid
-            if choice!='0':
-                if choice=='1':
+            if choice_made!='0':
+                if choice_made=='1':
                     print("### Power ###")
                     
                     if pasto.get_pump_power()==1:
@@ -499,32 +501,32 @@ if __name__ == "__main__":
                         print(" 0 - OFF\n",
                               "1 - (ON)\n")
                     
-                    choice = menu_choice(0,1) 
+                    choice_made = menu_choice(0,1)
                     print("\n")
                     
-                    if choice=='0':
+                    if choice_made=='0':
                         pasto.set_pump_power(1)
                         print("Power OFF")
-                    elif choice=='1':
+                    elif choice_made=='1':
                         pasto.set_pump_power(0)
                         print("Power ON")
-                    choice = '1'
-                if choice=='2':
-                    while choice!='0':
+                    choice_made = '1'
+                if choice_made=='2':
+                    while choice_made!='0':
                         print("### Speed ###")
                         print("\nCurrent speed = {}\n".format(pasto.get_pump_speed()))
                         print(" 1 - Modify\n",
                               "0 - Back\n")
                         
-                        choice = menu_choice(0,1) 
+                        choice_made = menu_choice(0,1)
                         print("\n")
                         
-                        if choice!='0':
+                        if choice_made!='0':
                             updatedSpeed = input("Enter a new speed: ")
                             pasto.set_pump_speed(int(updatedSpeed))
-                            choice = '-1'
-                    choice = '4'
-                if choice=='3':
+                            choice_made = '-1'
+                    choice_made = '4'
+                if choice_made=='3':
                     print("### Direction ###")
                     
                     if pasto.get_pump_dir()==0:
@@ -534,19 +536,19 @@ if __name__ == "__main__":
                         print(" 0 - Suction mode\n",
                               "1 - (Backflow mode)\n")
                     
-                    choice = menu_choice(0,1) 
+                    choice_made = menu_choice(0,1)
                     print("\n")
                     
-                    if choice=='0':
+                    if choice_made=='0':
                         pasto.set_pump_dir(0)
                         print("Suction mode ON")
-                    elif choice=='1':
+                    elif choice_made=='1':
                         pasto.set_pump_dir(1)
                         print("Backflow mode ON")
-                    choice = '2'
-                if choice=='4':
+                    choice_made = '2'
+                if choice_made=='4':
                     cursp = pasto.get_pump_speed()
-                    servol = pasto.get_pump_servo();
+                    servol = pasto.get_pump_servo()
                     # spmin = 99999999
                     # spmax = 0
                     # spavg = 0
@@ -569,30 +571,30 @@ if __name__ == "__main__":
                     print ("Min=%d, Max=%d, Avg=%d Hz, Pulse²=%d" % (servol[1],servol[0], servol[2], servol[3]) )
                     if cursp:
                         print ("Min=%f1%%, Max=%f1%%, Avg=%f1%%" % (servol[1]*100.0/cursp-100.0,servol[0]*100.0/cursp-100.0, servol[2]*100.0/cursp-100.0 ) )
-                if choice=='5':
+                if choice_made=='5':
                     print("Error returned by the regulator = {}".format(pasto.get_pump_error()))
                 
-                choice= '-1'
+                choice_made= '-1'
         
         return 0
 
     # Sub-menu to manage the tanks
     def subMenu_tanks():
         """Display a sub-menu to manage the tanks."""
-        choice = '-1'
+        choice_made = '-1'
         
-        while choice!='0':
+        while choice_made!='0':
             print("########## TANKS SUB-MENU ##########")
             print(" 1 - Tank 1 state\n",
                   "2 - Tank 2 state\n",
                   "0 - Back\n")
             
-            choice = menu_choice(0,2)
+            choice_made = menu_choice(0,2)
             print("\n")
             
             # If the choice is valid
-            if choice!='0':
-                if choice=='1':
+            if choice_made!='0':
+                if choice_made=='1':
                     print("### Tank 1 ###")
                     
                     if pasto.get_tank1()==0:
@@ -602,17 +604,17 @@ if __name__ == "__main__":
                         print(" 0 - OFF\n",
                               "1 - (ON)\n")
                     
-                    choice = menu_choice(0,1) 
+                    choice_made = menu_choice(0,1)
                     print("\n")
                     
-                    if choice=='0':
+                    if choice_made=='0':
                         pasto.set_tank1(0)
                         print("Tank 1 OFF")
-                    elif choice=='1':
+                    elif choice_made=='1':
                         pasto.set_tank1(1)
                         print("Tank 1 ON")
                     # input()
-                elif choice=='2':
+                elif choice_made=='2':
                     print("### Tank 2 ###")
                     
                     if pasto.get_tank2()==0:
@@ -622,27 +624,27 @@ if __name__ == "__main__":
                         print(" 0 - OFF\n",
                               "1 - (ON)\n")
                     
-                    choice = menu_choice(0,1) 
+                    choice_made = menu_choice(0,1)
                     print("\n")
                     
-                    if choice=='0':
+                    if choice_made=='0':
                         pasto.set_tank2(0)
                         print("Tank 2 OFF")
-                    elif choice=='1':
+                    elif choice_made=='1':
                         pasto.set_tank2(1)
                         print("Tank 2 ON")
                     # input()
             
-                choice = '-1'
+                choice_made = '-1'
         
         return 0
 
     # Sub-menu to manage the valves and solenoids
     def subMenu_valvesSol():
         """Display en sub-menu to manage the valves and solenoids."""
-        choice = '-1'
+        choice_made = '-1'
         
-        while choice!='0':
+        while choice_made!='0':
             print("########## VALVES AND SOLENOIDS SUB-MENU ##########")
             print(" 1 - Hot water solenoid\n",
                   "2 - Cold water solenoid\n",
@@ -650,12 +652,12 @@ if __name__ == "__main__":
                   "4 - Manage the valve 2\n",
                   "0 - Back\n")
             
-            choice = menu_choice(0,4)
+            choice_made = menu_choice(0,4)
             print("\n")
             
             # If the choice is valid
-            if choice!='0':
-                if choice=='1':
+            if choice_made!='0':
+                if choice_made=='1':
                     print("### Hot water solenoid ###")
                     
                     if pasto.get_sol_hot()==0:
@@ -665,17 +667,17 @@ if __name__ == "__main__":
                         print(" 0 - Close\n",
                               "1 - (Open)\n")
                     
-                    choice = menu_choice(0,1) 
+                    choice_made = menu_choice(0,1)
                     print("\n")
                     
-                    if choice=='0':
+                    if choice_made=='0':
                         pasto.set_sol_hot(0)
                         print("Hot water solenoid is closing")
-                    elif choice=='1':
+                    elif choice_made=='1':
                         pasto.set_sol_hot(1)
                         print("Hot water solenoid is opening")
                     # input()
-                elif choice=='2':
+                elif choice_made=='2':
                     print("### Cold water solenoid ###")
                     
                     if pasto.get_sol_cold()==0:
@@ -685,28 +687,28 @@ if __name__ == "__main__":
                         print(" 0 - Close\n",
                               "1 - (Open)\n")
                     
-                    choice = menu_choice(0,1) 
+                    choice_made = menu_choice(0,1)
                     print("\n")
                     
-                    if choice=='0':
+                    if choice_made=='0':
                         pasto.set_sol_cold(0)
                         print("Cold water solenoid is closing")
-                    elif choice=='1':
+                    elif choice_made=='1':
                         pasto.set_sol_cold(1)
                         print("Cold water solenoid is opening")
                     # input()
-                elif choice=='3':
-                    while choice!='0':
+                elif choice_made=='3':
+                    while choice_made!='0':
                         print("### Valve 1 ###")
                         print(" 1 - Power\n",
-                                  "2 - Direction\n",
-                                  "0 - Back")
+                              " 2 - Direction\n",
+                              " 0 - Back")
                         
-                        choice = menu_choice(0,2) 
+                        choice_made = menu_choice(0,2)
                         print("\n")
                         
-                        if choice!='0':
-                            if choice=='1':
+                        if choice_made!='0':
+                            if choice_made=='1':
                                 print("### Valve 1 power ###")
 
                                 if pasto.get_valve1_power()==0:
@@ -716,18 +718,18 @@ if __name__ == "__main__":
                                     print(" 0 - OFF\n",
                                           "1 - (ON)\n")
                                     
-                                choice = menu_choice(0,1) 
+                                choice_made = menu_choice(0,1)
                                 print("\n")
                                 
-                                if choice=='0':
+                                if choice_made=='0':
                                     pasto.set_valve1_power(0)
                                     print("Valve 1 power OFF")
-                                elif choice=='1':
+                                elif choice_made=='1':
                                     pasto.set_valve1_power(1)
                                     print("Valve 1 power ON")
                                 # input()
                             
-                            elif choice=='2':
+                            elif choice_made=='2':
                                 print("### Valve 1 direction ###")
 
                                 if pasto.get_valve1_dir()==0:
@@ -737,29 +739,29 @@ if __name__ == "__main__":
                                     print(" 0 - Direction 1\n",
                                           "1 - (Direction 2)\n")
                                     
-                                choice = menu_choice(0,1) 
+                                choice_made = menu_choice(0,1)
                                 print("\n")
                                 
-                                if choice=='0':
+                                if choice_made=='0':
                                     pasto.set_valve1_dir(0)
                                     print("Valve 1 set in direction 1")
-                                elif choice=='1':
+                                elif choice_made=='1':
                                     pasto.set_valve1_dir(1)
                                     print("Valve 1 set in direction 2")
                                 # input()
-                            choice = '-1'
-                elif choice=='4':
-                    while choice!='0':
+                            choice_made = '-1'
+                elif choice_made=='4':
+                    while choice_made!='0':
                         print("### Valve 2 ###")
                         print(" 1 - Power\n",
-                                  "2 - Direction\n",
-                                  "0 - Back")
+                              " 2 - Direction\n",
+                              " 0 - Back")
                         
-                        choice = menu_choice(0,2) 
+                        choice_made = menu_choice(0,2)
                         print("\n")
                         
-                        if choice!='0':
-                            if choice=='1':
+                        if choice_made!='0':
+                            if choice_made=='1':
                                 print("### Valve 2 power ###")
 
                                 if pasto.get_valve2_power()==0:
@@ -769,18 +771,18 @@ if __name__ == "__main__":
                                     print(" 0 - OFF\n",
                                           "1 - (ON)\n")
                                     
-                                choice = menu_choice(0,1) 
+                                choice_made = menu_choice(0,1)
                                 print("\n")
                                 
-                                if choice=='0':
+                                if choice_made=='0':
                                     pasto.set_valve2_power(0)
                                     print("Valve 2 power OFF")
-                                elif choice=='1':
+                                elif choice_made=='1':
                                     pasto.set_valve2_power(1)
                                     print("Valve 2 power ON")
                                 # input()
                             
-                            elif choice=='2':
+                            elif choice_made=='2':
                                 print("### Valve 2 direction ###")
 
                                 if pasto.get_valve2_dir()==0:
@@ -790,19 +792,19 @@ if __name__ == "__main__":
                                     print(" 0 - Direction 1\n",
                                           "1 - (Direction 2)\n")
                                     
-                                choice = menu_choice(0,1) 
+                                choice_made = menu_choice(0,1)
                                 print("\n")
                                 
-                                if choice=='0':
+                                if choice_made=='0':
                                     pasto.set_valve2_dir(0)
                                     print("Valve 2 set in direction 1")
-                                elif choice=='1':
+                                elif choice_made=='1':
                                     pasto.set_valve2_dir(1)
                                     print("Valve 2 set in direction 2")
                                 # input()
-                            choice = '-1'
+                            choice_made = '-1'
             
-                choice = '-1'
+                choice_made = '-1'
                 
         return 0
 
@@ -815,17 +817,17 @@ if __name__ == "__main__":
         print("General state = {}".format(pasto.get_general_state()))
         print("Error code = {}\n".format(pasto.get_error_code()))
 
-        choice = '9'
-        while choice!='0':
+        choice_made = '9'
+        while choice_made!='0':
             print(" 1 - debug ON\n",
                       "2 - debug OFF\n",
                       "0 - Back")
             
-            choice = menu_choice(0,2) 
+            choice_made = menu_choice(0,2)
             print("\n")
             
-            if choice!='0':
-                pasto.set_debug_flag(choice=='1')
+            if choice_made!='0':
+                pasto.set_debug_flag(choice_made=='1')
 
     def subMenu_registers():
         """Display the value of all the registers."""
@@ -878,8 +880,6 @@ if __name__ == "__main__":
         
         if choice!='0':
             choice = menuPrincipal[choice]()
-        
-            choice = '-1' 
 
     pasto.close()
     print("\nBye!\n")

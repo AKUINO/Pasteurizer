@@ -23,10 +23,11 @@ class State(object):
     dempty = False
     dgreasy = False
 
-
+    @staticmethod
     def get(letter,empty,greasy=False):
         return State.knownStates[letter][empty][greasy]
 
+    @staticmethod
     def setCurrent(letter,empty,greasy=False):
         State.current = State.get(letter,empty,greasy)
         State.empty = empty
@@ -34,15 +35,18 @@ class State(object):
         # print (State.current.letter)
         return State.current
 
+    @staticmethod
     def transitCurrent(step, action, now=int(time.time()) ):
         (State.start,State.current, State.empty, State.greasy) = State.current.transit(State.empty, State.greasy, step, action, State.start, now=now)
         # print (State.current.letter)
 
+    @staticmethod
     def transitDelayed(step, action, now=int(time.time()) ):
         (State.dstart,State.delayed, State.dempty, State.dgreasy) = State.current.transit(State.empty, State.greasy, step, action, State.start, toBeSaved=False, now=now)
         # print (State.delayed.letter)
 
-    def loadCurrent(dummy = None): # returns timestamp and current state
+    @staticmethod
+    def loadCurrent(): # returns timestamp and current state
         try:
             with open(datafiles.paramfile("state.csv")) as f:
                 stateData = f.read()
@@ -66,12 +70,14 @@ class State(object):
             State.saveCurrent()
         return 0,State.current,False,False # If state unknown, it is dirty !
 
+    @staticmethod
     def saveCurrent(now=int(time.time())):
         try:
             State.current.save(State.empty,State.greasy,State.start)
         except IOError: # no place to save current state ?
             traceback.print_exc()
 
+    @staticmethod
     def popDelayed(now=int(time.time())):
         if State.delayed:
             State.start = now
@@ -82,13 +88,17 @@ class State(object):
             State.saveCurrent()
             State.delayed = None
 
-    def __init__(self,letter,labels,color,transitions,emptiness=[False,True],greasiness=[False,True]):
+    def __init__(self, letter, labels, color, transitions, emptiness=None, greasiness=None):
         #cohorts.catalog[address] = self Done by the threading class...
+        if emptiness is None:
+            emptiness = [False, True]
+        if greasiness is None:
+            greasiness = [False, True]
         self.letter = letter
         self.color = color
         self.labels = labels
         self.transitions = transitions
-        if not letter in State.knownStates:
+        if letter not in State.knownStates:
             State.knownStates[letter] = [[None,None],[None,None]]
         for empty in emptiness:
             for greasy in greasiness:
@@ -97,7 +107,7 @@ class State(object):
     def transit(self,empty,greasy,step,action, start, toBeSaved=True, now=int(time.time()) ):
         for (actDone,nextState) in self.transitions:
             if actDone == action:
-                if nextState == None:
+                if nextState is None:
                     newState = State.get(self.letter,empty,greasy)
                 elif isinstance(nextState, list):
                     newLetter = None
@@ -109,9 +119,9 @@ class State(object):
                         else: # ACTION_END
                             newLetter = nextState[len(nextState) - 1]
                     if isinstance(newLetter, list):
-                        if newLetter[1] != None:
+                        if newLetter[1] is not None:
                             empty = newLetter[1]
-                        if newLetter[2] != None:
+                        if newLetter[2] is not None:
                             greasy = newLetter[2]
                         newLetter = newLetter[0]
                     if not newLetter:
@@ -128,11 +138,11 @@ class State(object):
                     return now, newState,empty, greasy
                 else:
                     return start, newState,empty,greasy
-        print ("Unknown action=%s for state=%s"%(action,self.letter))
+        print ("Unknown action=%s for state=%s" % (action,self.letter))
         try:
             return State.get('?',empty,greasy).transit(empty,greasy,step,action, start, toBeSaved=toBeSaved, now=now )
         except:
-            print ("IMPOSSIBLE action=%s for state=%s"%(action,self.letter))
+            print ("IMPOSSIBLE action=%s for state=%s" % (action,self.letter))
             return start,self,empty,greasy
 
     def allowedActions (self):

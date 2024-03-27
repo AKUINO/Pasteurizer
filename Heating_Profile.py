@@ -12,7 +12,7 @@ import traceback
 
 profiles = {}
 
-class Heating_Profile():
+class Heating_Profile:
 
     def set_letter(self,letter):
 
@@ -38,23 +38,23 @@ class Heating_Profile():
         self.set_letter(letter)
 
     def __str__(self):
-        return (self.letter+": "+str(self.temp)+"°C, "+str(self.duration)+'" : '+self.label.french)
+        return self.letter+": "+str(self.temp)+"°C, "+str(self.duration)+'" : '+self.label.french
 
     def to_dict(self):
         return {
          'letter' : self.letter
-        ,'temp' : self.temp
-        ,'duration' : self.duration
-        ,'FR': self.label.french
-        ,'EN': self.label.english
-        ,'NL': self.label.dutch
+         ,'temp' : self.temp
+         ,'duration' : self.duration
+         ,'FR': self.label.french
+         ,'EN': self.label.english
+         ,'NL': self.label.dutch
         }
 
     def getByLetter(self,letter):
 
         global profiles
 
-        if not letter in profiles.keys():
+        if letter not in profiles.keys():
             return None
         else:
             return profiles[letter]
@@ -67,7 +67,7 @@ class Heating_Profile():
 
 # Fonction pour lire un objet de la classe courante depuis le disque en utilisant JSON
 def load():
-    filenames = []
+    #filenames = []
     try:
         for filename in os.listdir(datafiles.DIR_BASE_DTZ):
             pext = filename.index(".json")
@@ -100,17 +100,17 @@ def load():
         pass
 
 
-def setProfile(letter,menus):
+def setProfile(letter, menus_param : menus):
 
     global profiles
 
     if letter in profiles.keys():
         prof = profiles[letter]
-        menus.store('z', letter)
-        menus.store('P', prof.temp)
-        menus.store('M', prof.duration)
+        menus_param.store('z', letter)
+        menus_param.store('P', prof.temp)
+        menus_param.store('M', prof.duration)
         #menus.store('F', prof.letter)
-        menus.save()
+        menus_param.save()
 
 # Heating_Profile('T',68.0,15.0,"Thermiser","Thermize","Thermis.")
 # Heating_Profile('L',72.0,15.0,"Lait","miLk","meLk")

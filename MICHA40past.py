@@ -82,7 +82,7 @@ class Micha4:
             except:
                 #traceback.print_exc()
                 self.close_serial_port()
-                print("MICHA read pin %d failed\r"%reg)
+                print("MICHA read pin %d failed\r" % reg)
                 i = i+1
         return None
 
@@ -105,7 +105,7 @@ class Micha4:
         return None
 
     def read_discrete(self,reg): # read a discrete input register at reg address
-        i=0
+        i = 0
         while i < MICHApast.MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()
@@ -116,7 +116,7 @@ class Micha4:
             except:
                 #traceback.print_exc()
                 self.close_serial_port()
-                print("MICHA read discrete %d failed\r"%reg)
+                print("MICHA read discrete %d failed\r" % reg)
                 i = i + 1
         return None
 
@@ -133,7 +133,7 @@ class Micha4:
             except:
                 #traceback.print_exc()
                 self.close_serial_port()
-                print("MICHA read input %d failed\r"%reg)
+                print("MICHA read input %d failed\r" % reg)
                 i = i+1
                 #time.sleep(0.1)
         return None
@@ -151,7 +151,7 @@ class Micha4:
             except:
                 #traceback.print_exc()
                 self.close_serial_port()
-                print("MICHA read holding %d failed\r"%reg)
+                print("MICHA read holding %d failed\r" % reg)
                 i = i+1
                 #time.sleep(0.1)
         return None
@@ -169,7 +169,7 @@ class Micha4:
             except:
                 #traceback.print_exc()
                 self.close_serial_port()
-                print("MICHA write holding %d=%d failed\r"%(reg,val))
+                print("MICHA write holding %d=%d failed\r" % (reg,val))
                 i = i+1
                 #time.sleep(0.1)
         return None
@@ -200,25 +200,27 @@ class Micha4:
     
     def get_thermi(self, th=0): # to get the thermistor value, returns the thermistor value
         self.thermi = th
-        i=0
+        i = 0
+        message = None
+        response = None
         while i < MICHApast.MODBUS_RETRY:
             try:
                 serial_port = self.get_serial_port()
                 
-                if self.thermi==0: # get the value of all the thermistors
+                if self.thermi == 0: # get the value of all the thermistors
                     message = rtu.read_input_registers(MICHApast.SLAVE_ID, MICHApast.THERMI1_REG, 4)
-                elif self.thermi==1: # get the thermistor 1 value
+                elif self.thermi == 1: # get the thermistor 1 value
                     message = rtu.read_input_registers(MICHApast.SLAVE_ID, MICHApast.THERMI1_REG, 1)
-                elif self.thermi==2: # get the thermistor 2 value
+                elif self.thermi == 2: # get the thermistor 2 value
                     message = rtu.read_input_registers(MICHApast.SLAVE_ID, MICHApast.THERMI2_REG, 1)
-                elif self.thermi==3: # get the thermistor 3 value
+                elif self.thermi == 3: # get the thermistor 3 value
                     message = rtu.read_input_registers(MICHApast.SLAVE_ID, MICHApast.THERMI3_REG, 1)
-                elif self.thermi==4: # get the thermistor 4 value
+                elif self.thermi == 4: # get the thermistor 4 value
                     message = rtu.read_input_registers(MICHApast.SLAVE_ID, MICHApast.THERMI4_REG, 1)
                 else:
                     print("ERROR: no thermistor was found at this value")
-                
-                response = rtu.send_message(message, serial_port)
+                if message:
+                    response = rtu.send_message(message, serial_port)
                 
                 self.release_serial_port()
                 return response
@@ -244,15 +246,15 @@ class Micha4:
         return 0
 
     def set_pump_speed_inc(self,inc=0): # to set the speed incrementation of the pump
-        if self.pump_speed_inc!=inc:
+        if self.pump_speed_inc != inc:
             self.pump_speed_inc = inc
             return self.write_holding(MICHApast.PUMP_SPEED_INC_REG, inc)
         return 0
     
-    def set_pump_dir(self,dir=0): # to set the direction of the pump
-        if self.pump_dir != dir:
-            self.pump_dir = dir
-            response = self.write_pin(MICHApast.PUMP_DIR_REG, dir)
+    def set_pump_dir(self, direction=0): # to set the direction of the pump
+        if self.pump_dir != direction:
+            self.pump_dir = direction
+            response = self.write_pin(MICHApast.PUMP_DIR_REG, direction)
             return response
         return 0
     
@@ -368,32 +370,32 @@ if __name__ == "__main__":
 
 
     def menu_choice(mini, maxi):
-        choice = '-1'
+        choice_made = '-1'
 
-        while (int(choice) < mini or int(choice) > maxi):
-            choice = input("Choose an option: ")
+        while int(choice_made) < mini or int(choice_made) > maxi:
+            choice_made = input("Choose an option: ")
 
             boot_monitoring()
 
-            if (int(choice) < mini or int(choice) > maxi):
+            if int(choice_made) < mini or int(choice_made) > maxi:
                 print("ERROR: incorrect choice. Your choice must be [{}:{}]".format(mini, maxi))
 
-        return choice
+        return choice_made
 
 
     # Allows to manage the thermistors
-    def thermis(choice):
+    def thermis(choice_made):
         """Display the value of the thermistors."""
 
-        if choice == 'tps':  # gets the current thermistors power pin state
+        if choice_made == 'tps':  # gets the current thermistors power pin state
             print("\nCurrent thermistor power pin state = {}\n".format(pasto.get_thermis_pow()))
-        elif choice == 'tp0':  # sets the thermistors power pin state to 0
+        elif choice_made == 'tp0':  # sets the thermistors power pin state to 0
             pasto.set_thermis_pow(0)
             print('\nThermistor power pin state sets to 0 (OFF)\n')
-        elif choice == 'tp1':  # sets the thermistors power pin state to 1
+        elif choice_made == 'tp1':  # sets the thermistors power pin state to 1
             pasto.set_thermis_pow(1)
             print('\nThermistor power pin state sets to 1 (ON)\n')
-        elif choice == 'ts':
+        elif choice_made == 'ts':
             thermi1 = pasto.get_thermi(1)[0]
             thermi2 = pasto.get_thermi(2)[0]
             thermi3 = pasto.get_thermi(3)[0]
@@ -410,19 +412,19 @@ if __name__ == "__main__":
                 print("Thermistor {} = {} ({:4.3f} mV)".format(i, value, (MICHApast.VOLTAGE_REF * value / 4096) * 1000))
                 i += 1
             print('\n')
-        elif choice == 'ts1':
+        elif choice_made == 'ts1':
             thermi1 = pasto.get_thermi(1)[0]
             thermi1_mV = (MICHApast.VOLTAGE_REF * thermi1 / 4096) * 1000
             print("\nThermistor 1 = {} ({:4.3f} mV)\n".format(thermi1, thermi1_mV))
-        elif choice == 'ts2':
+        elif choice_made == 'ts2':
             thermi2 = pasto.get_thermi(2)[0]
             thermi2_mV = (MICHApast.VOLTAGE_REF * thermi2 / 4096) * 1000
             print("\nThermistor 2 = {} ({:4.3f} mV)\n".format(thermi2, thermi2_mV))
-        elif choice == 'ts3':
+        elif choice_made == 'ts3':
             thermi3 = pasto.get_thermi(3)[0]
             thermi3_mV = (MICHApast.VOLTAGE_REF * thermi3 / 4096) * 1000
             print("\nThermistor 3 = {} ({:4.3f} mV)\n".format(thermi3, thermi3_mV))
-        elif choice == 'ts4':
+        elif choice_made == 'ts4':
             thermi4 = pasto.get_thermi(4)[0]
             thermi4_mV = (MICHApast.VOLTAGE_REF * thermi4 / 4096) * 1000
             print("\nThermistor 4 = {} ({:4.3f} mV)\n".format(thermi4, thermi4_mV))
@@ -431,48 +433,48 @@ if __name__ == "__main__":
 
 
     # Allows to manage the pump
-    def pump(choice):
+    def pump(choice_made):
         """Get or set a value related to the pump."""
 
-        if choice == 'ps':  # gets all the current pump pin state
+        if choice_made == 'ps':  # gets all the current pump pin state
             print("\nCurrent pump power pin state = {}".format(pasto.get_pump_power()))
             print("Current pump direction pin state = {}".format(pasto.get_pump_dir()))
             print("Current pump speed = {}".format(pasto.get_pump_speed()))
             print("Current pump speed incrementation = {}\n".format(pasto.get_pump_speed_inc()))
-        elif choice == 'pps':  # gets the current pump power pin state
+        elif choice_made == 'pps':  # gets the current pump power pin state
             print("\nCurrent pump power pin state = {}\n".format(pasto.get_pump_power()))
-        elif choice == 'pp0':  # sets the pump power pin state to 0
+        elif choice_made == 'pp0':  # sets the pump power pin state to 0
             pasto.set_pump_power(0)
             print('\nPump power pin state sets to 0 (ON)\n')
-        elif choice == 'pp1':  # sets the pump power pin state to 1
+        elif choice_made == 'pp1':  # sets the pump power pin state to 1
             pasto.set_pump_power(1)
             print('\nPump power pin state sets to 1 (OFF)\n')
-        elif choice == 'pds':  # gets the current pump direction pin state
+        elif choice_made == 'pds':  # gets the current pump direction pin state
             print("\nCurrent pump direction pin state = {}\n".format(pasto.get_pump_dir()))
-        elif choice == 'pd0':  # sets the pump direction pin state to 0
+        elif choice_made == 'pd0':  # sets the pump direction pin state to 0
             pasto.set_pump_dir(0)
             print('\nPump direction pin state sets to 0\n')
-        elif choice == 'pd1':  # sets the pump direction pin state to 1
+        elif choice_made == 'pd1':  # sets the pump direction pin state to 1
             pasto.set_pump_dir(1)
             print('\nPump direction pin state sets to 1\n')
-        elif choice == 'pss':  # gets the current pump speed value
+        elif choice_made == 'pss':  # gets the current pump speed value
             print("\nCurrent pump speed = {}\n".format(pasto.get_pump_speed()))
-        elif choice == 'psis':  # gets the current pump speed incrementation value
+        elif choice_made == 'psis':  # gets the current pump speed incrementation value
             print("\nCurrent pump speed incrementation = {}\n".format(pasto.get_pump_speed_inc()))
 
         return 0
 
 
     # Allows to manage the tank
-    def tank(choice):
+    def tank(choice_made):
         """Get or set a value related to the pump."""
 
-        if choice == 'cps':  # gets the current cistern pin state
+        if choice_made == 'cps':  # gets the current cistern pin state
             print("\nCurrent heating cistern power pin state = {}\n".format(pasto.get_tank1()))
-        elif choice == 'cp0':  # sets the cistern pin state to 0
+        elif choice_made == 'cp0':  # sets the cistern pin state to 0
             pasto.set_tank1(0)
             print('\nHeating cistern power pin state sets to 0 (OFF)\n')
-        elif choice == 'cp1':  # sets the cistern pin state to 1
+        elif choice_made == 'cp1':  # sets the cistern pin state to 1
             pasto.set_tank1(1)
             print('\nHeating cistern power pin state sets to 1 (ON)\n')
 
@@ -480,25 +482,25 @@ if __name__ == "__main__":
 
 
     # Allows to manage the water solenoid valve
-    def sol(choice):
+    def sol(choice_made):
         """Get or set a value related to the water solenoid valve."""
 
-        if choice == 'ss':  # gets the current water solenoid pin state
+        if choice_made == 'ss':  # gets the current water solenoid pin state
             print("\nCurrent water solenoid pin state = {}\n".format(pasto.get_sol_hot()))
-        elif choice == 's0':  # sets the water solenoid pin state to 0
+        elif choice_made == 's0':  # sets the water solenoid pin state to 0
             pasto.set_sol_hot(0)
             print('\nWater solenoid pin state sets to 0 (CLOSED)\n')
-        elif choice == 's1':  # sets the water solenoid pin state to 1
+        elif choice_made == 's1':  # sets the water solenoid pin state to 1
             pasto.set_sol_hot(1)
             print('\nWater solenoid pin state sets to 1 (OPENED)\n')
 
         return 0
 
 
-    def levelSensors(choice):
+    def levelSensors(choice_made):
         """Get or set a value related to the level sensors."""
 
-        if choice == 'ls':  # gets all the current level sensor values
+        if choice_made == 'ls':  # gets all the current level sensor values
             if pasto.get_level1_flag():
                 print("\nCurrent level sensor 1 value = {}".format(pasto.get_level1_sensor()))
             else:
@@ -507,27 +509,27 @@ if __name__ == "__main__":
                 print("Current level sensor 2 value = {}".format(pasto.get_level2_sensor()))
             else:
                 print("Current level sensor 2 value = désactivé")
-        elif choice == 'lfs':  # gets all the current level sensor flag states
+        elif choice_made == 'lfs':  # gets all the current level sensor flag states
             print("\nLevel sensor 1 flag state = {}".format(pasto.get_level1_flag()))
             print("Level sensor 2 flag state = {}\n".format(pasto.get_level2_flag()))
-        elif choice == 'l1s':  # gets the current level sensor 1 value
+        elif choice_made == 'l1s':  # gets the current level sensor 1 value
             print("\nCurrent level sensor 1 value = {}\n".format(pasto.get_level1_sensor()))
-        elif choice == 'lf1s':  # gets the current level sensor 1 flag state
+        elif choice_made == 'lf1s':  # gets the current level sensor 1 flag state
             print("\nLevel sensor 1 flag state = {}\n".format(pasto.get_level1_flag()))
-        elif choice == 'lf10':  # sets the level sensor 1 flag state to 0
+        elif choice_made == 'lf10':  # sets the level sensor 1 flag state to 0
             pasto.set_level1_flag(0)
             print('\nLevel sensor 1 flag state sets to 0 (OFF)\n')
-        elif choice == 'lf11':  # sets the level sensor 1 flag state to 1
+        elif choice_made == 'lf11':  # sets the level sensor 1 flag state to 1
             pasto.set_level1_flag(1)
             print('\nLevel sensor 1 flag state sets to 1 (ON)\n')
-        elif choice == 'l2s':  # gets the current level sensor 2 value
+        elif choice_made == 'l2s':  # gets the current level sensor 2 value
             print("\nCurrent level sensor 2 value = {}\n".format(pasto.get_level2_sensor()))
-        elif choice == 'lf2s':  # gets the level sensor 2 flag state
+        elif choice_made == 'lf2s':  # gets the level sensor 2 flag state
             print("\nLevel sensor 2 flag state = {}\n".format(pasto.get_level2_flag()))
-        elif choice == 'lf20':  # gsts the level sensor 2 flag state to 0
+        elif choice_made == 'lf20':  # gsts the level sensor 2 flag state to 0
             pasto.set_level2_flag(0)
             print('\nLevel sensor 2 flag state sets to 0 (OFF)\n')
-        elif choice == 'lf21':  # sets the level sensor 2 flag state to 1
+        elif choice_made == 'lf21':  # sets the level sensor 2 flag state to 1
             pasto.set_level2_flag(1)
             print('\nLevel sensor 2 flag state sets to 1 (ON)\n')
 
@@ -542,7 +544,7 @@ if __name__ == "__main__":
         return 0
 
 
-    def pressSensor(choice):
+    def pressSensor(choice_made):
         """Get or set a value related to the pressure sensor."""
         Vcc = 5.1  # power voltage applied to the pressure sensor
         pressure = pasto.get_press_sensor()  # raw value of the pressure (0-4095)
@@ -553,42 +555,42 @@ if __name__ == "__main__":
         pressure_psi = 100*(pressure_V/Vcc)
         pressure_bar = pressure_psi / 14.504  # pressure in bar
 
-        if choice == 'prs':  # gets the current pressure sensor value
+        if choice_made == 'prs':  # gets the current pressure sensor value
             if pasto.get_press_flag():
                 print("\nCurrent pressure sensor value = {} ({:4.3f} mV, {:4.3f} bars)\n".format(pressure, pressure_V,
                                                                                                  pressure_bar))
             else:
                 print("\nCurrent pressure sensor value = désactivé\n")
-        elif choice == 'prfs':  # gets the current pressure sensor flag state
+        elif choice_made == 'prfs':  # gets the current pressure sensor flag state
             print("\nLevel sensor 1 flag state = {}\n".format(pasto.get_press_flag()))
-        elif choice == 'prf0':  # sets the pressure sensor flag state to 0
+        elif choice_made == 'prf0':  # sets the pressure sensor flag state to 0
             pasto.set_press_flag(0)
             print('\nPressure sensor flag state sets to 0 (OFF)\n')
-        elif choice == 'prf1':  # sets the pressure sensor flag state to 1
+        elif choice_made == 'prf1':  # sets the pressure sensor flag state to 1
             pasto.set_press_flag(1)
             print('\nPressure sensor flag state sets to 1 (ON)\n')
 
         return 0
 
 
-    def generalState(choice):
+    def generalState(choice_made):
         """Get the error code and the general state of the system"""
 
-        if choice == 'id':
+        if choice_made == 'id':
             print("\nModbus ID = {}\n".format(pasto.get_id()))
-        elif choice == 'bss':
+        elif choice_made == 'bss':
             print("\nBoot state = {}\n".format(pasto.get_boot_flag()))
-        elif choice == 'dms':
+        elif choice_made == 'dms':
             print("\nDebug mode = {}\n".format(pasto.get_debug_flag()))
-        elif choice == 'dm0':
+        elif choice_made == 'dm0':
             pasto.set_debug_flag(0)
             print('\nDebug mode sets to 0 (OFF)\n')
-        elif choice == 'dm1':
+        elif choice_made == 'dm1':
             pasto.set_debug_flag(1)
             print('\nDebug mode sets to 1 (ON)\n')
-        elif choice == 'gss':
+        elif choice_made == 'gss':
             print("\nGeneral state = {}\n".format(pasto.get_general_state()))
-        elif choice == 'ecs':
+        elif choice_made == 'ecs':
             print("\nError code = {}\n".format(pasto.get_error_code()))
 
         return 0
@@ -797,7 +799,7 @@ if __name__ == "__main__":
                     try:
                         value = int(choice[3:])  # try to extract the number to update the speed incrementation
 
-                        if value >= 0 and value <= 65000:
+                        if 0 <= value <= 65000:
                             pasto.set_pump_speed_inc(value)
                             print('\nPump speed incrementation sets to {}\n'.format(value))
                             input()
@@ -815,7 +817,7 @@ if __name__ == "__main__":
                     try:
                         value = int(choice[2:])  # try to extract the number to update the speed
 
-                        if value >= 0 and value <= 65000:
+                        if 0 <= value <= 65000:
                             pasto.set_pump_speed(value)
                             print('\nPump speed sets to {}\n'.format(value))
                             input()

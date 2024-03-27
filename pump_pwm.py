@@ -18,7 +18,7 @@ TEST = False
 
 # Must be coherent with switch setting on the stepping motor driver module:
 REVOLUTION_STEPS = 6400 #1000, 2000, 4000, 5000, 8000, 10000, 20000, 25000
-                    #200, 400, 800, 1600, 3200, 6400, 12800, 25600
+#200, 400, 800, 1600, 3200, 6400, 12800, 25600
 
 if hardConf.MICHA_device:
     SPEED_INCREMENT = None # Ramping is done by MICHA
@@ -42,7 +42,7 @@ class ReadPump_PWM(threading.Thread):
     # 6:Out Tolerance: Out of tolerance : fast flash, 2 times
     # 7:Over Heating: The motor is overloaded for a long time : fast flash, 4 times
 
-    errors = ["none","Over Current","AD Sampling Bad","Power Down","Under Voltage","Over Voltage",
+    errors = ["--","Over Current","AD Sampling Bad","Power Down","Under Voltage","Over Voltage",
               "Out Tolerance","Over Heating"]
 
     # The duration of the red light when flashing slowly is 280 ms, The red light will last for 140ms, The flashing interval is 1.8s
@@ -84,12 +84,16 @@ class ReadPump_PWM(threading.Thread):
         else:
             self.pump.lastError = "BAD="+str(state)
 
+    def status(self):
+        return self.pump.lastError
+
     def repr(self):
         return ("[%s, error=%s]" % (self.pump.address, self.pump.lastError) )
 
     def run(self):
         state = None # unknown state
         now = time.perf_counter()
+        stateTime = now
         prv = now
         transition = now
         returnLine = -1 # silly value
@@ -111,10 +115,10 @@ class ReadPump_PWM(threading.Thread):
                     stateTime = now
                     state = 2  # SYNCED on low, no problem !
                 elif (now - transition) >= (self.SYNC_FACTOR * self.sampling):
-                        if state and state != 2:
-                            self.setStateStatus(state)
-                        stateTime = now
-                        state = 2  # SYNCED on low, no problem !
+                    if state and state != 2:
+                        self.setStateStatus(state)
+                    stateTime = now
+                    state = 2  # SYNCED on low, no problem !
                 elif state is None:
                     stateTime = now
                     state = 0 # low
@@ -179,8 +183,8 @@ class pump_PWM(sensor.Sensor):
                  maximal_liters = None,
                  minimal_liters = 15.0
                  ):
-        self.sensorType = pump_PWM.typeNum
-        self.address = "PUMP"
+
+        super().__init__(pump_PWM.typeNum,"PUMP",None)
         if hardConf.MICHA_device:
             self.pinPWM = MICHApast.PUMP_SPEED_REG #Holding register
             self.pinDirection = MICHApast.PUMP_DIR_REG #coil
@@ -376,8 +380,8 @@ class pump_PWM(sensor.Sensor):
                         self.setPWM(currSpeed)
                         time.sleep(0.05)
             else: #MICHA
-               self.setPWM(speed)
-               time.sleep(0.5)
+                self.setPWM(speed)
+                time.sleep(0.5)
         if float(speed) == 0.0 and SPEED_INCREMENT:
             self.setPWM(0)
         
@@ -387,9 +391,9 @@ class pump_PWM(sensor.Sensor):
         print(" %s=%d \r" % (self.address,speed) )
         if speed is None:
             speed = self.maxRPM
-        running = True
-        if float(self.speed) == 0.0:
-            running = False
+        # running = True
+        # if float(self.speed) == 0.0:
+        #     running = False
         self.previous_volume = self.volume()
         self.previous_speed = -self.speed if self.reverse else self.speed
         self.previous_change = self.now
@@ -402,8 +406,8 @@ class pump_PWM(sensor.Sensor):
                 self.speed_liters = None
         elif speed > 0:
             self.reverse = False
-            if speed >= self.speed:
-                inc = True
+            # if speed >= self.speed:
+            #     inc = True
             self.speed = speed
             self.speed_liters = liters
         if self.maxRPM and self.speed > self.maxRPM:
@@ -440,8 +444,8 @@ class pump_PWM(sensor.Sensor):
     def liters(self):
         if not self.speed:
             return 0.0
-        liters = self.speed_liters;
-        return (-liters if self.reverse else liters)
+        result_liters = self.speed_liters
+        return -result_liters if self.reverse else result_liters
 
     def current_liters(self,now=None):
         if not now:
@@ -473,14 +477,14 @@ class pump_PWM(sensor.Sensor):
         curr = self.current_liters(self.now)
         return self.previous_volume+curr, self.previous_change, curr
 
-    def display(self,format=" %6.0fmL"): # Over display in Sensor!
+    def display(self, format_param=" %6.0fmL"): # Over display in Sensor!
         if self.reverse:
             attr = term.blue
         elif self.speed > 0.0:
             attr = term.yellow
         else:
             attr = term.black
-        term.write(format % (self.volume()*1000.0), attr, term.bgwhite)
+        term.write(format_param % (self.volume() * 1000.0), attr, term.bgwhite)
 
     def reset_volume(self):
         self.previous_change = time.perf_counter()
@@ -488,7 +492,7 @@ class pump_PWM(sensor.Sensor):
 
     def message(self):
         if self.lastError:
-            return ("[%s, error=%s]" % (self.address, self.lastError))
+            return "[%s, error=%s]" % (self.address, self.lastError)
         return ""
 
 if __name__ == "__main__":
@@ -563,16 +567,16 @@ if __name__ == "__main__":
             else:
                 status = "--"
             if status != prvError :
-                if (status):
+                if status:
                     print( "Error=%d" % status )
                 else:
                     print("Motor OK")
                 prvError = status
           except KeyboardInterrupt:
-              break
+            break
           except:
-              traceback.print_exc()
-              continue
+            traceback.print_exc()
+            continue
                 
         if not pumpy.stop():
             print ("Error stopping!")

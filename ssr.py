@@ -57,14 +57,14 @@ class ssr(sensor.Sensor):
         #print (relay)
         return change
 
-    def display(self,format=" %5.0fW"):
+    def display(self, format_param=" %5.0fW"):
         if self.changed < 0.0:
             attr = term.blue
         elif self.changed > 0.0:
             attr = term.red
         else:
             attr = term.black
-        term.write(format % self.value, attr, term.bgwhite)
+        term.write(format_param % self.value, attr, term.bgwhite)
 
     def close(self):
         self.prec_relay = 0

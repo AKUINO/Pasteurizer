@@ -21,7 +21,7 @@ ref_tag = 'L'
 ref_ratio = 1.0
 ref_duration = 15.0
 
-class Dt_line():
+class Dt_line:
 
     def __init__(self):
         self.t = None
@@ -42,17 +42,17 @@ class Dt_line():
         self.tags = []
 
     def __str__(self):
-        return (self.address+": D"+str(self.Dt)+"°="+str(self.t)+'", z='+str(self.z)+'°C, tags='+','.join(self.tags)+", source="+(self.source if self.source else ""))
+        return self.address+": D"+str(self.Dt)+"°="+str(self.t)+'", z='+str(self.z)+'°C, tags='+','.join(self.tags)+", source="+(self.source if self.source else "")
 
     def to_dict(self):
         return {
          't' : self.t
-        ,'Dt' : self.Dt
-        ,'z' : self.z
-        ,'reduction' : self.reduction
-        ,'address' : self.address
-        ,'source' : self.source
-        ,'tags' : self.tags
+         ,'Dt' : self.Dt
+         ,'z' : self.z
+         ,'reduction' : self.reduction
+         ,'address' : self.address
+         ,'source' : self.source
+         ,'tags' : self.tags
         }
 
     def getByAddress(self,address):
@@ -92,7 +92,7 @@ class Dt_line():
     def validate_tags(self):
         OK = True
         for tag in self.tags:
-            if not tag in Heating_Profile.profiles:
+            if tag not in Heating_Profile.profiles:
                 OK = False
                 print(self.address+': Tag '+tag+' is not an heating profile.')
         return OK
@@ -133,7 +133,7 @@ class Dt_line():
 
 # Fonction pour lire un objet de la classe courante depuis le disque en utilisant JSON
 def load():
-    filenames = []
+    #filenames = []
     try:
         for filename in os.listdir(datafiles.DIR_BASE_DTZ):
             pext = filename.index(".json")
@@ -194,7 +194,7 @@ def set_ref_temp(temp,tag):
 
     if not temp:
         return None
-    ref_tag = tag
+    #ref_tag = tag
     ref_temp = temp
     address,base_duration = tagged_time_to_kill(temp,tag)
     #print(address+": duration="+str(base_duration))
@@ -238,6 +238,7 @@ load()
 
 def max_time_to_kill(temp,criteria):
     time_to_kill = -1.0
+    killingAddress = ""
     for (address, itemDt) in lines.items():
         if itemDt.include(criteria):
             t2k = itemDt.D_kill(temp)

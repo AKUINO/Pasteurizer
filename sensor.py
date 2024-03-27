@@ -71,18 +71,17 @@ class Sensor(object):
             return None
         return (self.value + self.prv1 + self.prv2) / 3.0
 
-    def val(self,format="%.2f",default=""):
+    def val(self, format_param="%.2f", default=""):
         if not self.value:
             return default
         else:
-            return format % self.value
+            return format_param % self.value
 
-    def display(self,format=" %5.2f°C"):
+    def display(self, format_param=" %5.2f°C"):
         if self.changed < 0.0:
             attr = term.blue
         elif self.changed > 0.0:
             attr = term.red
         else:
             attr = term.black
-        term.write(format % self.value, attr, term.bgwhite)
-
+        term.write(format_param % self.value, attr, term.bgwhite)

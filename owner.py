@@ -7,7 +7,8 @@ import datafiles
 class Owner(object): # Info about the Owner of the Pasteurizee
 
 # Fonction pour lire un objet de la classe courante depuis le disque en utilisant JSON
-    def load(dummy = None):
+    @staticmethod
+    def load():
         try:
             objdict = None
             with open(datafiles.ownerfile, 'r') as f:
@@ -46,4 +47,4 @@ class Owner(object): # Info about the Owner of the Pasteurizee
         with open(datafiles.ownerfile, 'w') as f:
             json.dump(self.to_dict(),f)
 
-owner = Owner.load(None)
+owner = Owner.load()

@@ -70,7 +70,7 @@ class Report(object): # Info about the Owner of the Pasteurizee
 
     def start(self, menuOptions:menus.Menus, state):
         self.state = state
-        self.owner = owner.Owner.load(None)
+        self.owner = owner.Owner.load()
         nowD = datetime.datetime.now()
         self.batch = nowD.strftime(datafiles.FILENAME_FORMAT)
         self.duration = 0

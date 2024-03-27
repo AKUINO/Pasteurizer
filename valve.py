@@ -28,7 +28,7 @@ class Valve(sensor.Sensor):
         elif self.value != value:
             mustBeSet = True
         if mustBeSet:
-            if (value > 0.0): # open
+            if value > 0.0: # open
                 value = 1.0
                 try:
                     if self.wire7:
@@ -89,7 +89,7 @@ class Valve(sensor.Sensor):
         #print ("%d=0" % (self.paramOpen if value > 0.0 else self.param))
         return change
 
-    def display(self,format=" %s"):
+    def display(self, format_param=" %s"):
         i = 0
         if self.value >= 0.0:
             i = 1
@@ -99,7 +99,7 @@ class Valve(sensor.Sensor):
             attr = term.red
         else:
             attr = term.black
-        term.write(format % Valve.onOff[int(self.value)+int(2*(1 if time.perf_counter() > valve.last+self.duration else 0))], attr, term.bgwhite)
+        term.write(format_param % Valve.onOff[int(self.value) + int(2 * (1 if time.perf_counter() > valve.last + self.duration else 0))], attr, term.bgwhite)
         
     def close(self):
         pass # Caller must set the valve in desired position...
@@ -125,4 +125,3 @@ if __name__ == "__main__":
             traceback.print_exc()
             break
     hardConf.close()
-

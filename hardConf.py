@@ -66,37 +66,37 @@ Out_Red = None # TXD, SYS_LED for Odroid?
 Out_Buzzer = None
 
 OW_input = None # Entrée
-OW_output= None # Sortie
+OW_output = None # Sortie
 OW_warranty = None # Garantie sortie serpentin long
 OW_heating = None # If no OneWire, this will be T_sp9b
 OW_extra = None
 
 A_input = None # Entrée de la chauffe
-A_intake= None # Entrée du pasteurisateur
+A_intake = None # Entrée du pasteurisateur
 A_warranty = None # Garantie sortie serpentin long
 A_heating = None # If no OneWire, this will be T_sp9b
 A_extra = None
 
 B_input = None # Entrée de la chauffe
-B_intake= None # Entrée du pasteurisateur
+B_intake = None # Entrée du pasteurisateur
 B_warranty = None # Garantie sortie serpentin long
 B_heating = None # If no OneWire, this will be T_sp9b
 B_extra = None
 
 C_input = None # Entrée de la chauffe
-C_intake= None # Entrée du pasteurisateur
+C_intake = None # Entrée du pasteurisateur
 C_warranty = None # Garantie sortie serpentin long
 C_heating = None # If no OneWire, this will be T_sp9b
 C_extra = None
 
 beta_input = None # Entrée de la chauffe
-beta_intake= None # Entrée du pasteurisateur
+beta_intake = None # Entrée du pasteurisateur
 beta_warranty = None # Garantie sortie serpentin long
 beta_heating = None # If no OneWire, this will be T_sp9b
 beta_extra = None
 
 ohm25_input = None # Entrée de la chauffe
-ohm25_intake= None # Entrée du pasteurisateur
+ohm25_intake = None # Entrée du pasteurisateur
 ohm25_warranty = None # Garantie sortie serpentin long
 ohm25_heating = None # If no OneWire, this will be T_sp9b
 ohm25_extra = None
@@ -135,19 +135,19 @@ configFile = ""
 configParsing = None
 MICHA_version = None
 reversedPump = False
-tubing=None
+tubing = None
 
-def string_mL(anItem):
-    if not anItem[1]:
+def string_mL(anItem_param):
+    if not anItem_param[1]:
         return None
     try:
-        fd = float(anItem[1])
-        if (fd < 100.0): # Liters and not milliters
+        fd = float(anItem_param[1])
+        if fd < 100.0: # Liters and not milliters
             return fd * 1000.0
         else:
             return fd
     except:
-        print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+        print((anItem_param[0] + ': ' + anItem_param[1] + ' is not decimal.'))
         return None
 
 if hostname and hostname.startswith(prefixHostname):
@@ -392,41 +392,41 @@ if configParsing:
 
         OW = None
         vol = None
-        beta  = None
+        beta = None
         ohm25 = None
         A = None
         B = None
         C = None
         POWER = None
         if section in configParsing.sections():
-            for anItem in configParsing.items(section):
-                opt = anItem[0].lower()
+            for currItem in configParsing.items(section):
+                opt = currItem[0].lower()
                 if opt == 'port':
                     try:
-                        T = int(anItem[1])
+                        T = int(currItem[1])
                     except:
-                        print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+                        print((currItem[0] + ': ' + currItem[1] + ' is not decimal.'))
                 elif opt == 'power':
                     try:
-                        POWER = int(anItem[1])
+                        POWER = int(currItem[1])
                     except:
-                        print((anItem[0] + ': ' + anItem[1] + ' is not decimal.'))
+                        print((currItem[0] + ': ' + currItem[1] + ' is not decimal.'))
                 elif opt == 'onewire':
-                    OW = anItem[1]
+                    OW = currItem[1]
                 elif opt == 'volume':
-                    vol = string_mL(anItem)
+                    vol = string_mL(currItem)
                 elif opt == 'beta':
-                    beta = float(anItem[1])
+                    beta = float(currItem[1])
                 elif opt == 'ohm25':
-                    ohm25 = float(anItem[1])
+                    ohm25 = float(currItem[1])
                 elif opt == 'a':
-                    A = float(anItem[1])
+                    A = float(currItem[1])
                 elif opt == 'b':
-                    B = float(anItem[1])
+                    B = float(currItem[1])
                 elif opt == 'c':
-                    C = float(anItem[1])
+                    C = float(currItem[1])
                 else:
-                    print('['+section+'] '+anItem[0] + ': ' + anItem[1] + ' unknown option. Valid: port, onewire, volume, beta, ohm25, a, b, c, power')
+                    print('['+section+'] '+currItem[0] + ': ' + currItem[1] + ' unknown option. Valid: port, onewire, volume, beta, ohm25, a, b, c, power')
         return (T,OW,vol,beta,ohm25,A,B,C,POWER)
 
     (T_heating, OW_heating, vol_heating, beta_heating, ohm25_heating, A_heating, B_heating, C_heating, power_heating) = parseThermistor('heating', T_heating)
@@ -443,10 +443,10 @@ if configParsing:
     if 'Rmeter' in configParsing.sections():
         import RMETERpast
         #BCM (pigpio) configuration
-        R_S1=25
-        R_S2=6
-        R_S3=5
-        R_polarity=16
+        R_S1 = 25
+        R_S2 = 6
+        R_S3 = 5
+        R_polarity = 16
         for anItem in configParsing.items('Rmeter'):
             opt = anItem[0].lower()
             if opt == 's1':
@@ -519,7 +519,6 @@ def close():
         # All ExpanderPI GPIO in input mode:
         io.set_port_direction(0, 0xFF)
         io.set_port_direction(1, 0xFF)
-        ## We do not leave output floating because we are not sure we have the right pull up always there...
-        ##io.set_port_direction(0, 0xFF)
-        ##io.set_port_direction(1, 0xFF)
-
+        # We do not leave output floating because we are not sure we have the right pull up always there...
+        #io.set_port_direction(0, 0xFF)
+        #io.set_port_direction(1, 0xFF)

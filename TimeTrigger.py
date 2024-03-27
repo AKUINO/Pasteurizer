@@ -29,15 +29,15 @@ class TimeTrigger(object):
                     return True
         return False
 
-    def resets(none=None):
+    @staticmethod
+    def resets():
         for key, value in TimeTrigger.known_triggers.items():
             value.reset()
 
-    def triggers(none=None):
+    @staticmethod
+    def triggers():
         trigs = []
         for key, value in TimeTrigger.known_triggers.items():
             if value.trigger():
                 trigs = trigs + key
         return trigs
-
-

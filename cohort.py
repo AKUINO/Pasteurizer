@@ -25,12 +25,12 @@ class Cohort(object):
         self.pumpAddress = None
         self.reft = sensor.Sensor(111,'reft',None) # Calibration data received by Internet
 
-    def addSensor(self,address,sensor):
+    def addSensor(self, address, sensor_param):
         self.addCatalog(address)
-        self.catalog[address] = sensor
+        self.catalog[address] = sensor_param
 
     def addCatalog(self,address):
-        if not address in self.catalog:
+        if address not in self.catalog:
             self.catalog[address] = None
             self.history[address] = [None] * self.depth            
             self.calibration[address] = []
@@ -69,7 +69,7 @@ class Cohort(object):
         per = self.last_period()
         pseq = 0
         for entr in self.sequence:
-            if entr[1]==address:
+            if entr[1] == address:
                 break
             pseq += 1
         if pseq >= len(self.sequence): # unknown address
@@ -98,8 +98,8 @@ class Cohort(object):
             pseq = pseq-1
             if pseq < 0:
                 break
-##        for entr in result:
-##            print("%2d: [%s] %7.5f°C" % (entr[0],entr[1],entr[2]))
+#        for entr in result:
+#            print("%2d: [%s] %7.5f°C" % (entr[0],entr[1],entr[2]))
         return volTotal/1000.0,result
 
     def diff_time(self,beginPer,endPer):
@@ -133,7 +133,7 @@ class Cohort(object):
                 for tuples in means:
                     mean = tuples[1]
                     data_file.write("%.1f\t%d\t%.3f\t%.3f\n" \
-                                % (tuples[0],mean[0],mean[1],mean[2]) )
+                                    % (tuples[0],mean[0],mean[1],mean[2]) )
             self.calibration[address] = means
         except:
             traceback.print_exc()
@@ -145,8 +145,8 @@ class Cohort(object):
                 obj = { 'a':a, 'b': b }
                 json.dump(obj,data_file)
         except:
-                traceback.print_exc()
-                pass
+            traceback.print_exc()
+            pass
 
     def readCalibration(self,address):
         try:
@@ -169,6 +169,7 @@ class Cohort(object):
         except:
             traceback.print_exc()
             pass
+
     def mergeCalibration(self,current_observ):
         # TODO: merge current calibration in future calibration: for one sensor only?
         #<a href="/calibrate/merge"><button class="btn btn-danger">$(ml.T("Fusionner Actuel","Merge Current","Huidige Samenvoegen"))</button></a> 
@@ -181,7 +182,7 @@ class Cohort(object):
             return None
 
     def getCalibratedValue(self,address,apparentValue=None):
-        if not address in self.catalog:
+        if address not in self.catalog:
             return None
         if apparentValue is None:
             apparentValue = self.catalog[address].value
@@ -217,39 +218,53 @@ class Cohort(object):
         #print("**4="+str(trueValue))
         return trueValue
 
-    def val(self,address,format="%.2f",peak=0):
-        if not address in self.catalog:
+    def val(self, address, format_param="%.2f", peak=0):
+        if address not in self.catalog:
             return ""
-        sensor = self.catalog[address]
-        if not sensor.value:
+        curr_sensor = self.catalog[address]
+        if not curr_sensor.value:
             return ""
         else:
             if peak == 0:
-                return format % self.getCalibratedValue(address)
+                return format_param % self.getCalibratedValue(address)
             elif peak < 0:
-                return format % self.getCalibratedValue(address,apparentValue=sensor.min)
+                return format_param % self.getCalibratedValue(address, apparentValue=curr_sensor.min)
             else: # peak > 0:
-                return format % self.getCalibratedValue(address,apparentValue=sensor.max)
+                return format_param % self.getCalibratedValue(address, apparentValue=curr_sensor.max)
 
-    def display(self,term,address,format=" %5.2f°C"):
-        if not address in self.catalog:
+    def mL(self,address):
+        for entr in self.sequence:
+            if entr[1] == address:
+                return entr[0]
+        return None
+
+    def up_to_mL(self,address):
+        total = 0.0
+        for entr in self.sequence:
+            total = total + entr[0]
+            if entr[1] == address:
+                return total
+        return 0.0
+
+    def display(self, term, address, format_param=" %5.2f°C"):
+        if address not in self.catalog:
             return
-        sensor = self.catalog[address]
-        if sensor.changed < 0.0:
+        curr_sensor = self.catalog[address]
+        if curr_sensor.changed < 0.0:
             attr = term.blue
-        elif sensor.changed > 0.0:
+        elif curr_sensor.changed > 0.0:
             attr = term.red
         else:
             attr = term.black
-        if sensor.value:
-            term.write(format % self.getCalibratedValue(address), attr, term.bgwhite)
+        if curr_sensor.value:
+            term.write(format_param % self.getCalibratedValue(address), attr, term.bgwhite)
 
 if __name__ == "__main__":
     cohort = Cohort(3,10)
     cohort.addSensor("1",sensor.Sensor("X","1","params"))
     cohort.addSensor("2",sensor.Sensor("X","2","params"))
     i = 0
-    while (True):
+    while True:
         cohort.catalog["1"].set(time.time() % 60)
         cohort.catalog["1"].set(i % 11)
         i += 1

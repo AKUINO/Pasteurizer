@@ -32,8 +32,8 @@ import hardConf
 #bResistance = 3969
 
 # Constants
-t0 = 273.15;  # 0°C in °Kelvin
-t25 = t0 + 25.0; # 25°C in Kelvin
+t0 = 273.15  # 0°C in °Kelvin
+t25 = t0 + 25.0 # 25°C in Kelvin
 
 def calcResistance(voltage,top_resis):
     try:
@@ -58,14 +58,14 @@ class Thermistor(sensor.Sensor):
             hardConf.io.set_pin_direction(self.stim_pin,0) #Output
             hardConf.io.write_pin(self.stim_pin,1) #Disable measurement
     
-    def display(self,format=" %5.2f°C"):
+    def display(self, format_param=" %5.2f°C"):
         if self.changed < 0.0:
             attr = term.blue
         elif self.changed > 0.0:
             attr = term.red
         else:
             attr = term.black
-        term.write(format % (self.value if self.value else 0.0), attr, term.bgwhite)
+        term.write(format_param % (self.value if self.value else 0.0), attr, term.bgwhite)
 
     def calcTemp(self, resistance):
         try:
@@ -86,9 +86,9 @@ class Thermistor(sensor.Sensor):
                 hardConf.io.write_pin(self.stim_pin, 1)
             else: # MICHA
                 volts = hardConf.io.read_input(self.param)
-                if volts != None:
+                if volts is not None:
                     volts *= hardConf.thermistors_voltage/4096.0
-            if volts != None:
+            if volts is not None:
                 res = calcResistance(volts,hardConf.thermistors_Rtop)
                 temp = self.calcTemp(res)
                 #print ("%d(%f)=%f ohm; %f°C"%(self.param,volts,res,temp))
@@ -110,7 +110,7 @@ class Thermistor(sensor.Sensor):
 def main(args):
     try:
         # print(Thermistor("THE1",1).calcTemp(1868)) # test pour la resistance de 72°C
-        therm=[Thermistor("THE1",1),Thermistor("THE2",2),Thermistor("THE3",3),Thermistor("THE4",4)]
+        therm = [Thermistor("THE1",1),Thermistor("THE2",2),Thermistor("THE3",3),Thermistor("THE4",4)]
         while True:
             for t in therm:
                 temp = t.get()

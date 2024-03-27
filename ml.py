@@ -6,25 +6,25 @@ lang = 'f' # default current language
 allowed = 'efn'
 
 def setLang(some_lang):
-	global lang, allowed
-	some_lang = some_lang.lower()
-	if some_lang in allowed:
-		lang = some_lang
-		return True
-	return False
+    global lang, allowed
+    some_lang = some_lang.lower()
+    if some_lang in allowed:
+        lang = some_lang
+        return True
+    return False
 
 # manages Multilinguism
 # Initialized using t("français","english","nederlands")
 # and accessed using .t property
 class T(object):
-	
+
     def __init__(self,f=None,e=None,n=None):
         self.french = f if f else (e if e else n)
         self.english = e if e else (f if f else n)
         self.dutch = n if n else (e if e else f)
 
     def __str__(self):
-		
+
         global lang
 
         if lang == 'f':
