@@ -632,8 +632,8 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                'M':['M',ml.T("Multi","Multi","Multi") \
                        ,ml.T("Nouveau lait entrée et un récipient pasteurisé en sortie","New milk inlet and a pasteurized container outlet","Nieuwe melk bij de inlaat en een gepasteuriseerde container bij de uitlaat") \
                        ,ml.T("Passer à un autre lait","Switch to another milk","Overschakelen naar een andere melk")],
-               'R':['R',ml.T("Rinçage (4 Flush)","Rinse (4 Flush)","Spoelen (4 Flush)") \
-                       ,ml.T("Sortie dans le seau de Récupération. Entrée à l'égout","Outlet in the recycling bucket. Inlet over sewer","Uitlaat in het opvangemmer. Afvoer naar riool") \
+               'R':['R',ml.T("Rinçage avec Réemploi","Rinse with Reuse","Spoelen met Hergebruik") \
+                       ,ml.T("Entrée dans le seau de Récupération. Sortie à l'égout","Inlet in the recycling bucket. Outlet over sewer","Inlaat in het opvangemmer. Uitlaat naar riool") \
                        ,ml.T("Rincer à fond le circuit","Rinse the circuit thoroughly","Spoel de leidingen grondig af")],
                'C':['C',ml.T("net.Caustique","Caustic clean","Bijtend Schoon") \
                        ,ml.T("Entrée et Sortie dans un même seau, Ajouter le Détergent...","Inlet and Outlet in a bucket, Add Detergent ...","Inlaat en uitlaat in dezelfde emmer. Wasmiddel toevoegen ...") \
@@ -1713,14 +1713,14 @@ opSequences = {
           Operation('HotW','HOTW','warranty','input',base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True)
           ],
     'R': # Pré-rinçage 4 fois
-        [ Operation('Pr1T','HEAT', ref='R', dump=True, programmable=True, bin=buck.SEWR, bout=buck.RECUP, kbout=lambda: 2 * total_volume, kbin=lambda:0),
-          Operation('Pr1S','PAUS',message=ml.T("Eau recyclée en SORTIE!","Recycled water at OUTPUT end!","Gerecycled water aan het OUTPUT-einde!"),dump=True),
-          Operation('Pr1R','REVR', base_speed=MAX_SPEED, qty=lambda:-2*total_volume, ref='R', dump=True),
-          Operation('End2','MESS',message=ml.T("double rinçage effectué!","double flush done!","2 keer doorspoelen!"),dump=True),
+        [ Operation('Pr1T','HEAT', ref='R', dump=True, programmable=True, bin=buck.RECUP, bout=buck.SEWR, kbout=lambda: 2 * total_volume, kbin=lambda:0),
+          Operation('Pr1S','PAUS',message=ml.T("Eau recyclée en entrée!","Recycled water as Input!","Gerecycled water als input!"),dump=True),
+          Operation('Pr1R','PUMP', base_speed=MAX_SPEED, qty=lambda:2*total_volume, ref='R', dump=True),
+          Operation('End2','MESS',message=ml.T("double pré-rinçage effectué!","double pre-rince done!","2 keer doorspoelen!"),dump=True),
           Operation('PreT','HEAT', ref='R', dump=True, programmable=True, bin=[buck.WPOT, buck.WPOT], bout=buck.RECUP, kbout=lambda: 2 * total_volume, kbin=lambda:0),
-          Operation('PreS','SEAU',message=ml.T("Eau potable fraiche en entrée!","Fresh drinking water as input!","Drinkwater als input!"),ref='R', dump=True),
           Operation('Pr3I','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
           Operation('Pr3R','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+          Operation('PreS','PAUS',message=ml.T("Eau à recycler en entrée+sortie!","Water for future re-use as input+output!","Water voor toekomstig hergebruik als input+output!"),ref='R', dump=True),
           Operation('Pr4i','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
           Operation('Pr4r','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('Pr4m','MESS',message=ml.T("4 rinçages effectués!","4 flushes done!","4 keer doorspoelen!"),dump=True,)
