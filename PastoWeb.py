@@ -9,12 +9,38 @@ lors du cyclage d’un nettoyage, le schéma montre comme si le seau se vidait e
 dans le seau d’entrée, à la place d’indiquer la formule complète, par exemple 19,8-5,3=14,5L, indiquer juste ce qui est enlever du seau, -5,3L.
 
 si on lance par exemple un pasteurisation et qu’on l’arrête directement car fausse manipulation, le pasteurisateur croit quand même que l’action a été faite
+- Seau de désinfectant: 15L noir (couvercle)
+- Seau de détergent: 15L bleu (couvercle)
+- Seau de récup "A": 20L blanc
+- Seau de récup "B": 15L blanc
 
-* Corriger les RAPPORTS: marche mieux ???
-       S'inspirer des règles canadiennes pour compléter le rapport...
+- Rinçages: suivre le nombre et permettre de choisir une configuration de réutilisation de seaux
+    Désinfection:
+        Si pas d'utilisation pendant plus qu'un jour, SIMPLE FLUSH:
+             Entrée+Sortie=seau de recup "A" -- remplir la machine d'eau du robinet (5L), faire un flush d'eau potable (5L) (FLUSH doit-il faire 10L si le circuit est vide?)
+        Entrée+Sortie=seau de désinfectant -- lancer la désinfection qui va au besoin remplir la machine (5L)
+           puis faire un flush (5L) pour pouvoir diluer le désinfectant.
+           Cyclage, délai d'action de 15 minutes (paramètre?),
+               flush d'évacuation (5L) donc 10L dans le seau de désinfectant
+        DOUBLE FLUSH:
+            Entrée+Sortie=seau de recup "A" -- faire deux flush (10L)  (donc total 10 à 15L dans le seau de recup "A")
+    Pasteurisation: CHAUFFE (le circuit doit être rempli d'eau)
+        Entrée=lait cru
+        Sortie=seau de recup "B" = 5L d'eau qui sorte au début corrompue par du lait  (donc total 10L dans le seau de recup "B")
+        Sortie = lait pasteurisé
+        Entrée = seau de recup "B", faire la pousse à l'eau (rajouter un ou deux litres d'eau dans le seau B au besoin)
+        ASPI DOUBLE+DOUBLE FLUSH:
+            Entrée = au dessus de l'égout (rejet), Sortie(aspirée!)=seau de recup "A" -- faire deux flush "récupérant" INVERSE, jeter la fin du seau "A" (rincer des seaux sales)
+                 Puis deux flush d'eau potable (10L) + VIDER donc 10L restent récupérables dans le seau "A"
+    Nettoyage caustique:
+        Entrée+Sortie = seau de caustique -- lancer le nettoyage qui va remplir (5L) puis faire un flush (5L) pour pouvoir diluer le détergent.
+           Cyclage avec chauffe, plateau de 15 minutes
+               flush d'évacuation (5L) donc 10L dans le seau de détergent
+        ASPI DOUBLE+DOUBLE FLUSH:
+            Sortie = seau de recup "A", faire deux flush INVERSE (donc Entrée au dessus de l'égout), jeter la fin du seau "A" (rincer des seaux sales)
+                 Puis deux flush d'eau potable (10L) + VIDER donc 10L restent récupérables dans le seau "A"
 - Prendre la durée de pasteurisation à la température de pasteurisation pour calculer un ratio supplémentaire de réduction de la souche bactérienne retenue à cette température là.
     Utiliser ce ratio pour toutes les souches. A TESTER !
-- Rinçages: suivre le nombre et permettre de choisir une configuration de réutilisation de seaux
 - Ne jamais accélérer (décélérer) quand on n'est pas en pasteurisation (quand ce n'est pas une régulation sur la courbe de survie d'un microbe)
 - Arrêter de chauffer quand la pompe tourne déjà bien vite
 - Ne pas aller trop vite quand on pousse l'eau ou qu'on pousse à l'eau.
@@ -445,7 +471,7 @@ class ThreadOneWire(threading.Thread):
         try:
             self.owproxy = pyownet.protocol.proxy(host="localhost", port=4304)
         except:
-            pass
+            traceback.print_exc()
 
     def sensorParam(self,address,param):
         global cohorts
@@ -607,8 +633,8 @@ menus.actionName = { 'X':['X',ml.T("eXit","eXit","eXit") \
                        ,ml.T("Nouveau lait entrée et un récipient pasteurisé en sortie","New milk inlet and a pasteurized container outlet","Nieuwe melk bij de inlaat en een gepasteuriseerde container bij de uitlaat") \
                        ,ml.T("Passer à un autre lait","Switch to another milk","Overschakelen naar een andere melk")],
                'R':['R',ml.T("Rinçage (4 Flush)","Rinse (4 Flush)","Spoelen (4 Flush)") \
-                       ,ml.T("Entrée et Sortie dans un seau. Récupération?","Inlet and Outlet in the same bucket. Recycling?","Inlaat en uitlaat in dezelfde emmer. Recyclen?") \
-                       ,ml.T("Rincer à fond les tuyaux","Rinse the pipes thoroughly","Spoel de leidingen grondig af")],
+                       ,ml.T("Sortie dans le seau de Récupération. Entrée à l'égout","Outlet in the recycling bucket. Inlet over sewer","Uitlaat in het opvangemmer. Afvoer naar riool") \
+                       ,ml.T("Rincer à fond le circuit","Rinse the circuit thoroughly","Spoel de leidingen grondig af")],
                'C':['C',ml.T("net.Caustique","Caustic clean","Bijtend Schoon") \
                        ,ml.T("Entrée et Sortie dans un même seau, Ajouter le Détergent...","Inlet and Outlet in a bucket, Add Detergent ...","Inlaat en uitlaat in dezelfde emmer. Wasmiddel toevoegen ...") \
                        ,ml.T("Nettoyer avec un détergent (caustique)","Clean with detergent (caustic)","Reinig met afwasmiddel (bijtend)")],
@@ -713,10 +739,10 @@ State('v',ml.T('Eau vieille','Old Water','Oude Waser'),'darkcyan', \
       [ ('A',['v',['a',None,False]]),('C',['v',['c',None,False]]),('F',''),('V',''),('B',''),('D',['','d','d']),('w','') ] )
 
 State('c',ml.T('Soude','Soda','Natrium'),'blue', \
-      [ ('R',['','r']),('F',''),('V',''),('w','') ] )
+      [ ('R',['','r']),('F',['','r']),('V',''),('w','') ] )
 
 State('a',ml.T('Acide','Acid','Zuur'),'red', \
-      [ ('R',['','r']),('F',''),('V',''),('w','') ] )
+      [ ('R',['','r']),('F',['','r']),('V',''),('w','') ] )
 
 State('d',ml.T('Désinfectant','Sanitizer','ontsmettingsmiddel'),'fuchsia', \
       [ ('F',['','r']),('V',''),('w','') ] )
@@ -725,7 +751,7 @@ State('d',ml.T('Désinfectant','Sanitizer','ontsmettingsmiddel'),'fuchsia', \
 #    [ ('I',[['',None,True]]),('M',[['',None,True]]),('E','e'),     ('C',['e','e',['c',None,False]]),('F','e'),('V','') ]
 #    , [False,True],[True] )
 State('p',ml.T('Produit','Product','Product'),'orange', \
-      [ ('I',''),('M',''),('E',''),('R','e'),('F',''),('V','') ] )
+      [ ('I',''),('M',''),('E',''),('R',['','e']),('F',['','e']),('V','') ] )
 
 #State('e',ml.T('Eau+Produit Gras','Water+Greasy Product','Water+Vet Product'), \
 #      [                                 ('C',['e','e',['c',None,False]]),('P','p'),('F',''),('V',''),('w','s') ]
@@ -1050,7 +1076,6 @@ class ThreadDAC(threading.Thread):
                                        #cohorts.catalog['intake'].value, batt
                 except:
                     traceback.print_exc()
-                    pass
 
                 if not display_pause:
                     time.sleep(0.01)
@@ -1669,11 +1694,15 @@ opSequences = {
     #       ],
 
     'F': # Pré-rinçage (Flush)
-        [Operation('PreT','HEAT', ref='R', dump=True, programmable=True, bin=[buck.RECUP,buck.WPOT], bout=buck.RECUP, kbin=lambda:total_volume),
+        [Operation('PreT','HEAT', ref='R', dump=True, programmable=True, bin=[buck.RECUP,buck.WPOT], bout=buck.RECUP, kbin=lambda:2*total_volume),
          Operation('PreS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='R', dump=True),
+         #Operation('PreF','FILL', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),
          Operation('PreI','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
          Operation('PreR','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
-         Operation('Prem','MESS',message=ml.T("Recommencer au besoin!","Repeat if needed!","Herhaal indien nodig!"),dump=True)
+         Operation('PreN','PAUS',message=ml.T("Une deuxième fois?","A second time?","Een tweede keer?"),ref='R'),
+         Operation('Prei','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
+         Operation('Prer','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+         Operation('Prem','MESS',message=ml.T("Rinçage terminé!","Rince finished!","Spoelen voltooid!"),dump=True)
          ],
     'H': # Distribution d'eau pasteurisée: GROSSIERE ERREUR: ne fonctionne que sur un circuit vide !!!
         [ Operation('HotT','HEAT', ref='P', dump=True, programmable=True, bin=buck.WPOT, bout=buck.SEWR, kbin=lambda:total_volume, kbout=lambda:start_volume),
@@ -1684,27 +1713,19 @@ opSequences = {
           Operation('HotW','HOTW','warranty','input',base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True)
           ],
     'R': # Pré-rinçage 4 fois
-        [ Operation('Pr1T','HEAT', ref='R', dump=True, programmable=True, bin=buck.RECUP, bout=[buck.RECUP,buck.SEWR], kbin=lambda: (total_volume if State.empty else 0.0) + (4 * total_volume), kbout=lambda:(4 * total_volume)),
-          Operation('Pr1S','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('Pr1F','FILL', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),
-          Operation('Pr1I','HOTW','warranty','input', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, min_speed=pumpy.minimal_liters, ref='R', qty=lambda:total_volume, shake_qty=SHAKE_QTY, dump=True),
-          Operation('Pr1R','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
-          Operation('1END','MESS',message=ml.T("1 rinçage effectué!","1 flush done!","1 keer doorspoelen!"),dump=True),
-          Operation('Pr2T','HEAT',ref='R', dump=True,programmable=True),
-          #Operation('Pr2I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
-          Operation('Pr2I','HOTW','warranty','input', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, min_speed=pumpy.minimal_liters, ref='R', qty=lambda:total_volume, shake_qty=SHAKE_QTY, dump=True),
-          Operation('Pr2R','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
-          Operation('2END','MESS',message=ml.T("2 rinçages effectués!","2 flushes done!","2 keer doorspoelen!"),dump=True,bin=[buck.WPOT,buck.RECUP],bout=buck.RECUP),
-          Operation('CLEA','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('Pr3T','HEAT',ref='R', dump=True,programmable=True),
-          #Operation('Pr3I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
-          Operation('Pr3I','HOTW','warranty','input', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, min_speed=pumpy.minimal_liters, ref='R', qty=lambda:total_volume, shake_qty=SHAKE_QTY, dump=True),
+        [ Operation('Pr1T','HEAT', ref='R', dump=True, programmable=True, bin=buck.SEWR, bout=buck.RECUP, kbout=lambda: 2 * total_volume, kbin=lambda:0),
+          Operation('Pr1S','PAUS',message=ml.T("Eau recyclée en SORTIE!","Recycled water at OUTPUT end!","Gerecycled water aan het OUTPUT-einde!"),dump=True),
+          Operation('Pr1R','RFLO', base_speed=MAX_SPEED, qty=lambda:-total_volume, ref='R', dump=True),
+          Operation('End1','MESS',message=ml.T("1 rinçage effectué!","1 flush done!","1 keer doorspoelen!"),dump=True),
+          Operation('Pr2R','RFLO', base_speed=MAX_SPEED, qty=lambda:-total_volume, ref='R', dump=True),
+          Operation('End2','MESS',message=ml.T("double rinçage effectué!","double flush done!","2 keer doorspoelen!"),dump=True),
+
+          Operation('PreT','HEAT', ref='R', dump=True, programmable=True, bin=[buck.WPOT, buck.WPOT], bout=buck.RECUP, kbout=lambda: 2 * total_volume, kbin=lambda:0),
+          Operation('PreS','SEAU',message=ml.T("Eau potable fraiche en entrée!","Fresh drinking water as input!","Drinkwater als input!"),ref='R', dump=True),
+          Operation('Pr3I','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
           Operation('Pr3R','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
-          Operation('3END','MESS',message=ml.T("3 rinçages effectués!","3 flushes done!","3 keer doorspoelen!"),dump=True),
-          Operation('Pr4T','HEAT',ref='R', dump=True,programmable=True),
-          #Operation('Pr4I','FLOO',duration=lambda:flood_liters_to_seconds(TOTAL_VOL),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='R',dump=True),  #
-          Operation('Pr4I','HOTW','warranty','input', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, min_speed=pumpy.minimal_liters, ref='R', qty=lambda:total_volume, shake_qty=SHAKE_QTY, dump=True),
-          Operation('Pr4R','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True,),
+          Operation('Pr4i','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
+          Operation('Pr4r','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('Pr4m','MESS',message=ml.T("4 rinçages effectués!","4 flushes done!","4 keer doorspoelen!"),dump=True,)
           ],
     'V': # Vider le réservoir (aux égouts la plupart du temps)
@@ -3005,7 +3026,6 @@ class getCSV:
                         result = result + f.read()
                     except IOError:
                         traceback.print_exc()
-                        pass
             return result
 
 class getCSVdir:
