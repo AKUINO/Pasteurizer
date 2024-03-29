@@ -1715,7 +1715,7 @@ opSequences = {
     'R': # Pré-rinçage 4 fois
         [ Operation('Pr1T','HEAT', ref='R', dump=True, programmable=True, bin=buck.SEWR, bout=buck.RECUP, kbout=lambda: 2 * total_volume, kbin=lambda:0),
           Operation('Pr1S','PAUS',message=ml.T("Eau recyclée en SORTIE!","Recycled water at OUTPUT end!","Gerecycled water aan het OUTPUT-einde!"),dump=True),
-          Operation('Pr1R','PUMP', base_speed=-MAX_SPEED, qty=lambda:-2*total_volume, ref='R', dump=True),
+          Operation('Pr1R','REVR', base_speed=MAX_SPEED, qty=lambda:-2*total_volume, ref='R', dump=True),
           Operation('End2','MESS',message=ml.T("double rinçage effectué!","double flush done!","2 keer doorspoelen!"),dump=True),
           Operation('PreT','HEAT', ref='R', dump=True, programmable=True, bin=[buck.WPOT, buck.WPOT], bout=buck.RECUP, kbout=lambda: 2 * total_volume, kbin=lambda:0),
           Operation('PreS','SEAU',message=ml.T("Eau potable fraiche en entrée!","Fresh drinking water as input!","Drinkwater als input!"),ref='R', dump=True),
