@@ -282,9 +282,9 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                     # 'K':['K',ml.T("Quantité Froid","Quantity Cold","Koel Aantal") \
                             # ,ml.T("Quantité d'eau de refroidissement","Cooling Water Quantity","Koelwater Aantal") \
                             # ,midTemperTank,midTemperTank,"L",False,19.9,0.1], # Quantité d'eau froide à mettre dans le bassin de refroidissement
-                    'Q':['Q',ml.T("Quantité","Quantity","Aantal") \
-                            ,ml.T("Quantité de lait à entrer","Amount of milk to input","Aantal melk voor invoor") \
-                            ,0.0,0.0,"L",True,9999.9,0.1,"number"], # Quantité de lait à traiter,ZeroIsNone=True
+                    # 'Q':['Q',ml.T("Quantité","Quantity","Aantal") \
+                            # ,ml.T("Quantité de lait à entrer","Amount of milk to input","Aantal melk voor invoor") \
+                            #  ,0.0,0.0,"L",True,9999.9,0.1,"number"], # Quantité de lait à traiter,ZeroIsNone=True
                     'H':['H',ml.T("Démarrage","Start","Start") \
                             ,ml.T("Heure de démarrage","Start Time","Starttijd") \
                             ,0.0,0.0,"hh:mm",True,84000,600,"time"], # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
@@ -299,8 +299,8 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                          ,'L','L',"hh:mm",True,None,None,"text"] }
                     # 'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
                     #         ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
-menus.sortedOptions = "FPMGwQDdHRrusCcAaZES" #T
-menus.cleanOptions = "PMGQH" #TtK
+menus.sortedOptions = "FPMGwDdHRrusCcAaZES" #T
+menus.cleanOptions = "PMGH" #TtK
 menus.dirtyOptions = "RrusCcAawDdHES" #Cc
 
 menus.loadCurrent()
@@ -1163,7 +1163,7 @@ class Operation(object):
     global menus,lines,columns, hotTapSolenoid, optimal_speed
 
     def __init__(self, acronym, typeOp, sensor1=None, sensor2=None, ref=None, ref2=None, base_speed=None, min_speed=None, qty=None, shake_qty=None, \
-                 duration=None, subSequence = None, dump=False, inject=None, message=None, cooling=0, programmable=False, waitAdd=False, \
+                 duration=None, subSequence = None, dump=False, inject=None, message=None, pasteurizing=0, programmable=False, waitAdd=False, \
                  bin = None, bout = None, kbin = None, kbout = None, qbin=None, qbout=None):
         self.acronym = acronym
         self.typeOp = typeOp
@@ -1183,7 +1183,7 @@ class Operation(object):
         self.inject = inject
         self.message = message
         self.waitAdd = waitAdd
-        self.cooling = cooling # 1=if cooling of output is permitted. Auto-Pause (option Q) is then also taken into account. And also signal we are pasteurizing. 2=new product (starts new pasteurisation report)
+        self.pasteurizing = pasteurizing # signals we are pasteurizing. 2=new product (starts new pasteurisation report)
         self.programmable = programmable
         self.bin = bin
         self.bout = bout
@@ -1281,10 +1281,10 @@ class Operation(object):
                 pass #TOOD:FLOOD with water in bucket + x seconds pumping; RFLO: do nothing
         elif self.typeOp == 'REVR':
             T_Pump.pump.reset_pump()
-        elif self.typeOp == 'TRAK' or self.typeOp == 'PUMP':
+        elif self.typeOp in ['PUMP', 'TRAK']:
             #T_Pump.forcible = True
-            if self.cooling > 0:
-                if self.cooling == 2:
+            if self.pasteurizing > 0:
+                if self.pasteurizing == 2:
                     reportPasteur.start(menus,'p')
                 elif not reportPasteur.state:
                     reportPasteur.start(menus,'p')
@@ -1351,12 +1351,14 @@ class Operation(object):
                 return True
         elif self.typeOp == 'FILL' :
             if State.empty :
+                time.sleep(0.01)
                 return False # not finished
             else:
                 return True # finished
         elif self.typeOp in ['FLOO','RFLO','HOTW']:
             if menus.val('s') < 1.0:
                 if self.typeOp != 'RFLO':
+                    time.sleep(0.01)
                     return False
             else: # Seau
                 if self.typeOp == 'RFLO':
@@ -1371,16 +1373,14 @@ class Operation(object):
                     elif volnow > 0.2: # on part dans le mauvais sens !
                         T_Pump.pump.reset_pump()
                         return True
+            time.sleep(0.01)
             return False # not finished
         elif self.typeOp in ['PUMP','TRAK','EMPT','REVR']:
-            if self.typeOp == 'TRAK' and self.sensor1 == 'warranty' and T_Pump.currOpContext: # Pasteurizing and not cleaning
-                if zeroIsNone(menus.val('Q')):
-                    #print("Q="+menus.display('Q'))
-                    #print("vol="+str(T_Pump.currOpContext.volume() ))
-                    if T_Pump.currOpContext.volume() > menus.val('Q'):
-                        #print("Stopping")
-                        menus.store('Q',None) # reset the option...
-                        return True
+            # if self.typeOp == 'TRAK' and self.sensor1 == 'warranty' and reportPasteur.state and T_Pump.currOpContext: # Pasteurizing and not cleaning
+            #     if zeroIsNone(menus.val('Q')):
+            #         if (reportPasteur.volume + T_Pump.currOpContext.volume()) > menus.val('Q'):
+            #             menus.store('Q',None) # reset the option...
+            #             return True
             if currqty and T_Pump.currOpContext:
                 if currqty > 0.0 and (T_Pump.currOpContext.volume() >= currqty):
                     return True
@@ -1391,18 +1391,22 @@ class Operation(object):
                     elif volnow > 0.2: # on part dans le mauvais sens !
                         T_Pump.pump.reset_pump()
                         return True
+            time.sleep(0.01)
             return False # not finished
         elif self.typeOp == 'SHAK':
 ##            if self.sensor1 and self.value1 \
 ##               and T_Pump.pump.speed > 0.0 \
 ##               and (float(cohorts.catalog[self.sensor1].value) >= float(self.value1)):
 ##                return True
+            time.sleep(0.01)
             return False
         elif self.typeOp in ['PAUS','SEAU']: # Switch to next operation
+            time.sleep(0.01)
             return not T_Pump.paused
         elif self.typeOp in ['SUBR','SUBS','MESS']: # Switch to next operation
             return True
         time.sleep(0.01)
+        return False
 
     def quantity(self):
         if self.qty:
@@ -1596,14 +1600,17 @@ class Operation(object):
             State.empty = False
         elif self.typeOp == 'REVR':
             T_Pump.pump.reset_pump()
-        elif self.typeOp in ['PUMP','SHAK','TRAK','EMPT']:
+        elif self.typeOp in ['PUMP','TRAK']:
             T_Pump.forcible = False
             T_Pump.pump.stop()
-            State.empty = (self.typeOp == 'EMPT')
-            if self.cooling > 0 and reportPasteur.state:
+            if self.pasteurizing > 0 and reportPasteur.state:
                 reportPasteur.volume = reportPasteur.volume + T_Pump.currOpContext.volume()
                 reportPasteur.duration = reportPasteur.duration + T_Pump.currOpContext.duration()
                 reportPasteur.save()
+        elif self.typeOp in ['SHAK','EMPT']:
+            T_Pump.forcible = False
+            T_Pump.pump.stop()
+            State.empty = (self.typeOp == 'EMPT')
         if self.message:
             if self.typeOp not in ['PAUS','SEAU']:
                 T_Pump.setMessage(self.message)
@@ -1713,11 +1720,11 @@ opSequences = {
           Operation('HotW','HOTW','warranty','input',base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True)
           ],
     'R': # Pré-rinçage 4 fois
-        [ Operation('Pr1T','HEAT', ref='R', dump=True, programmable=True, bin=buck.RECUP, bout=buck.SEWR, kbout=lambda: 2 * total_volume, kbin=lambda:0),
+        [ Operation('Pr1T','HEAT', ref='R', dump=True, programmable=True, bin=buck.RECUP, bout=buck.SEWR, kbout=lambda: 2 * total_volume, kbin=0.0),
           Operation('Pr1S','PAUS',message=ml.T("Eau recyclée en entrée!","Recycled water as Input!","Gerecycled water als input!"),dump=True),
           Operation('Pr1R','PUMP', base_speed=MAX_SPEED, qty=lambda:2*total_volume, ref='R', dump=True),
           Operation('End2','MESS',message=ml.T("double pré-rinçage effectué!","double pre-rince done!","2 keer doorspoelen!"),dump=True),
-          Operation('PreT','HEAT', ref='R', dump=True, programmable=True, bin=[buck.WPOT, buck.WPOT], bout=buck.RECUP, kbout=lambda: 2 * total_volume, kbin=lambda:0),
+          Operation('PreT','HEAT', ref='R', dump=True, programmable=True, bin=[buck.WPOT, buck.WPOT], bout=buck.RECUP, kbout=lambda: 2 * total_volume),
           Operation('Pr3I','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
           Operation('Pr3R','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
           Operation('PreS','PAUS',message=ml.T("Eau à recycler en entrée+sortie!","Water for future re-use as input+output!","Water voor toekomstig hergebruik als input+output!"),ref='R', dump=True),
@@ -1804,36 +1811,37 @@ opSequences = {
           Operation('CL8F','PUMP','heating','input', base_speed=OPT_SPEED, ref=85, qty=lambda:total_volume, shake_qty=SHAKE_QTY, dump=False)
           ],
     'P': # Pasteurisation
-        [ Operation('PasT','HEAT', ref='P', dump=True, programmable=True, bin=buck.RAW, bout=buck.SEWR, kbin=lambda:total_volume),
+        [ Operation('PasT','HEAT', ref='P', dump=True, programmable=True, bin=buck.RAW, bout=buck.SEWR, kbin=lambda:safe_total_volume),
           Operation('PasI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P', qty=lambda:start_volume, shake_qty=SHAKE_QTY, dump=True),
           Operation('Pasi','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=lambda:(safe_total_volume - start_volume), shake_qty=SHAKE_QTY, dump=True),
-          Operation('PasE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',dump=True,bin=buck.RAW,bout=buck.PAST,kbin=0.0,qbout=True),
-          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=2),
-          Operation('Pasm','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
+          Operation('PasE','PAUS',message=ml.T("Secouer/Vider le tampon puis une touche pour embouteiller","Shake / Empty the buffer tank then press a key to start bottling","Schud / leeg de buffertank en druk op een toets om het bottelen te starten"),ref='P',dump=True,bin=buck.RAW,bout=buck.PAST,qbout=True),
+          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', shake_qty=SHAKE_QTY, dump=True, kbin=0.0, pasteurizing=2),
+          Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
     'I': # Reprise d'une Pasteurisation
         [ Operation('PasT','HEAT',ref='P',dump=True,programmable=True,bin=buck.RAW,bout=buck.PAST,kbin=0.0),
-          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=1),
-          Operation('Pasm','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
+          Operation('PasP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', shake_qty=SHAKE_QTY, dump=True, pasteurizing=1),
+          Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ],
     'E': # Eau pour finir une Pasteurisation en poussant juste ce qu'il faut le lait encore dans les tuyaux
         [ Operation('EauT','HEAT', ref='P', dump=True, programmable=True, bin=buck.WPOT, bout=buck.PAST, kbin=lambda:safe_total_volume),
-          Operation('EauI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P',qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=1),
-          Operation('EauP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=lambda:(start_volume - SHAKE_QTY), shake_qty=SHAKE_QTY, dump=True, cooling=1),
-          Operation('EauV','PUMP', base_speed=OPT_SPEED, ref='P', qty=lambda:(safe_total_volume - start_volume), dump=True, cooling=1),
-          Operation('Eaum','MESS',message=ml.T("Faites C quand vous voulez nettoyer!","Press C when you want to clean!","Druk op C als u wilt reinigen!"),dump=True)
+          Operation('EauI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P', qty=SHAKE_QTY, shake_qty=SHAKE_QTY, dump=True, \
+                    pasteurizing=1, kbin=lambda:safe_total_volume),
+          Operation('EauP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=lambda:(start_volume - SHAKE_QTY), shake_qty=SHAKE_QTY, dump=True, pasteurizing=1, kbin=lambda:safe_total_volume),
+          Operation('EauV','PUMP', base_speed=OPT_SPEED, ref='P', qty=lambda:(safe_total_volume - start_volume), dump=True, pasteurizing=1),
+          Operation('CLOS','MESS',message=ml.T("Maintenant, rincer puis nettoyer...","Now, Rinse and Clean...","Nu, uitspoelen en reinigen..."),dump=True)
           ],
     'M': # Passer à un lait d'un autre provenance en chassant celui de la pasteurisation précédente
-        [ Operation('Mult','HEAT', ref='P', dump=True, programmable=True, bin=buck.RAW2, bout=buck.PAST, kbin=0.0, kbout=lambda:safe_total_volume),
-          Operation('Muli','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P',qty=SHAKE_QTY,shake_qty=SHAKE_QTY,dump=True,cooling=1),
-          Operation('Mulp','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=lambda:start_volume - SHAKE_QTY, shake_qty=SHAKE_QTY, dump=True, cooling=1),
+        [ Operation('Mult','HEAT', ref='P', dump=True, programmable=True, bin=buck.RAW2, bout=buck.PAST, kbin=lambda:safe_total_volume, kbout=lambda:safe_total_volume),
+          Operation('Muli','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref='P', qty=SHAKE_QTY, shake_qty=SHAKE_QTY, dump=True, pasteurizing=1),
+          Operation('Mulp','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=lambda:start_volume - SHAKE_QTY, shake_qty=SHAKE_QTY, dump=True, pasteurizing=1),
           Operation('MulC','PAUS',message=ml.T("Consigne nouveau lait puis une touche pour finir de chasser le 1er lait","Setpoint for New milk then press a key to finish bottling 1st","Instelpunt voor nieuwe melk en druk vervolgens op een toets om het bottelen eerst te beëindigen"),ref='P',dump=True),
           Operation('MulT','HEAT',ref='P',dump=True),
-          Operation('MulP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=lambda:(safe_total_volume - start_volume), shake_qty=SHAKE_QTY, dump=True, cooling=1),
-          Operation('MulE','PAUS',message=ml.T("Contenant pour le nouveau lait!","New Milk container!","Houder voor nieuwe melk!"),ref='P',dump=True,bin=buck.RAW2,bout=buck.PAST2,kbin=0.0,kbout=0.0,qbout=True),
-          Operation('MulH','HEAT',ref='P',dump=True),
-          Operation('MulI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P',shake_qty=SHAKE_QTY,dump=True,cooling=2),
-          Operation('Mulm','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
+          Operation('MulP','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', qty=lambda:(safe_total_volume - start_volume), shake_qty=SHAKE_QTY, dump=True, pasteurizing=1),
+          Operation('MulE','PAUS',message=ml.T("Contenant pour le nouveau lait!","New Milk container!","Houder voor nieuwe melk!"),ref='P',dump=True,bin=buck.RAW2,bout=buck.PAST2,kbout=0.0,qbout=True),
+          Operation('MulH','HEAT',ref='P',dump=True,kbin=0.0),
+          Operation('MulI','TRAK','warranty','input', base_speed=OPT_SPEED, min_speed=-pumpy.minimal_liters, ref='P', shake_qty=SHAKE_QTY, dump=True, pasteurizing=2),
+          Operation('CLOS','MESS',message=ml.T("Faites I pour reprise ou E pour chasser le lait!","Press I to resume or E to drive out the milk!","Druk op I om te hervatten of E om de melk te verdrijven!"),dump=True)
           ]
     }
 
@@ -1929,7 +1937,7 @@ class ThreadPump(threading.Thread):
         if op.bout is not None:
             self.bout = op.bout
         if op.kbin is not None:
-            self.kbin = op.kbin() if callable(op.kbin) else op.kbin
+            self.kbin = op.kbin
             self.kbout = self.kbin
         if op.kbout is not None:
             self.kbout = op.kbout() if callable(op.kbout) else op.kbout
@@ -2302,7 +2310,7 @@ class ThreadPump(threading.Thread):
                         reportPasteur.total_temperature = reportPasteur.total_temperature + (self.pump.speed*(loop_delay-prec_loop)*cohorts.catalog['heating'].value)
                     else:
                         reportPasteur.save()
-                        reportPasteur.state = None
+                        # reportPasteur.state = None NO! NO!
             except:
                 traceback.print_exc()
                 self.pump.stop()
@@ -2777,6 +2785,7 @@ class WebApiAction:
                     T_Pump.manAction('X')
                     os.kill(os.getpid(),signal.SIGINT)
                     WebExit = True # SHUTDOWN !
+                time.sleep(0.01)
             else: # State dependent Actions
                 if not T_Pump.setAction(letter):
                     message = str(ml.T("Invalide","Invalid","Ongeldig"))
@@ -3218,6 +3227,7 @@ class ThreadInputProcessor(threading.Thread):
                         T_Pump.stopRequest = True
                     elif menu_selection in ['M', 'E', 'P', 'H', 'I', 'R', 'V', 'F', 'A', 'C', 'D', 'B']: # 'C','K'
                         T_Pump.setAction(menu_selection)
+                    time.sleep(0.01)
                 elif menu_selection in ['J', 'K', 'L', 'T', 'Y']:
                     Heating_Profile.setProfile(menu_selection, menus)
                     option_confirm(0.0)
