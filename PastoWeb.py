@@ -60,7 +60,7 @@ import signal
 import argparse
 import json
 import time
-import web
+import web # pip install web.py
 from datetime import datetime
 from enum import Enum
 
@@ -73,7 +73,7 @@ import ml  # Not unused !!!
 import datafiles
 
 import pyownet
-import term
+import term  # pip install py-term
 import threading
 
 import hardConf
@@ -293,7 +293,7 @@ menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                          ,0.0,0.0,'mL',False,2000,1,"number"], # Volume des tuyaux en entrée du pasteurisateur
                     'S':['S',ml.T("Aval(mL)","Downstream(mL)","StroomAFwaarts(mL)") \
                          ,ml.T("Volume des tuyaux en aval(cm*0,7854*d²)","Downstream Pipes Volume(cm*0,7854*d²)","StroomAFwaarts leidingvolume(cm*0,7854*d²)") \
-                         ,0.0,0.0,'mL',False,2000,1,"number"], # Volume des tuyaux en sortie du pasteurisateur
+                         ,0.0,0.0,'mL',False,15000,1,"number"], # Volume des tuyaux en sortie du pasteurisateur
                     'z':['z',ml.T("Pré-configuration","Pre-configuration","Pre-configuratie") \
                          ,ml.T("Code de pré-configuration","Pre-configuration code","Pre-configuratiecode") \
                          ,'L','L',"hh:mm",True,None,None,"text"] }
@@ -1083,7 +1083,7 @@ class ThreadDAC(threading.Thread):
                     term.pos(lines,1)
                     term.writeLine("",term.bgwhite) # scroll the whole display by one line
                     term.pos(lines-4,1)
-                    term.write("%2d" % (int(nowT)%60), term.white, term.bold, term.bgwhite)
+                    term.write("%2d" % (int(nowT) % 60), term.white, term.bold, term.bgwhite)
                     term.write(self.T_Pump.currOperation.acronym[3:4] if self.T_Pump.currOperation else " ",term.blue,term.bgwhite)
                     cohorts.catalog[self.T_Pump.pump.address].display() # Pompe
                     #cohorts.display(term,'extra',format=" %5.1f° ") #Echgeur
@@ -1368,7 +1368,7 @@ class Operation(object):
                     return True
                 if currqty < 0.0:
                     volnow = T_Pump.currOpContext.volume()
-                    if (volnow <= currqty):
+                    if volnow <= currqty:
                         return True
                     elif volnow > 0.2: # on part dans le mauvais sens !
                         T_Pump.pump.reset_pump()
@@ -1511,9 +1511,9 @@ class Operation(object):
                 if float(valSensor1) < float(self.tempRef()): # Shake
                     T_Pump.forcible = True
                     pressed = GreenButton.poll() if GreenButton else False # Pressing the GreenButton forces slow speed forward...
-                    if (pressed and pressed > 0.0):
+                    if pressed and pressed > 0.0:
                         speed = abs(self.min_speed)
-                    elif (T_Pump.forcing > 0):
+                    elif T_Pump.forcing > 0:
                         speed = abs(self.min_speed)
                     elif self.min_speed >= 0.0:
                         speed = self.min_speed
@@ -2541,7 +2541,7 @@ class WebOption:
 
         if data and len(data) > 1: # Process saved options from options editing forms
             #print(data.__repr__())
-            if ('reset' in data and data['reset'].lower() == 'on'):
+            if 'reset' in data and data['reset'].lower() == 'on':
                 for choice in (menus.cleanOptions if page == '1' else menus.dirtyOptions):
                     if len(menus.options[choice]) > Menus.INI:
                         menus.options[choice][Menus.VAL] = menus.options[choice][Menus.INI]
@@ -2835,7 +2835,7 @@ class WebApiState:
             #greasy = State.greasy
             if data: # Process saved options from options editing forms
                 empty = False
-                if ('empty' in data and data['empty'].lower() == 'on'):
+                if 'empty' in data and data['empty'].lower() == 'on':
                     empty = True
                 #greasy = False
                 #if ('greasy' in data and data['greasy'].lower() == 'on'):
@@ -3016,7 +3016,7 @@ class getCSV:
             # Iterate directory
             for path in sorted(os.listdir(datafiles.DIR_DATA_CSV),reverse=True):
                 # check if current path is a file
-                if os.path.isfile(os.path.join(datafiles.DIR_DATA_CSV, path)) and len(path) == 18  and path.startswith("2") \
+                if os.path.isfile(os.path.join(datafiles.DIR_DATA_CSV, path)) and len(path) == 18 and path.startswith("2") \
                         and path.endswith(".csv") and path <= endParam:
                     if gotSmall:
                         break

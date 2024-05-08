@@ -6,7 +6,7 @@ import traceback
 import os
 import codecs
 import sys
-from serial import Serial, PARITY_NONE, PARITY_EVEN
+from serial import Serial, PARITY_NONE, PARITY_EVEN # pip install pyserial
 import platform
 import term
 import ml

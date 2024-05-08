@@ -7,7 +7,7 @@
 
 import traceback
 from serial import Serial, PARITY_NONE
-from umodbus.client.serial import rtu
+from umodbus.client.serial import rtu # pip install uModbus
 import time
 
 SLAVE_ID = 1
