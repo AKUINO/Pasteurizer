@@ -23,14 +23,14 @@ ref_duration = 15.0
 
 class Dt_line:
 
-    def __init__(self):
-        self.t = None
-        self.Dt = 0.0
-        self.z = None
-        self.reduction = DEFAULT_REDUCTION
-        self.address = None
-        self.source = None
-        self.tags = []
+    # def __init__(self):
+    #     self.t = None
+    #     self.Dt = 0.0
+    #     self.z = None
+    #     self.reduction = DEFAULT_REDUCTION
+    #     self.address = None
+    #     self.source = None
+    #     self.tags = []
 
     def __init__(self,t,Dt,z,reduction=DEFAULT_REDUCTION):
         self.t = t # seconds
@@ -55,7 +55,7 @@ class Dt_line:
          ,'tags' : self.tags
         }
 
-    def getByAddress(self,address):
+    def getByAddress(address):
 
         global lines
 

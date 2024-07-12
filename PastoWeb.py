@@ -2223,14 +2223,14 @@ class ThreadPump(threading.Thread):
                     if self.paused:
                         self.setPause(False)
 
-                if hardConf.MICHA_device and hardConf.io and T_Pump.currAction in ['M','E','P','H','I']: # Output probably in the buffer tank
+                if hardConf.MICHA_device and hardConf.io: # Output probably in the buffer tank
                     hardConf.io.write_pin(hardConf.MICHApast.LEVEL1_FLAG_REG,1) # PULLUP
                     self.level1 = hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR1_REG)
-                    if self.level1 == 0:
+                    if self.level1 == 0 and T_Pump.currAction in ['M','E','P','H','I']:
                         self.setPause(True)
                     hardConf.io.write_pin(hardConf.MICHApast.LEVEL2_FLAG_REG,0) # PULLDOWN
                     self.level2 = hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR2_REG)
-                    if self.level2:
+                    if self.level2 and T_Pump.currAction in ['M','E','P','H','I']:
                         self.setPause(True)
                 if Buzzer:
                     Buzzer.off()
