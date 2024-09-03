@@ -206,8 +206,8 @@ if hardConf.In_Emergency:
 #BATH_TUBE = 4.6 # degrees Celsius. Margin between temperature in bath and temperature wished in the tube
 
 CLEAN_TIME = 900.0 #seconds= 15 minutes. Was 1800 but now we wait for input heating before beginning
-DISINF_TIME = 600.0 #seconds= 10 minutes. Was 900 but now we wait for input heating before beginning
-TH_DISINF_TIME = 300.0 #seconds
+ACID_TIME = 600.0 #seconds= 10 minutes. Was 900 but now we wait for input heating before beginning
+DISINF_PAUSE_TIME = 900.0 #seconds= 15 minutes, pause to leave disinfectant to act
 STAY_CLEAN_TIME = 2*3600 #seconds = 2 hours
 
 DEFAULT_FORCING_TIME = 30 #seconds. Each time the user forces pumping forward, normal operation resumes after this delay
@@ -225,78 +225,78 @@ TANK_EMPTY_LIMIT = 60 #seconds. If heating time has not diminished in this delay
 PUMP_LOOP_DELAY = 0.2
 
 menus = Menus.singleton
-menus.options =  {  'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
+menus.options =  {'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                             ,ml.T("Gradient de température","Temperature Gradient","Gradient van Temperatuur") \
-                            ,3.0,3.0,"°C",False,7,0.1,"number"], # Gradient de Température
-                    #'g':['g',ml.T("Produit Gras","Fatty Product","Vet Product") \
-                    #    ,ml.T("Nécessite de la soude(1) Pas toujours(0)","Needs Soda Cleaning(1) Not always(0)","Soda-reiniging nodig(1) Niet altijd(0)") \
-                    #    ,1,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
-                    # 'F':['F',ml.T("Profil Bact.","Profile Bact.","Profiel Bact.") \
-                    #     ,ml.T("Courbe de réduction des bactéries","Bacteria reduction curve","Bacterie reductiecurve") \
-                    #     ,'L','L',"",True,None,None,"text"], # Gradient de Température
-                    'P':['P',ml.T("Pasteurisation°","Pasteurization°","Pasteurisatie°") \
+                            ,3.0,3.0,"°C",False,7,0.1,"number"],  # Gradient de Température
+                  #'g':['g',ml.T("Produit Gras","Fatty Product","Vet Product") \
+                  #    ,ml.T("Nécessite de la soude(1) Pas toujours(0)","Needs Soda Cleaning(1) Not always(0)","Soda-reiniging nodig(1) Niet altijd(0)") \
+                  #    ,1,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
+                  # 'F':['F',ml.T("Profil Bact.","Profile Bact.","Profiel Bact.") \
+                  #     ,ml.T("Courbe de réduction des bactéries","Bacteria reduction curve","Bacterie reductiecurve") \
+                  #     ,'L','L',"",True,None,None,"text"], # Gradient de Température
+                  'P':['P',ml.T("Pasteurisation°","Pasteurization°","Pasteurisatie°") \
                             ,ml.T("Température de pasteurisation","Pasteurisation Temperature","Pasteurisatie Temperatuur") \
-                            ,72.0,72.0,"°C",False,90,0.1,"number"], # Température normale de pasteurisation
-                    'w':['w',ml.T("Pause maximale","Max Pause","Max Pauze") \
+                            ,72.0,72.0,"°C",False,90,0.1,"number"],  # Température normale de pasteurisation
+                  'w':['w',ml.T("Pause maximale","Max Pause","Max Pauze") \
                          ,ml.T("Temps d'arrêt maximum autorisé","Maximum process stop duration","Maximaal toegestane uitvaltijd") \
-                         ,STAY_CLEAN_TIME,STAY_CLEAN_TIME,"hh:mm",False,3600*2,600,"time"], # Durée où un tuyau propre le reste sans rinçage (le double avant de tout re-nettoyer)
-                    'R':['R',ml.T("Rinçage°","Rinse°","Spoelen°") \
+                         ,STAY_CLEAN_TIME,STAY_CLEAN_TIME,"hh:mm",False,3600*2,600,"time"],  # Durée où un tuyau propre le reste sans rinçage (le double avant de tout re-nettoyer)
+                  'R':['R',ml.T("Rinçage°","Rinse°","Spoelen°") \
                             ,ml.T("Température de rinçage","Rinse Temperature","Spoelen Temperatuur") \
-                            ,25.0,25.0,"°C",False,90,0.1,"number"], # Température du Bassin pour le prélavage
-                    'r':['r',ml.T("Rinçage\"","Rinse\"","Spoelen\"") \
+                            ,25.0,25.0,"°C",False,90,0.1,"number"],  # Température du Bassin pour le prélavage
+                  'r':['r',ml.T("Rinçage\"","Rinse\"","Spoelen\"") \
                             ,ml.T("Durée du dernier Rinçage","Last Rinse duration","Laatste spoelduur") \
-                            ,0.0,60.0,'\"',False,300,1,"number",60], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
-                    'u':['u',ml.T("Rinçage(L)","Rinse(L)","Spoelen(L)") \
+                            ,0.0,60.0,'\"',False,300,1,"number",60],  # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
+                  'u':['u',ml.T("Rinçage(L)","Rinse(L)","Spoelen(L)") \
                             ,ml.T("Volume du dernier Rinçage","Last Rinse Volume","Laatste spoelvolume") \
-                            ,0.0,0.0,'L',False,20,0.01,"number",4.0], # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
-                    's':['s',ml.T("Seau pour l'Eau","Bucket for Water","Emmer voor water\"") \
+                            ,0.0,0.0,'L',False,20,0.01,"number",4.0],  # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
+                  's':['s',ml.T("Seau pour l'Eau","Bucket for Water","Emmer voor water\"") \
                          ,ml.T("Eau courante(0) ou amenée dans un seau(1)","Running water(0) or brought in a bucket(1)","Stromend water(0) of gebracht in een emmer(1)") \
-                         ,0,1,"-",False,1,1,'range'], # Faux=0, 1=Vrai
-                    'C':['C',ml.T("net.Caustique°","Caustic cleaning°","Bijtende schoonmaak°") \
+                         ,0,1,"-",False,1,1,'range'],  # Faux=0, 1=Vrai
+                  'C':['C',ml.T("net.Caustique°","Caustic cleaning°","Bijtende schoonmaak°") \
                             ,ml.T("Température de nettoyage","Cleaning Temperature","Schoonmaak Temperatuur") \
-                            ,50.0,50.0,"°C",False,60,0.1,"number"], # Température pour un passage au détergent
-                    'c':['c',ml.T("net.Caustique\"","Caustic cleaning\"","Bijtende schoonmaak\"") \
+                            ,50.0,50.0,"°C",False,60,0.1,"number"],  # Température pour un passage au détergent
+                  'c':['c',ml.T("net.Caustique\"","Caustic cleaning\"","Bijtende schoonmaak\"") \
                             ,ml.T("Durée de nettoyage","Cleaning Duration","Schoonmaak Tijd") \
                             ,CLEAN_TIME,CLEAN_TIME,"hh:mm",False,3600*2,60,"time"],
-                    'D': ['D', ml.T("Désinfection°""Disinfection°", "Desinfectie°") \
+                  'D': ['D', ml.T("Désinfection°""Disinfection°", "Desinfectie°") \
                           , ml.T("Température de désinfection", "Disinfection Temperature", "Desinfectie Temperatuur") \
                           , 25.0, 25.0, "°C", False, 30, 0.1, "number"],  # Température normale de désinfection vinaigre + peroxyde
                     'd': ['d', ml.T("Désinfection \"", "Disinfection \"", "Desinfectie \"") \
                           , ml.T("Durée de désinfection", "Disinfection Duration", "Desinfectie Tijd") \
-                          , TH_DISINF_TIME,TH_DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
+                          , DISINF_PAUSE_TIME, DISINF_PAUSE_TIME, "hh:mm", False, 3600, 60, "time"],  # Temps d'action pour un traitement à l'acide ou au percarbonate de soude
                     'A':['A',ml.T("net.Acide°""Acidic cleaning°","Zuur schoonmaak°") \
                             ,ml.T("Température de nettoyage acide","Acidic cleaning Temperature","Zuur schoomaak Temperatuur") \
-                            ,40.0,40.0,"°C",False,60,0.1,"number"], # Température pour un traitement à l'acide ou au percarbonate de soude
-                    'a':['a',ml.T("net.Acide\"","Acidic cleaning\"","Zuur schoonmaak\"") \
-                            ,ml.T("Durée de nettoyage acide","Acidic cleaning Duration","Zuur schoomaak Tijd") \
-                            ,DISINF_TIME,DISINF_TIME,"hh:mm",False,3600*2,60,"time"], # Température pour un traitement à l'acide ou au percarbonate de soude
+                            ,40.0,40.0,"°C",False,60,0.1,"number"],  # Température pour un traitement à l'acide ou au percarbonate de soude
+                    'a':['a', ml.T("net.Acide\"","Acidic cleaning\"","Zuur schoonmaak\"") \
+                            , ml.T("Durée de nettoyage acide","Acidic cleaning Duration","Zuur schoomaak Tijd") \
+                            , ACID_TIME, ACID_TIME, "hh:mm", False, 3600 * 2, 60, "time"],  # Température pour un traitement à l'acide ou au percarbonate de soude
                     'M':['M',ml.T("Minimum","Minimum","Minimum") \
                             ,ml.T("Durée minimale de pasteurisation","Minimum pasteurization time","Minimale pasteurisatietijd") \
-                            ,12.0,12.0,'"',False,120,1,"number"], # Durée minimale de pasteurisation
-                    # 'T':['T',ml.T("Tempérisation Max°","Tempering Max°","Temperen Max°") \
-                            # ,ml.T("Température d'ajout d'eau de refroidissement","Cooling water addition temperature","Koelwatertoevoegings Temperatuur") \
-                            # ,0.0,0.0,"°C",True,90.0,0.1], # Température à laquelle on ajoute de l'eau de refroidissement,ZeroIsNone=True
-                    # 't':['t',ml.T("Tempérisation Min°","Tempering Min°","Temperen Min°") \
-                            # ,ml.T("Réchauffement à la sortie","Output Heating","Opwarmen") \
-                            # ,18.0,18.0,"°C",True,90.0,0.1], # Température à laquelle on chauffe la cuve de sortie,ZeroIsNone=True
-                    # 'K':['K',ml.T("Quantité Froid","Quantity Cold","Koel Aantal") \
-                            # ,ml.T("Quantité d'eau de refroidissement","Cooling Water Quantity","Koelwater Aantal") \
-                            # ,midTemperTank,midTemperTank,"L",False,19.9,0.1], # Quantité d'eau froide à mettre dans le bassin de refroidissement
-                    # 'Q':['Q',ml.T("Quantité","Quantity","Aantal") \
-                            # ,ml.T("Quantité de lait à entrer","Amount of milk to input","Aantal melk voor invoor") \
-                            #  ,0.0,0.0,"L",True,9999.9,0.1,"number"], # Quantité de lait à traiter,ZeroIsNone=True
-                    'H':['H',ml.T("Démarrage","Start","Start") \
+                            ,12.0,12.0,'"',False,120,1,"number"],  # Durée minimale de pasteurisation
+                  # 'T':['T',ml.T("Tempérisation Max°","Tempering Max°","Temperen Max°") \
+                  # ,ml.T("Température d'ajout d'eau de refroidissement","Cooling water addition temperature","Koelwatertoevoegings Temperatuur") \
+                  # ,0.0,0.0,"°C",True,90.0,0.1], # Température à laquelle on ajoute de l'eau de refroidissement,ZeroIsNone=True
+                  # 't':['t',ml.T("Tempérisation Min°","Tempering Min°","Temperen Min°") \
+                  # ,ml.T("Réchauffement à la sortie","Output Heating","Opwarmen") \
+                  # ,18.0,18.0,"°C",True,90.0,0.1], # Température à laquelle on chauffe la cuve de sortie,ZeroIsNone=True
+                  # 'K':['K',ml.T("Quantité Froid","Quantity Cold","Koel Aantal") \
+                  # ,ml.T("Quantité d'eau de refroidissement","Cooling Water Quantity","Koelwater Aantal") \
+                  # ,midTemperTank,midTemperTank,"L",False,19.9,0.1], # Quantité d'eau froide à mettre dans le bassin de refroidissement
+                  # 'Q':['Q',ml.T("Quantité","Quantity","Aantal") \
+                  # ,ml.T("Quantité de lait à entrer","Amount of milk to input","Aantal melk voor invoor") \
+                  #  ,0.0,0.0,"L",True,9999.9,0.1,"number"], # Quantité de lait à traiter,ZeroIsNone=True
+                  'H':['H',ml.T("Démarrage","Start","Start") \
                             ,ml.T("Heure de démarrage","Start Time","Starttijd") \
-                            ,0.0,0.0,"hh:mm",True,84000,600,"time"], # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
-                    'E':['E',ml.T("Amont(mL)","Upstream(mL)","StroomOPwaarts(mL)") \
+                            ,0.0,0.0,"hh:mm",True,84000,600,"time"],  # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
+                  'E':['E',ml.T("Amont(mL)","Upstream(mL)","StroomOPwaarts(mL)") \
                          ,ml.T("Volume des tuyaux en amont(cm*0,7854*d²)","Upstream Pipes Volume(cm*0,7854*d²)","StroomOPwaarts leidingvolume(cm*0,7854*d²)") \
-                         ,0.0,0.0,'mL',False,2000,1,"number"], # Volume des tuyaux en entrée du pasteurisateur
-                    'S':['S',ml.T("Aval(mL)","Downstream(mL)","StroomAFwaarts(mL)") \
+                         ,0.0,0.0,'mL',False,2000,1,"number"],  # Volume des tuyaux en entrée du pasteurisateur
+                  'S':['S',ml.T("Aval(mL)","Downstream(mL)","StroomAFwaarts(mL)") \
                          ,ml.T("Volume des tuyaux en aval(cm*0,7854*d²)","Downstream Pipes Volume(cm*0,7854*d²)","StroomAFwaarts leidingvolume(cm*0,7854*d²)") \
-                         ,0.0,0.0,'mL',False,15000,1,"number"], # Volume des tuyaux en sortie du pasteurisateur
-                    'z':['z',ml.T("Pré-configuration","Pre-configuration","Pre-configuratie") \
+                         ,0.0,0.0,'mL',False,15000,1,"number"],  # Volume des tuyaux en sortie du pasteurisateur
+                  'z':['z',ml.T("Pré-configuration","Pre-configuration","Pre-configuratie") \
                          ,ml.T("Code de pré-configuration","Pre-configuration code","Pre-configuratiecode") \
-                         ,'L','L',"hh:mm",True,None,None,"text"] }
+                         ,'L','L',"hh:mm",True,None,None,"text"]}
                     # 'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
                     #         ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
 menus.sortedOptions = "FPMGwDdHRrusCcAaZES" #T
@@ -1769,7 +1769,7 @@ opSequences = {
           Operation('DetN','PAUS',message=ml.T("Mettre dans le seau le désinfectant acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the sanitizer and the 2 pipes, then restart!","Doe het ontsmettingsmiddel en de 2 pijpen in de emmer, en herstart!"),ref='R',dump=False,bin=buck.DESI,bout=buck.DESI,kbin=0.0,qbout=True),
           Operation('Deti','PUMP', base_speed=OPT_SPEED, qty=lambda:total_volume, ref='D', dump=False),
           Operation('Detj','PUMP', base_speed=MAX_SPEED, qty=lambda:(total_volume * 2.0), ref='D', dump=False),
-          Operation('Detn','PAUS',message=ml.T("Laisser tremper si désiré puis redémarrer!","Let soak for a while if desired then restart!","Laat eventueel weken, en herstart!"),ref='D',dump=False),
+          Operation('Detn','PAUS',message=ml.T("Laisser tremper si désiré puis redémarrer!","Let soak for a while if desired then restart!","Laat eventueel weken, en herstart!"),ref='D',duration=lambda:menus.val('d'),dump=False),
           Operation('Dets','SEAU', message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"), ref='D', dump=False, bin=[buck.DESI,buck.WPOT], bout=buck.DESI, kbin=lambda:total_volume, qbin=True, qbout=True),
           Operation('Detf','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='D', dump=False),
           Operation('Detr','PAUS', message=ml.T("Evacuer le seau de désinfectant et lancer un dernier rinçage!","Remove the bucket with sanitizer and restart for a last rinse!","Verwijder de emmer met ontsmettingsmiddel en herstart aan een laatste spoeling!"), ref='D', dump=False, bin=[buck.WPOT,buck.RECUP], bout=buck.RECUP, kbin=lambda:total_volume, qbout=True),
