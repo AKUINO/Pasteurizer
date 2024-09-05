@@ -1343,9 +1343,11 @@ class Operation(object):
 
         requiredTime = self.duration() if self.duration else None
         if requiredTime and T_Pump.currOpContext and (T_Pump.currOpContext.duration() >= requiredTime):
-            if self.typeOp in 'PAUS':
+            if self.typeOp == 'PAUS':
                 print ('Waited=%d vs Required=%d' % (T_Pump.currOpContext.duration() , requiredTime) )
-            return True
+                T_Pump.setPause(False)
+                time.sleep(0.01)
+        return True
         currqty = self.quantity()
         if self.typeOp == 'HEAT':
             #if float(cohorts.getCalibratedValue('heating')) >= float(self.tempWithGradient()-HYSTERESIS):
