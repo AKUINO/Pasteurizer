@@ -2257,6 +2257,8 @@ class ThreadPump(threading.Thread):
                     speed = 0.0
                     if GreenLED:
                         GreenLED.blink(2) # blink twice per second
+                    if self.currOperation and self.currOperation.typeOp == 'PAUS' and self.currOperation.duration and self.currOperation.isFinished():
+                        self.nextOperation()
                 else:
                     if GreenLED:
                         if RedPendingConfirmation != 0.0 and self.currAction in [None,'X','Z',' ']:
