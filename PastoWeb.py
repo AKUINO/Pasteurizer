@@ -1342,12 +1342,18 @@ class Operation(object):
         dumpValve.set(1.0 if self.dump else 0.0) # Will stop command if open/close duration is done
 
         requiredTime = self.duration() if self.duration else None
-        if requiredTime and T_Pump.currOpContext and (T_Pump.currOpContext.duration() >= requiredTime):
-            if self.typeOp == 'PAUS':
-                print ('Waited=%d vs Required=%d' % (T_Pump.currOpContext.duration() , requiredTime) )
-                T_Pump.setPause(False)
-                time.sleep(0.01)
-        return True
+        if requiredTime and T_Pump.currOpContext:
+            try:
+                currDuration = T_Pump.currOpContext.duration()
+                if currDuration >= requiredTime:
+                    if self.typeOp == 'PAUS':
+                        print ('Waited=%d vs Required=%d' % (currDuration, requiredTime) )
+                        T_Pump.setPause(False)
+                        time.sleep(0.01)
+                    return True
+            except:
+                print ('Op=%s vs Required=%d' % (self.typeOp, requiredTime) )
+                traceback.print_exc()
         currqty = self.quantity()
         if self.typeOp == 'HEAT':
             #if float(cohorts.getCalibratedValue('heating')) >= float(self.tempWithGradient()-HYSTERESIS):
