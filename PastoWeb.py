@@ -2234,7 +2234,7 @@ class ThreadPump(threading.Thread):
                     # Level2 = Output (pulled LOW = OK, in Air, NOT in liquid), HIGH = in Liquid: Pause!
                     hardConf.io.write_pin(hardConf.MICHApast.LEVEL2_FLAG_REG,1) # Enable Level detection (not meaning 0=PULLDOWN)
                     self.level2 = hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR2_REG)
-                    print ("Output in liquid=%d" % self.level2)
+                    #print ("Output in liquid=%d" % self.level2)
                     if self.level2 and T_Pump.currAction in ['M','E','P','H','I']:
                         self.setPause(True)
                 if Buzzer:
