@@ -1345,9 +1345,9 @@ class Operation(object):
         if requiredTime and T_Pump.currOpContext:
             try:
                 currDuration = T_Pump.currOpContext.duration()
+                print ('Waited=%d vs Required=%d, Op=%s' % (currDuration, requiredTime,self.typeOp) )
                 if currDuration >= requiredTime:
                     if self.typeOp == 'PAUS':
-                        print ('Waited=%d vs Required=%d' % (currDuration, requiredTime) )
                         T_Pump.setPause(False)
                         time.sleep(0.01)
                     return True
@@ -1778,7 +1778,7 @@ opSequences = {
           Operation('DetI','FLOO',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, ref='D',dump=False),
           Operation('DetN','PAUS',message=ml.T("Mettre dans le seau le désinfectant acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the sanitizer and the 2 pipes, then restart!","Doe het ontsmettingsmiddel en de 2 pijpen in de emmer, en herstart!"),ref='R',dump=False,bin=buck.DESI,bout=buck.DESI,kbin=0.0,qbout=True),
           Operation('Deti','PUMP', base_speed=OPT_SPEED, qty=lambda:total_volume, ref='D', dump=False),
-          Operation('Detj','PUMP', base_speed=MAX_SPEED, qty=lambda:(total_volume * 2.0), ref='D', dump=False),
+          #Operation('Detj','PUMP', base_speed=MAX_SPEED, qty=lambda:(total_volume * 2.0), ref='D', dump=False),
           Operation('Detn','PAUS',message=ml.T("Laisser tremper si désiré puis redémarrer!","Let soak for a while if desired then restart!","Laat eventueel weken, en herstart!"),ref='D',duration=lambda:menus.val('d'),dump=False),
           Operation('Dets','SEAU', message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"), ref='D', dump=False, bin=[buck.DESI,buck.WPOT], bout=buck.DESI, kbin=lambda:total_volume, qbin=True, qbout=True),
           Operation('Detf','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='D', dump=False),
