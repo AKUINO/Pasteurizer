@@ -2084,7 +2084,7 @@ class ThreadPump(threading.Thread):
                     return subr.operation.duration() - subr.duration(), warning
                 return 0, warning
         else: # Timed operation
-            if not self.paused:
+            if not self.paused or self.currOperation.typeOp == 'PAUS':
                 self.lastDurationEval = self.currOperation.duration() - self.currOpContext.duration()
             return int(self.lastDurationEval), warning
 
