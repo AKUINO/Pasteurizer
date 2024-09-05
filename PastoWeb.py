@@ -2225,12 +2225,12 @@ class ThreadPump(threading.Thread):
 
                 if hardConf.MICHA_device and hardConf.io: # Output probably in the buffer tank
                     # Level1 = Input (pulled HIGH = OK, in liquid), LOW = in Air: Pause!
-                    hardConf.io.write_pin(hardConf.MICHApast.LEVEL1_FLAG_REG,1) # PULLUP
+                    hardConf.io.write_pin(hardConf.MICHApast.LEVEL1_FLAG_REG,1) # Enable Level detection (not meaning 1=PullUp)
                     self.level1 = hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR1_REG)
                     if self.level1 == 0 and T_Pump.currAction in ['M','E','P','H','I']:
                         self.setPause(True)
                     # Level2 = Output (pulled LOW = OK, in Air, NOT in liquid), HIGH = in Liquid: Pause!
-                    hardConf.io.write_pin(hardConf.MICHApast.LEVEL2_FLAG_REG,0) # PULLDOWN
+                    hardConf.io.write_pin(hardConf.MICHApast.LEVEL2_FLAG_REG,1) # Enable Level detection (not meaning 0=PULLDOWN)
                     self.level2 = hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR2_REG)
                     print ("Output in liquid=%d" % self.level2)
                     if self.level2 and T_Pump.currAction in ['M','E','P','H','I']:
