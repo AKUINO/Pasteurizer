@@ -888,6 +888,7 @@ class ThreadDAC(threading.Thread):
         self.totalWatts2 = 0.0
         self.currLog = None
         self.empty_tank = False
+        self.danger = False
 
     def set_temp(self,setpoint=None, refpoint=None):
         if refpoint:
@@ -2163,6 +2164,7 @@ class ThreadPump(threading.Thread):
         self.running = True
         self.stopRequest = False
         self.pasteurizationDurations = {}
+        danger_detected = False
 
         speed = 0.0
         prec_speed = 0.0
@@ -2253,6 +2255,13 @@ class ThreadPump(threading.Thread):
                         self.level2 = 0
                 if Buzzer:
                     Buzzer.off()
+
+                if T_DAC.danger:
+                    if not danger_detected:
+                        if Buzzer:
+                            Buzzer.on()
+                        RedLED.blink(2)
+                danger_detected = T_DAC.danger
 
                 if self.forcing > 0:
                     now = int(time.time())
@@ -2677,6 +2686,7 @@ def LogData(letter):
             danger = str(ml.T('Cuve de chauffe VIDE ou déconnectée?','Heating tank EMPTY or disconnected?','Verwarmingstank LEEG of losgemaakte?'))
         elif warning:
             danger = str(ml.T('Cuve de chauffe mal remplie?','Heating tank not correctly filled?','Verwarmingstank niet correct gevuld?'))
+        T_DAC.danger = danger != ''
     return {    'date': str(datetime.fromtimestamp(int(nowT))), \
                 'actif': 1 if actif else 0, \
                 'actionletter': T_Pump.currAction, \
