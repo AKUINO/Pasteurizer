@@ -38,6 +38,7 @@ class Pump_Calibration:
         self.LH_to_RPM = numpy.polynomial.Polynomial([12.28124,1.03637,0.001046376])
         self.maximal_liters = self.RPM_to_LH(self.maxRPM)
         self.currspeed = 0 # last speed requested (RPM)
+        self.tap_open = None # time when water tap was opened (tap timing)
 
     def __str__(self):
         return 'Pump LH='+str(self.RPM_to_LH)+", RPM="+str(self.LH_to_RPM)+", MaxRPM="+str(self.maxRPM)+(", "+str(self.measures.shape[0])+" measures" if self.measures is not None else "")

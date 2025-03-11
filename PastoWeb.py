@@ -389,6 +389,7 @@ dry_volume = 0.0
 # pumpy = pump.pump()
 pumpy = pump_pwm.pump_PWM()
 pumpy.buzzer = Buzzer
+# pumpy.solenoid is initialized further down below
 
 def init_volumes():
 
@@ -2411,7 +2412,7 @@ for i in range(1,lines):
 
 # Solenoids:
 hotTapSolenoid = Solenoid('TAP',hardConf.TAP)
-
+pumpy.solenoid = hotTapSolenoid
 reloadPasteurizationSpeed()
 
 T_OneWire = None
@@ -3042,7 +3043,16 @@ class WebCalibratePump:
             elif param_action == 'dl':
                 if row_timestamp:
                     currPump.calibration.remove(row_timestamp)
-        return render.calibrate_pump(param_action, currPump.calibration)
+            elif param_action == 'tap':
+                print ("Tap open!")
+                hotTapSolenoid.set(1) # open the tap !
+                currPump.calibration.tap_open = time.perf_counter()
+            elif param_action == 'tp':
+                if 'mLtap' in data and data['mLtap']:
+                    menus.options['u'][Menus.VAL] = int(data['mLtap'])/1000.0 # stored in Liters !
+                    menus.options['r'][Menus.VAL] = currPump.calibration.timeslice
+                    menus.save()
+            return render.calibrate_pump(param_action, currPump.calibration)
 
     def POST(self):
         return self.GET()

@@ -109,17 +109,24 @@ class ReadPump_PWM(threading.Thread):
             else:
                 prv = now
             now = time.perf_counter()
-            if self.pump.calibration.ongoing and self.pump.speed > 0.0:
-                # Manage the calibration process
-                if (now-calibration_bip) >= self.pump.calibration.timeslice:
-                    calibration_bip = now
-                    if self.pump.buzzer:
-                        self.pump.buzzer.on()
+            if self.pump.calibration.ongoing:
+                if self.pump.calibration.tap_open:
+                    if (now-self.pump.calibration.tap_open) >= self.pump.calibration.timeslice:
+                        if self.pump.solenoid:
+                            self.pump.solenoid.set(0) # close the tap after timeslice seconds
+                        self.pump.calibration.tap_open = None
+                        print("Tap closed")
+                if self.pump.speed > 0.0:
+                    # Manage the calibration process
+                    if (now-calibration_bip) >= self.pump.calibration.timeslice:
+                        calibration_bip = now
+                        if self.pump.buzzer:
+                            self.pump.buzzer.on()
+                        else:
+                            print ('BUZZ!')
                     else:
-                        print ('BUZZ!')
-                else:
-                    if self.pump.buzzer:
-                        self.pump.buzzer.off()
+                        if self.pump.buzzer:
+                            self.pump.buzzer.off()
             # Manage error line from the pump driver
             prvLine = returnLine
             returnLine = self.pump.read_return()
@@ -230,6 +237,7 @@ class pump_PWM(sensor.Sensor):
         else:
             self.maximal_liters = maximal_liters
         self.buzzer = None # to enable beeps during calibration
+        self.solenoid = None # to enable closing the water tap
 
     set = None
     avg3 = None
