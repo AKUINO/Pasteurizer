@@ -105,19 +105,17 @@ $if calibration.measures is not None:
 
             <!-- This is the chart data -->
             <polyline stroke-linejoin="round"
-                      points="$(calibration.get_graph())"
-                      stroke="blue"
-                      stroke-width="3"
-                      fill="none"
-                      stroke-opacity="1"
-                      stroke-linecap="round" />
-
-            <polyline stroke-linejoin="round"
                       points="$(calibration.get_graph_formula())"
                       stroke="red"
                       stroke-width="3"
                       fill="none"
                       stroke-opacity="1"
                       stroke-linecap="round" />
+            $ coords = calibration.get_graph()
+            $for coord in coords:
+                <circle $(coord)
+                          fill="blue"
+                          r="5"/>
+
         </svg>
 </main>
