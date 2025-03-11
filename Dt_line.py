@@ -178,7 +178,7 @@ def set_pump(pump):
     global maxTime, minTime
 
     maxTime = (3600.0 * hardConf.holding_volume) / (pump.minimal_liters * 1000.0)
-    minTime = (3600.0 * hardConf.holding_volume) / (pump.maximal_liters * 1000.0)
+    minTime = (3600.0 * hardConf.holding_volume) / (pump.calibration.maximal_liters * 1000.0)
 
 def set_ref_speed(speed):
 

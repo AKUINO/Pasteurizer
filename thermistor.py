@@ -49,7 +49,7 @@ class Thermistor(sensor.Sensor):
         super().__init__(Thermistor.typeNum,address,param)
         self.bResistance = None # A,B,C are prefered except if Beta is specified in config (old Beta is 3694.0)
         self.t25Resistance = 10000.0
-        # Reinhart-hart contants (for the temperature range from 20°C to 100°C)
+        # Reinhart-hart constants (for the temperature range from 20°C to 100°C)
         self.A = 0.0010296697555538872
         self.B = 0.00023902485774993708
         self.C = 1.572127153105922e-07

@@ -8,6 +8,7 @@ import threading
 import traceback
 import sensor
 import term
+import pump_calibration
 
 import MICHApast
 import hardConf
@@ -31,7 +32,8 @@ else:
 #hardConf.MICHA_device.set_pump_speed_inc(REAL_SPEED_INCREMENT * 20)
 
 class ReadPump_PWM(threading.Thread):
-    
+    # This thread ensures monitoring of the pump driver error LED.
+    # It also manages the pump calibration procedure because its timing is relatively stable (not complex subfunctions)
     global TEST
 
     # 1:Over Current: Overcurrent alarm : constant red
@@ -88,7 +90,7 @@ class ReadPump_PWM(threading.Thread):
         return self.pump.lastError
 
     def repr(self):
-        return ("[%s, error=%s]" % (self.pump.address, self.pump.lastError) )
+        return "[%s, error=%s]" % (self.pump.address, self.pump.lastError)
 
     def run(self):
         state = None # unknown state
@@ -96,7 +98,9 @@ class ReadPump_PWM(threading.Thread):
         stateTime = now
         prv = now
         transition = now
+        calibration_bip = now
         returnLine = -1 # silly value
+        print("Read Pump Error Status started...")
         while self.OK:
             sleepTime = prv + self.sampling - now
             if sleepTime > 0:
@@ -105,6 +109,18 @@ class ReadPump_PWM(threading.Thread):
             else:
                 prv = now
             now = time.perf_counter()
+            if self.pump.calibration.ongoing and self.pump.speed > 0.0:
+                # Manage the calibration process
+                if (now-calibration_bip) >= self.pump.calibration.timeslice:
+                    calibration_bip = now
+                    if self.pump.buzzer:
+                        self.pump.buzzer.on()
+                    else:
+                        print ('BUZZ!')
+                else:
+                    if self.pump.buzzer:
+                        self.pump.buzzer.off()
+            # Manage error line from the pump driver
             prvLine = returnLine
             returnLine = self.pump.read_return()
             if returnLine != prvLine:
@@ -195,7 +211,8 @@ class pump_PWM(sensor.Sensor):
             self.pinStatus = pinStatus
         self.pumpSerial = None
         self.prec_entry = 0.0
-        self.maxRPM = hardConf.pumpMaxRPM
+        self.calibration = pump_calibration.Pump_Calibration()
+        #self.maxRPM = self.calibration.pumpMaxRPM #hardconf.MaxRPM
         self.minimal_liters = minimal_liters
         self.speed = 0.0
         self.speed_liters = 0.0
@@ -209,9 +226,10 @@ class pump_PWM(sensor.Sensor):
         self.running = False
         self.subdivision = 8
         if not maximal_liters:
-            self.maximal_liters = self.speedLitersHour(self.maxRPM)
+            self.maximal_liters = self.speedLitersHour(self.calibration.maxRPM)
         else:
             self.maximal_liters = maximal_liters
+        self.buzzer = None # to enable beeps during calibration
 
     set = None
     avg3 = None
@@ -226,7 +244,7 @@ class pump_PWM(sensor.Sensor):
             reverse = True
         #speed = 1.767022 + (1.27568*liters) - (0.0001245927*liters*liters)
         #speed = 2.862497 + (1.384241*liters) - (0.0002019344*liters*liters)
-        speed = 12.28124 + (1.03637*liters) + (0.001046376*liters*liters)
+        speed = self.calibration.LH_to_RPM(liters) # 12.28124 + (1.03637*liters) + (0.001046376*liters*liters)
         if reverse:
             speed = -speed
         return speed
@@ -242,7 +260,7 @@ class pump_PWM(sensor.Sensor):
         #LH = -2.286407 + (2.275162*speed) - (0.009631488*speed*speed)
         #LH = -1.553908 + (0.7883528*speed) + (0.00004403381*speed*speed)
         #LH = -2.255906 + (0.7268268*speed) + (0.00006146902*speed*speed)
-        LH = -9.831412 + (0.9269884*speed) - (0.0004694142*speed*speed)
+        LH = self.calibration.RPM_to_LH(speed) # -9.831412 + (0.9269884*speed) - (0.0004694142*speed*speed)
         if LH <= 0.0:
             LH = 0.0
         elif reverse:
@@ -390,7 +408,7 @@ class pump_PWM(sensor.Sensor):
         prvSpeed = -self.speed if self.reverse else self.speed
         print(" %s=%d \r" % (self.address,speed) )
         if speed is None:
-            speed = self.maxRPM
+            speed = self.calibration.maxRPM
         # running = True
         # if float(self.speed) == 0.0:
         #     running = False
@@ -410,8 +428,8 @@ class pump_PWM(sensor.Sensor):
             #     inc = True
             self.speed = speed
             self.speed_liters = liters
-        if self.maxRPM and self.speed > self.maxRPM:
-            self.speed = self.maxRPM
+        if self.calibration.maxRPM and self.speed > self.calibration.maxRPM:
+            self.speed = self.calibration.maxRPM
             self.speed_liters = self.maximal_liters
         elif not self.speed_liters:
             self.speed_liters = self.speedLitersHour(self.speed)

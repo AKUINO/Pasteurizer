@@ -288,20 +288,17 @@ menus.options =  {'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                   'H':['H',ml.T("Démarrage","Start","Start") \
                             ,ml.T("Heure de démarrage","Start Time","Starttijd") \
                             ,0.0,0.0,"hh:mm",True,84000,600,"time"],  # Hour.minutes (as a floating number, by 10 minutes),ZeroIsNone=True
-                  'E':['E',ml.T("Amont(mL)","Upstream(mL)","StroomOPwaarts(mL)") \
-                         ,ml.T("Volume des tuyaux en amont(cm*0,7854*d²)","Upstream Pipes Volume(cm*0,7854*d²)","StroomOPwaarts leidingvolume(cm*0,7854*d²)") \
-                         ,0.0,0.0,'mL',False,2000,1,"number"],  # Volume des tuyaux en entrée du pasteurisateur
-                  'S':['S',ml.T("Aval(mL)","Downstream(mL)","StroomAFwaarts(mL)") \
-                         ,ml.T("Volume des tuyaux en aval(cm*0,7854*d²)","Downstream Pipes Volume(cm*0,7854*d²)","StroomAFwaarts leidingvolume(cm*0,7854*d²)") \
-                         ,0.0,0.0,'mL',False,15000,1,"number"],  # Volume des tuyaux en sortie du pasteurisateur
+                  'L':['L',ml.T("Configuration Pompe","Pump Configuration","Pompconfiguratie") \
+                      ,ml.T("Profil de configuration de la pompe","Pump configuration profile","Pompconfiguratieprofiel") \
+                      ,0,0,'',False,9,1,"number"], \
                   'z':['z',ml.T("Pré-configuration","Pre-configuration","Pre-configuratie") \
                          ,ml.T("Code de pré-configuration","Pre-configuration code","Pre-configuratiecode") \
                          ,'L','L',"hh:mm",True,None,None,"text"]}
                     # 'Z':['Z',ml.T("Défaut","Default","Standaardwaarden") \
                     #         ,ml.T("Retour aux valeurs par défaut","Back to default values","Terug naar standaardwaarden")] }
-menus.sortedOptions = "FPMGwDdHRrusCcAaZES" #T
+menus.sortedOptions = "FPMGwDdHRrusCcAaZL" #T
 menus.cleanOptions = "PMGH" #TtK
-menus.dirtyOptions = "RrusCcAawDdHES" #Cc
+menus.dirtyOptions = "RrusCcAawDdHL" #Cc
 
 menus.loadCurrent()
 
@@ -386,11 +383,20 @@ total_volume = 0.0
 safe_total_volume = 0.0
 dry_volume = 0.0
 
+# if HEAT_EXCHANGER:
+# pumpy = pump.double_pump(addr0=0,addr1=1,inverse1=True)
+# else:
+# pumpy = pump.pump()
+pumpy = pump_pwm.pump_PWM()
+pumpy.buzzer = Buzzer
+
 def init_volumes():
 
-    global menus, cohorts, start_volume, total_volume, safe_total_volume, dry_volume
+    global menus, cohorts, start_volume, total_volume, safe_total_volume, dry_volume, pumpy
     # Volumes for the different parts of the pasteurizer circuit
     #hardConf.holding_volume = vol_tube(9.5,hardConf.holding_length) # = 625mL = 15 seconds for 150L / hour. Should be 833mL for 200L 11757
+
+    pumpy.calibration.load(menus.val('L'))
 
     if hardConf.tubing == "horizontal":
         #Amorçage=2330mL, Pasteurisation=625mL, Total=3587mL (new config system)
@@ -420,12 +426,15 @@ def init_volumes():
     up_to_extra = total_tubing
     if hardConf.vol_extra:
         up_to_extra = hardConf.vol_extra
-
-    up_to_solenoid = up_to_solenoid - 100 + menus.val('E')
-    up_to_heating_tank = up_to_heating_tank - 100 + menus.val('E')
-    up_to_thermistor = up_to_thermistor - 100 + menus.val('E')
-    up_to_extra = up_to_extra - 200 + menus.val('E') + menus.val('S')
-    total_tubing = total_tubing - 200 + menus.val('E') + menus.val('S')
+    # amont = menus.val('E')
+    # aval = menus.val('S')
+    amont = pumpy.calibration.uphill
+    aval = pumpy.calibration.downhill
+    up_to_solenoid = up_to_solenoid - 100 + amont
+    up_to_heating_tank = up_to_heating_tank - 100 + amont
+    up_to_thermistor = up_to_thermistor - 100 + amont
+    up_to_extra = up_to_extra - 200 + amont + aval
+    total_tubing = total_tubing - 200 + amont + aval
 
     cohorts.sequence = [ # Tubing and Sensor Sequence of the Pasteurizer
                         [up_to_solenoid, 'intake'], # apres la pompe
@@ -1222,9 +1231,9 @@ class Operation(object):
         if self.base_speed == OPT_SPEED:
             return optimal_speed
         if self.base_speed == HALF_SPEED:
-            return pumpy.maximal_liters / 2.0
+            return pumpy.calibration.maximal_liters / 2.0
         if self.base_speed == MAX_SPEED:
-            return pumpy.maximal_liters
+            return pumpy.calibration.maximal_liters
         return self.base_speed # If positive, absolute value
 
     # Initialize current operation and starts it if it is not the pump...
@@ -1512,7 +1521,7 @@ class Operation(object):
 
             if T_Pump.time2speedL(time_for_temp) >= T_Pump.pump.minimal_liters:
                 speed = T_Pump.dynamicRegulation(time_for_temp)
-                T_Pump.pasteurizationOverSpeed = speed >= T_Pump.pump.maximal_liters
+                T_Pump.pasteurizationOverSpeed = speed >= T_Pump.pump.calibration.maximal_liters
                 if reportPasteur.startRegulating:
                     reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, (cohorts.mL('warranty')) / 1000.0))
                     reportPasteur.startRegulating = 0
@@ -1586,11 +1595,11 @@ class Operation(object):
                 elif speed == 0.0:
                     speed = self.desired_speed()
         if speed >= 0.0:
-            if speed > T_Pump.pump.maximal_liters:
-                speed = T_Pump.pump.maximal_liters
+            if speed > T_Pump.pump.calibration.maximal_liters:
+                speed = T_Pump.pump.calibration.maximal_liters
         else:
-            if speed < -T_Pump.pump.maximal_liters:
-                speed = -T_Pump.pump.maximal_liters
+            if speed < -T_Pump.pump.calibration.maximal_liters:
+                speed = -T_Pump.pump.calibration.maximal_liters
         #print("RUN speed="+str(speed)+"\r")
         return speed
 
@@ -1629,11 +1638,6 @@ class Operation(object):
         dumpValve.setWait(1.0 if self.dump else 0.0)
 
 # Tracks volumes based on speed and time
-# if HEAT_EXCHANGER:
-    # pumpy = pump.double_pump(addr0=0,addr1=1,inverse1=True)
-# else:
-    # pumpy = pump.pump()
-pumpy = pump_pwm.pump_PWM()
 Dt_line.set_pump(pumpy)
 cohorts.pumpAddress = pumpy.address
 cohorts.addSensor(pumpy.address,pumpy)
@@ -1754,7 +1758,7 @@ opSequences = {
           Operation('DesI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, dump=False),
           Operation('DesN','PAUS','intake','input',ref='A',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),dump=False,bin=buck.ACID,bout=buck.ACID,kbin=0.0,qbout=True),
           Operation('Desi','PUMP','intake','input', ref='A', base_speed=MAX_SPEED, qty=lambda:start_volume, dump=False),
-          Operation('Desh','TRAK','intake','input', ref='A', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=lambda:total_volume * 2.0, shake_qty=total_volume, dump=False),
+          Operation('Desh','TRAK','intake','input', ref='A', base_speed=MAX_SPEED, min_speed=-pumpy.calibration.maximal_liters, qty=lambda:total_volume * 2.0, shake_qty=total_volume, dump=False),
           Operation('Desf','SUBR',duration=lambda:menus.val('a'),subSequence='a',dump=False),
           Operation('Dess','SEAU', message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"), dump=False, bin=[buck.ACID,buck.RECUP], bout=buck.ACID, kbin=lambda:total_volume, qbin=True, qbout=True),
           Operation('Desf','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='A', dump=False),
@@ -1770,7 +1774,7 @@ opSequences = {
         #   Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
         #   Operation('DetI','FLOO','intake',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=True),  #
         #   Operation('Dety','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='D',dump=False),
-        #   Operation('Deth','TRAK','intake','input', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, ref='D', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
+        #   Operation('Deth','TRAK','intake','input', base_speed=MAX_SPEED, min_speed=-pumpy.calibration.maximal_liters, ref='D', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
         #   Operation('CLOS','MESS',message=ml.T("DANGER: Eau chaude sous pression. Mettre des gants pour séparer les tuyaux!","DANGER: Hot water under pressure. Wear gloves to separate the pipes!","GEVAAR: Heet water onder druk. Draag handschoenen om de leidingen te scheiden!"),dump=True)
         #   ],
         [ Operation('DetT','HEAT', ref='D', dump=False, programmable=True, waitAdd=True, bin=[buck.DESI,buck.WPOT], bout=buck.DESI, kbin=lambda: (total_volume if State.empty else 0.0) + DILUTE_VOL),
@@ -1795,7 +1799,7 @@ opSequences = {
           Operation('NetI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL,dump=False),
           Operation('NetY','PAUS','intake','input',ref='C',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),dump=False,bin=buck.CAUS,bout=buck.CAUS,kbin=0.0,qbout=True),
           Operation('Neti','PUMP','intake','input', ref='C', base_speed=MAX_SPEED, qty=lambda:start_volume, dump=False),
-          Operation('Neth','TRAK','intake','input', ref='C', base_speed=MAX_SPEED, min_speed=-pumpy.maximal_liters, qty=lambda:total_volume * 2.0, shake_qty=total_volume, dump=False),
+          Operation('Neth','TRAK','intake','input', ref='C', base_speed=MAX_SPEED, min_speed=-pumpy.calibration.maximal_liters, qty=lambda:total_volume * 2.0, shake_qty=total_volume, dump=False),
           Operation('Neto','SUBR',duration=lambda:menus.val('c'),subSequence='c',dump=False),
           #Operation('NetV','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,dump=True),
           Operation('Nets','SEAU', message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"), dump=True, bin=[buck.CAUS,buck.WPOT], bout=buck.CAUS, kbin=lambda:total_volume, qbin=True, qbout=True),
@@ -1866,8 +1870,8 @@ def reloadPasteurizationSpeed():
         menus.store('M', 12.0)
     optimal_speed = (mL_L(hardConf.holding_volume) / menus.val('M')) * 3600.0 # duree minimale de pasteurisation (sec) --> vitesse de la pompe en L/heure
 
-    if optimal_speed > pumpy.maximal_liters: # trop lent est sans doute dangereux
-        optimal_speed = pumpy.maximal_liters
+    if optimal_speed > pumpy.calibration.maximal_liters: # trop lent est sans doute dangereux
+        optimal_speed = pumpy.calibration.maximal_liters
     elif optimal_speed < pumpy.minimal_liters: # trop lent est sans doute dangereux
         optimal_speed = pumpy.minimal_liters
 
@@ -2260,7 +2264,8 @@ class ThreadPump(threading.Thread):
                     if not danger_detected:
                         if Buzzer:
                             Buzzer.on()
-                        RedLED.blink(2)
+                        if RedLED:
+                            RedLED.blink(2)
                 danger_detected = T_DAC.danger
 
                 if self.forcing > 0:
@@ -2280,19 +2285,22 @@ class ThreadPump(threading.Thread):
                             pass
                         else:
                             GreenLED.off()
-                    if not self.currOperation:
-                        if not self.currSequence or not len(self.currSequence):
-                            speed = 0.0
-                            T_DAC.set_temp(None, None)
-                            #T_DAC.set_cold(None)
-                        else:
-                            self.nextOperation()
-                    while self.currOperation and self.currOperation.isFinished(): # Is it finished?
-                        self.nextOperation()
-                    if self.currOperation:
-                        speed = self.currOperation.execute(now)
+                    if self.pump.calibration.ongoing:
+                        pass # do not touch anything !
                     else:
-                        speed = 0.0
+                        if not self.currOperation:
+                            if not self.currSequence or not len(self.currSequence):
+                                speed = 0.0
+                                T_DAC.set_temp(None, None)
+                                #T_DAC.set_cold(None)
+                            else:
+                                self.nextOperation()
+                        while self.currOperation and self.currOperation.isFinished(): # Is it finished?
+                            self.nextOperation()
+                        if self.currOperation:
+                            speed = self.currOperation.execute(now)
+                        else:
+                            speed = 0.0
                 if YellowLED:
                     if RedPendingConfirmation != 0.0 and self.currAction in [None,'X','Z',' ']:
                         pass
@@ -2301,7 +2309,7 @@ class ThreadPump(threading.Thread):
                     else:
                         YellowLED.on()
                 prec_speed = self.pump.liters()
-                if speed != prec_speed:
+                if speed != prec_speed and not self.pump.calibration.ongoing:
                     time.sleep(0.01)
                     if speed == 0.0:
                         self.pump.stop()
@@ -2616,6 +2624,9 @@ class WebExplain:
 
     def GET(self, letter):
 
+        if T_Pump.pump.calibration.ongoing:
+            T_Pump.pump.calibration.ongoing = False
+            T_Pump.pump.stop()
         data, connected, mail, password = init_access()
         return render.index(connected,mail, False, letter, False, False)
 
@@ -2754,6 +2765,9 @@ class WebApiAction:
 
         global menus, WebExit, dumpValve
 
+        if T_Pump.pump.calibration.ongoing:
+            T_Pump.pump.calibration.ongoing = False
+            T_Pump.pump.stop()
         data, connected, mail, password = init_access()
         web.header('Content-type', 'application/json; charset=utf-8')
         if not connected:
@@ -2946,6 +2960,92 @@ class WebCalibrate:
 
     def POST(self, param_sensor=None):
         return self.GET(param_sensor)
+
+class WebCalibratePump:
+
+    def __init(self):
+        self.name = u"WebCalibratePump"
+
+    def GET(self):
+
+        #global calibrating, temp_ref_calib
+
+        data, connected, mail, password = init_access()
+        means = {}
+        currPump = T_Pump.pump
+        if T_Pump.currAction not in [None,'X','Z',' ']: # Immediate stop, no confirmation
+            T_Pump.stopAction()
+        currPump.calibration.ongoing = True
+        newSpeed = None
+        param_action:str = None
+        id_config = 0
+        row_timestamp = None
+        if not connected or currPump is None:
+            raise web.seeother('/')
+        else:
+            if 'rpm' in data and data['rpm']:
+                newSpeed = int(data['rpm'])
+            if 'action' in data and data['action']:
+                param_action = data['action']
+                if (param_action.startswith("go") or param_action.startswith("mx")) and len(param_action) > 2:
+                    newSpeed = int(param_action[2:])
+                    param_action = param_action[:2]
+                elif param_action.startswith("dl") and len(param_action) > 2:
+                    row_timestamp = float(param_action[2:])
+                    param_action = param_action[:2]
+            if 'id' in data and data['id']:
+                id_config = int(data['id'])
+            if not param_action:
+                pass # do nothing except display the calibration form
+            # record the pump configuration in ../PasteurizerData/calibs/pump.json
+            elif param_action == 'load':
+                currPump.calibration.load(id_config)
+                if id_config != menus.options['L'][Menus.VAL]:
+                    menus.options['L'][Menus.VAL] = id_config
+                    menus.save()
+            elif param_action == 'save':
+                if 'idsaved' in data and data['idsaved']:
+                    id_config = int(data['idsaved'])
+                if not id_config:
+                    id_config = currPump.calibration.id
+                if 'description' in data and data['description']:
+                    currPump.calibration.description = data['description']
+                if 'uphill' in data and data['uphill']:
+                    currPump.calibration.uphill = int(data['uphill'])
+                if 'downhill' in data and data['downhill']:
+                    currPump.calibration.downhill = int(data['downhill'])
+                if 'stepRPM' in data and data['stepRPM']:
+                    currPump.calibration.stepRPM = int(data['stepRPM'])
+                if 'timeslice' in data and data['timeslice']:
+                    currPump.calibration.timeslice = int(data['timeslice'])
+                currPump.calibration.save(True,id_config)
+            # Ask to run the pump at a given RPM to check when it begins choking.
+            # The last speed requested is kept as the absolute max speed of the pump
+            # but the RECORD CALIBRATION button must be pressed to keep it permanently
+            elif param_action == 'go' or param_action == 'mx':
+                if newSpeed is None:
+                    pass
+                elif newSpeed <= 0: # This is not NONE !
+                    currPump.stop() # max without RPM specified = STOP running !
+                    currPump.calibration.currspeed = 0
+                else:
+                    if param_action == 'mx':
+                        currPump.calibration.maxRPM = newSpeed
+                        currPump.calibration.save(False,currPump.calibration.id)
+                    currPump.calibration.currspeed = newSpeed
+                    currPump.run(newSpeed, currPump.speedLitersHour(newSpeed))
+            elif param_action == 'add':
+                if currPump.calibration.currspeed > 0:
+                    if 'mLadd' in data and data['mLadd']:
+                        lh = currPump.calibration.scale_mL_to_LH(currPump.calibration.timeslice,int(data['mLadd']))
+                        currPump.calibration.add(currPump.calibration.currspeed,lh)
+            elif param_action == 'dl':
+                if row_timestamp:
+                    currPump.calibration.remove(row_timestamp)
+        return render.calibrate_pump(param_action, currPump.calibration)
+
+    def POST(self):
+        return self.GET()
 
 class WebApiPut:
 
@@ -3341,6 +3441,7 @@ try:
         '/option(.)', 'WebOption',
         '/calibrate/(.+)', 'WebCalibrate',
         '/calibrate', 'WebCalibrate',
+        '/calibrate-pump', 'WebCalibratePump',
         '/linear/(.+)/(.+)/(.+)', 'WebApiLinear',
         '/linear/(.+)', 'WebApiLinear',
         '/api/log', 'WebApiLog',
