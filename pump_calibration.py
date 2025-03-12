@@ -142,10 +142,11 @@ class Pump_Calibration:
 
     def get_graph(self): # returns three lists of measures (time, RPM and LH)
         points = []
-        r = self.measures['RPM'].tolist()
-        l = self.measures['LH'].tolist()
-        for i in range(self.measures.shape[0]):
-            points.append("cx="+str(int(r[i]*5/6))+" cy="+str(400-int(l[i])))
+        if self.measures:
+            r = self.measures['RPM'].tolist()
+            l = self.measures['LH'].tolist()
+            for i in range(self.measures.shape[0]):
+                points.append("cx="+str(int(r[i]*5/6))+" cy="+str(400-int(l[i])))
         return points
 
     def get_graph_formula(self): # returns three lists of measures (time, RPM and LH)
