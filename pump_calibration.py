@@ -142,7 +142,7 @@ class Pump_Calibration:
 
     def get_graph(self): # returns three lists of measures (time, RPM and LH)
         points = []
-        if self.measures:
+        if self.measures is not None:
             r = self.measures['RPM'].tolist()
             l = self.measures['LH'].tolist()
             for i in range(self.measures.shape[0]):
