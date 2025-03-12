@@ -60,7 +60,7 @@ $var title : Pump Calibration
             </select>
         </div>
         <button type="submit" name="action" value="save" class="btn btn-success">$(ml.T("Enregistrer","Save","Redden"))</button></form><hr/>
-$if calibration.measures is not None:
+
     <form><table cellpadding="3">
     $ times, rpms, lhs = calibration.get_spaced()
     $ i = 0
