@@ -2174,6 +2174,8 @@ class ThreadPump(threading.Thread):
         speed = 0.0
         prec_speed = 0.0
 
+        calibration_bip = 0
+
         while self.running:
             try:
                 time.sleep(PUMP_LOOP_DELAY)
@@ -2278,8 +2280,11 @@ class ThreadPump(threading.Thread):
                     speed = 0.0
                     if GreenLED:
                         GreenLED.blink(2) # blink twice per second
-                    if self.currOperation and self.currOperation.typeOp == 'PAUS' and self.currOperation.duration and self.currOperation.isFinished():
-                        self.nextOperation()
+                    if self.pump.calibration.ongoing:
+                        pass # do not touch anything !
+                    else:
+                        if self.currOperation and self.currOperation.typeOp == 'PAUS' and self.currOperation.duration and self.currOperation.isFinished():
+                            self.nextOperation()
                 else:
                     if GreenLED:
                         if RedPendingConfirmation != 0.0 and self.currAction in [None,'X','Z',' ']:
@@ -3053,6 +3058,7 @@ class WebCalibratePump:
                         currPump.calibration.maxRPM = newSpeed
                         currPump.calibration.save(False,currPump.calibration.id)
                     currPump.calibration.currspeed = newSpeed
+                    T_Pump.setPause(False)
                     currPump.run(newSpeed, currPump.speedLitersHour(newSpeed))
             elif param_action == 'add':
                 if currPump.calibration.currspeed > 0:

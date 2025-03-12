@@ -98,7 +98,7 @@ class ReadPump_PWM(threading.Thread):
         stateTime = now
         prv = now
         transition = now
-        calibration_bip = now
+        # calibration_bip = now
         returnLine = -1 # silly value
         print("Read Pump Error Status started...")
         while self.OK:
@@ -109,24 +109,24 @@ class ReadPump_PWM(threading.Thread):
             else:
                 prv = now
             now = time.perf_counter()
-            if self.pump.calibration.ongoing:
-                if self.pump.calibration.tap_open:
-                    if (now-self.pump.calibration.tap_open) >= self.pump.calibration.timeslice:
-                        if self.pump.solenoid:
-                            self.pump.solenoid.set(0) # close the tap after timeslice seconds
-                        self.pump.calibration.tap_open = None
-                        print("Tap closed")
-                if self.pump.speed > 0.0:
-                    # Manage the calibration process
-                    if (now-calibration_bip) >= self.pump.calibration.timeslice:
-                        calibration_bip = now
-                        if self.pump.buzzer:
-                            self.pump.buzzer.on()
-                        else:
-                            print ('BUZZ!')
-                    else:
-                        if self.pump.buzzer:
-                            self.pump.buzzer.off()
+            # if self.pump.calibration.ongoing:
+            #     if self.pump.calibration.tap_open:
+            #         if (now - self.pump.calibration.tap_open) >= self.pump.calibration.timeslice:
+            #             if self.pump.solenoid:
+            #                 self.pump.solenoid.set(0)  # close the tap after timeslice seconds
+            #             self.pump.calibration.tap_open = None
+            #             print("Tap closed")
+            #     if self.pump.speed > 0.0:
+            #         # Manage the calibration process
+            #         if (now - calibration_bip) >= self.pump.calibration.timeslice:
+            #             calibration_bip = now
+            #             if self.pump.buzzer:
+            #                 self.pump.buzzer.on()
+            #             else:
+            #                 print('BUZZ!')
+            #         else:
+            #             if self.pump.buzzer:
+            #                 self.pump.buzzer.off()
             # Manage error line from the pump driver
             prvLine = returnLine
             returnLine = self.pump.read_return()
