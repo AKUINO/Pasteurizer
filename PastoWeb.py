@@ -2253,7 +2253,7 @@ class ThreadPump(threading.Thread):
                         hardConf.io.write_pin(hardConf.MICHApast.LEVEL2_FLAG_REG,1) # Enable Level detection if pasteurizing (not meaning 0=PULLDOWN)
                         self.level2 = hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR2_REG)
                         #print ("Output in liquid=%d" % self.level2)
-                        if self.level2:
+                        if self.level2 >= 1:
                             self.setPause(True)
                     else:
                         hardConf.io.write_pin(hardConf.MICHApast.LEVEL1_FLAG_REG,0) # Disable Level detection
