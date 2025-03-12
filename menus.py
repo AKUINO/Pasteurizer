@@ -49,6 +49,9 @@ class Menus(object):
     def val(self,letter):
         return self.options[letter][Menus.VAL]
 
+    def intval(self,letter):
+        return int(float(self.options[letter][Menus.VAL]))
+
     def ini(self,letter):
         return self.options[letter][Menus.INI]
 

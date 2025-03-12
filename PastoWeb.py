@@ -1247,7 +1247,7 @@ class Operation(object):
         T_Pump.currOpContext = OperationContext(self,T_Pump.pump)
         T_Pump.forcible = False # unless TRAK...
         #print("%d >= %d" % ( (int(datetime.now().timestamp()) % (24*60*60)), int(menus.val('H'))) )
-        if not self.programmable or not menus.val('H') or (int(time.time()) % (24*60*60)) >= int(menus.val('H')):
+        if not self.programmable or not menus.val('H') or (int(time.time()) % (24*60*60)) >= menus.valint('H'):
             T_Pump.T_DAC.set_temp(self.tempWithGradient(), self.tempRef())
         else:
             T_Pump.T_DAC.set_temp(None,None) # Delayed start
@@ -1447,7 +1447,7 @@ class Operation(object):
         Dt_line.set_ref_temp(self.tempRef(),menus.val('z'))
         dumpValve.set(1.0 if self.dump else 0.0) # Will stop command if open/close duration is done
         #print("%d >= %d" % ( (int(datetime.now().timestamp()) % (24*60*60)), int(menus.val('H'))) )
-        if not self.programmable or not menus.val('H') or (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
+        if not self.programmable or not menus.val('H') or (int(datetime.now().timestamp()) % (24*60*60)) >= menus.valint('H'):
             T_Pump.T_DAC.set_temp(self.tempWithGradient(),self.tempRef()) # In case of a manual change
         else:
             T_Pump.T_DAC.set_temp(None,None) #, None) # Delayed start
@@ -1609,7 +1609,7 @@ class Operation(object):
 
         global T_Pump, menus, hotTapSolenoid
 
-        if self.programmable and menus.val('H') and menus.val('H') != 0.0 and (int(datetime.now().timestamp()) % (24*60*60)) >= int(menus.val('H')):
+        if self.programmable and menus.val('H') and menus.val('H') != 0.0 and (int(datetime.now().timestamp()) % (24*60*60)) >= menus.valint('H'):
             menus.store('H', 0.0)
         #T_Pump.T_DAC.set_cold(None)
         if self.typeOp in ['FILL','FLOO','RFLO','HOTW']:
@@ -2985,7 +2985,7 @@ class WebCalibratePump:
             raise web.seeother('/')
         else:
             if 'rpm' in data and data['rpm']:
-                newSpeed = int(data['rpm'])
+                newSpeed = int(float(data['rpm']))
             if 'action' in data and data['action']:
                 param_action = data['action']
                 if (param_action.startswith("go") or param_action.startswith("mx")) and len(param_action) > 2:
@@ -3012,13 +3012,13 @@ class WebCalibratePump:
                 if 'description' in data and data['description']:
                     currPump.calibration.description = data['description']
                 if 'uphill' in data and data['uphill']:
-                    currPump.calibration.uphill = int(data['uphill'])
+                    currPump.calibration.uphill = int(float(data['uphill']))
                 if 'downhill' in data and data['downhill']:
-                    currPump.calibration.downhill = int(data['downhill'])
+                    currPump.calibration.downhill = int(float(data['downhill']))
                 if 'stepRPM' in data and data['stepRPM']:
-                    currPump.calibration.stepRPM = int(data['stepRPM'])
+                    currPump.calibration.stepRPM = int(float(data['stepRPM']))
                 if 'timeslice' in data and data['timeslice']:
-                    currPump.calibration.timeslice = int(data['timeslice'])
+                    currPump.calibration.timeslice = int(float(data['timeslice']))
                 currPump.calibration.save(True,id_config)
             # Ask to run the pump at a given RPM to check when it begins choking.
             # The last speed requested is kept as the absolute max speed of the pump
@@ -3038,7 +3038,7 @@ class WebCalibratePump:
             elif param_action == 'add':
                 if currPump.calibration.currspeed > 0:
                     if 'mLadd' in data and data['mLadd']:
-                        lh = currPump.calibration.scale_mL_to_LH(currPump.calibration.timeslice,int(data['mLadd']))
+                        lh = currPump.calibration.scale_mL_to_LH(currPump.calibration.timeslice,int(float(data['mLadd'])))
                         currPump.calibration.add(currPump.calibration.currspeed,lh)
             elif param_action == 'dl':
                 if row_timestamp:
@@ -3049,7 +3049,7 @@ class WebCalibratePump:
                 currPump.calibration.tap_open = time.perf_counter()
             elif param_action == 'tp':
                 if 'mLtap' in data and data['mLtap']:
-                    menus.options['u'][Menus.VAL] = int(data['mLtap'])/1000.0 # stored in Liters !
+                    menus.options['u'][Menus.VAL] = float(data['mLtap'])/1000.0 # stored in Liters !
                     menus.options['r'][Menus.VAL] = currPump.calibration.timeslice
                     menus.save()
             return render.calibrate_pump(param_action, currPump.calibration)
