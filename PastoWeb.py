@@ -2309,27 +2309,46 @@ class ThreadPump(threading.Thread):
                         YellowLED.off()
                     else:
                         YellowLED.on()
-                prec_speed = self.pump.liters()
-                if speed != prec_speed and not self.pump.calibration.ongoing:
-                    time.sleep(0.01)
-                    if speed == 0.0:
-                        self.pump.stop()
-                    else:
-                        # if (speed > 0.0) == (prec_speed > 0.0):
-                            # if prec_speed != 0.0:
-                                # self.pump.stop()
-                                # time.sleep(0.1)
-                        self.pump.run_liters(speed)
-                        State.popDelayed()
+                if self.pump.calibration.ongoing:
+                    if self.pump.calibration.tap_open:
+                        if (now-self.pump.calibration.tap_open) >= self.pump.calibration.timeslice:
+                            if self.pump.solenoid:
+                                self.pump.solenoid.set(0) # close the tap after timeslice seconds
+                            self.pump.calibration.tap_open = None
+                            print("Tap closed")
+                    if self.pump.speed > 0.0:
+                        # Manage the calibration process
+                        if (now-calibration_bip) >= self.pump.calibration.timeslice:
+                            calibration_bip = now
+                            if self.pump.buzzer:
+                                self.pump.buzzer.on()
+                            else:
+                                print ('BUZZ!')
+                        else:
+                            if self.pump.buzzer:
+                                self.pump.buzzer.off()
+                else:
+                    prec_speed = self.pump.liters()
+                    if speed != prec_speed and not self.pump.calibration.ongoing:
+                        time.sleep(0.01)
+                        if speed == 0.0:
+                            self.pump.stop()
+                        else:
+                            # if (speed > 0.0) == (prec_speed > 0.0):
+                                # if prec_speed != 0.0:
+                                    # self.pump.stop()
+                                    # time.sleep(0.1)
+                            self.pump.run_liters(speed)
+                            State.popDelayed()
 
-                    time.sleep(0.01)
-                    if not DEBUG:
-                        prec_disp = display_pause
-                        display_pause = True
-                        (nlines,ncols) = termSize()
-                        term.pos(1,ncols-10)
-                        term.write("%5.2d" % speed, term.bold, term.yellow if speed > 0.0 else term.red, term.bgwhite)
-                        display_pause = prec_disp
+                        time.sleep(0.01)
+                        if not DEBUG:
+                            prec_disp = display_pause
+                            display_pause = True
+                            (nlines,ncols) = termSize()
+                            term.pos(1,ncols-10)
+                            term.write("%5.2d" % speed, term.bold, term.yellow if speed > 0.0 else term.red, term.bgwhite)
+                            display_pause = prec_disp
                 # if not reportPasteur.state:
                 #     if State.current.letter in ['p','e'] :
                 #         reportPasteur.start(menus, State.current.letter)
