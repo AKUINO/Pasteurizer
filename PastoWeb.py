@@ -254,7 +254,7 @@ menus.options =  {'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                          ,0,1,"-",False,1,1,'range'],  # Faux=0, 1=Vrai
                   'C':['C',ml.T("net.Caustique°","Caustic cleaning°","Bijtende schoonmaak°") \
                             ,ml.T("Température de nettoyage","Cleaning Temperature","Schoonmaak Temperatuur") \
-                            ,50.0,50.0,"°C",False,60,0.1,"number"],  # Température pour un passage au détergent
+                            ,40.0,50.0,"°C",False,60,0.1,"number"],  # Température pour un passage au détergent
                   'c':['c',ml.T("net.Caustique\"","Caustic cleaning\"","Bijtende schoonmaak\"") \
                             ,ml.T("Durée de nettoyage","Cleaning Duration","Schoonmaak Tijd") \
                             ,CLEAN_TIME,CLEAN_TIME,"hh:mm",False,3600*2,60,"time"],
@@ -743,7 +743,7 @@ State('r',ml.T('Propre','Clean','Schoon'),'aqua', \
       [ ('A',['r',['a',None,False]]),('P','p'),('D',['','d','d']),('H',''),('F',''),('V',''),('B',''),('w','o') ] )
 
 State('o',ml.T('Eau','Water','Waser'),'navy', \
-      [ ('A',['o',['a',None,False]]),('F',''),('V',''),('B',''),('D',['','d','d']),('H',['','r']),('w','v') ] )
+      [ ('A',['o',['a',None,False]]),('C',['o',['c',None,False]]),('F',''),('V',''),('B',''),('D',['','d','d']),('H',['','r']),('w','v') ] )
 
 State('v',ml.T('Eau vieille','Old Water','Oude Waser'),'darkcyan', \
       [ ('A',['v',['a',None,False]]),('C',['v',['c',None,False]]),('F',''),('V',''),('B',''),('D',['','d','d']),('w','') ] )
