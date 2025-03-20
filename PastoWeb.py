@@ -2078,7 +2078,7 @@ class ThreadPump(threading.Thread):
                     self.lastDurationEval = None
                     newEval = 0
                 else:
-                    newEval =  diffTemp * tank * kCalWatt / ( (hardConf.power_heating-((heating-ROOM_TEMP)*WATT_LOSS))) * 3600.0
+                    newEval =  diffTemp * tank * kCalWatt / ( (hardConf.power_heating-((float(self.currOperation.tempRef())-ROOM_TEMP)*WATT_LOSS))) * 3600.0
                     #print("Evaluation=%f tank=%f kCalW=%f HP=%f RT=%f WL=%f" % (newEval, tank, kCalWatt,hardConf.power_heating,ROOM_TEMP,WATT_LOSS) )
                     if not self.lastDurationEval or not self.lastDurationEvalTime:
                         self.lastDurationEval = newEval
