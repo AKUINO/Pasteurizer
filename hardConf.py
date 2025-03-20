@@ -110,7 +110,7 @@ vol_extra = None
 vol_total = None
 
 power_heating = None # Heating electricity power consumption (and energy released)
-power_heating_DEFAULT = 2500 # en mL
+power_heating_DEFAULT = 2500 # en Watts
 power_dummy = None # do not use!
 
 #holding_length = 8820 #mm for 150L/h, 11757 mm for 200L/h
