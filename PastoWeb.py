@@ -398,7 +398,6 @@ def init_volumes():
     #hardConf.holding_volume = vol_tube(9.5,hardConf.holding_length) # = 625mL = 15 seconds for 150L / hour. Should be 833mL for 200L 11757
 
     pumpy.calibration.load(menus.val('L'))
-    pumpy.maximal_liters = pumpy.calibration.
 
     if hardConf.tubing == "horizontal":
         #Amorçage=2330mL, Pasteurisation=625mL, Total=3587mL (new config system)
