@@ -3030,7 +3030,7 @@ class WebCalibratePump:
                     menus.save()
             elif param_action == 'save':
                 if 'idsaved' in data and data['idsaved']:
-                    id_config = int(data['idsaved'])
+                    id_config = int(float(str(data['idsaved'])))
                 if not id_config:
                     id_config = currPump.calibration.id
                 if 'description' in data and data['description']:

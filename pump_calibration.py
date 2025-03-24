@@ -86,7 +86,6 @@ class Pump_Calibration:
             with open(datafiles.linearfile("pump"+str(self.id)), 'r') as f:
                 objdict = json.load(f)
                 self.from_dict(objdict)
-                self.id = config
                 print("Load "+str(self))
             return True
         except:
