@@ -66,6 +66,7 @@ class Pump_Calibration:
         self.measures = pandas.DataFrame.from_dict(input['measures']) if input['measures'] is not None else None
         self.RPM_to_LH = numpy.polynomial.Polynomial(input['RPM_to_LH']) if input['RPM_to_LH'] is not None else None
         self.LH_to_RPM = numpy.polynomial.Polynomial(input['LH_to_RPM']) if input['LH_to_RPM'] is not None else None
+        self.maximal_liters = self.RPM_to_LH(self.maxRPM)
 
     # Fonction pour sauvegarder un objet de la classe courante en utilisant JSON : normalement on édite les JSON a la main !
     def save(self, interpolate = False, config=0):
