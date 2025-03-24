@@ -81,9 +81,9 @@ class Pump_Calibration:
 
     # Fonction pour lire un objet de la classe courante depuis le disque en utilisant JSON
     def load(self,config=0):
-        self.id = config
+        self.id = int(float(str(config)))
         try:
-            with open(datafiles.linearfile("pump"+str(config)), 'r') as f:
+            with open(datafiles.linearfile("pump"+str(self.id)), 'r') as f:
                 objdict = json.load(f)
                 self.from_dict(objdict)
                 self.id = config
