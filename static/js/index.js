@@ -162,7 +162,9 @@ function setTemp(data,label) {
     $('#D'+label).addClass('danger')
   }
   $('#'+label).text(floorDeci(val));
-
+  sv = $('#set_'+label).val();
+  if ( !sv || sv == '')
+      $('#set_'+label).val(floorDeci(val));
 }
 
 function LitersOnLiters(q,k,input) {

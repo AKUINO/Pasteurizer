@@ -582,11 +582,11 @@ class ThreadThermistor(threading.Thread):
             try:
                 time.sleep(1.0)
                 for (address, aSensor) in cohorts.catalog.items():
-                    if aSensor.sensorType == Pressure.typeNum:
+                    if aSensor.sensorType in [Pressure.typeNum, Thermistor.typeNum]:
                         aSensor.get()
-                    if aSensor.sensorType == Thermistor.typeNum:
-                        aSensor.get()
-                if not hardConf.MICHA_device: # Average of 3 measures needed
+                if hardConf.io: #simulation
+                    pass
+                elif not hardConf.MICHA_device: # Average of 3 measures needed
                     time.sleep(0.01)
                     for (address, aSensor) in cohorts.catalog.items():
                         if aSensor.sensorType == Thermistor.typeNum:
@@ -934,6 +934,8 @@ class ThreadDAC(threading.Thread):
         prec_heating = None
         some_heating = False
         has_heated = False
+        FLUSH_COUNT = 20 # Number of lines before flushing the log file
+        flush_current = 0
         # TODO: allow to balance both heating tanks to reduce power demand
         while self.running:
             time.sleep(0.01)
@@ -1085,6 +1087,13 @@ class ThreadDAC(threading.Thread):
                                        #cohorts.catalog['DAC2'].val(), \
                                        #cohorts.catalog['sp9b'].value
                                        #cohorts.catalog['intake'].value, batt
+                        if flush_current >= FLUSH_COUNT:
+                            log_file.flush()
+                            os.fsync(log_file.fileno())
+                            flush_current = 0
+                        else:
+                            flush_current += 1
+                        #print (flush_current)
                 except:
                     traceback.print_exc()
 
@@ -2585,6 +2594,16 @@ class WebIndex:
         if 'commands' in data and len(data['commands']) > 0:
             if data['commands'][0].lower() in ['o','y','d','s']:
                 commands = 'true'
+        if hardConf.io is None:
+            if 'intake' in data and len(data['intake']) > 0:
+                cohorts.catalog['intake'].set(float(data['intake']))
+            if 'input' in data and len(data['input']) > 0:
+                cohorts.catalog['input'].set(float(data['input']))
+            if 'warranty' in data and len(data['warranty']) > 0:
+                cohorts.catalog['warranty'].set(float(data['warranty']))
+            if 'heating' in data and len(data['heating']) > 0:
+                cohorts.catalog['heating'].set(float(data['heating']))
+            #print ('Heating='+str(cohorts.catalog['heating'].get()))
         return render.index(connected, mail, False, None, paving, commands) #True if Paving...
 
     def POST(self):

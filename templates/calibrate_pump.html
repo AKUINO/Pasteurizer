@@ -3,17 +3,17 @@ $var title : Pump Calibration
 <script type="text/javascript">
    var commands = false ;
 </script>
-<main role="main" class="container">
+<main role="main" class="container"><a name="tap"></a>
     <div class="jumbotron" onclick="void(0);">
-        <h3><b id="time"></b> $(ml.T("Calibration du débit d'eau courante","Calibration of water tap flow","Kraanwaterstroom calibratie")): <b id="fill">$(ml.T("Ouvert","Open","Geopend"))</b></h3>
-        <div class="form-group"><form>
+        <h3><a name="load"></a><b id="time"></b> $(ml.T("Calibration du débit d'eau courante","Calibration of water tap flow","Kraanwaterstroom calibratie")): <b id="fill">$(ml.T("Ouvert","Open","Geopend"))</b></h3>
+        <div class="form-group"><form action="#tap">
             <button type="submit" name="action" value="tap" class="btn btn-primary">$(ml.T("Ouvrir Robinet","Tap Open","Kraan Open"))</button>
-            <input class="form-control" id="mLtap" name="mLtap" placeholder="0" min="0" max="15000" step="1" type="number" value="$(int(float(menus.val('u')*1000.0)/(menus.intval('r')) if menus.val('r') else 1)*calibration.timeslice))"/>
+            <input class="form-control" id="mLtap" name="mLtap" placeholder="0" size="5" min="0" max="15000" step="1" type="number" value="$(int(float(menus.val('u')*1000.0)/(menus.intval('r')) if menus.val('r') else 1)*calibration.timeslice))"/>
             <button type="submit" name="action" value="tp" class="btn btn-primary">$(ml.T("Fixer","Set","Instellen"))</button></form>
         </div><hr/>
-        <h3>$(ml.T("Calibration de la pompe","Calibration of the pump","Pompcalibratie"))</h3>
+        <h3><a name="max"></a>$(ml.T("Calibration de la pompe","Calibration of the pump","Pompcalibratie"))</h3>
         <p><span><b id="vitesse"></b> $(ml.T("Litres par heure","Liters per hour","Liters per uur"))</span></p>
-        <div class="form-group"><form>
+        <div class="form-group"><form action="#load">
             <label for="id">$(ml.T("Profil chargé","Loaded Profile","Profiel geladen"))</label>
             $ index = calibration.index()
             <select class="form-select" id="id" name="id">
@@ -21,7 +21,7 @@ $var title : Pump Calibration
                 <option value="$(i)" $('selected' if i==calibration.id else '')>$(i) : $(index[i] if i in index.keys() else '---')</option>
             </select><button type="submit" name="action" value="load" class="btn btn-info">$(ml.T("Charger","Load","Laden"))</button></form>
         </div><hr/>
-        <div class="form-group"><form>
+        <div class="form-group adjust-nav"><a name="param"></a><form action="#max">
             <label for="rpm">$(ml.T("Max RPM","Max RPM","Max RPM"))</label>
 
             <input class="form-control" id="rpm" name="rpm" placeholder="360" min="0" max="600" step="1" type="number" value="$(calibration.maxRPM)">
@@ -30,7 +30,7 @@ $var title : Pump Calibration
             <button type="submit" name="action" value="mx" class="btn btn-primary">$(ml.T("Fixer","Set","Instellen"))</button>
             <button type="submit" name="action" value="go0" class="btn btn-warning">STOP</button></form>
         </div><hr/>
-        <form>
+        <div class="adjust-nav"><form action="#param">
         <div class="form-group">
             <label for="description">$(ml.T("Description","Description","Beschrijving"))</label>
             <input class="form-control" id="description" name="description" placeholder="---" type="text" value="$(calibration.description)">
@@ -51,7 +51,7 @@ $var title : Pump Calibration
             <label for="timeslice">$(ml.T("Temps d'échantillonage","Sample duration","Bemonsteringstijd"))</label>
             <input class="form-control" id="timeslice" name="timeslice" placeholder="15" min="10" max="90" step="1" type="number" value="$(calibration.timeslice)"/>
         </div>
-        <div class="form-group">
+        <div class="form-group"><a name="cal"></a>
             <label for="id">$(ml.T("Profil sauvé","Saved Profile","Opgenomen profiel"))</label>
             $ index = calibration.index()
             <select class="form-select" id="idsaved" name="idsaved">
@@ -59,9 +59,9 @@ $var title : Pump Calibration
                     <option value="$(i)" $('selected' if i==calibration.id else '')>$(i) : $(index[i] if i in index.keys() else '---')</option>
             </select>
         </div>
-        <button type="submit" name="action" value="save" class="btn btn-success">$(ml.T("Enregistrer","Save","Redden"))</button></form><hr/>
+        <button type="submit" name="action" value="save" class="btn btn-success">$(ml.T("Enregistrer","Save","Redden"))</button></form></div><hr/>
 
-    <form><table cellpadding="3">
+    <div class="adjust-nav"><form action="#cal"><table cellpadding="3">
     $ times, rpms, lhs = calibration.get_spaced()
     $ i = 0
     <tr><th>RPM</th>
@@ -78,7 +78,7 @@ $var title : Pump Calibration
             <td align=right><b>$(lhs[i] if lhs[i] else '')</b></td>
             <td align=right>
                 $if rpms[i] != prvRPM and rpms[i] == calibration.currspeed:
-                    <input class="form-control" id="mLadd" name="mLadd" placeholder="0" min="0" max="15000" step="1" type="number" value="$(int(lhs[i]/3.6*calibration.timeslice) if lhs[i] else '')"/>
+                    <input class="form-control" id="mLadd" name="mLadd" size="5" placeholder="0" min="0" max="15000" step="1" type="number" value="$(int(lhs[i]/3.6*calibration.timeslice) if lhs[i] else '')"/>
                     <button type="submit" name="action" value="add" class="btn btn-info"><b>+</b></button>
                 $elif lhs[i]:
                     $(int(lhs[i]/3.6*calibration.timeslice))
@@ -90,7 +90,7 @@ $var title : Pump Calibration
         </tr>
         $ prvRPM = rpms[i]
         $ i+= 1
-    </table></form></div>
+    </table></form></div></div>
         <svg height="400" width="$(calibration.maxRPM*5/6)" style="border:1px solid black;" class="chart">
             <!-- This is the background lines -->
             <text x="5" y="350">50</text>

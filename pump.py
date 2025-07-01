@@ -82,7 +82,7 @@ class ReadPump(threading.Thread):
                 status.type = pump.ERROR[0]
                 status.value = 10 #Fatal error
                 self.pump.lastError = status.value
-                self.print() # ('['+str(self.buffer)+']')
+                #self.print() # ('['+str(self.buffer)+']')
                 self.buffer = b""
                 return status
         while len(self.buffer):

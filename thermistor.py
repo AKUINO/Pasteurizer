@@ -94,7 +94,9 @@ class Thermistor(sensor.Sensor):
                 #print ("%d(%f)=%f ohm; %f°C"%(self.param,volts,res,temp))
                 if (temp > 0.0) and (temp < 100.0):
                     return volts,res,temp
-        return 0.0,0.0,None
+            return 0.0,0.0,None
+        #else Simulation
+        return 0.0,0.0,self.value
 
     def get(self):
         value,res,temperature = self.getreading()
