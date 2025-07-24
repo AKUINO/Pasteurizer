@@ -901,11 +901,11 @@ class ThreadDAC(threading.Thread):
         self.danger = False
 
     def set_temp(self,setpoint=None, refpoint=None):
-        if refpoint:
+        if refpoint is not None:
             self.refpoint = float(refpoint)
         else:
             self.refpoint = None
-        if setpoint:
+        if setpoint is not None:
             self.setpoint = float(setpoint)
         else:
             self.setpoint = None
@@ -961,7 +961,7 @@ class ThreadDAC(threading.Thread):
                     # elif wattHour >= hardConf.power_heating:
                         # wattHour = hardConf.power_heating
 
-                if self.setpoint and cohorts.catalog['heating'].value:
+                if self.setpoint is not None and self.refpoint is not None and cohorts.catalog['heating'].value:
                     currHeat = int(self.dacSetting.value)
                     #print("%d %f / %f" % (currHeat, cohorts.catalog['heating'].value , self.setpoint) )
                     heating = cohorts.getCalibratedValue('heating')
@@ -1177,6 +1177,7 @@ MIN_SPEED = -1
 OPT_SPEED = -2
 HALF_SPEED = -3
 MAX_SPEED = -4
+CLEAN_SPEED = -5
 
 class Operation(object):
 
@@ -1244,6 +1245,12 @@ class Operation(object):
             return pumpy.calibration.maximal_liters / 2.0
         if self.base_speed == MAX_SPEED:
             return pumpy.calibration.maximal_liters
+        if self.base_speed == CLEAN_SPEED:
+            if pumpy.calibration.cleaning_liters is None:
+                print('NO CLEANING SPEED?')
+                return pumpy.calibration.maximal_liters
+            else:
+                return pumpy.calibration.cleaning_liters
         return self.base_speed # If positive, absolute value
 
     # Initialize current operation and starts it if it is not the pump...
@@ -1604,12 +1611,13 @@ class Operation(object):
                     speed = self.desired_speed()
                 elif speed == 0.0:
                     speed = self.desired_speed()
-        if speed >= 0.0:
-            if speed > T_Pump.pump.calibration.maximal_liters:
-                speed = T_Pump.pump.calibration.maximal_liters
-        else:
-            if speed < -T_Pump.pump.calibration.maximal_liters:
-                speed = -T_Pump.pump.calibration.maximal_liters
+        if self.sensor1 == 'warranty': # Pasteurizing and not cleaning
+            if speed >= 0.0:
+                if speed > T_Pump.pump.calibration.maximal_liters:
+                    speed = T_Pump.pump.calibration.maximal_liters
+            else:
+                if speed < -T_Pump.pump.calibration.maximal_liters:
+                    speed = -T_Pump.pump.calibration.maximal_liters
         #print("RUN speed="+str(speed)+"\r")
         return speed
 
@@ -1711,29 +1719,29 @@ opSequences = {
 
     # 'A': # Amorçage, pré chauffage...
     #     [ Operation('AmoT','HEAT',ref='P', dump=True,programmable=True),
-    #       Operation('AmoF','FILL',duration=lambda:menus.val('r'),base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='P',dump=False),
-    #       Operation('AmoI','FLOO',duration=lambda:menus.val('r')*1.5, base_speed=MAX_SPEED,qty=TOTAL_VOL*1.5, ref='P', dump=False),
+    #       Operation('AmoF','FILL',duration=lambda:menus.val('r'),base_speed=CLEAN_SPEED,qty=TOTAL_VOL, ref='P',dump=False),
+    #       Operation('AmoI','FLOO',duration=lambda:menus.val('r')*1.5, base_speed=CLEAN_SPEED,qty=TOTAL_VOL*1.5, ref='P', dump=False),
     #       Operation('AmoJ','HEAT',ref='P', dump=False),
-    #       Operation('Amoi','PUMP',base_speed=MAX_SPEED,qty=START_VOL,ref='P',dump=False),
+    #       Operation('Amoi','PUMP',base_speed=CLEAN_SPEED,qty=START_VOL,ref='P',dump=False),
     #       Operation('Amoo','SUBR',duration=lambda:menus.val('r'),subSequence='a',dump=False),
-    #       Operation('AmoP','PUMP',ref='P',base_speed=MAX_SPEED, qty=1.0,dump=False),
+    #       Operation('AmoP','PUMP',ref='P',base_speed=CLEAN_SPEED, qty=1.0,dump=False),
     #       Operation('CLOS','MESS',message=ml.T("Déconnecter le tuyau d'entrée, P pour pasteuriser!","Disconnect input pipe, P to pasteurize!","Ontkoppel de invoerleiding, P om te pasteuriseren!"),dump=True)
     #       ],
     #
     # 'a': # Étape répétée du nettoyage
-    #     [ Operation('Amop','PUMP',ref='P',base_speed=MAX_SPEED, qty=2.0,dump=False),
-    #       Operation('AmoS','REVR',ref='P',base_speed=MAX_SPEED, qty=-0.4,dump=False)
+    #     [ Operation('Amop','PUMP',ref='P',base_speed=CLEAN_SPEED, qty=2.0,dump=False),
+    #       Operation('AmoS','REVR',ref='P',base_speed=CLEAN_SPEED, qty=-0.4,dump=False)
     #       ],
 
     'F': # Pré-rinçage (Flush)
         [Operation('PreT','HEAT', ref='R', dump=True, programmable=True, bin=[buck.RECUP,buck.WPOT], bout=buck.RECUP, kbin=lambda:2*total_volume),
          Operation('PreS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='R', dump=True),
-         #Operation('PreF','FILL', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),
-         Operation('PreI','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
-         Operation('PreR','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+         #Operation('PreF','FILL', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, ref='R', dump=True),
+         Operation('PreI','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
+         Operation('PreR','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=CLEAN_SPEED, qty=-2.0,dump=True),
          Operation('PreN','PAUS',message=ml.T("Une deuxième fois?","A second time?","Een tweede keer?"),ref='R'),
-         Operation('Prei','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
-         Operation('Prer','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+         Operation('Prei','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
+         Operation('Prer','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=CLEAN_SPEED, qty=-2.0,dump=True),
          Operation('Prem','MESS',message=ml.T("Rinçage terminé!","Rince finished!","Spoelen voltooid!"),dump=True)
          ],
     'H': # Distribution d'eau pasteurisée: GROSSIERE ERREUR: ne fonctionne que sur un circuit vide !!!
@@ -1747,80 +1755,80 @@ opSequences = {
     'R': # Pré-rinçage 4 fois
         [ Operation('Pr1T','HEAT', ref='R', dump=True, programmable=True, bin=buck.RECUP, bout=buck.SEWR, kbout=lambda: 2 * total_volume, kbin=0.0),
           Operation('Pr1S','PAUS',message=ml.T("Eau recyclée en entrée!","Recycled water as Input!","Gerecycled water als input!"),dump=True),
-          Operation('Pr1R','PUMP', base_speed=MAX_SPEED, qty=lambda:2*total_volume, ref='R', dump=True),
+          Operation('Pr1R','PUMP', base_speed=CLEAN_SPEED, qty=lambda:2*total_volume, ref='R', dump=True),
           Operation('End2','MESS',message=ml.T("double pré-rinçage effectué!","double pre-rince done!","2 keer doorspoelen!"),dump=True),
           Operation('PreT','HEAT', ref='R', dump=True, programmable=True, bin=[buck.WPOT, buck.WPOT], bout=buck.RECUP, kbout=lambda: 2 * total_volume),
-          Operation('Pr3I','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
-          Operation('Pr3R','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+          Operation('Pr3I','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
+          Operation('Pr3R','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=CLEAN_SPEED, qty=-2.0,dump=True),
           Operation('PreS','PAUS',message=ml.T("Eau à recycler en entrée+sortie!","Water for future re-use as input+output!","Water voor toekomstig hergebruik als input+output!"),ref='R', dump=True),
-          Operation('Pr4i','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
-          Operation('Pr4r','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+          Operation('Pr4i','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, ref='R', dump=True),  #
+          Operation('Pr4r','RFLO',duration=lambda:KICKBACK,ref='R',base_speed=CLEAN_SPEED, qty=-2.0,dump=True),
           Operation('Pr4m','MESS',message=ml.T("4 rinçages effectués!","4 flushes done!","4 keer doorspoelen!"),dump=True,)
           ],
     'V': # Vider le réservoir (aux égouts la plupart du temps)
-        [  Operation('VidV','EMPT', base_speed=MAX_SPEED, qty=lambda:dry_volume, dump=True, bin=buck.AIR, bout=buck.RECUP, kbin=lambda:dry_volume, kbout=lambda:total_volume),
+        [  Operation('VidV','EMPT', base_speed=CLEAN_SPEED, qty=lambda:dry_volume, dump=True, bin=buck.AIR, bout=buck.RECUP, kbin=lambda:dry_volume, kbout=lambda:total_volume),
            Operation('Vidm','MESS',message=ml.T("Tuyaux vidés autant que possible.","Pipes emptied as much as possible.","Leidingen zoveel mogelijk geleegd."),dump=True)
         ],
     'A': # Désinfectant acide
         [ Operation('DesT','HEAT','intake','input', ref='R', dump=False, programmable=True, waitAdd=True, bin=[buck.ACID,buck.WPOT], bout=buck.ACID, kbin=lambda: (total_volume if State.empty else 0.0) + DILUTE_VOL),
           Operation('DesS','SEAU','intake','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=False),
-          Operation('DesF','FILL','intake','input', ref='R', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, dump=False),
-          Operation('DesI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, dump=False),
+          Operation('DesF','FILL','intake','input', ref='R', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, dump=False),
+          Operation('DesI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=CLEAN_SPEED,qty=DILUTE_VOL, dump=False),
           Operation('DesN','PAUS','intake','input',ref='A',message=ml.T("Mettre dans le seau l'acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the acid and the 2 pipes, then restart!","Doe het zuur en de 2 pijpen in de emmer, en herstart!"),dump=False,bin=buck.ACID,bout=buck.ACID,kbin=0.0,qbout=True),
-          Operation('Desi','PUMP','intake','input', ref='A', base_speed=MAX_SPEED, qty=lambda:start_volume, dump=False),
-          Operation('Desh','TRAK','intake','input', ref='A', base_speed=MAX_SPEED, min_speed=-pumpy.calibration.maximal_liters, qty=lambda:total_volume * 2.0, shake_qty=total_volume, dump=False),
+          Operation('Desi','PUMP','intake','input', ref='A', base_speed=CLEAN_SPEED, qty=lambda:start_volume, dump=False),
+          Operation('Desh','TRAK','intake','input', ref='A', base_speed=CLEAN_SPEED, min_speed=-pumpy.calibration.maximal_liters, qty=lambda:total_volume * 2.0, shake_qty=total_volume, dump=False),
           Operation('Desf','SUBR',duration=lambda:menus.val('a'),subSequence='a',dump=False),
           Operation('Dess','SEAU', message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"), dump=False, bin=[buck.ACID,buck.RECUP], bout=buck.ACID, kbin=lambda:total_volume, qbin=True, qbout=True),
-          Operation('Desf','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='A', dump=False),
+          Operation('Desf','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, ref='A', dump=False),
           Operation('Desm','MESS',message=ml.T("Seau d'Acide réutilisable en sortie... Bien rincer!","Reusable Acid Bucket in output... Rinse well!","Herbruikbaar zuur emmer in output... Goed uitspoelen!!"),dump=True)
         ],
     'a': # Étape répétée de la désinfection acide
-        [ Operation('DesA','PUMP',ref='A', base_speed=MAX_SPEED, qty=4.0,dump=False,bin=buck.ACID,bout=buck.ACID),
-          Operation('DesP','REVR',ref='A', base_speed=MAX_SPEED, qty=-2.0,dump=False)
+        [ Operation('DesA','PUMP',ref='A', base_speed=CLEAN_SPEED, qty=4.0,dump=False,bin=buck.ACID,bout=buck.ACID),
+          Operation('DesP','REVR',ref='A', base_speed=CLEAN_SPEED, qty=-2.0,dump=False)
         ],
 
     'D': # Désinfection (fut thermique)
         # [ Operation('Dett','HEAT','intake',ref='R',dump=False,programmable=True),
         #   Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-        #   Operation('DetI','FLOO','intake',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=MAX_SPEED,qty=TOTAL_VOL, ref='D',dump=True),  #
+        #   Operation('DetI','FLOO','intake',duration=lambda:flood_liters_to_seconds(TOTAL_VOL), base_speed=CLEAN_SPEED,qty=TOTAL_VOL, ref='D',dump=True),  #
         #   Operation('Dety','PAUS',message=ml.T("Entrée et Sortie connectés bout à bout","Inlet and Outlet connected end to end","Input en output aangesloten"),ref='D',dump=False),
-        #   Operation('Deth','TRAK','intake','input', base_speed=MAX_SPEED, min_speed=-pumpy.calibration.maximal_liters, ref='D', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
+        #   Operation('Deth','TRAK','intake','input', base_speed=CLEAN_SPEED, min_speed=-pumpy.calibration.maximal_liters, ref='D', qty=TOTAL_VOL, shake_qty=TOTAL_VOL/2.1,dump=False),
         #   Operation('CLOS','MESS',message=ml.T("DANGER: Eau chaude sous pression. Mettre des gants pour séparer les tuyaux!","DANGER: Hot water under pressure. Wear gloves to separate the pipes!","GEVAAR: Heet water onder druk. Draag handschoenen om de leidingen te scheiden!"),dump=True)
         #   ],
         [ Operation('DetT','HEAT', ref='D', dump=False, programmable=True, waitAdd=True, bin=[buck.DESI,buck.WPOT], bout=buck.DESI, kbin=lambda: (total_volume if State.empty else 0.0) + DILUTE_VOL),
           Operation('DetS','SEAU',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),ref='D',dump=False),
-          Operation('DetF','FILL', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='D', dump=False),
-          Operation('DetI','FLOO',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL, ref='D',dump=False),
+          Operation('DetF','FILL', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, ref='D', dump=False),
+          Operation('DetI','FLOO',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=CLEAN_SPEED,qty=DILUTE_VOL, ref='D',dump=False),
           Operation('DetN','PAUS',message=ml.T("Mettre dans le seau le désinfectant acide et les 2 tuyaux, puis redémarrer!","Put in the bucket the sanitizer and the 2 pipes, then restart!","Doe het ontsmettingsmiddel en de 2 pijpen in de emmer, en herstart!"),ref='R',dump=False,bin=buck.DESI,bout=buck.DESI,kbin=0.0,qbout=True),
           Operation('Deti','PUMP', base_speed=OPT_SPEED, qty=lambda:total_volume, ref='D', dump=False),
-          Operation('Detj','PUMP', base_speed=MAX_SPEED, qty=lambda:(total_volume * 2.0), ref='D', dump=False),
+          Operation('Detj','PUMP', base_speed=CLEAN_SPEED, qty=lambda:(total_volume * 2.0), ref='D', dump=False),
           Operation('Detn','PAUS',message=ml.T("Laisser tremper si désiré puis redémarrer!","Let soak for a while if desired then restart!","Laat eventueel weken, en herstart!"),ref='D',duration=lambda:menus.val('d'),dump=False),
           Operation('Dets','SEAU', message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"), ref='D', dump=False, bin=[buck.DESI,buck.WPOT], bout=buck.DESI, kbin=lambda:total_volume, qbin=True, qbout=True),
-          Operation('Detf','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='D', dump=False),
+          Operation('Detf','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, ref='D', dump=False),
           Operation('Detr','PAUS', message=ml.T("Evacuer le seau de désinfectant et lancer un dernier rinçage!","Remove the bucket with sanitizer and restart for a last rinse!","Verwijder de emmer met ontsmettingsmiddel en herstart aan een laatste spoeling!"), ref='D', dump=False, bin=[buck.WPOT,buck.RECUP], bout=buck.RECUP, kbin=lambda:total_volume, qbout=True),
-          Operation('DetP','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='D', dump=True),
-          Operation('DetR','RFLO',duration=lambda:KICKBACK,ref='D',base_speed=MAX_SPEED, qty=-2.0,dump=True),
+          Operation('DetP','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, ref='D', dump=True),
+          Operation('DetR','RFLO',duration=lambda:KICKBACK,ref='D',base_speed=CLEAN_SPEED, qty=-2.0,dump=True),
           Operation('Desm','MESS',message=ml.T("Prêt à l'emploi!","Ready to use!","Klaar voor gebruik!"),dump=True)
         ],
     'C': # Détergent
         [ Operation('NetT','HEAT','intake','input', ref='R', dump=False, programmable=True, waitAdd=True, bin=[buck.CAUS,buck.WPOT], bout=buck.CAUS, kbin=lambda: (total_volume if State.empty else 0.0) + DILUTE_VOL),
           Operation('NetS','SEAU','intake','input',ref='R',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
-          Operation('NetF','FILL','intake','input', ref='R', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, dump=False),
-          Operation('NetI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=MAX_SPEED,qty=DILUTE_VOL,dump=False),
+          Operation('NetF','FILL','intake','input', ref='R', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, dump=False),
+          Operation('NetI','FLOO','intake','input',ref='R',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=CLEAN_SPEED,qty=DILUTE_VOL,dump=False),
           Operation('NetY','PAUS','intake','input',ref='C',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),dump=False,bin=buck.CAUS,bout=buck.CAUS,kbin=0.0,qbout=True),
-          Operation('Neti','PUMP','intake','input', ref='C', base_speed=MAX_SPEED, qty=lambda:start_volume, dump=False),
-          Operation('Neth','TRAK','intake','input', ref='C', base_speed=MAX_SPEED, min_speed=-pumpy.calibration.maximal_liters, qty=lambda:total_volume * 2.0, shake_qty=total_volume, dump=False),
+          Operation('Neti','PUMP','intake','input', ref='C', base_speed=CLEAN_SPEED, qty=lambda:start_volume, dump=False),
+          Operation('Neth','TRAK','intake','input', ref='C', base_speed=CLEAN_SPEED, min_speed=-pumpy.calibration.maximal_liters, qty=lambda:total_volume * 2.0, shake_qty=total_volume, dump=False),
           Operation('Neto','SUBR',duration=lambda:menus.val('c'),subSequence='c',dump=False),
-          #Operation('NetV','EMPT',base_speed=MAX_SPEED, qty=TOTAL_VOL,dump=True),
+          #Operation('NetV','EMPT',base_speed=CLEAN_SPEED, qty=TOTAL_VOL,dump=True),
           Operation('Nets','SEAU', message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"), dump=True, bin=[buck.CAUS,buck.WPOT], bout=buck.CAUS, kbin=lambda:total_volume, qbin=True, qbout=True),
-          Operation('Netf','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=MAX_SPEED, qty=lambda:total_volume, ref='A', dump=False),
+          Operation('Netf','FLOO', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, ref='A', dump=False),
           Operation('Netm','MESS',message=ml.T("Seau de Soude réutilisable en sortie... Bien rincer!","Reusable Soda Bucket in output... Rinse well!","Herbruikbaar soda emmer in output... Goed uitspoelen!!"),dump=True)
         ],
     'c': # Étape répétée du nettoyage
-        [ Operation('NetC','PUMP',ref='C',base_speed=MAX_SPEED, qty=4.0,dump=False,bin=buck.CAUS,bout=buck.CAUS),
-          Operation('NetP','REVR',ref='C',base_speed=MAX_SPEED, qty=-2.0,dump=False)
+        [ Operation('NetC','PUMP',ref='C',base_speed=CLEAN_SPEED, qty=4.0,dump=False,bin=buck.CAUS,bout=buck.CAUS),
+          Operation('NetP','REVR',ref='C',base_speed=CLEAN_SPEED, qty=-2.0,dump=False)
           ],
-    'B': # Calibrsation
+    'B': # Calibration des thermomètres
         [ Operation('CL55','TRAK','heating','input', base_speed=OPT_SPEED, bin=buck.WPOT, bout=buck.WPOT, min_speed=-pumpy.minimal_liters, ref=55, qty=lambda:total_volume, shake_qty=SHAKE_QTY * 4, dump=False),
           Operation('CL66','TRAK','heating','input', base_speed=OPT_SPEED, min_speed= pumpy.minimal_liters, ref=60, qty=lambda:total_volume, shake_qty=SHAKE_QTY, dump=False),
           Operation('CL6A','PUMP','heating','input', base_speed=OPT_SPEED, ref=60, qty=lambda:total_volume, shake_qty=SHAKE_QTY, dump=False),
@@ -1880,7 +1888,7 @@ def reloadPasteurizationSpeed():
         menus.store('M', 12.0)
     optimal_speed = (mL_L(hardConf.holding_volume) / menus.val('M')) * 3600.0 # duree minimale de pasteurisation (sec) --> vitesse de la pompe en L/heure
 
-    if optimal_speed > pumpy.calibration.maximal_liters: # trop lent est sans doute dangereux
+    if optimal_speed > pumpy.calibration.maximal_liters: # trop rapide est sans doute dangereux
         optimal_speed = pumpy.calibration.maximal_liters
     elif optimal_speed < pumpy.minimal_liters: # trop lent est sans doute dangereux
         optimal_speed = pumpy.minimal_liters
@@ -2157,7 +2165,7 @@ class ThreadPump(threading.Thread):
                 to_remove.append(vol)
             elif time > max_time:
                 max_time = time
-        print (to_remove)
+        #print (to_remove)
         for vol in to_remove:
             # print ("Remove "+str(vol)+"mL "+str(self.pasteurizationDurations[vol])+"sec.")
             del(self.pasteurizationDurations[vol])
@@ -3021,6 +3029,7 @@ class WebCalibratePump:
             T_Pump.stopAction()
         currPump.calibration.ongoing = True
         newSpeed = None
+        newSpeedCleaning = None
         param_action:str = None
         id_config = 0
         row_timestamp = None
@@ -3029,10 +3038,15 @@ class WebCalibratePump:
         else:
             if 'rpm' in data and data['rpm']:
                 newSpeed = int(float(data['rpm']))
+            if 'rpmcleaning' in data and data['rpmcleaning']:
+                newSpeedCleaning = int(float(data['rpmcleaning']))
             if 'action' in data and data['action']:
                 param_action = data['action']
                 if (param_action.startswith("go") or param_action.startswith("mx")) and len(param_action) > 2:
                     newSpeed = int(param_action[2:])
+                    param_action = param_action[:2]
+                elif param_action.startswith("nx") and len(param_action) > 2:
+                    newSpeedCleaning = int(param_action[2:])
                     param_action = param_action[:2]
                 elif param_action.startswith("dl") and len(param_action) > 2:
                     row_timestamp = float(param_action[2:])
@@ -3066,18 +3080,22 @@ class WebCalibratePump:
             # Ask to run the pump at a given RPM to check when it begins choking.
             # The last speed requested is kept as the absolute max speed of the pump
             # but the RECORD CALIBRATION button must be pressed to keep it permanently
-            elif param_action == 'go' or param_action == 'mx':
-                if newSpeed is None:
-                    pass
-                elif newSpeed <= 0: # This is not NONE !
+            elif param_action == 'go' or param_action == 'mx' or param_action == 'nx':
+                if newSpeed is not None and newSpeed <= 0: # This is not NONE !
                     currPump.stop() # max without RPM specified = STOP running !
                     currPump.calibration.currspeed = 0
-                else:
-                    if param_action == 'mx':
-                        currPump.calibration.maxRPM = newSpeed
-                        currPump.calibration.save(False,currPump.calibration.id)
+                elif param_action == 'go' and newSpeed is not None:
                     currPump.calibration.currspeed = newSpeed
-                    T_Pump.setPause(False)
+                elif param_action == 'mx' and newSpeed is not None:
+                    currPump.calibration.maxRPM = newSpeed
+                    currPump.calibration.save(False,currPump.calibration.id)
+                    currPump.calibration.currspeed = newSpeed
+                elif param_action == 'nx' and newSpeedCleaning is not None:
+                    currPump.calibration.maxRPMcleaning = newSpeedCleaning
+                    currPump.calibration.save(False,currPump.calibration.id)
+                    newSpeed = newSpeedCleaning
+                T_Pump.setPause(False)
+                if newSpeed is not None:
                     currPump.run(newSpeed, currPump.speedLitersHour(newSpeed))
             elif param_action == 'add':
                 if currPump.calibration.currspeed > 0:

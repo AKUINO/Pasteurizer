@@ -27,6 +27,7 @@ class Pump_Calibration:
         self.uphill = 0.0 # mL added before pasteurization point
         self.downhill = 0.0 # mL added after pasteurization point
         self.maxRPM = hardConf.pumpMaxRPM
+        self.maxRPMcleaning = None
         self.stepRPM = 50 # 50, 100, 150, 200, 250, 300, 350, Max RPM...
         self.timeslice = 15 # seconds between each "bip" to measure water quantity pumped
         self.newRPM = None # if a new RPM row has to be displayed
@@ -37,6 +38,7 @@ class Pump_Calibration:
         # speed = 12.28124 + (1.03637*liters) + (0.001046376*liters*liters)
         self.LH_to_RPM = numpy.polynomial.Polynomial([12.28124,1.03637,0.001046376])
         self.maximal_liters = self.RPM_to_LH(self.maxRPM)
+        self.cleaning_liters = None
         self.currspeed = 0 # last speed requested (RPM)
         self.tap_open = None # time when water tap was opened (tap timing)
 
@@ -46,6 +48,7 @@ class Pump_Calibration:
     def to_dict(self):
         return {
          'maxRPM' : self.maxRPM
+         ,'maxRPMcleaning' : self.maxRPMcleaning
          ,'description' : self.description
          ,'stepRPM' : self.stepRPM
          ,'timeslice' : self.timeslice
@@ -58,6 +61,9 @@ class Pump_Calibration:
 
     def from_dict(self,input):
         self.maxRPM = input['maxRPM']
+        self.maxRPMcleaning = None
+        if 'maxRPMcleaning' in input:
+            self.maxRPMcleaning = input['maxRPMcleaning']
         self.description = input['description']
         self.stepRPM = input['stepRPM']
         self.timeslice = input['timeslice']
@@ -67,6 +73,21 @@ class Pump_Calibration:
         self.RPM_to_LH = numpy.polynomial.Polynomial(input['RPM_to_LH']) if input['RPM_to_LH'] is not None else None
         self.LH_to_RPM = numpy.polynomial.Polynomial(input['LH_to_RPM']) if input['LH_to_RPM'] is not None else None
         self.maximal_liters = self.RPM_to_LH(self.maxRPM)
+        self.cleaning_liters = None
+        if self.maxRPMcleaning is not None and self.maxRPMcleaning >= self.maxRPM:
+            self.cleaning_liters = self.RPM_to_LH(self.maxRPMcleaning)
+
+    def value_RPMcleaning(self) -> int:
+        if self.maxRPMcleaning is None:
+            return 0;
+        return self.maxRPMcleaning
+
+    def update_liters(self):
+        self.maximal_liters = self.RPM_to_LH(self.maxRPM)
+        self.cleaning_liters = None
+        if self.maxRPMcleaning is not None and self.maxRPMcleaning >= self.maxRPM:
+            self.cleaning_liters = self.RPM_to_LH(self.maxRPMcleaning)
+        print('Cleaning=',self.cleaning_liters)
 
     # Fonction pour sauvegarder un objet de la classe courante en utilisant JSON : normalement on édite les JSON a la main !
     def save(self, interpolate = False, config=0):
@@ -74,6 +95,9 @@ class Pump_Calibration:
             self.RPM_to_LH = numpy.polynomial.Polynomial.fit(self.measures["RPM"].tolist(), self.measures["LH"].tolist(), 2).convert()
             self.LH_to_RPM = numpy.polynomial.Polynomial.fit(self.measures["LH"].tolist(), self.measures["RPM"].tolist(), 2).convert()
         self.maximal_liters = self.RPM_to_LH(self.maxRPM)
+        self.cleaning_liters = None
+        if self.maxRPMcleaning is not None and self.maxRPMcleaning >= self.maxRPM:
+            self.cleaning_liters = self.RPM_to_LH(self.maxRPMcleaning)
         print(self.maxRPM,'RPM = ',self.maximal_liters,' Liters/hour')
         with open(datafiles.linearfile("pump"+str(config)), 'w') as f:
             #print(json.dumps(self.to_dict()))
@@ -88,6 +112,7 @@ class Pump_Calibration:
                 objdict = json.load(f)
                 self.from_dict(objdict)
                 print("Load "+str(self))
+            self.update_liters()
             return True
         except:
             traceback.print_exc()
@@ -122,8 +147,8 @@ class Pump_Calibration:
             rpms = self.measures["RPM"].tolist()
             for j in range(0,self.measures.shape[0]):
                 rpm = rpms[j]
-                if prev < min(rpm,self.maxRPM):
-                    for i in range(prev, min(rpm,self.maxRPM), self.stepRPM):
+                if prev < min(rpm,self.maxRPM+1):
+                    for i in range(prev, min(rpm,self.maxRPM+1), self.stepRPM):
                         t.append(None)
                         l.append(None)
                         r.append(i)

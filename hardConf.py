@@ -34,7 +34,7 @@ pumpOFF = 1
 pumpDirection = -14
 
 # Max allowed speed (RPM) allowed for the pump (theoretical: 600)
-pumpMaxRPM = 360 #450 #Maximum pump speed without "rattrapage"
+pumpMaxRPM = 600 #360 #450 #Maximum pump speed without "rattrapage"
 
 # Solenoids to control water inputs
 TAP = 8 # Hot rinsing water

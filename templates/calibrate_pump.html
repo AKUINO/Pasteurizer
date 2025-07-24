@@ -21,16 +21,23 @@ $var title : Pump Calibration
                 <option value="$(i)" $('selected' if i==calibration.id else '')>$(i) : $(index[i] if i in index.keys() else '---')</option>
             </select><button type="submit" name="action" value="load" class="btn btn-info">$(ml.T("Charger","Load","Laden"))</button></form>
         </div><hr/>
-        <div class="form-group adjust-nav"><a name="param"></a><form action="#max">
+        <div class="form-group adjust-nav"><a name="max"></a><form action="#max">
             <label for="rpm">$(ml.T("Max RPM","Max RPM","Max RPM"))</label>
-
             <input class="form-control" id="rpm" name="rpm" placeholder="360" min="0" max="600" step="1" type="number" value="$(calibration.maxRPM)">
             <button type="submit" name="action" value="mx$(calibration.maxRPM-10)" class="btn btn-success"> - </button>
             <button type="submit" name="action" value="mx$(calibration.maxRPM+10)" class="btn btn-danger"> + </button>
             <button type="submit" name="action" value="mx" class="btn btn-primary">$(ml.T("Fixer","Set","Instellen"))</button>
             <button type="submit" name="action" value="go0" class="btn btn-warning">STOP</button></form>
+        </div>
+        <div class="form-group adjust-nav"><a name="maxclean"></a><form action="#maxclean">
+            <label for="rpmcleaning">$(ml.T("RPM Nettoyage","Cleaning RPM","SchoonMaak RPM"))</label>
+            <input class="form-control" id="rpmcleaning" name="rpmcleaning" placeholder="0" min="0" max="600" step="1" type="number" value="$(calibration.value_RPMcleaning())">
+            <button type="submit" name="action" value="nx$(calibration.value_RPMcleaning()-10)" class="btn btn-success"> - </button>
+            <button type="submit" name="action" value="nx$(calibration.value_RPMcleaning()+10)" class="btn btn-danger"> + </button>
+            <button type="submit" name="action" value="nx" class="btn btn-primary">$(ml.T("Fixer","Set","Instellen"))</button>
+            <button type="submit" name="action" value="go0" class="btn btn-warning">STOP</button></form>
         </div><hr/>
-        <div class="adjust-nav"><form action="#param">
+        <div class="adjust-nav"><a name="param"></a><form action="#param">
         <div class="form-group">
             <label for="description">$(ml.T("Description","Description","Beschrijving"))</label>
             <input class="form-control" id="description" name="description" placeholder="---" type="text" value="$(calibration.description)">
@@ -75,7 +82,7 @@ $var title : Pump Calibration
                 <button type="submit" name="action" value="go$(rpms[i])" class="btn btn-primary">$(rpms[i])</button>
             </td>
             <th>$(str(datetime.fromtimestamp(int(times[i]))) if times[i] else '')</th>
-            <td align=right><b>$(lhs[i] if lhs[i] else '')</b></td>
+            <td align=right><b>$(int(lhs[i]) if lhs[i] else '')</b></td>
             <td align=right>
                 $if rpms[i] != prvRPM and rpms[i] == calibration.currspeed:
                     <input class="form-control" id="mLadd" name="mLadd" size="5" placeholder="0" min="0" max="15000" step="1" type="number" value="$(int(lhs[i]/3.6*calibration.timeslice) if lhs[i] else '')"/>
@@ -91,23 +98,24 @@ $var title : Pump Calibration
         $ prvRPM = rpms[i]
         $ i+= 1
     </table></form></div></div>
-        <svg height="400" width="$(calibration.maxRPM*5/6)" style="border:1px solid black;" class="chart">
+        <svg height="450" width="$(36+(calibration.maxRPM*5/6))" style="border:1px solid black;" class="chart">
             <!-- This is the background lines -->
-            <text x="5" y="350">50</text>
-            <text x="5" y="300">100</text>
-            <text x="5" y="250">150</text>
-            <text x="5" y="200">200</text>
-            <text x="5" y="150">250</text>
-            <text x="5" y="100">300</text>
+            <text x="5" y="400">50</text>
+            <text x="5" y="350">100</text>
+            <text x="5" y="300">150</text>
+            <text x="5" y="250">200</text>
+            <text x="5" y="200">250</text>
+            <text x="5" y="150">300</text>
+            <text x="5" y="100">350</text>
             <text x="5" y="50">L/h</text>
-            <text x="$(5+(2*calibration.stepRPM*5/6))" y="360">RPM</text>
-            $for i in range(calibration.stepRPM, calibration.maxRPM, calibration.stepRPM):
+            <text x="$(5+(2*calibration.stepRPM*5/6))" y="410">RPM</text>
+            $for i in range(calibration.stepRPM, calibration.maxRPM+1, calibration.stepRPM):
                 <polyline
-                        points="$(i*5/6),0 $(i*5/6),400"
+                        points="$(i*5/6),0 $(i*5/6),450"
                         stroke="grey"
                         stroke-width="1"
                         fill="none" />
-                <text x="$(4+(i*5/6))" y="385">$(i)</text>
+                <text x="$(4+(i*5/6))" y="435">$(i)</text>
 
             <!-- This is the chart data -->
             <polyline stroke-linejoin="round"

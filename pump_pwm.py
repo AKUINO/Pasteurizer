@@ -203,7 +203,6 @@ class pump_PWM(sensor.Sensor):
                  pinPWM = 12, # 12(board=32) or 18(board=12) CustardPi Digital out #2, RPi PWM
                  pinDirection = -14, # 17(board=11) CustardPi Digital out #2
                  pinStatus = -15,  # 23(board=16) CustardPi Digital in #1. RPi pin must be in "Pull-up"...
-                 maximal_liters = None,
                  minimal_liters = 15.0
                  ):
 
@@ -219,7 +218,6 @@ class pump_PWM(sensor.Sensor):
         self.pumpSerial = None
         self.prec_entry = 0.0
         self.calibration = pump_calibration.Pump_Calibration()
-        #self.maxRPM = self.calibration.pumpMaxRPM #hardconf.MaxRPM
         self.minimal_liters = minimal_liters
         self.speed = 0.0
         self.speed_liters = 0.0
@@ -232,10 +230,6 @@ class pump_PWM(sensor.Sensor):
         self.lastError = None
         self.running = False
         self.subdivision = 8
-        if not maximal_liters:
-            self.maximal_liters = self.speedLitersHour(self.calibration.maxRPM)
-        else:
-            self.maximal_liters = maximal_liters
         self.buzzer = None # to enable beeps during calibration
         self.solenoid = None # to enable closing the water tap
 
@@ -436,10 +430,11 @@ class pump_PWM(sensor.Sensor):
             #     inc = True
             self.speed = speed
             self.speed_liters = liters
-        if self.calibration.maxRPM and self.speed > self.calibration.maxRPM:
-            self.speed = self.calibration.maxRPM
-            self.speed_liters = self.maximal_liters
-        elif not self.speed_liters:
+        # if self.calibration.maxRPM and self.speed > self.calibration.maxRPM:
+        #     self.speed = self.calibration.maxRPM
+        #     self.speed_liters = self.maximal_liters
+        # el
+        if not self.speed_liters:
             self.speed_liters = self.speedLitersHour(self.speed)
         if hardConf.MICHA_device or hardConf.processor != 'pc':
             self.setSpeed(prvSpeed,self.speed,self.reverse)
