@@ -1538,6 +1538,7 @@ class Operation(object):
 
             if T_Pump.time2speedL(time_for_temp) >= T_Pump.pump.minimal_liters:
                 speed = T_Pump.dynamicRegulation(time_for_temp)
+                print("Dyn Speed=%f" % speed)
                 T_Pump.pasteurizationOverSpeed = speed >= T_Pump.pump.calibration.maximal_liters
                 if reportPasteur.startRegulating:
                     reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, (cohorts.mL('warranty')) / 1000.0))
