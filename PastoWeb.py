@@ -1538,7 +1538,7 @@ class Operation(object):
 
             if T_Pump.time2speedL(time_for_temp) >= T_Pump.pump.minimal_liters:
                 speed = T_Pump.dynamicRegulation(time_for_temp)
-                print("Dyn Speed=%f" % speed)
+                #print("Dyn Speed=%f" % speed)
                 T_Pump.pasteurizationOverSpeed = speed >= T_Pump.pump.calibration.maximal_liters
                 if reportPasteur.startRegulating:
                     reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, (cohorts.mL('warranty')) / 1000.0))
@@ -2149,6 +2149,17 @@ class ThreadPump(threading.Thread):
 
         curr_volume = self.pump.volume()*1000.0  # Liters to milliliters !
         end_holding = curr_volume+hardConf.holding_volume
+
+        to_remove = []
+        for (vol,time) in self.pasteurizationDurations.items():
+            if vol < curr_volume:
+                to_remove.append(vol)
+            if vol > end_holding:
+                to_remove.append(vol)
+        for vol in to_remove:
+            #print ("Remove "+str(vol)+"mL "+str(self.pasteurizationDurations[vol])+"sec.")
+            del(self.pasteurizationDurations[vol])
+
         if end_holding in self.pasteurizationDurations:
             prev =  self.pasteurizationDurations[end_holding]
             if pasteurization_holding_time <= prev:
@@ -2159,17 +2170,10 @@ class ThreadPump(threading.Thread):
             self.pasteurizationDurations[end_holding] = pasteurization_holding_time
         #print ("Set "+str(curr_volume)+"+"+str(hardConf.holding_volume)+"="+str(end_holding)+"mL "+str(pasteurization_holding_time)+"sec.")
 
-        to_remove = []
         max_time = pasteurization_holding_time
         for (vol,time) in self.pasteurizationDurations.items():
-            if vol < curr_volume:
-                to_remove.append(vol)
-            elif time > max_time:
+            if time > max_time:
                 max_time = time
-        #print (to_remove)
-        for vol in to_remove:
-            # print ("Remove "+str(vol)+"mL "+str(self.pasteurizationDurations[vol])+"sec.")
-            del(self.pasteurizationDurations[vol])
         return self.time2speedL(max_time)
 
     def run(self):
