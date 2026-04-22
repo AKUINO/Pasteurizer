@@ -1686,7 +1686,7 @@ def flood_liters_to_seconds(liters):
     tim = menus.val('r')
     if vol <= 0.1 or tim < 20: # invalid parameters, return a default value
         return liters * 60 / FLOOD_PER_MINUTE
-    return liters/vol*tim
+    return (liters/vol)*tim
 
 menus.CITY_WATER_ACTIONS = "FRACDH"
 DILUTION_ACTIONS = "ACD"
@@ -3118,6 +3118,7 @@ class WebCalibratePump:
                 if 'mLtap' in data and data['mLtap']:
                     menus.options['u'][Menus.VAL] = float(data['mLtap'])/1000.0 # stored in Liters !
                     menus.options['r'][Menus.VAL] = currPump.calibration.timeslice
+                    #print(menus.options['u'][Menus.VAL],menus.options['r'][Menus.VAL])
                     menus.save()
             return render.calibrate_pump(param_action, currPump.calibration)
 
