@@ -934,7 +934,7 @@ class ThreadDAC(threading.Thread):
         prec_heating = None
         some_heating = False
         has_heated = False
-        FLUSH_COUNT = 20 # Number of lines before flushing the log file
+        FLUSH_COUNT = 60 # Number of lines before flushing the log file
         flush_current = 0
         # TODO: allow to balance both heating tanks to reduce power demand
         while self.running:
@@ -1059,7 +1059,7 @@ class ThreadDAC(threading.Thread):
                 (durationRemaining, warning) = self.T_Pump.durationRemaining(nowT)
                 quantityRemaining = self.T_Pump.quantityRemaining()
                 try:
-                    with open(datafiles.csvfile(datafiles.logfile), "a") as log_file:
+                    with open(datafiles.logfile(), "a") as log_file:
                         log_file.write("%d\t%s%s%s\t%s\t%s\t%d\t%.3f\t%.2f\t%.2f\t%.2f\t%d\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n"
                                     % (int(nowT), \
                                        State.current.letter if State.current else '', \
@@ -1090,6 +1090,15 @@ class ThreadDAC(threading.Thread):
                         if flush_current >= FLUSH_COUNT:
                             log_file.flush()
                             os.fsync(log_file.fileno())
+                            # --- SYNCHRONISATION DU RÉPERTOIRE PARENT ---
+                            # Récupère le chemin absolu du dossier contenant le fichier log
+                            log_dir = os.path.dirname(os.path.abspath(log_file.name))
+                            # Ouvre le répertoire en lecture seule (requis par l'OS pour faire un fsync sur un dossier)
+                            dir_fd = os.open(log_dir, os.O_RDONLY)
+                            try:
+                                os.fsync(dir_fd)
+                            finally:
+                                os.close(dir_fd)
                             flush_current = 0
                         else:
                             flush_current += 1
@@ -2519,7 +2528,7 @@ else:
     dumpValve = Sensor(Valve.typeNum,'DMP',hardConf.DMP_open) # Dummy Valve only to know if we are dumping or cycling...
 dumpValve.set(1.0) # Open by default
 
-with open(datafiles.csvfile(datafiles.logfile), "w") as data_file:
+with open(datafiles.logfile(), "w") as data_file:
     data_file.write("epoch_sec\tstate\taction\toper\tstill\tqrem\twatt\tvolume\tpump\tpause\tinput\twarant\tintake\theat\theatbath\t"
                     + ("press" if hardConf.inputPressure else "rmeter")
                     + "\tlinput\tloutput\n") #\twatt2\ttemper\theat
@@ -3210,7 +3219,7 @@ class getCSV:
             raise web.seeother('/')
         elif not endParam:
             if not fileParam:
-                fileParam = datafiles.logfile
+                fileParam = datafiles.logfile_name
             web.header('Content-type', 'text/csv')
             with open(datafiles.csvfile(fileParam),'r') as f:
                 try:
@@ -3631,7 +3640,7 @@ while T_DAC.is_alive():
     T_DAC.running = False
     time.sleep(0.2)
 
-with open(datafiles.csvfile(datafiles.logfile), "r") as data_file:
+with open(datafiles.logfile(), "r") as data_file:
     term.write("Données stockées dans ",term.blue, term.bgwhite)
     term.writeLine(os.path.realpath(data_file.name),term.red,term.bold, term.bgwhite)
 

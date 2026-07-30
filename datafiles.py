@@ -44,8 +44,7 @@ TEMPLATES_DIR = os.path.join(DIR_BASE, 'templates/')
 DIR_BASE_DTZ = os.path.join(DIR_BASE, 'dtz/')
 DIR_PRIV_DTZ = os.path.join(DIR_BASE_DATA, 'dtz/')
 
-FILENAME_FORMAT = "%Y_%m%d_%H%M"
-logfile = datetime.datetime.now().strftime(FILENAME_FORMAT)
+logfile_name = None
 
 def calibfile(fileName):
     return DIR_DATA_CALIB + fileName + ".csv"
@@ -61,6 +60,14 @@ def dtzSharedFile(fileName):
 
 def csvfile(fileName):
     return DIR_DATA_CSV + fileName + ".csv"
+
+def logfile():
+    global logfile_name
+
+    if logfile_name is None:
+        FILENAME_FORMAT = "%Y_%m%d_%H%M"
+        logfile_name = datetime.datetime.now().strftime(FILENAME_FORMAT)
+    return csvfile(logfile_name)
 
 def reportfile(fileName):
     return DIR_DATA_REPORT + fileName + ".json"
