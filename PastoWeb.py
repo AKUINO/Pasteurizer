@@ -243,7 +243,7 @@ menus.options =  {'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                          ,STAY_CLEAN_TIME,STAY_CLEAN_TIME,"hh:mm",False,3600*2,600,"time"],  # Durée où un tuyau propre le reste sans rinçage (le double avant de tout re-nettoyer)
                   'R':['R',ml.T("Rinçage°","Rinse°","Spoelen°") \
                             ,ml.T("Température de rinçage","Rinse Temperature","Spoelen Temperatuur") \
-                            ,25.0,25.0,"°C",False,90,0.1,"number"],  # Température du Bassin pour le prélavage
+                            ,25.0,35.0,"°C",False,90,0.1,"number"],  # Température du Bassin pour le prélavage
                   'r':['r',ml.T("Rinçage\"","Rinse\"","Spoelen\"") \
                             ,ml.T("Durée du dernier Rinçage","Last Rinse duration","Laatste spoelduur") \
                             ,0.0,60.0,'\"',False,300,1,"number",60],  # Volume du dernier flush pour calcul du Temps d'admission de l'eau courante (TOTAL_VOL à mettre par défaut)
@@ -255,19 +255,19 @@ menus.options =  {'G':['G',ml.T("Gradient°","Gradient°","Gradient°") \
                          ,0,1,"-",False,1,1,'range'],  # Faux=0, 1=Vrai
                   'C':['C',ml.T("net.Caustique°","Caustic cleaning°","Bijtende schoonmaak°") \
                             ,ml.T("Température de nettoyage","Cleaning Temperature","Schoonmaak Temperatuur") \
-                            ,40.0,65.0,"°C",False,60,0.1,"number"],  # Température pour un passage au détergent
+                            ,40.0,65.0,"°C",False,70,0.1,"number"],  # Température pour un passage au détergent
                   'c':['c',ml.T("net.Caustique\"","Caustic cleaning\"","Bijtende schoonmaak\"") \
                             ,ml.T("Durée de nettoyage","Cleaning Duration","Schoonmaak Tijd") \
                             ,CLEAN_TIME,CLEAN_TIME,"hh:mm",False,3600*2,60,"time"],
                   'D': ['D', ml.T("Désinfection°""Disinfection°", "Desinfectie°") \
                           , ml.T("Température de désinfection", "Disinfection Temperature", "Desinfectie Temperatuur") \
-                          , 25.0, 35.0, "°C", False, 30, 0.1, "number"],  # Température normale de désinfection vinaigre + peroxyde
+                          , 25.0, 35.0, "°C", False, 35, 0.1, "number"],  # Température normale de désinfection vinaigre + peroxyde
                     'd': ['d', ml.T("Désinfection \"", "Disinfection \"", "Desinfectie \"") \
                           , ml.T("Durée de désinfection", "Disinfection Duration", "Desinfectie Tijd") \
                           , DISINF_PAUSE_TIME, DISINF_PAUSE_TIME, "hh:mm", False, 3600, 60, "time"],  # Temps d'action pour un traitement à l'acide ou au percarbonate de soude
                     'A':['A',ml.T("net.Acide°""Acidic cleaning°","Zuur schoonmaak°") \
                             ,ml.T("Température de nettoyage acide","Acidic cleaning Temperature","Zuur schoomaak Temperatuur") \
-                            ,40.0,50.0,"°C",False,60,0.1,"number"],  # Température pour un traitement à l'acide ou au percarbonate de soude
+                            ,40.0,50.0,"°C",False,55,0.1,"number"],  # Température pour un traitement à l'acide ou au percarbonate de soude
                     'a':['a', ml.T("net.Acide\"","Acidic cleaning\"","Zuur schoonmaak\"") \
                             , ml.T("Durée de nettoyage acide","Acidic cleaning Duration","Zuur schoomaak Tijd") \
                             , ACID_TIME, ACID_TIME, "hh:mm", False, 3600 * 2, 60, "time"],  # Température pour un traitement à l'acide ou au percarbonate de soude
