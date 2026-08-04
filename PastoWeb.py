@@ -1840,9 +1840,9 @@ opSequences = {
           Operation('NetS','SEAU','input','warranty',ref='C',message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"),dump=True),
           Operation('NetF','FILL','input','warranty', ref='C', duration=lambda:flood_liters_to_seconds(total_volume), base_speed=CLEAN_SPEED, qty=lambda:total_volume, dump=False),
           Operation('NetI','FLOO','input','warranty',ref='C',duration=lambda:flood_liters_to_seconds(DILUTE_VOL),base_speed=CLEAN_SPEED,qty=DILUTE_VOL,dump=False),
+          Operation('Neti','PUMP','input','warranty', ref='C', base_speed=HALF_SPEED, qty=lambda:total_volume*2.0, dump=False),
           Operation('NetY','PAUS','input','warranty',ref='C',message=ml.T("Mettre le Nettoyant dans le seau puis une touche!","Put the Cleaner in the bucket then press a key!","Zet de Cleaner in de emmer en druk op een toets!"),dump=False,bin=buck.CAUS,bout=buck.CAUS,kbin=0.0,qbout=True),
-          Operation('Neti','PUMP','input','warranty', ref='C', base_speed=HALF_SPEED, qty=lambda:start_volume, dump=False),
-          Operation('Neth','TRAK','input','warranty', ref='C', base_speed=HALF_SPEED, min_speed=pumpy.minimal_liters, qty=lambda:total_volume * 2.0, \
+          Operation('Neth','TRAK','input','warranty', ref='C', base_speed=OPT_SPEED, min_speed=HALF_SPEED, qty=lambda:total_volume * 2.0, \
                     shake_qty=lambda:pumpy.minimal_liters*REST_TIME/3600, dump=False),
           Operation('Neto','SUBR',duration=lambda:menus.val('c'),subSequence='c',dump=False),
           Operation('Nets','SEAU', message=ml.T("Eau potable en entrée!","Drinking water as input!","Drinkwater als input!"), dump=True, bin=[buck.CAUS,buck.WPOT], bout=buck.CAUS, kbin=lambda:total_volume, qbin=True, qbout=True),
