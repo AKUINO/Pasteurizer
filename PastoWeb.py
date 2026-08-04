@@ -1235,7 +1235,8 @@ class Operation(object):
         if not self.ref: # do not heat !
             return 0.0
         if isinstance(self.ref,str):
-            return menus.val(self.ref) + ( menus.val('G') if self.sensor1 == 'warranty' else GRADIENT_FOR_INTAKE if self.sensor1 == 'intake' else 0.0 )
+            return menus.val(self.ref) + ( menus.val('G') if self.sensor1 in ['warranty','input'] \
+                                               else GRADIENT_FOR_INTAKE if self.sensor1 == 'intake' else 0.0 )
         else:
             return self.ref
 
