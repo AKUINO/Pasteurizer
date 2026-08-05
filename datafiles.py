@@ -3,6 +3,7 @@ import datetime
 from pathlib import Path
 
 DIR_BASE = os.path.dirname(os.path.abspath(__file__)) + '/'
+FILENAME_FORMAT = "%Y_%m%d_%H%M"
 
 # TO BE CALLED AT BEGINNING OF APPLICATION
 def goto_application_root():
@@ -65,7 +66,6 @@ def logfile():
     global logfile_name
 
     if logfile_name is None:
-        FILENAME_FORMAT = "%Y_%m%d_%H%M"
         logfile_name = datetime.datetime.now().strftime(FILENAME_FORMAT)
     return csvfile(logfile_name)
 
