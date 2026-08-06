@@ -53,6 +53,7 @@ si on lance par exemple un pasteurisation et qu’on l’arrête directement car
       Pour une pasteurisation, ce pourrait être idem avec un gradient de 3°C (paramétré)
    ATTENTION: CHANGEMENT a moitié fait.
 """
+import shutil
 import socket
 import sys
 import os
@@ -60,6 +61,8 @@ import signal
 import argparse
 import json
 import time
+import zipfile
+
 import web # pip install web.py
 from datetime import datetime
 from enum import Enum
@@ -3269,11 +3272,32 @@ class getCSV:
             return result
 
 class getCSVdir:
-    def GET(self):
+    def GET(self, download=None):
 
         data, connected, mail, password = init_access()
         if not connected:
             raise web.seeother('/')
+        elif download:
+            dossier_a_zipper = datafiles.DIR_DATA_CSV
+            zip_path = "/tmp/csv-pasteur.zip" # Le chemin sans l'extension .zip
+
+            # 1. Création du ZIP en ne filtrant que les .csv
+            with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+                for root, dirs, files in os.walk(dossier_a_zipper):
+                    for file in files:
+                        if file.lower().endswith('.csv'):
+                            full_path = os.path.join(root, file)
+                            # Conserve la structure relative des sous-dossiers
+                            arcname = os.path.relpath(full_path, dossier_a_zipper)
+                            zf.write(full_path, arcname)
+            # 2. Configuration des en-têtes web.py pour le téléchargement
+            web.header('Content-Type', 'application/zip')
+            web.header('Content-Disposition', f'attachment; filename="csv_pasteur.zip"')
+            web.header('Content-Length', str(os.path.getsize(zip_path)))
+
+            # 3. Lecture et envoi du fichier
+            with open(zip_path, 'rb') as f:
+                return f.read()
         else:
             # list to store files
             res = []
@@ -3554,6 +3578,7 @@ try:
         '/static/css/(.+)', 'getCSS',
         '/js/(.+)', 'getJS',
         '/css/(.+)', 'getCSS',
+        '/csvdir/(.+)', 'getCSVdir',
         '/csvdir', 'getCSVdir',
         '/csv/(.+)/(.+)', 'getCSV',
         '/csv/(.+)', 'getCSV',
