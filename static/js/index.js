@@ -281,7 +281,7 @@ function fillDisplay(data,logging) {
                 $('#accro').text(accro);
                 //$('#totalwatt').text(floorUni2(data['totalwatts'],data['totalwatts2']));
                 $('#totalwatt').text(floorUni(data['totalwatts']));
-                $('#watts').text(floorUni(data['watts']));
+                $('#watts').text(floorDeci(float(data['watts'])/1000.0));
                 //$('#watts2').text(floorUni(data['watts2']));
                 $('#volume').text(floorDeci(data['volume']));
                 if ('remain' in data && data['remain']) {
