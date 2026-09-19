@@ -51,8 +51,8 @@ $var title : $(ml.T("Rapport","Report","Rapport"))
         <tr>
             <th>$(ml.T('Température de pasteurisation','Pasteurisation Temperature','Pasteurisatie temperatuur'))</th>
             <td>
-                $if report.duration > 0 and report.volume > 0:
-                    $('%.1f' % (report.total_temperature/(report.duration*report.volume)) )°C
+                $if report.duration > 0 and report.volume > 0 and report.count > 0:
+                    $('%.1f' % (report.total_temperature/report.count) )°C
                 $(ml.T('Demandé','Requested','Aangevraagd')):<b>$('%.1f' % report.temp)°C</b>
             </td>
         </tr>
@@ -74,9 +74,14 @@ $var title : $(ml.T("Rapport","Report","Rapport"))
         <tr>
             <th>$(ml.T('Chauffe','Heating','Verwarming'))</th>
             <td>$(menus.showTime(report.total_time_heating))
-                = $(2.5*report.total_time_heating/3600)kW
+                = $('%.3f' % (2.5*report.total_time_heating/3600))kW
             </td>
         </tr>
+            <tr>
+                <th>$(ml.T('Récupération','Heat Recovery','Warmteterugwinning'))</th>
+                <td>$('%.1f >> %.1f' % (report.first_performance, report.last_performance))%
+                </td>
+            </tr>
         <tr>
             <th>$(ml.T('Pauses','Pauses','Pauzeert'))</th>
             <td>

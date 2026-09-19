@@ -59,6 +59,9 @@ class Report(object): # Info about the Owner of the Pasteurizee
 
         self.total_time_heating = 0
         self.total_temperature = 0.0
+        self.count = 0
+        self.first_performance = 0.0
+        self.last_performance = 0.0
 
         self.input_source = ""
         self.customer = ""
@@ -84,6 +87,9 @@ class Report(object): # Info about the Owner of the Pasteurizee
         print ('report start at %d' % self.begin)
         self.total_temperature = 0.0
         self.total_time_heating = 0
+        self.count = 0
+        self.first_performance = 0.0
+        self.last_performance = 0.0
 
         self.input_source = ""
         self.customer = ""
@@ -123,7 +129,21 @@ class Report(object): # Info about the Owner of the Pasteurizee
         self.state = reportDict['state']
         self.begin = reportDict['begin']
         self.total_temperature = reportDict['total_temperature']
+        if self.total_temperature is None:
+            self.total_temperature = 0.0
         self.total_time_heating = reportDict['total_time_heating']
+        if 'count' in reportDict:
+            self.count = reportDict['count']
+        else:
+            self.count = 0
+        if 'first_perf' in reportDict:
+            self.first_performance = reportDict['first_perf']
+        else:
+            self.first_performance = 0.0
+        if 'last_perf' in reportDict:
+            self.last_performance = reportDict['last_perf']
+        else:
+            self.last_performance = 0.0
 
         self.from_form(reportDict)
         return self
@@ -143,6 +163,9 @@ class Report(object): # Info about the Owner of the Pasteurizee
             ,'begin' : self.begin
             ,'total_temperature' : self.total_temperature
             ,'total_time_heating' : self.total_time_heating
+            ,'count' : self.count
+            ,'first_perf' : self.first_performance
+            ,'last_perf' : self.last_performance
             ,'input_source' : self.input_source
             ,'customer' : self.customer
             ,'planned_volume' : self.planned_volume
@@ -152,11 +175,23 @@ class Report(object): # Info about the Owner of the Pasteurizee
             ,'signature' : self.signature
         }
 
-    # Fonction pour sauvegarder un objet de la classe courante en utilisant JSON
-    def save(self):
+    # Fonction pour sauvegarder un rapport en utilisant JSON
+    def save(self, flush = False):
         with open(datafiles.reportfile(self.batch), 'w') as f:
             json.dump(self.to_dict(),f)
+            if flush:
+                f.flush()
+                os.fsync(f.fileno())
+                # --- SYNCHRONISATION DU RÉPERTOIRE PARENT ---
+                # Récupère le chemin absolu du dossier contenant le rapport
+                report_dir = os.path.dirname(os.path.abspath(f.name))
+                # Ouvre le répertoire en lecture seule (requis par l'OS pour faire un fsync sur un dossier)
+                dir_fd = os.open(report_dir, os.O_RDONLY)
+                try:
+                    os.fsync(dir_fd)
+                finally:
+                    os.close(dir_fd)
 
-    def record(self,data):
+def record(self,data):
         self.from_form(data)
         self.save()

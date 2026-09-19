@@ -325,6 +325,8 @@ function fillDisplay(data,logging) {
                 // $('#extra').text(data['extra'] != 0.0 ? (floorDeci(data['extra'])+'°'):"");
                 $('#pumpeff').text(floorUni(data['pumpeff']));
                 $('#heateff').text(floorDeci(data['heateff']));
+                $('#duty').text(floorUni(data['duty']));
+                $('#performance').text(floorUni(data['performance']));
                 $('#message').text(data['message']);
                 if (data['allowedActions'] != '') {
                     //console.log('AA='+data['allowedActions']);
@@ -492,7 +494,7 @@ function fillDisplay(data,logging) {
                 if ('pumpopt' in data && data['pumpopt']) {
                     $('#pumpopt').text(floorDeci(data['pumpopt']));
                 }
-                if (actionletter in ['M','E','P','I'] && data['pumpeff'] > 0 && speed != 0 ) {
+                if ('MEPI'.includes(actionletter) && data['pumpeff'] > 0 && speed != 0 ) {
                     $('#eff').show();
                 } else {
                     $('#eff').hide();

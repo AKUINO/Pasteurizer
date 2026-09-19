@@ -87,6 +87,7 @@ import pump_pwm
 import cohort
 import Heating_Profile
 import Dt_line
+from DutyCycle import DutyCycle
 
 from thermistor import Thermistor
 from pressure import Pressure
@@ -217,6 +218,7 @@ REST_TIME = 20#seconds : slowest speed in order to leave the pump (and liquid) r
 DEFAULT_FORCING_TIME = 30 #seconds. Each time the user forces pumping forward, normal operation resumes after this delay
 
 HYSTERESIS = 0.2 # degrees below / over setpoint to open / close heating
+DUTY_AVERAGING_TIME = 120 # duty cycle date is averaged on 120 seconds
 
 #FLOOD_TIME = 60.0 # 90 seconds of hot water tap flushing (when a pump is in the way. 60 if not) to FILL an EMPTY machine
 #floodLitersMinute = 3.5 # 4.0 si pas de pompe dans le chemin; 3 sinon    DEPEND DE LA PRESSION, PAS UTILISABLE
@@ -441,13 +443,14 @@ def init_volumes():
     up_to_extra = up_to_extra - 200 + amont + aval
     total_tubing = total_tubing - 200 + amont + aval
 
-    cohorts.sequence = [ # Tubing and Sensor Sequence of the Pasteurizer
+    cohorts.setSequence ( [ # Tubing and Sensor Sequence of the Pasteurizer
                         [up_to_solenoid, 'intake'], # apres la pompe
                         [up_to_heating_tank - up_to_solenoid,'input'], #input de la chauffe
                         [up_to_thermistor - up_to_heating_tank, 'warranty'], # Garantie
-                        [up_to_extra - up_to_thermistor, 'extra'] ]
+                        [up_to_extra - up_to_thermistor, 'extra'] ] )
     #                    ,[total_tubing - up_to_extra, 'total']] # Sortie TO BE IMPLEMENTED WHEN EXTRA THERMISTOR WILL BE AVAILABLE
-    tell_message("Entrée=%dmL, avant Cuve=%dmL, Garantie=%dmL, Sortie=%dmL" % (cohorts.mL('intake'), cohorts.mL('input'), cohorts.mL('warranty'), cohorts.mL('extra')))
+    tell_message("Entrée=%dmL, avant Cuve=%dmL, Garantie=%dmL, Sortie=%dmL"
+                 % (cohorts.up_to_mL('intake'), cohorts.up_to_mL('input'), cohorts.up_to_mL('warranty'), cohorts.up_to_mL('extra')))
     # Parameterized volumes are in Liters and not milliliters...
     start_volume = mL_L(up_to_thermistor) # 1.9L
     total_volume = mL_L(total_tubing) # 3.5L
@@ -705,6 +708,8 @@ menus.cleanActions = "LYJKTPIMEHV" #K
 menus.dirtyActions = "RFDCAV"
 menus.sysActions = "ZX"
 
+pasteurizing_Actions = ['M','E','P','H','I']
+
 menus.operName = { 'HEAT':ml.T('chauffer','heating','verwarm') \
                    ,'PUMP':ml.T('pomper','pump','pomp') \
                    ,'EMPT':ml.T('vider','purge','purge') \
@@ -903,6 +908,7 @@ class ThreadDAC(threading.Thread):
         self.currLog = None
         self.empty_tank = False
         self.danger = False
+        self.duty_cycle = None
 
     def set_temp(self,setpoint=None, refpoint=None):
         if refpoint is not None:
@@ -934,6 +940,8 @@ class ThreadDAC(threading.Thread):
 
         self.running = True
         lastLoop = time.perf_counter()
+        self.duty_cycle = DutyCycle(cohorts.periodicity, DUTY_AVERAGING_TIME)
+
         lastWatt = 0
         prec_heating = None
         some_heating = False
@@ -947,7 +955,7 @@ class ThreadDAC(threading.Thread):
             if now > (lastLoop+cohorts.periodicity):
               delay = now - lastLoop
               lastLoop = now
-              cohorts.nextPeriod()
+              cohorts.nextPeriod(now) # Get all sensors calibrated and smoothed values
               try:
                 wattHour = False
                 flooding = False
@@ -982,6 +990,7 @@ class ThreadDAC(threading.Thread):
 
                     if wattHour and not self.empty_tank:
                         self.dacSetting.set(1)
+                        self.duty_cycle.record(1,now)
                         self.totalWatts += (hardConf.power_heating/3600.0 * delay)
                         if not lastWatt or self.T_Pump.pump.speed != 0.0:
                             lastWatt = now
@@ -1003,11 +1012,15 @@ class ThreadDAC(threading.Thread):
                                     some_heating = False
                     else:
                         self.dacSetting.set(0)
+                        self.duty_cycle.record(0,now)
                         lastWatt = 0
                         prec_heating = None
                         some_heating = False
+                    #print(self.duty_cycle.get()[0])
                 else:
                     self.dacSetting.set(0)
+                    self.duty_cycle.record(None,now)
+                    #print(now)
                     lastWatt = 0
                     prec_heating = None
                     some_heating = False
@@ -1329,9 +1342,9 @@ class Operation(object):
                     reportPasteur.start(menus,'p')
                 elif not reportPasteur.state:
                     reportPasteur.start(menus,'p')
-                reportPasteur.save()
+                reportPasteur.save(False)
             elif reportPasteur.state:
-                reportPasteur.save()
+                reportPasteur.save(False)
                 reportPasteur.state = None
         elif self.typeOp == 'PAUS':
             if not T_Pump.added:
@@ -1565,7 +1578,7 @@ class Operation(object):
                 #print("Dyn Speed=%f" % speed)
                 T_Pump.pasteurizationOverSpeed = speed >= T_Pump.pump.calibration.maximal_liters
                 if reportPasteur.startRegulating:
-                    reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, (cohorts.mL('warranty')) / 1000.0))
+                    reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, cohorts.up_to_mL('warranty') / 1000.0))
                     reportPasteur.startRegulating = 0
                 T_Pump.forcible = False
             else:  # More than 90 seconds to traverse pasteurization tube = too slow
@@ -1600,7 +1613,7 @@ class Operation(object):
                     #print("SHAK="+str(speed)+"\r")
                 else: # No more "shake"
                     if reportPasteur.startRegulating:
-                        reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, cohorts.mL('warranty') / 1000.0))
+                        reportPasteur.regulations.append((time.perf_counter() - reportPasteur.startRegulating, cohorts.up_to_mL('warranty') / 1000.0))
                         reportPasteur.startRegulating = 0
                     T_Pump.forcible = False
                     #if menus.val('g') and self.sensor1 == 'warranty':
@@ -1668,9 +1681,9 @@ class Operation(object):
             T_Pump.forcible = False
             T_Pump.pump.stop()
             if self.pasteurizing > 0 and reportPasteur.state:
-                reportPasteur.volume = reportPasteur.volume + T_Pump.currOpContext.volume()
-                reportPasteur.duration = reportPasteur.duration + T_Pump.currOpContext.duration()
-                reportPasteur.save()
+                reportPasteur.volume += T_Pump.currOpContext.volume()
+                reportPasteur.duration += T_Pump.currOpContext.duration()
+                reportPasteur.save(True)
         elif self.typeOp in ['SHAK','EMPT']:
             T_Pump.forcible = False
             T_Pump.pump.stop()
@@ -1925,6 +1938,33 @@ def reloadPasteurizationSpeed():
     Dt_line.set_ref_speed(optimal_speed)
     # i=input(str(max_liters))
 
+def performance_heat_exchanger():
+    global cohorts
+
+    performance = 0.0
+    last_period = cohorts.last_period()
+    if last_period:
+        Voutlet = cohorts.history[cohorts.VOLUME][last_period]
+        if Voutlet:
+            Vinlet = Voutlet - cohorts.up_to_mL('intake','input')
+            Vreturn = Voutlet - hardConf.holding_volume
+            Toutlet = cohorts.history['input'][last_period]
+            Tinlet = None
+            Treturn = None
+            if Toutlet:
+                Dinlet = cohorts.find_period_by_volume(Vinlet)
+                if Dinlet:
+                    Tinlet = cohorts.history['intake'][Dinlet]
+                    if Toutlet > Tinlet:
+                        Dreturn = cohorts.find_period_by_volume(Vreturn)
+                        if Dreturn:
+                            Treturn = cohorts.history['warranty'][Dreturn]
+                            if Treturn > Tinlet:
+                                performance = 100.0*(Toutlet-Tinlet)/(Treturn-Tinlet)
+    return performance
+
+
+
 class ThreadPump(threading.Thread):
 
     def __init__(self, pumpy_param, T_DAC_param):
@@ -2092,7 +2132,7 @@ class ThreadPump(threading.Thread):
         if self.paused and not paused:
             duration = time.perf_counter()-self.startPause
             if reportPasteur.state:
-                reportPasteur.pauses.append((duration, cohorts.mL('warranty') / 1000.0))
+                reportPasteur.pauses.append((duration, cohorts.up_to_mL('warranty') / 1000.0))
             if self.currOpContext:
                 self.currOpContext.extend_duration(duration)
         self.pumpLastChange = time.perf_counter()
@@ -2293,7 +2333,7 @@ class ThreadPump(threading.Thread):
                         self.setPause(False)
 
                 if hardConf.MICHA_device and hardConf.io: # Output probably in the buffer tank
-                    if T_Pump.currAction in ['M','E','P','H','I']:
+                    if T_Pump.currAction in pasteurizing_Actions:
                         # Level1 = Input (pulled HIGH = OK, in liquid), LOW = in Air: Pause!
                         hardConf.io.write_pin(hardConf.MICHApast.LEVEL1_FLAG_REG,1) # Enable Level detection (not meaning 1=PullUp)
                         self.level1 = hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR1_REG)
@@ -2419,10 +2459,15 @@ class ThreadPump(threading.Thread):
                 if reportPasteur.state:
                     if State.current.letter == 'p':
                         loop_delay = time.perf_counter()
-                        reportPasteur.total_time_heating = reportPasteur.total_time_heating + ((loop_delay-prec_loop)*isnull(cohorts.catalog['DAC1'].value,0))
-                        reportPasteur.total_temperature = reportPasteur.total_temperature + (self.pump.speed*(loop_delay-prec_loop)*cohorts.catalog['heating'].value)
+                        reportPasteur.total_time_heating += ((loop_delay-prec_loop)*isnull(cohorts.catalog['DAC1'].value,0))
+                        reportPasteur.total_temperature += cohorts.catalog['warranty'].value
+                        reportPasteur.count += 1
+
+                        reportPasteur.last_performance = performance_heat_exchanger()
+                        if reportPasteur.last_performance > 0.0 and reportPasteur.first_performance <= 0.0:
+                            reportPasteur.first_performance = reportPasteur.last_performance
                     else:
-                        reportPasteur.save()
+                        reportPasteur.save(False)
                         # reportPasteur.state = None NO! NO!
             except:
                 traceback.print_exc()
@@ -2433,7 +2478,7 @@ class ThreadPump(threading.Thread):
         # if State.current.letter in ['p','e'] and reportPasteur.volume > 0.0 : # Closing while pasteurizing: save the report !
         #     reportPasteur.save()
         if reportPasteur.state:
-            reportPasteur.save()
+            reportPasteur.save(True)
             reportPasteur.state = None
         time.sleep(0.01)
         self.pump.stop()
@@ -2737,9 +2782,14 @@ def LogData(letter):
         kbin = None
         kbout = None
         actif = False
+        avg_dc, avg_ts = T_DAC.duty_cycle.average()
+        clogged = False
+
         if T_Pump.currAction and T_Pump.currAction != 'Z':
             message = str(menus.actionName[T_Pump.currAction][2])
             if T_Pump.currOperation:
+                if T_Pump.currAction in pasteurizing_Actions and T_Pump.currOperation.typeOp == 'TRAK' and isnull(avg_dc,0.0) >= 1.0 : # heating too much while pasteurizing?
+                    clogged = True
                 actif = True
                 opt_temp = T_Pump.currOperation.tempRef()
                 if opt_temp == 0.0:
@@ -2782,7 +2832,11 @@ def LogData(letter):
             danger = str(ml.T('Cuve de chauffe VIDE ou déconnectée?','Heating tank EMPTY or disconnected?','Verwarmingstank LEEG of losgemaakte?'))
         elif warning:
             danger = str(ml.T('Cuve de chauffe mal remplie?','Heating tank not correctly filled?','Verwarmingstank niet correct gevuld?'))
+        elif clogged:
+            danger = str(ml.T("Circuit sans doute encrassé.","Circuit likely clogged.","Circuit waarschijnlijk verstopt."))
         T_DAC.danger = danger != ''
+        performance = performance_heat_exchanger()
+
     return {    'date': str(datetime.fromtimestamp(int(nowT))), \
                 'actif': 1 if actif else 0, \
                 'actionletter': T_Pump.currAction, \
@@ -2815,6 +2869,7 @@ def LogData(letter):
                 'input': isnull(input_temp, ''), \
                 'intake': isnull(intake_temp, ''), \
                 'watts': isnull(cohorts.catalog['DAC1'].value*hardConf.power_heating, '0'), \
+                'duty': isnull(avg_dc,0.0)*100.0, \
                 #'watts2': isnull(cohorts.catalog['DAC2'].value*MITIG_POWER, ''), \
                 'warranty': isnull(warranty_temp, ''), \
                 'heating': isnull(heating_temp, ''), \
@@ -2830,7 +2885,7 @@ def LogData(letter):
                 'opt_temp': opt_temp, \
                 'added': 2 if T_Pump.added else (1 if T_Pump.waitingAdd else 0),
                 'bucket': (1 if T_Pump.currAction in menus.CITY_WATER_ACTIONS else 0) if menus.val('s') < 1.0 else 2,
-                'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in ['M','E','P','H','I'] else 1), \
+                'purge': (3 if T_Pump.currOperation and (not T_Pump.currOperation.dump) else 2) if dumpValve.value == 1.0 else (0 if T_Pump.currAction in pasteurizing_Actions else 1), \
                 'pause': 1 if T_Pump.paused else 0, \
                 'fill': hotTapSolenoid.get()[0], \
                 'pumpopt': optimal_speed, \
@@ -2838,7 +2893,8 @@ def LogData(letter):
                 'heateff': (100.0*heating_volume/(pumping_time/3600))/hardConf.power_heating if pumping_time else 0, \
                 'level1': T_Pump.level1, \
                 'level2': T_Pump.level2, \
-                'forcing': 2 if T_Pump.forcing > 0 else (1 if T_Pump.forcible else 0) \
+                'forcing': 2 if T_Pump.forcing > 0 else (1 if T_Pump.forcible else 0), \
+                'performance': performance \
                 }
 
 class WebApiAction:
@@ -3474,7 +3530,7 @@ class ThreadInputProcessor(threading.Thread):
                 menu_selection = str(getch()).upper() # BLOCKING I-O !
                 if menu_selection == ' ':
                     display_pause = False
-                elif menu_selection in ['M', 'E', 'P', 'H', 'I', 'R', 'V', 'F', 'A', 'C', 'D', 'X', 'Z', 'B']: # 'C','K'
+                elif menu_selection in ['M', 'E', 'P', 'H', 'I', 'R', 'V', 'F', 'A', 'C', 'D', 'B', 'X', 'Z']: # 'C','K'
                     menu_selection = menu_confirm(menu_selection, 8.0)
                     if menu_selection == 'X':
                         #T_Pump.stopAction()
