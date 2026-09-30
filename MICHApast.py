@@ -24,6 +24,7 @@ THERMI_WIRE = 0.6 # value of the twin wire resistor
 THERMIS_POW_REG             = 0x00  # 4.0 register which stores the thermistor power state
 LEVEL1_FLAG_REG             = 0x01  # 4.0 register which stores the default value of the level sensor 1 when unplugged
 LEVEL2_FLAG_REG             = 0x02  # 4.0 register which stores the default value of the level sensor 2 when unplugged
+PERIOD2_FLAG_REG = 0x12
 PRESS_FLAG_REG              = 0x03  # 4.0 register which stores the flag which enables/disables the pressure sensor management
 
 PUMP_DIR_REG                = 0x10  # register which stores the pump direction
@@ -42,6 +43,7 @@ DEBUG_FLAG_REG              = 0x41  # register which stores the state of the deb
 # discrete registers
 LEVEL_SENSOR1_REG           = 0x01  # 4.0 register which stores the state of the input level sensor (1 for water)
 LEVEL_SENSOR2_REG           = 0x02  # 4.0 register which stores the state of the output level sensor (1 for water)
+PERIOD_SENSOR2_REG = 0x12
 EMERGENCY_STOP_REG          = 0x10  # 4.0 register which stores the state of  the emergency stop button (0 for active emergency stop)
 
 # input registers
