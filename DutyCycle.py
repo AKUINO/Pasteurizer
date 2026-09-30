@@ -30,7 +30,7 @@ class DutyCycle:
 
         self.cleaning_required = False
 
-    def record(self, state: int | None, timestamp: float):
+    def record(self, state, timestamp: float):
         timestamp = float(timestamp)
 
         # CAS 1 : Inactif ou Panne
@@ -130,7 +130,7 @@ class DutyCycle:
                 self.stable_duty = self.time_on / tot
                 self.stable_timestamp = ts
 
-    def get(self) -> tuple[float | None, float | None]:
+    def get(self) -> tuple:
         """
         Retourne (valeur, timestamp) du DERNIER cycle individuel complété.
         """
@@ -138,7 +138,7 @@ class DutyCycle:
             return (None, None)
         return self.last_completed_cycle
 
-    def average(self) -> tuple[float | None, float | None]:
+    def average(self) -> tuple:
         """
         Retourne (valeur, timestamp) de la MOYENNE LISSÉE pondérée sur la fenêtre.
         """
