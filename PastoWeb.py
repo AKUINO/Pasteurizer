@@ -106,6 +106,8 @@ global render, _lock_socket
 
 DEBUG = True
 
+TESTING = True
+
 KEY_ADMIN = "user@akuino.net"  # Omnipotent user
 PWD = "past0.NET"
 
@@ -226,7 +228,7 @@ FLOOD_PER_MINUTE = 4.0 # liters in a one minute flood from the tap (also used wi
 
 TANK_NOT_FILLED = 1.5 # If heating time remaining is decreasing more than expected (ratio above 1.3 and not 3), the tank may not be filled correctly...
 
-TANK_EMPTY_LIMIT = 60 #seconds. If heating time has not diminished in this delay, the heating tank may be empty...
+TANK_EMPTY_LIMIT = 75 #seconds. If heating time has not diminished in this delay, the heating tank may be empty...
 
 PUMP_LOOP_DELAY = 0.2
 
@@ -326,7 +328,7 @@ PUMP_SLOWDOWN = 1.0 # Slowing factor from speed calculated by temperature differ
 
 periodicity = 3 # 3 seconds intervall between cohort data
 depth = 100 # 100 x 3 seconds of data kept
-cohorts = cohort.Cohort(periodicity,depth)
+cohorts = cohort.Cohort(periodicity,depth, None, hardConf.holding_volume)
 
 calibrating = False
 temp_ref_calib = []
@@ -459,7 +461,13 @@ def init_volumes():
 
     dry_volume = total_volume * 1.5 # (air) liters to pump to empty the tubes...
 
+    cohorts.total_volume = total_volume
+    cohorts.holding_volume = hardConf.holding_volume
+
     tell_message("Amorçage=%dmL, Pasteurisation=%dmL : %.1fL/h, Total=%dmL" % (int(up_to_thermistor), int(hardConf.holding_volume), (mL_L(hardConf.holding_volume) / 15.0) * 3600.0, int(total_tubing)))
+
+    if TESTING:
+        hardConf.io.write_pin(hardConf.MICHApast.PERIOD2_FLAG_REG,1) # Measure flow...
 
 init_volumes()
 
@@ -934,6 +942,7 @@ class ThreadDAC(threading.Thread):
             # self.coldpoint = None
             # coldTapSolenoid.set(0) # Arrêter net
 
+
     def run(self):
 
         global cohorts, display_pause,tank,ROOM_TEMP, lines, columns
@@ -1098,7 +1107,7 @@ class ThreadDAC(threading.Thread):
                                        cohorts.val('heating'), \
                                        cohorts.val('press' if hardConf.inputPressure else 'rmeter') , \
                                        self.T_Pump.level1, \
-                                       self.T_Pump.level2 ) )
+                                       self.T_Pump.period2 if TESTING else self.T_Pump.level2 ) )
                                        #self.totalWatts2, \
                                        #cohorts.val('temper'),
                                        #cohorts.catalog['DAC2'].val(), \
@@ -1340,10 +1349,10 @@ class Operation(object):
             if self.pasteurizing > 0:
                 if self.pasteurizing == 2:
                     reportPasteur.start(menus,'p')
-                elif not reportPasteur.state:
+                elif reportPasteur.state is None:
                     reportPasteur.start(menus,'p')
                 reportPasteur.save(False)
-            elif reportPasteur.state:
+            elif reportPasteur.state is not None:
                 reportPasteur.save(False)
                 reportPasteur.state = None
         elif self.typeOp == 'PAUS':
@@ -1680,7 +1689,7 @@ class Operation(object):
         elif self.typeOp in ['PUMP','TRAK']:
             T_Pump.forcible = False
             T_Pump.pump.stop()
-            if self.pasteurizing > 0 and reportPasteur.state:
+            if self.pasteurizing > 0 and reportPasteur.state is not None:
                 reportPasteur.volume += T_Pump.currOpContext.volume()
                 reportPasteur.duration += T_Pump.currOpContext.duration()
                 reportPasteur.save(True)
@@ -1938,32 +1947,6 @@ def reloadPasteurizationSpeed():
     Dt_line.set_ref_speed(optimal_speed)
     # i=input(str(max_liters))
 
-def performance_heat_exchanger():
-    global cohorts
-
-    performance = 0.0
-    last_period = cohorts.last_period()
-    if last_period:
-        Voutlet = cohorts.history[cohorts.VOLUME][last_period]
-        if Voutlet:
-            Vinlet = Voutlet - cohorts.up_to_mL('intake','input')
-            Vreturn = Voutlet - hardConf.holding_volume
-            Toutlet = cohorts.history['input'][last_period]
-            Tinlet = None
-            Treturn = None
-            if Toutlet:
-                Dinlet = cohorts.find_period_by_volume(Vinlet)
-                if Dinlet:
-                    Tinlet = cohorts.history['intake'][Dinlet]
-                    if Toutlet > Tinlet:
-                        Dreturn = cohorts.find_period_by_volume(Vreturn)
-                        if Dreturn:
-                            Treturn = cohorts.history['warranty'][Dreturn]
-                            if Treturn > Tinlet:
-                                performance = 100.0*(Toutlet-Tinlet)/(Treturn-Tinlet)
-    return performance
-
-
 
 class ThreadPump(threading.Thread):
 
@@ -1994,6 +1977,7 @@ class ThreadPump(threading.Thread):
         self.lastQuantityEval = None
         self.level1 = 1
         self.level2 = 0
+        self.period2 = 0
         self.waitingAdd = False
         self.added = False
         self.forcing = 0
@@ -2246,7 +2230,7 @@ class ThreadPump(threading.Thread):
 
     def run(self):
 
-        global display_pause, WebExit, RedConfirmationDelay, trigger_w, reportPasteur
+        global display_pause, WebExit, RedConfirmationDelay, trigger_w, reportPasteur, total_volume, cohorts
 
         if GreenLED:
             GreenLED.off()
@@ -2260,6 +2244,11 @@ class ThreadPump(threading.Thread):
         self.stopRequest = False
         self.pasteurizationDurations = {}
         danger_detected = False
+
+        performance_vol_slice_0 = 0.0
+        performance_vol_slice_1 = 0.0
+        performance_vol_slice_2 = 0.0
+        slice_volume = total_volume
 
         speed = 0.0
         prec_speed = 0.0
@@ -2350,6 +2339,9 @@ class ThreadPump(threading.Thread):
                         self.level1 = 1
                         hardConf.io.write_pin(hardConf.MICHApast.LEVEL2_FLAG_REG,0) # Disable Level detection
                         self.level2 = 0
+                    if TESTING:
+                        hardConf.io.write_pin(hardConf.MICHApast.PERIOD2_FLAG_REG,1) # Measure flow...
+                        self.period2 = hardConf.io.read_input(hardConf.MICHApast.PERIOD_SENSOR2_REG)
                 if Buzzer:
                     Buzzer.off()
 
@@ -2456,16 +2448,26 @@ class ThreadPump(threading.Thread):
                 #     elif State.current.letter == 'p':
                 #         reportPasteur.volume = reportPasteur.base_volume+(self.pump.volume() - (self.qbout if self.qbout is not None else 0.0)) + self.fbout
                 #         reportPasteur.duration = time.perf_counter() - reportPasteur.begin
-                if reportPasteur.state:
+                if reportPasteur.state is not None:
                     if State.current.letter == 'p':
                         loop_delay = time.perf_counter()
                         reportPasteur.total_time_heating += ((loop_delay-prec_loop)*isnull(cohorts.catalog['DAC1'].value,0))
                         reportPasteur.total_temperature += cohorts.catalog['warranty'].value
                         reportPasteur.count += 1
 
-                        reportPasteur.last_performance = performance_heat_exchanger()
-                        if reportPasteur.last_performance > 0.0 and reportPasteur.first_performance <= 0.0:
-                            reportPasteur.first_performance = reportPasteur.last_performance
+                        curr_volume = self.pump.volume()
+                        curr_performance = reportPasteur.performance_heat_exchanger(cohorts)
+                        if curr_performance > 0.0 and speed > 0.0:
+                            if curr_volume > (total_volume*2) and reportPasteur.first_performance <= 0.0:
+                                reportPasteur.first_performance = curr_performance
+                            if curr_volume > slice_volume:
+                                # AT LEAST THREE SLICES ot total_volume NEEDED to do not receive data associated with the very end of pasteurization
+                                reportPasteur.last_performance = performance_vol_slice_2
+                                performance_vol_slice_2 = performance_vol_slice_1
+                                performance_vol_slice_1 = performance_vol_slice_0
+                                performance_vol_slice_0 = curr_performance
+                                slice_volume = curr_volume + total_volume
+                            reportPasteur.speed_squared = reportPasteur.speed_squared + ( (speed / 60.0) ** 2.0 )
                     else:
                         reportPasteur.save(False)
                         # reportPasteur.state = None NO! NO!
@@ -2477,7 +2479,7 @@ class ThreadPump(threading.Thread):
 
         # if State.current.letter in ['p','e'] and reportPasteur.volume > 0.0 : # Closing while pasteurizing: save the report !
         #     reportPasteur.save()
-        if reportPasteur.state:
+        if reportPasteur.state is not None:
             reportPasteur.save(True)
             reportPasteur.state = None
         time.sleep(0.01)
@@ -2761,7 +2763,7 @@ class WebExplain:
         return render.index(connected,mail, False, letter, False, False)
 
 def LogData(letter):
-    global T_DAC, T_Pump, menus, optimal_speed, cohorts, hotTapSolenoid
+    global T_DAC, T_Pump, menus, optimal_speed, cohorts, hotTapSolenoid, reportPasteur
 
     data, connected, mail, password = init_access()
     web.header('Content-type', 'application/json; charset=utf-8')
@@ -2783,13 +2785,13 @@ def LogData(letter):
         kbout = None
         actif = False
         avg_dc, avg_ts = T_DAC.duty_cycle.average()
-        clogged = False
+        max_heat_gen = False
 
         if T_Pump.currAction and T_Pump.currAction != 'Z':
             message = str(menus.actionName[T_Pump.currAction][2])
             if T_Pump.currOperation:
                 if T_Pump.currAction in pasteurizing_Actions and T_Pump.currOperation.typeOp == 'TRAK' and isnull(avg_dc,0.0) >= 1.0 : # heating too much while pasteurizing?
-                    clogged = True
+                    max_heat_gen = True
                 actif = True
                 opt_temp = T_Pump.currOperation.tempRef()
                 if opt_temp == 0.0:
@@ -2832,10 +2834,10 @@ def LogData(letter):
             danger = str(ml.T('Cuve de chauffe VIDE ou déconnectée?','Heating tank EMPTY or disconnected?','Verwarmingstank LEEG of losgemaakte?'))
         elif warning:
             danger = str(ml.T('Cuve de chauffe mal remplie?','Heating tank not correctly filled?','Verwarmingstank niet correct gevuld?'))
-        elif clogged:
-            danger = str(ml.T("Circuit sans doute encrassé.","Circuit likely clogged.","Circuit waarschijnlijk verstopt."))
+        # elif max_heat_gen:   This is FALSE: max_heat_generated is a normal condition as the pasteurizer is regulated by speed
+        #     danger = str(ml.T("Circuit sans doute encrassé.","Circuit likely clogged.","Circuit waarschijnlijk verstopt."))
         T_DAC.danger = danger != ''
-        performance = performance_heat_exchanger()
+        performance = reportPasteur.performance_heat_exchanger(cohorts)
 
     return {    'date': str(datetime.fromtimestamp(int(nowT))), \
                 'actif': 1 if actif else 0, \
@@ -2861,14 +2863,14 @@ def LogData(letter):
                 'accro': T_Pump.currOperation.acronym if T_Pump.currOperation else "", \
                 'delay': durationRemaining, \
                 'remain': quantityRemaining, \
-                'totalwatts': T_DAC.totalWatts, \
+                'totalwatts': isnull(T_DAC.totalWatts, 0.0), \
                 #'totalwatts2': T_DAC.totalWatts2, \
                 'volume': T_Pump.pump.volume(), \
                 'speed': T_Pump.pump.liters() if not T_Pump.paused else 0, \
                 #'extra': isnull(cohorts.getCalibratedValue('extra'), ''), \
                 'input': isnull(input_temp, ''), \
                 'intake': isnull(intake_temp, ''), \
-                'watts': isnull(cohorts.catalog['DAC1'].value*hardConf.power_heating, '0'), \
+                'watts': isnull(cohorts.catalog['DAC1'].value, 0.0)*hardConf.power_heating, \
                 'duty': isnull(avg_dc,0.0)*100.0, \
                 #'watts2': isnull(cohorts.catalog['DAC2'].value*MITIG_POWER, ''), \
                 'warranty': isnull(warranty_temp, ''), \
@@ -2893,6 +2895,7 @@ def LogData(letter):
                 'heateff': (100.0*heating_volume/(pumping_time/3600))/hardConf.power_heating if pumping_time else 0, \
                 'level1': T_Pump.level1, \
                 'level2': T_Pump.level2, \
+                'period2': T_Pump.period2, \
                 'forcing': 2 if T_Pump.forcing > 0 else (1 if T_Pump.forcible else 0), \
                 'performance': performance \
                 }
@@ -3368,13 +3371,84 @@ class getCSVdir:
 class WebReport:
     def GET(self, batchParam=None):
 
-        global reportPasteur
+        global reportPasteur, cohorts
 
         data, connected, mail, password = init_access()
         if not connected:
             raise web.seeother('/')
         elif not batchParam or batchParam == "current":
             return render.report(reportPasteur)
+        elif batchParam == "csvdir":
+            # list to store files
+            res = []
+
+            # Iterate directory
+            for path in os.listdir(datafiles.DIR_DATA_CSV):
+                # check if current path is a file
+                if os.path.isfile(os.path.join(datafiles.DIR_DATA_CSV, path)) and path.startswith("2") and path.endswith(".csv"): #and len(path) == 18
+                    res.append(path)
+            if reportPasteur.state is not None:
+                reportPasteur.save(True)
+                reportPasteur.state = None
+            for fileName in sorted(res):
+                with open(datafiles.DIR_DATA_CSV + fileName ) as f:
+                    try:
+                        if f.readline() is None: # skip header
+                            continue
+                        print (fileName)
+                        while True:
+                            time.sleep(0.001)
+                            curr_line = f.readline()
+                            if curr_line is None or len(curr_line) == 0:
+                                break
+                            curr_cells = curr_line.split('\t')
+                            if len(curr_cells) < 14:
+                                continue
+                            if len(curr_cells[0]) == 0:
+                                continue
+                            if len(curr_cells[3]) == 0:
+                                continue
+                            if len(curr_cells[14]) == 0:
+                                continue
+                            #print(curr_cells)
+                            reportPasteur.report_csv_line(
+                                # 0: epoch_sec
+                                log_epoch_sec = int(curr_cells[0]),
+                                # 1: state
+                                # 2: action
+                                log_action = curr_cells[2],
+                                # 3: oper
+                                log_oper = curr_cells[3],
+                                # 4: still
+                                # 5: qrem
+                                # 6: watt
+                                # 7: volume
+                                log_vol = float(curr_cells[7] if curr_cells[7] else '0.0'),
+                                # 8: pump
+                                log_speed = float(curr_cells[8] if curr_cells[8] else '0.0'),
+                                # 9: pause
+                                log_pause = int(curr_cells[9] if curr_cells[9] else '0'),
+                                # 10: input
+                                log_input_temp = float(curr_cells[10] if curr_cells[10] else '0.0'),
+                                # 11: warant
+                                log_warant_temp = float(curr_cells[11] if curr_cells[11] else '0.0'),
+                                # 12: intake
+                                log_intake_temp = float(curr_cells[12] if curr_cells[12] else '0.0'),
+                                # 13: heat
+                                log_isheating = float(curr_cells[13] if curr_cells[13] else '0'),
+                                # 14: heatbath
+                                log_heat_temp = float(curr_cells[14] if curr_cells[14] else '0.0'),
+                                # 15: press
+                                # 16: linput
+                                # 17: loutput
+                                base_cohorts=cohorts
+                            )
+                        if reportPasteur.state is not None:
+                            reportPasteur.save(True)
+                            reportPasteur.state = None
+                    except:
+                        traceback.print_exc()
+            raise web.seeother('/reports')
         elif batchParam:
             shownReport = report.load(batchParam)
             if shownReport:

@@ -261,6 +261,11 @@ function fillDisplay(data,logging) {
                     $('#level2').hide();
                     $('#NOTlevel2').show();
                 }
+                if ('period2' in data && data['period2']>'0') {
+                    $('#period2').show().text(floorUni(10000.0/float(data['period2']))+"Hz");
+                } else {
+                    $('#period2').hide();
+                }
                 if ('forcing' in data && data['forcing'] > 0) {
                     if (data['actif'] > 0 && data['forcing'] == 1) {
                         $('#forcing').show().addClass("btn-success").removeClass("btn-light").removeClass("disabled");
@@ -280,14 +285,29 @@ function fillDisplay(data,logging) {
                 }
                 $('#accro').text(accro);
                 //$('#totalwatt').text(floorUni2(data['totalwatts'],data['totalwatts2']));
-                $('#totalwatt').text(floorUni(data['totalwatts']));
-                $('#watts').text(floorDeci(float(data['watts'])/1000.0));
-                //$('#watts2').text(floorUni(data['watts2']));
-                $('#volume').text(floorDeci(data['volume']));
-                if ('remain' in data && data['remain']) {
-                    $('#remain').html('&blacktriangledown;<b>'+floorDeci(data['remain'])+'</b>L');
+                totalwatt = float(data['totalwatts'])/1000.0;
+                if (totalwatt > 0.0) {
+                    $('#totalwatt').show().text(floorDeci(totalwatt));
                 } else {
-                    $('#remain').html('');
+                    $('#totalwatt').hide().text('');
+                }
+                watts = float(data['watts'])/1000.0;
+                if (watts > 0.0) {
+                    $('#watts').show().text(floorDeci(watts));
+                } else {
+                    $('#watts').hide().text('');
+                }
+                //$('#watts2').text(floorUni(data['watts2']));
+                volume = float(data['volume']);
+                if (volume > 0.0) {
+                    $('#volume').show().text(floorDeci(volume));
+                } else {
+                    $('#volume').hide().text('');
+                }
+                if ('remain' in data && data['remain']) {
+                    $('#remain').show().html('&blacktriangledown;<b>'+floorDeci(data['remain'])+'</b>L');
+                } else {
+                    $('#remain').html('').hide();
                 }
                 if ('delay' in data && data['delay'] != '') {
                     $('#delay').html('&blacktriangledown;<b>'+data['delay']+'</b>"');
@@ -325,8 +345,12 @@ function fillDisplay(data,logging) {
                 // $('#extra').text(data['extra'] != 0.0 ? (floorDeci(data['extra'])+'°'):"");
                 $('#pumpeff').text(floorUni(data['pumpeff']));
                 $('#heateff').text(floorDeci(data['heateff']));
-                $('#duty').text(floorUni(data['duty']));
-                $('#performance').text(floorUni(data['performance']));
+                duty = floorUni(data['duty'])
+                if (duty > '0') { duty += '%' } else { duty = '' }
+                $('#duty').text(duty);
+                performance = floorUni(data['performance'])
+                if (performance > '0') { performance += '%' } else { performance = '' }
+                $('#performance').text(performance);
                 $('#message').text(data['message']);
                 if (data['allowedActions'] != '') {
                     //console.log('AA='+data['allowedActions']);
@@ -492,7 +516,7 @@ function fillDisplay(data,logging) {
                     $('#opt_tempbis').text(temptext);
                 }
                 if ('pumpopt' in data && data['pumpopt']) {
-                    $('#pumpopt').text(floorDeci(data['pumpopt']));
+                    $('#pumpopt').text(floorUni(data['pumpopt']));
                 }
                 if ('MEPI'.includes(actionletter) && data['pumpeff'] > 0 && speed != 0 ) {
                     $('#eff').show();

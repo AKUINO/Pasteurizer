@@ -8,6 +8,7 @@ import time
 import traceback
 import csv
 import json
+import copy
 
 import datafiles
 import sensor
@@ -17,7 +18,7 @@ class Cohort(object):
     TIME = '*'
     VOLUME = '!'
 
-    def __init__(self, periodicity, depth):
+    def __init__(self, periodicity, depth, total_volume, holding_volume):
         """Initialize the Cohort instance.
 
         :param periodicity: Time interval in seconds between data samples (e.g., 3s).
@@ -35,6 +36,8 @@ class Cohort(object):
         self.pumpAddress = None
         self.totalVolume = 0.0
         self.reft = sensor.Sensor(111, 'reft', None)  # Calibration reference data received via Internet
+        self.holding_volume = holding_volume
+        self.total_volume = total_volume
 
     def addSensor(self, address, sensor_param):
         """Add a sensor to the catalog and initialize its tracking data structures."""
@@ -61,6 +64,22 @@ class Cohort(object):
             if currVol > 0.0: # total pumped volume never goes back because back pumping is inefficient and most heat remains where it arrived
                 self.totalVolume += currVol*1000.0 # liters to mL
         self.history[Cohort.VOLUME][self.period] = self.totalVolume
+        """Advance one period step in the circular buffer"""
+        self.period += 1
+        if self.period >= self.depth: # circular buffer, goto beginning
+            self.period = 0
+
+    def setPeriod(self,now,intake,input,warrant,heating,volume):
+        if "intake" in self.catalog:
+            self.history["intake"][self.period] = intake
+        if "input" in self.catalog:
+            self.history["input"][self.period] = input
+        if "warranty" in self.catalog:
+            self.history["warranty"][self.period] = warrant
+        if "heating" in self.catalog:
+            self.history["heating"][self.period] = heating
+        self.history[Cohort.TIME][self.period] = now
+        self.history[Cohort.VOLUME][self.period] = volume*1000
         """Advance one period step in the circular buffer"""
         self.period += 1
         if self.period >= self.depth: # circular buffer, goto beginning

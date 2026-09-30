@@ -79,7 +79,7 @@ $if not paving:
                 <tr>
                     <td class="vertical Eshape" rowspan="2"><small style="color:red">$(ml.T("Sortie","Output","Uitvoer"))</small></td>
                     <td id="OUTbucket" class="bucketOUT1" rowspan="2"><span id="tbout"></span><br/><small id="qbout"></small></td>
-                    <td colspan="5">&nbsp;</td>
+                    <td>&nbsp;</td><td colspan="2"><span id="remain"></span></td><td colspan="2"></td>
                     <td class="Ushape" rowspan="4" id="Dheating"><div class="OWshape" id="Dwarranty"><div class="Drotate"><span class="glyphicon glyphicon-random show-flow"></span></div><span>&nbsp;<b id="warranty"></b>°&nbsp;</span></div><span>&nbsp;<b id="heating"></b>°&nbsp;</span></td>
                 </tr>
                 <tr>
@@ -104,15 +104,17 @@ $if not paving:
                 <tr>
                     <td class="Dshape" colspan="2" align="left" style="text-align:left !important"><span id="Dintake" style="text-align:left !important"> <b id="intake"></b>° </span><div style="float:right"><span class="glyphicon glyphicon-log-in" id="fill" style="color:blue"></span></div></td>
                     <td class="Dshape" colspan="2"><span id="Dinput" style="float:right"> <b id="input"></b>° </span></td>
+                    <td colspan="2"/>
+                    <td><b id="period2"></b></td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
-                    <td valign="top" colspan="2"><!--span id="pressMin" font-color="blue"></span>&nbsp;&lt;&nbsp;<b id="press"></b>&nbsp;&lt;&nbsp;<span id="pressMax" font-color="red"></span>bar<br/-->&sum;=<b id="volume"></b>L<br/><span id="remain"></span></td>
+                    <td valign="top" colspan="2"><!--span id="pressMin" font-color="blue"></span>&nbsp;&lt;&nbsp;<b id="press"></b>&nbsp;&lt;&nbsp;<span id="pressMax" font-color="red"></span>bar<br/-->&sum;=<b id="volume"></b>L</td>
                     <!--td align="right" colspan="2"><span class="nobreak"><div style="display:inline;"><span class="glyphicon glyphicon-fire"/></div><b id="watts2"></b>W/h</span></td-->
-                    <td align="right" colspan="2">&sum;=<b id="totalwatt"></b>W</td>
-                    <td align="right"><span class="glyphicon glyphicon-fire"></span><b id="watts"></b>kW/h</td>
+                    <td align="right" colspan="2">&sum;=<b id="totalwatt"></b>kWh</td>
+                    <td align="right"><span class="glyphicon glyphicon-fire"></span><b id="watts"></b>kW</td>
                 </tr>
                 <tr>
                     <td>&nbsp;</td>
@@ -128,9 +130,9 @@ $if not paving:
                     <td>&nbsp;</td>
                     <td>&nbsp;</td>
                     <td colspan="2" style="text-decoration:overline"><i id="pumpeff"></i><i>L/h</i></td>
-                    <td><i id="performance"></i>%</i></td>
+                    <td><i id="performance"></i></td>
                     <!--td align="center"><span id="cooling"><i id="opt_T"></i><i>°</i></span> <span id="cleaning"><i id="opt_tempbis"></i><i>°</i></span></td-->
-                    <td align="right" colspan="4"><i id="duty"></i><i>%</i></td>
+                    <td align="right" colspan="4"><i id="duty"></i></td>
                 </tr>
         </table>
     <p style="text-align:center"><span id="emptied">$(ml.T("Circuit vidé","Emptied circuit","Leeg circuit")), </span>$(ml.T("État","State","Staat"))=<b id="stateletter" class="show-flow"></b>:<b id="state"></b></p>

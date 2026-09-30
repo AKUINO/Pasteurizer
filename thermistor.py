@@ -77,7 +77,7 @@ class Thermistor(sensor.Sensor):
         except:
             return 0.0
 
-    def getreading(self):
+    def getreading(self, defaultValue = None):
         if hardConf.io:
             if not hardConf.MICHA_device: # LOCAL ADC (not MICHA)
                 hardConf.io.write_pin(self.stim_pin, 0)
@@ -96,10 +96,16 @@ class Thermistor(sensor.Sensor):
                     return volts,res,temp
             return 0.0,0.0,None
         #else Simulation
-        return 0.0,0.0,self.value
+        else:
+            if defaultValue is not None:
+                res = calcResistance(defaultValue,hardConf.thermistors_Rtop)
+                temp = self.calcTemp(res)
+                return defaultValue,res,temp
+            else:
+                return 0.0,0.0,self.value
 
-    def get(self):
-        value,res,temperature = self.getreading()
+    def get(self, defaultValue = None):
+        value,res,temperature = self.getreading(defaultValue)
         if temperature:
             self.set(temperature)
         return temperature
@@ -110,6 +116,26 @@ class Thermistor(sensor.Sensor):
             hardConf.io.write_pin(self.stim_pin,1) #Disable measurement
 
 def main(args):
+
+    import cohort
+
+    cohorts = cohort.Cohort(3, 5, None, hardConf.holding_volume)
+    cohorts.setSequence ( [ # Tubing and Sensor Sequence of the Pasteurizer
+        [1000, 'warranty'] ] )
+    s_warrant = Thermistor(5, 'warranty')
+    cohorts.addSensor('warranty', s_warrant)
+
+    OK = True
+    while OK:
+        x = input ("Resistance Ohm:")
+        if len(x) > 0:
+            userValue = float(x)
+            #temp = cohorts.catalog['warranty'].get(userValue)
+            temp = cohorts.catalog['warranty'].calcTemp(userValue)
+            print (temp,"°C")
+        else:
+            OK = False
+
     try:
         # print(Thermistor("THE1",1).calcTemp(1868)) # test pour la resistance de 72°C
         therm = [Thermistor("THE1",1),Thermistor("THE2",2),Thermistor("THE3",3),Thermistor("THE4",4)]

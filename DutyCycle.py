@@ -191,6 +191,8 @@ def main():
 
     # 6. Cuve bloquée à 100% ON pendant 120s (> durée de lissage -> monte à 100%)
     simulate(state=1, duration_sec=120, label="6. Chauffe continue 100% ON (> 120s lissage)")
+    # Une deuxième fois pour voir !
+    simulate(state=1, duration_sec=120, label="6.b Chauffe continue 100% ON encore un peu!")
 
     # 7. Passage du contrôle à None (Panne / Inactif)
     simulate(state=None, duration_sec=15, label="7. Contrôle inactif (state=None)")
