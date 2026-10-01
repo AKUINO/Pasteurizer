@@ -2342,7 +2342,7 @@ class ThreadPump(threading.Thread):
                     if TESTING:
                         hardConf.io.write_pin(hardConf.MICHApast.PERIOD2_FLAG_REG,1) # Measure flow...
                         self.period2 = hardConf.io.read_input(hardConf.MICHApast.PERIOD_SENSOR2_REG)
-                        print (self.period2)
+                        print ("Period2=%d\n" % (self.period2) )
                 if Buzzer:
                     Buzzer.off()
 
