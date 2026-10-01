@@ -85,7 +85,8 @@ class ThreadButtons (threading.Thread):
                     i = 0
                 for currbutton in self.buttons: #Take only the existing buttons
                     #time.sleep(0.01)
-                    if currbutton.poll() > 0:
+                    value = currbutton.poll()
+                    if value is not None and value > 0:
                         currbutton.set(1.0)
                     if currbutton.LED:
                         currbutton.LED.phase = ( i <= 2 ) # Blink twice a second

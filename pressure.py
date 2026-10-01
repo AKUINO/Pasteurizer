@@ -72,7 +72,7 @@ class Pressure(sensor.Sensor):
                 maxVal = calcBar(hardConf.io.read_input(self.param+2))
                 #print ("%d(%f)=%f ohm; %f°C"%(self.param,volts,res,temp))
                 return press,minVal,maxVal
-        return 0.0
+        return 0.0, 0.0, 0.0
 
     def get(self):
         value,min,max = self.getreading()
