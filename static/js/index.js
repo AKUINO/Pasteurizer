@@ -261,11 +261,6 @@ function fillDisplay(data,logging) {
                     $('#level2').hide();
                     $('#NOTlevel2').show();
                 }
-                if ('period2' in data && data['period2']>'0') {
-                    $('#period2').show().text(floorUni(10000.0/float(data['period2']))+"Hz");
-                } else {
-                    $('#period2').hide();
-                }
                 if ('forcing' in data && data['forcing'] > 0) {
                     if (data['actif'] > 0 && data['forcing'] == 1) {
                         $('#forcing').show().addClass("btn-success").removeClass("btn-light").removeClass("disabled");
@@ -319,8 +314,15 @@ function fillDisplay(data,logging) {
                 } else {
                     $('#fill').hide();
                 }
-                var speed = floorUni(data['speed']);
-                $('#vitesse').text(speed);
+                var speed = float(data['speed']);
+                if ('period2' in data && data['period2']>'0') {
+                    var hertz = 10000.0/float(data['period2']);
+                    $('#period2').show().text(floorUni(hertz)+"Hz");
+                    speed = hertz*15.0;
+                } else {
+                    $('#period2').hide();
+                }
+                $('#vitesse').text(floorUni(speed));
                 colorit($('#vitesse'),0.0,625*3.6/data['opt_M'],180.0);
                 if (speed >= 0) {
                     $('.forward').removeClass('glyphicon-arrow-left').addClass('glyphicon-arrow-right')
