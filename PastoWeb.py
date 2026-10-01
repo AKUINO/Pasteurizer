@@ -2342,7 +2342,7 @@ class ThreadPump(threading.Thread):
                     if TESTING:
                         hardConf.io.write_pin(hardConf.MICHApast.PERIOD2_FLAG_REG,1) # Measure flow...
                         self.period2 = hardConf.io.read_input(hardConf.MICHApast.PERIOD_SENSOR2_REG)
-                        print ("Period2=%d\n" % (self.period2) )
+                        #print ("Period2=%d\n" % (self.period2) )
                 if Buzzer:
                     Buzzer.off()
 
@@ -2470,8 +2470,8 @@ class ThreadPump(threading.Thread):
                                 slice_volume = curr_volume + total_volume
                             reportPasteur.speed_squared = reportPasteur.speed_squared + ( (speed / 60.0) ** 2.0 )
                     else:
-                        reportPasteur.save(False)
-                        # reportPasteur.state = None NO! NO!
+                        reportPasteur.save(True)
+                        reportPasteur.state = None
             except:
                 traceback.print_exc()
                 self.pump.stop()
