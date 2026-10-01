@@ -107,6 +107,7 @@ global render, _lock_socket
 DEBUG = True
 
 TESTING = True
+TEST_HZ_LH = 15
 
 KEY_ADMIN = "user@akuino.net"  # Omnipotent user
 PWD = "past0.NET"
@@ -1108,7 +1109,7 @@ class ThreadDAC(threading.Thread):
                                        cohorts.val('press' if hardConf.inputPressure else 'rmeter') , \
                                        self.T_Pump.level1, \
                                        (0 if self.T_Pump.period2 == 0 \
-                                        else int((10000.0/self.T_Pump.period2)*15.0) if TESTING \
+                                        else int((10000.0/self.T_Pump.period2)*TEST_HZ_LH) if TESTING \
                                         else self.T_Pump.level2 ) ) )
                                        #self.totalWatts2, \
                                        #cohorts.val('temper'),
@@ -2331,11 +2332,12 @@ class ThreadPump(threading.Thread):
                         if self.level1 == 0:
                             self.setPause(True)
                         # Level2 = Output (pulled LOW = OK, in Air, NOT in liquid), HIGH = in Liquid: Pause!
-                        hardConf.io.write_pin(hardConf.MICHApast.LEVEL2_FLAG_REG,1) # Enable Level detection if pasteurizing (not meaning 0=PULLDOWN)
-                        self.level2 = hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR2_REG)
-                        #print ("Output in liquid=%d" % self.level2)
-                        if self.level2 >= 1:
-                            self.setPause(True)
+                        if not TESTING:
+                            hardConf.io.write_pin(hardConf.MICHApast.LEVEL2_FLAG_REG,1) # Enable Level detection if pasteurizing (not meaning 0=PULLDOWN)
+                            self.level2 = hardConf.io.read_discrete(hardConf.MICHApast.LEVEL_SENSOR2_REG)
+                            #print ("Output in liquid=%d" % self.level2)
+                            if self.level2 >= 1:
+                                self.setPause(True)
                     else:
                         hardConf.io.write_pin(hardConf.MICHApast.LEVEL1_FLAG_REG,0) # Disable Level detection
                         self.level1 = 1
