@@ -1107,7 +1107,9 @@ class ThreadDAC(threading.Thread):
                                        cohorts.val('heating'), \
                                        cohorts.val('press' if hardConf.inputPressure else 'rmeter') , \
                                        self.T_Pump.level1, \
-                                       self.T_Pump.period2 if TESTING else self.T_Pump.level2 ) )
+                                       (0 if self.T_Pump.period2 == 0 \
+                                        else int((10000.0/self.T_Pump.period2)*15.0) if TESTING \
+                                        else self.T_Pump.level2 ) ) )
                                        #self.totalWatts2, \
                                        #cohorts.val('temper'),
                                        #cohorts.catalog['DAC2'].val(), \
